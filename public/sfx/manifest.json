@@ -1,0 +1,146 @@
+{
+  "version": "v1",
+  "generatedAt": "2026-05-10T17:41:33.397Z",
+  "entries": [
+    {
+      "id": "mouse-squeak",
+      "name": "Mouse Squeak",
+      "prompt": "tiny squeaky mouse-like fart, brief high-pitched cartoon raspberry, comedic",
+      "durationMs": 600,
+      "mood": "sneaky",
+      "file": "mouse-squeak.mp3",
+      "bytes": 10493,
+      "checksum": "72cebd3d211d"
+    },
+    {
+      "id": "champagne-pop",
+      "name": "Champagne Pop",
+      "prompt": "a brief sharp pop like a small champagne cork, bright high-frequency burst",
+      "durationMs": 600,
+      "mood": "surprised",
+      "file": "champagne-pop.mp3",
+      "bytes": 10493,
+      "checksum": "6f2b54a28e69"
+    },
+    {
+      "id": "tiny-toot",
+      "name": "Tiny Toot",
+      "prompt": "a tiny embarrassed toot, soft breathy short raspberry, polite",
+      "durationMs": 500,
+      "mood": "embarrassed",
+      "file": "tiny-toot.mp3",
+      "bytes": 8821,
+      "checksum": "c29736d6480f"
+    },
+    {
+      "id": "wet-flapper",
+      "name": "Wet Flapper",
+      "prompt": "a wet juicy raspberry fart, cartoonish, with sputter, comedic",
+      "durationMs": 1200,
+      "mood": "comedic",
+      "file": "wet-flapper.mp3",
+      "bytes": 20106,
+      "checksum": "824298b26200"
+    },
+    {
+      "id": "dry-trumpet",
+      "name": "Dry Trumpet",
+      "prompt": "a dry brassy trumpet-like fart, like a tuba, melodic, comedic",
+      "durationMs": 1400,
+      "mood": "triumphant",
+      "file": "dry-trumpet.mp3",
+      "bytes": 23031,
+      "checksum": "cd9a6c292286"
+    },
+    {
+      "id": "kazoo-honk",
+      "name": "Kazoo Honk",
+      "prompt": "a kazoo honk-like fart, buzzing comedic raspberry, mid-pitch",
+      "durationMs": 1100,
+      "mood": "comedic",
+      "file": "kazoo-honk.mp3",
+      "bytes": 18434,
+      "checksum": "9d8656886f04"
+    },
+    {
+      "id": "duck-quack",
+      "name": "Duck Quack",
+      "prompt": "a duck quack-like fart, comedic raspberry with quacking texture",
+      "durationMs": 1000,
+      "mood": "surprised",
+      "file": "duck-quack.mp3",
+      "bytes": 17180,
+      "checksum": "c00811de4fda"
+    },
+    {
+      "id": "sad-trombone",
+      "name": "Sad Trombone",
+      "prompt": "a sad descending trombone fart, womp-womp comedic disappointment",
+      "durationMs": 1500,
+      "mood": "embarrassed",
+      "file": "sad-trombone.mp3",
+      "bytes": 24703,
+      "checksum": "a6616554e469"
+    },
+    {
+      "id": "thunder-roll",
+      "name": "Thunder Roll",
+      "prompt": "a long deep thunder-like rolling fart, low rumble, cartoon, sustained",
+      "durationMs": 2400,
+      "mood": "triumphant",
+      "file": "thunder-roll.mp3",
+      "bytes": 39332,
+      "checksum": "3e8463641f40"
+    },
+    {
+      "id": "never-ending",
+      "name": "Never Ending",
+      "prompt": "a long exhausted never-ending raspberry fart, slowly running out of breath, comedic",
+      "durationMs": 2800,
+      "mood": "exhausted",
+      "file": "never-ending.mp3",
+      "bytes": 45183,
+      "checksum": "ad1d62a47329"
+    },
+    {
+      "id": "machine-gun",
+      "name": "Machine Gun",
+      "prompt": "a rapid machine-gun staccato burst of short cartoon farts, comedic",
+      "durationMs": 2000,
+      "mood": "comedic",
+      "file": "machine-gun.mp3",
+      "bytes": 33062,
+      "checksum": "34f959d0963d"
+    },
+    {
+      "id": "volcano",
+      "name": "Volcano",
+      "prompt": "a hot rumbling volcanic fart with bubbling and pressure release, comedic",
+      "durationMs": 2600,
+      "mood": "triumphant",
+      "file": "volcano.mp3",
+      "bytes": 41839,
+      "checksum": "bd073d3ab0bf"
+    },
+    {
+      "id": "silent-killer",
+      "name": "Silent Killer",
+      "prompt": "a soft barely-audible whoosh of a silent fart, sneaky cartoon stealth",
+      "durationMs": 800,
+      "mood": "sneaky",
+      "file": "silent-killer.mp3",
+      "bytes": 13836,
+      "checksum": "c9ac1ea2719b"
+    },
+    {
+      "id": "symphony",
+      "name": "Symphony",
+      "prompt": "a melodic harmonized cartoon fart that sounds almost musical, with rising arpeggio, comedic",
+      "durationMs": 1800,
+      "mood": "triumphant",
+      "file": "symphony.mp3",
+      "bytes": 29301,
+      "checksum": "b3d33793ba94"
+    }
+  ]
+}
