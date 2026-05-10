@@ -1,6 +1,25 @@
 import { loadMuted } from './mute';
+import {
+  loadManifest,
+  pickSampleId,
+  playSample,
+  type SliderConfig,
+} from './sample-player';
 
 let audioCtx: AudioContext | null = null;
+let samplePathTried = false;
+let manifestReady: Awaited<ReturnType<typeof loadManifest>> = null;
+
+// Eagerly start manifest load on module init — so first Launch can use samples
+// without a 100-200ms fetch delay. Cache hit on subsequent loads.
+function ensureManifestLoading(): void {
+  if (manifestReady !== null || samplePathTried) return;
+  samplePathTried = true;
+  void loadManifest().then((m) => {
+    manifestReady = m;
+  });
+}
+ensureManifestLoading();
 
 export interface FartSchedule {
   cuePresent: boolean;
@@ -41,6 +60,34 @@ export function resumeAudio(): void {
   if (audioCtx && audioCtx.state === 'suspended') void audioCtx.resume();
 }
 
+/**
+ * Anticipation cue oscillator — shared between sample-path and procedural-
+ * only paths in playFart. 150ms triangle-wave rumble below the main fart's
+ * frequency range, with a soft attack/decay envelope.
+ */
+function schedulCue(
+  ctx: AudioContext,
+  cueStart: number,
+  cueDur: number,
+  temp: number,
+  volume: number,
+): void {
+  const cueGain = ctx.createGain();
+  cueGain.gain.value = 0.04 + volume * 0.015;
+  cueGain.connect(ctx.destination);
+  const cueOsc = ctx.createOscillator();
+  cueOsc.type = 'triangle';
+  const cueFreq = 35 + temp * 3;
+  cueOsc.frequency.setValueAtTime(cueFreq, cueStart);
+  cueOsc.frequency.linearRampToValueAtTime(cueFreq + 8, cueStart + cueDur);
+  cueGain.gain.setValueAtTime(0.001, cueStart);
+  cueGain.gain.linearRampToValueAtTime(0.04 + volume * 0.015, cueStart + cueDur * 0.6);
+  cueGain.gain.linearRampToValueAtTime(0.001, cueStart + cueDur);
+  cueOsc.connect(cueGain);
+  cueOsc.start(cueStart);
+  cueOsc.stop(cueStart + cueDur);
+}
+
 // QUALITY-LEGACY: playFart is dense procedural-audio scheduling — branching
 // reflects per-slider effect toggles rather than business logic. Refactoring
 // to ≤10 complexity would shatter the natural fart-anatomy reading order.
@@ -57,33 +104,44 @@ export function playFart(
   if (loadMuted()) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
-  // Comic-timing anticipation cue: a low-amplitude rumble for ~150ms,
-  // followed by ~50ms of silence, then the main fart. Per AUDIO_CRITIC.md
-  // §A24 (Brooks/Neale/Krutnik on set-up + payoff structure).
+
+  // Sample-bank path: if the manifest is loaded, schedule the cue
+  // (procedural — keeps comic timing) AND play the sample for the main hit.
+  // Falls through to the procedural-only path below if no manifest entry
+  // matches or decoding fails.
+  if (manifestReady) {
+    const cfg: SliderConfig = { length, wetness, volume, stinkiness, temp, musical };
+    const id = pickSampleId(cfg, manifestReady);
+    if (id) {
+      const cueDur = 0.15;
+      const cueGap = 0.05;
+      const cueStart = ctx.currentTime;
+      const mainStartAt = cueStart + cueDur + cueGap;
+      // Anticipation cue (procedural — same shape as the no-sample path).
+      schedulCue(ctx, cueStart, cueDur, temp, volume);
+      void playSample(ctx, manifestReady, id, mainStartAt, volume);
+      lastSchedule = {
+        cuePresent: true,
+        cueDurationMs: Math.round(cueDur * 1000),
+        mainStartOffsetMs: Math.round((cueDur + cueGap) * 1000),
+        // Estimate from manifest entry; close enough for tests.
+        mainDurationMs: manifestReady.entries.find((e) => e.id === id)?.durationMs ?? 1000,
+      };
+      return (cueDur + cueGap) + (manifestReady.entries.find((e) => e.id === id)?.durationMs ?? 1000) / 1000;
+    }
+  }
+
+  // Comic-timing anticipation cue + procedural-only main fart path
+  // (no sample available). Per AUDIO_CRITIC.md §A24 (Brooks/Neale/Krutnik
+  // on set-up + payoff structure).
   const cueDur = 0.15;
   const cueGap = 0.05;
   const mainOffset = cueDur + cueGap; // 0.20s before the main hit
   const dur = 0.3 + length * 0.25;
   const startedAt = ctx.currentTime;
-  const cueStart = startedAt;
   const now = startedAt + mainOffset;
 
-  // Anticipation cue oscillator — quieter, lower frequency than main.
-  const cueGain = ctx.createGain();
-  cueGain.gain.value = 0.04 + volume * 0.015; // softer than main
-  cueGain.connect(ctx.destination);
-  const cueOsc = ctx.createOscillator();
-  cueOsc.type = 'triangle';
-  const cueFreq = 35 + temp * 3; // sits below the main baseFreq
-  cueOsc.frequency.setValueAtTime(cueFreq, cueStart);
-  // Slight rise during the cue to imply "build-up."
-  cueOsc.frequency.linearRampToValueAtTime(cueFreq + 8, cueStart + cueDur);
-  cueGain.gain.setValueAtTime(0.001, cueStart);
-  cueGain.gain.linearRampToValueAtTime(0.04 + volume * 0.015, cueStart + cueDur * 0.6);
-  cueGain.gain.linearRampToValueAtTime(0.001, cueStart + cueDur);
-  cueOsc.connect(cueGain);
-  cueOsc.start(cueStart);
-  cueOsc.stop(cueStart + cueDur);
+  schedulCue(ctx, startedAt, cueDur, temp, volume);
 
   const master = ctx.createGain();
   master.gain.value = 0.15 + volume * 0.07;
