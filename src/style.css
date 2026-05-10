@@ -87,9 +87,16 @@ h1 {
 .slider-label .hint[data-intensity='3'] { font-size: 0.95em; }
 input[type=range] {
   width: 100%;
-  height: 30px;
+  /*
+   * V3 / WCAG 2.2 SC 2.5.8: 44px minimum target height. Was 30px which
+   * failed the touch-target spec on mobile (375×667). The thumb is
+   * already 44×44 but the track itself must also be tappable.
+   */
+  height: 44px;
   -webkit-appearance: none;
   background: linear-gradient(90deg, #004400, #00ff00, #ffff00, #ff0000);
+  background-clip: content-box;
+  padding: 7px 0;
   border-radius: 12px;
   outline: none;
   touch-action: manipulation;
@@ -277,7 +284,11 @@ footer {
   text-align: center;
   padding: 20px;
   color: #aaccaa;
-  font-size: 0.85em;
+  /*
+   * V13: 0.9em (~14.4px) — clears the primary-content floor 14px and
+   * matches .ach-desc parity. Was 0.85em (~13.6px) below floor.
+   */
+  font-size: 0.9em;
 }
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
