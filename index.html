@@ -38,7 +38,7 @@
         </div>
         <div class="progression-strip" role="region" aria-label="Progression">
           <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
-          <span class="progression-stat" aria-label="Research notes">📝 <span id="notesCount" aria-live="polite">0</span></span>
+          <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
           <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
         </div>
@@ -191,6 +191,20 @@
       </div>
 
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+    </div>
+
+    <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">
+      <div class="research-modal-card">
+        <div class="research-modal-header">
+          <h2>📝 Research Lab</h2>
+          <button type="button" id="researchCloseBtn" class="research-close" aria-label="Close research panel">✕</button>
+        </div>
+        <div class="research-modal-balance" aria-live="polite">
+          📝 You have <span id="researchBalance">0</span> research notes
+        </div>
+        <div class="research-offers" id="researchOffers"></div>
+        <div class="research-modal-flavor">Research notes accumulate from failed launches (match% &lt; 50). Spend them to unlock foods the daily shop doesn't offer.</div>
+      </div>
     </div>
 
     <div id="notebookModal" class="notebook-modal" hidden role="dialog" aria-modal="true" aria-label="Lab notebook">

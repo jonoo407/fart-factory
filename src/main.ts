@@ -40,6 +40,7 @@ import { loadMode, setMode, type Mode } from './state/persistence';
 import { initStoryPantry } from './ui/plate';
 import { wireShop } from './ui/shop';
 import { wireNotebook } from './ui/notebook';
+import { wireResearch } from './ui/research';
 import {
   comments,
   weakComments,
@@ -466,6 +467,7 @@ function init(): void {
   initStoryPantry(); // Story Mode pantry/plate/belly — hidden in Sandbox by CSS
   wireShop();
   wireNotebook();
+  wireResearch();
   renderChallengeCard();
   renderBestToday();
   renderHall();

@@ -403,6 +403,136 @@ body {
   font-style: italic;
 }
 
+/* --- Research notes button (in progression strip; clickable counter) --- */
+.progression-stat-btn {
+  background: transparent;
+  border: 1px dashed rgba(170, 255, 226, 0.3);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #aaffe2;
+  font-weight: bold;
+  font-size: 1.05em;
+  cursor: pointer;
+}
+.progression-stat-btn:hover { background: rgba(170, 255, 226, 0.1); border-style: solid; }
+
+/* --- Research modal --- */
+.research-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.research-modal[hidden] { display: none; }
+.research-modal-card {
+  background: linear-gradient(135deg, #0a3a30, #052520);
+  border: 3px solid #aaffe2;
+  border-radius: 14px;
+  padding: 18px 18px 14px;
+  max-width: 520px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  color: #fff;
+  box-shadow: 0 0 30px rgba(170, 255, 226, 0.35);
+}
+.research-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.research-modal-header h2 {
+  margin: 0;
+  font-size: 1.4em;
+  color: #aaffe2;
+}
+.research-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
+.research-close:hover { background: rgba(255, 255, 255, 0.2); }
+.research-modal-balance {
+  background: rgba(170, 255, 226, 0.12);
+  border: 1px solid rgba(170, 255, 226, 0.4);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-weight: bold;
+  color: #aaffe2;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.research-offers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.research-offer {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.research-offer .food-emoji { font-size: 1.6em; }
+.research-offer .food-name { font-weight: bold; }
+.research-offer-rarity {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  letter-spacing: 0.05em;
+}
+.research-offer-cost {
+  font-weight: bold;
+  color: #aaffe2;
+  white-space: nowrap;
+}
+.research-offer-unlock {
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  border: 2px solid #4ade80;
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.research-offer-unlock:hover { filter: brightness(1.1); }
+.research-offer-unlock[aria-disabled="true"] {
+  background: #444;
+  border-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.research-offer-refused {
+  animation: shop-refuse 0.6s ease-out;
+}
+.research-offers-empty {
+  text-align: center;
+  font-style: italic;
+  opacity: 0.7;
+  padding: 20px;
+}
+.research-modal-flavor {
+  font-size: 0.82em;
+  opacity: 0.65;
+  text-align: center;
+  font-style: italic;
+}
+
 /* --- Notebook button (in progression strip) --- */
 .notebook-btn {
   margin-left: auto;

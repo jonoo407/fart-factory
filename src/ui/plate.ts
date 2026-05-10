@@ -20,6 +20,7 @@ import {
 import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
 import { awardGoldForLaunch } from '../scoring/reward';
+import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
@@ -433,6 +434,7 @@ function onStoryLaunch(): void {
 
   if (ingredientCount > 0) {
     awardGoldForLaunch(match.pct);
+    awardResearchForLaunch(match.pct);
   }
 
   clearPlate();
