@@ -1,9 +1,12 @@
-# Audio Critic v2 — Rubric & Operationalization
+# Audio Critic v3 — Rubric & Operationalization
 
 > Applies to multi-agent overhaul iterations on `overhaul-v2`. Replaces the
 > five-line block at `docs/PLAN.md` §F (the "Audio critic" subsection).
-> Same v1→v2 redesign approach as `docs/FUN_CRITIC.md` (committed `4b9f7b3`,
-> evolved to v3 in `ca3f7d5`).
+> Same v1→v2→v3 redesign approach as `docs/FUN_CRITIC.md`. v3 adds a
+> Sound Design Craft axis covering audio-as-art (Murch / Sonnenschein /
+> Collins / Farnell / Stalling / Foley / G.A.N.G. criteria / comic
+> timing / leitmotif / distinctiveness / diegetic-non-diegetic) — the
+> aesthetic dimension v2 didn't measure.
 
 ---
 
@@ -23,9 +26,13 @@ Concretely, v1's failures:
 
 **Observable in `docs/iteration-log.md`:** audio scores 5\*, 4\*\*, 8, 8, 7, 7, 7, 7 across iters 1-8. Asterisks acknowledge the toolchain-only iterations (iter 1) and the legacy-port iter where 6 blockers were filed but committed anyway. The 7s on iters 5-8 are the scoring failure: nothing changed audio-side, the planned library still didn't exist, and yet the score sat at 7.
 
+### 1.1 What v3 adds to v2
+
+v2 caught technical-integrity failures (no manifest, no mute, no visibilitychange, autoplay silence, loudness chaos). User stress-test exposed a further class v2 doesn't reach: **artistic craft.** A procedural fart synth could pass every v2 gate (clean lifecycle, normalized loudness, paired captions) and still sound like generic Web Audio synth output with no comic timing, no recognizable iconic effects, no tonal alignment with the cartoon-silly theme. v3 adds a sixth axis — **Sound Design Craft** — backed by 12 cited principles spanning film sound design (Walter Murch, David Sonnenschein), game audio aesthetics (Karen Collins, Andy Farnell), procedural sound design as authored behavior, the Stalling/Hanna-Barbera Mickey-Mousing tradition, Foley as performance, comic-timing structure (set-up + payoff), Wagner-derived leitmotif, distinctive-character-per-asset, and the diegetic vs non-diegetic layering distinction. The axis maps award-jury criteria (G.A.N.G., BAFTA Audio Achievement) into operationalizable lens-questions. v2 axes/gates remain unchanged; v3 is purely additive.
+
 ---
 
-## 2. Design principles backing v2
+## 2. Design principles backing v3
 
 Each axis and gate below traces to one or more cited principles. Principles inherit numbering scheme from `docs/FUN_CRITIC.md` (which uses P1-P19); audio principles are A1-A15.
 
@@ -46,12 +53,24 @@ Each axis and gate below traces to one or more cited principles. Principles inhe
 | A13 | **Mute persistence (WCAG SC 1.4.2)** — user-set mute must survive reload via `localStorage` or equivalent. | WCAG 2.1 SC 1.4.2 "Audio Control"; Apple HIG and Material Design accessibility guidance. |
 | A14 | **Buffer reuse / decode-once cache** — `AudioBuffer` is immutable and reusable; decode each sample once into a Map and create fresh `AudioBufferSourceNode` per play. | MDN `AudioBuffer`; Adenot Web Audio memory model. |
 | A15 | **Web Audio chain hygiene** — every effect chain (`OscillatorNode` → filter → gain → destination) must be created with explicit cleanup; one-shot sources auto-disconnect after `onended`, but oscillators with no `stop()` leak. | MDN `OscillatorNode`, `AudioScheduledSourceNode`. |
+| A16 | **Murch quadrant — encoded vs embodied; voiceless music vs musical voice** — every sound occupies a position in this 2D space; strong design intentionally places different events in different quadrants. | Walter Murch, *In the Blink of an Eye* (Silman-James 1995); Murch in Vincent LoBrutto, *Sound-On-Film* (Praeger 1994). |
+| A17 | **Timbre as character** — spectral fingerprint (attack shape, harmonic content, spectral centroid) carries character information independent of pitch and loudness; each significant sound needs a "timbral identity card" — a spectral *shape*, not a translation of the same shape. | David Sonnenschein, *Sound Design* (Michael Wiese 2001) chs. 4-6. |
+| A18 | **Frequency as space and size** — spectral content maps perceptually to physical attributes: sub-bass = mass/weight; mid = human-scale presence; sparkle highs = smallness/magic/comedy. Crafted sounds use frequency to communicate the object's implied physics. | Sonnenschein 2001 ch. 5. |
+| A19 | **Aesthetic coherence with game tone/genre** — audio aesthetic must align with fiction; functionally-correct but aesthetically-wrong audio breaks the world. Five-second blind audition test: can a stranger describe the genre/tone from audio alone? | Karen Collins, *Game Sound* (MIT 2008) ch. 5. |
+| A20 | **Procedural sound as authored behavior** — procedural synthesis IS design when modeled as physical narrative (gut pressure × sphincter aperture × gas composition × tissue resonance), not as a knob bank mapped 1:1 to UI labels. | Andy Farnell, *Designing Sound* (MIT 2010) Pt. III. |
+| A21 | **Stalling / Mickey-Mousing — iconic single-purpose effects library** — sound tightly synced to visual; library of named, instantly-recognizable effects ("boing," "honk," "splat," "slide-whistle"); each effect plays its action in under one second when heard cold, out of context. | Daniel Goldmark, *Tunes for 'Toons* (UC Press 2005); Scott Curtis in Altman ed., *Sound Theory, Sound Practice* (Routledge 1992). |
+| A22 | **Foley as performance, not recording** — each trigger shows expressive *micro-variation* (different attack, weight, inflection); two consecutive playbacks are never identical, but the variation is hand-shaped, not uniform-random. | Vanessa Theme Ament, *The Foley Grail* (Focal 2009) chs. 3-5. |
+| A23 | **G.A.N.G. / BAFTA award criteria** — four common evaluation dimensions: (a) integration with gameplay/narrative, (b) distinctiveness of palette, (c) consistency of aesthetic across the game, (d) emotional impact. Asset must score ≥4/5 on all four to be jury-tier. | Game Audio Network Guild Awards (gang.org); BAFTA Games Audio Achievement (bafta.org/games); Karen Collins, *Playing with Sound* (MIT 2013) ch. 6. |
+| A24 | **Comic timing — set-up + payoff structure** — a comedic sound has anticipation cue (50-200ms low-amplitude or silent wind-up) before the main hit. Without anticipation, the punch lands flat; without punch, anticipation has no resolution. | Mel Brooks practitioner consensus (*All About Me!*, Ballantine 2021); Steve Neale & Frank Krutnik, *Popular Film and Television Comedy* (Routledge 1990) ch. 3; BAFTA Comedy criteria. |
+| A25 | **Leitmotif / tonal alignment** — recurring sonic motifs bind a world; the audio palette has *constraints* (which intervals, timbres, rhythms are "in" or "out"). Without constraints, you don't have a theme — you have synthesizer defaults. | Wagner, *Oper und Drama* (1851; Ellis trans 1893); Tim Summers, *Understanding Video Game Music* (Cambridge UP 2016) ch. 4 on Koji Kondo. |
+| A26 | **Distinctive character per asset** — no two events are sonically interchangeable; played blind, listeners distinguish them ≥90% of the time. | Karen Collins (2008) ch. 5; Joonas Turner GDC 2015 "The Sound of Nuclear Throne." |
+| A27 | **Diegetic vs non-diegetic layering** — sound from inside the world vs commentary on it; strong design uses both layers and exploits their interplay (a diegetic event triggers a non-diegetic sting). | Karen Collins & Mark Grimshaw eds., *The Oxford Handbook of Sound and Image in Digital Media* (Oxford UP 2013); Claudia Gorbman, *Unheard Melodies* (Indiana UP 1987). |
 
 ---
 
-## 3. The v2 rubric
+## 3. The v3 rubric
 
-### 3.1 Five mechanism-level axes
+### 3.1 Six mechanism-level axes
 
 Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 
@@ -62,6 +81,7 @@ Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 | **Mastering Quality** | Integrated LUFS within ±3 LU across the sample bank, true-peak ≤ -1 dBTP, format/bitrate sane (≤128 kbps SFX, ≤192 kbps music, mono content as mono), total payload within budget. | A4, A8, A12 |
 | **Resilience & Production Reality** | Procedural fallback exists for every sample-driven event; if `package.json`'s `sfx:generate` (or equivalent) is declared, the manifest is present and matches the planned seed count; samples can 404 without silence. | A9 |
 | **Accessibility & Persistence** | Every audio-conveyed event has a simultaneous visible indicator (WCAG SC 1.2.1); mute toggle exists, persists across reload, and stops in-progress audio; visibilitychange suspends/resumes context. | A2, A10, A13 |
+| **Sound Design Craft** *(new in v3)* | Audio-as-art: spectral *shape* changes per asset (not just translation); aesthetic alignment with game tone (5-second blind-audition test); procedural model is physical-narrative not knob-bank; iconic single-purpose effects library (Stalling test); micro-variation reads as performance not random-jitter; comic-timing structure (anticipation cue + payoff hit); leitmotif / tonal palette constraints documented; distinctive character per asset (≤10% blind-confusion rate); diegetic + non-diegetic layers both used. | A16-A27 |
 
 ### 3.2 Seven hard gates (auto-fail to ≤4)
 
@@ -98,11 +118,13 @@ For the four required-simulation scenarios from `FUN_CRITIC.md` §3.4 (Mash-max 
 
 | Score | What it looks like |
 |---|---|
-| **9-10** | Sample library shipped (≥20 unique entries), LUFS-normalized to documented target, dual-stack with procedural fallback per category, visibilitychange + mute persisting + all-event captions, sample-accurate scheduling, buffer cache, ≤4 MB total payload. |
-| **7-8** | Either samples shipped without full mastering OR procedural-only that hits all lifecycle/feel/accessibility gates and is genuinely the intended scope (documented as such in PLAN.md). |
-| **5-6** | Audio works but has axis gaps: no LUFS evidence, weak variety, missing mute, no visibilitychange handler, or borderline accessibility. Plays but not shippable as-is. |
+| **9-10** | All 5 technical axes ≥7 AND **Sound Design Craft ≥7**: sample library shipped (≥20 unique entries), LUFS-normalized, dual-stack fallback, visibilitychange + mute persisting + all-event captions, sample-accurate scheduling, buffer cache, ≤4 MB payload — *plus* Stalling-test passes (named iconic effects), comic-timing anticipation cues present, blind-confusion <10%, palette constraints documented, ≥2 quadrants of the Murch grid populated. The audio carries the game's identity, not just its mechanics. |
+| **7-8** | Technical axes mostly clean (samples or procedural-only intentionally); craft axis ≥5 (some named-asset library, basic comic timing, recognizable tonal palette). One of these is missing: full LUFS mastering, all-quadrant Murch coverage, full Stalling library. |
+| **5-6** | Technical works but craft axis ≤4: parameter-space synthesis with no named effects, no comic structure, generic timbral palette. Audio plays but doesn't say anything about the game. |
 | **3-4** | Default for any iteration that fails ≥1 hard gate. The audio system has a structural defect. |
 | **1-2** | Audio crashes, no audio at all, or critical accessibility absent (no visible indicators alongside sound). |
+
+A 9-10 cannot be reached on technical conformance alone. The Sound Design Craft axis is the gating bar between "engineered correctly" and "designed."
 
 ### 3.5 Output schema
 
@@ -118,7 +140,8 @@ Same shape as `FUN_CRITIC.md` §3.6. Orchestrator parsing in `PLAN.md` §F lines
     "varietyAndFeel": 0,
     "masteringQuality": 0,
     "resilience": 0,
-    "accessibilityPersistence": 0
+    "accessibilityPersistence": 0,
+    "soundDesignCraft": 0
   },
   "diagnostics": {
     "audioContextConstructions": [{"file": "...", "line": 0, "userGestureGated": false}],
@@ -130,6 +153,20 @@ Same shape as `FUN_CRITIC.md` §3.6. Orchestrator parsing in `PLAN.md` §F lines
     "samples": {"count": 0, "totalBytes": 0, "lufsRange": "<n/a if no samples>"},
     "captionsCoverage": {"audioEvents": 0, "visualIndicators": 0, "ratio": 0.0},
     "proceduralFallback": {"present": false, "primary": false, "covers": []},
+    "craft": {
+      "murchQuadrantsPopulated": 0,
+      "spectralShapeChangesAcrossParams": false,
+      "tonalPaletteAlignment": "<5-second blind audition: stranger names genre = ?>",
+      "physicalNarrativeModel": false,
+      "namedIconicEffects": [],
+      "stallingTestPasses": "<count of effects whose action is named cold in <1s>",
+      "comicTimingAnticipationMs": 0,
+      "performanceVsRandomJitter": "<performance | random | none>",
+      "blindConfusionRatePct": 0,
+      "leitmotifConstraintsDocumented": false,
+      "diegeticLayers": [],
+      "nonDiegeticLayers": []
+    },
     "simulation": {
       "mashMax": "<audible signature>",
       "mashMin": "<audible signature>",
@@ -166,6 +203,18 @@ Evaluating commit `11f58ec` on `overhaul-v2` — the head of the autonomous sess
 - **captionsCoverage**: Launch fires audio at [src/audio/procedural.ts:18](src/audio/procedural.ts:18) AND visual reactions at [src/visuals/gas.ts](src/visuals/gas.ts), [src/visuals/particles.ts](src/visuals/particles.ts), [src/content/commentary.ts:60](src/content/commentary.ts:60), AND haptics at [src/ui/haptics.ts:11](src/ui/haptics.ts:11). Every audio event has a visible counterpart. Passes A10.
 - **proceduralFallback**: `playFart()` is the *only* sound source — procedural is primary, no samples exist. Robust to network failures (no fetches happen). Passes A9 *technically*, but only because the Library Absence Gate caught the deeper issue.
 - **simulation** (procedural code-trace): Mash-max → 6 oscillator + 1 noise buffer + 4 musical overtones + 3 sputter pops, dur=2.8s. Mash-min → 1 oscillator, dur=0.55s, no noise (stinkiness=1, wetness=1 below thresholds at [src/audio/procedural.ts:55,75](src/audio/procedural.ts:55)). Median → ~3 oscillator/noise nodes, dur=1.55s. Mash-max and mash-min produce audibly distinct signatures. Passes the audible-distinctness check.
+- **craft (new in v3)**:
+  - **Murch quadrants populated**: 1 of 4. Every output sits in "embodied non-musical" — somatic noise. No encoded/symbolic events (no win-jingle, no narrator interjection); no pure-musical-voice events. **Fail A16.**
+  - **Spectral shape changes across params**: false. The synth at [src/audio/procedural.ts:34-44](src/audio/procedural.ts:34) is `sawtooth + lowpass`. Parameters scale `baseFreq` and `lp.frequency` — they translate the spectrum, not change its shape. No format resonances toggle, no harmonic ratios swap. **Fail A17.**
+  - **Tonal palette alignment** (5-second blind audition): listener cold would describe as "buzzy synth noise" or "Web Audio synth demo"; would not name "fart factory." **Fail A19.**
+  - **Physical narrative model**: false. Slider names (`length`, `wetness`, `volume`, `stinkiness`, `temp`, `musical`) are UI labels, not physical variables (gut pressure, sphincter aperture, gas composition, tissue resonance). The synth is a knob bank. **Fail A20.**
+  - **Named iconic effects**: zero. There is no "the squeaker," "the trumpet," "the wet flapper," "the silent-but-deadly" library. Only continuous parameter-space points. **Fail A21 (Stalling test).**
+  - **Stalling-test passes**: 0 (no preset effects exist).
+  - **Comic timing anticipation**: 0ms. `osc.start(now)` fires immediately at full amplitude per [src/audio/procedural.ts:52](src/audio/procedural.ts:52). The end-of-fart sputter at [src/audio/procedural.ts:89-101](src/audio/procedural.ts:89) is a coda, not a set-up. No silence-before-hit. **Fail A24.**
+  - **Performance vs random-jitter**: random. Variation comes from `Math.random() * 60 - 30` on pitch bends ([src/audio/procedural.ts:41](src/audio/procedural.ts:41)). Uniform stochastic, not hand-shaped performance. **Fail A22 (Foley test).**
+  - **Blind-confusion rate** (estimated): high. "Weak fart" (low-volume + short) and "strong fart" (high-volume + long) sound like the same fart at different scale. Not qualitatively distinct. **Fail A26.**
+  - **Leitmotif constraints documented**: no. There's no audio-palette doc stating which intervals/timbres/rhythms are "in." The constraints are whatever the synth defaults emit. **Fail A25.**
+  - **Diegetic / non-diegetic layers**: only diegetic (the fart itself). No non-diegetic celebration sting on S+, no commentator voice, no audio "narrator." **Fail A27.**
 
 ### 4.2 Per-axis scores
 
@@ -174,25 +223,35 @@ Evaluating commit `11f58ec` on `overhaul-v2` — the head of the autonomous sess
 - **Mastering Quality: 3.** No samples to normalize. Procedural amplitude is set at [src/audio/procedural.ts:31](src/audio/procedural.ts:31) by `master.gain.value = 0.15 + volume * 0.07`, range ~[0.22, 0.85]. Reasonable headroom but no LUFS measurement, no documented target, no compressor/limiter on the master bus. A12 not enforced — at volume=10 with high stinkiness adding noise + 4 overtones + 3 sputters, the sum-of-amplitudes can briefly approach unity gain.
 - **Resilience & Production Reality: 4.** Procedural-only game survives all network failures. *But:* the project's `package.json` commits to an SFX pipeline that hasn't shipped, and `docs/PLAN.md` §C describes 30+ ElevenLabs samples with checksum-cached generation. The gap between intent and reality is the entire score.
 - **Accessibility & Persistence: 4.** Visual indicators per-event: ✓. Mute toggle: ✗. Volume control: ✗. Visibilitychange: ✗. Mute persistence: n/a (no mute). The captions story is good; the controls story is empty.
+- **Sound Design Craft: 2** *(new in v3)*. Eight of nine craft sub-tests fail (Murch quadrants 1/4, no spectral shape change, no tonal alignment, knob-bank parameters, no named effects library, no comic anticipation, random-jitter not performance, no leitmotif constraints, no diegetic/non-diegetic layering). The synth is parametrically varied but artistically uniform — the Hanna-Barbera library would not have shipped any of these as a sound effect.
 
-Average: (7+5+3+4+4)/5 = **4.6**.
+Average: (7+5+3+4+4+2)/6 = 25/6 = **4.17**.
 
 ### 4.3 Verdict
 
 - **Hard gates failed**: Mute Failure (no mute exists at all → 3a), Visibility Bleed (no visibilitychange handler), Library Absence (`sfx:generate` declared in package.json but no manifest). **3 of 7.**
-- **v2 score: 4** (raw average 4.6 capped at 4 by gate failure).
-- **v1 score on the same artifact: 7** (iter 8). Delta: **−3**.
+- **v3 score: 4** (raw average 4.17 capped at 4 by gate failure; the new Craft axis pulls raw average down from v2's 4.6 to 4.17, but score is gate-capped either way).
+- **v2 score on the same artifact: 4.** Delta v2→v3: 0 final score, but Craft axis exposes 8 specific sub-test failures the technical axes didn't surface.
+- **v1 score on the same artifact: 7** (iter 8). Delta v1→v3: **−3**.
 
-The v1→v2 delta is the proof v2 fires where v1 didn't. The autonomous session ran for 76 minutes, ended with the Audio critic giving 7s, and two of the three gates that v2 would have failed (mute, visibilitychange) are explicit follow-up items in `FINAL_REPORT.md` §"What did NOT ship" — exactly the items v2 would have blocked on. The Library Absence Gate would have prevented the §I "quality target hit" stop condition by keeping the audio score below 6 across all 8 iterations until the SFX pipeline shipped.
+The v3 delta is more about **specific diagnosis** than score. v2 said "fix mute, visibilitychange, library." v3 adds: "AND the procedural synth is parameter-space, not designed — no Murch quadrants, no Stalling library, no comic timing, no Foley performance, no leitmotif, no diegetic layering." When the v2 blockers ship (mute + visibilitychange + sample library), score uncaps to 4.17 raw — capped at 5-6 max because Craft is still 2/10. To clear 7-8, the sample library must also have *designed character* (named iconic effects with comic timing and tonal palette constraints), not just *exist*.
 
 ### 4.4 Blockers (must address before audio ≥ 6)
 
+**v2 technical blockers (still required):**
 1. **Ship the SFX library OR remove the `sfx:generate` script.** Either run the planned Tier 2.7-2.10 work (manifest pipeline + 30+ samples + sample player + procedural fallback for unrecoverable assets) and clear the Library Absence Gate, or honestly document the project as procedural-only by removing `sfx:generate` from `package.json` and updating `docs/PLAN.md` §C.
 2. **Add a mute toggle with localStorage persistence.** Reachable from main UI; mid-fart toggle must drop master gain to 0 within 200ms (e.g. `master.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2)`). Persist boolean to localStorage; read on init before any audio scheduling.
 3. **Add a `visibilitychange` listener.** Calls `audioCtx.suspend()` when `document.hidden`; `resume()` when visible. No audio scheduling allowed while suspended.
 4. **(After samples ship)** add LUFS normalization evidence — either a build-time `ffmpeg -af loudnorm=I=-16:TP=-1.5:LRA=11` step in the SFX pipeline, or per-entry `gainOffsetDb` in the manifest applied at decode time.
 
-Items 2 and 3 close the existing-flagged "scope-deferred" issues per FINAL_REPORT.md §"What did NOT ship" rows 2 and the audio side of row 1. Item 1 forces an honest scope decision.
+**v3 craft blockers (additional, must clear for audio ≥ 7-8):**
+5. **Replace the parameter-space synth with a named-preset library** (Stalling A21, Collins A26). Define ≥8 named effects ("the squeaker," "the trumpet," "the wet flapper," "the silent-but-deadly," "the duck," "the rumble," "the sputter," "the staccato"). Each preset is a distinct *spectral shape* (different waveform, different filter chain, different envelope), not a different point in the same parameter space. Pass criterion: blind-listening test on 20 random triggers gets ≥8 distinct labels from a stranger.
+6. **Add comic anticipation cues** (A24). Before the main fart, schedule a 100-200ms pre-roll: a soft "ahem" inhale, a creak of strain, or an audible silence. Use `audioCtx.currentTime + 0.15` to schedule the punch *after* the cue. The set-up + punch structure is the difference between a noise and a joke.
+7. **Document the audio palette as constraints** (A25). Drop `docs/AUDIO_PALETTE.md` listing: which intervals are "in" (e.g. tritone for biohazard, perfect fifth for victory, minor second for "uh oh"); which timbres ("squelch" via short envelopes; "honk" via square wave; "rumble" via low sawtooth). Without constraints, you have no theme.
+8. **Add a non-diegetic celebratory sting on S+** (A27). A 1-2 second musical phrase that comments on the achievement from outside the fictional world. Could be a triumphant trumpet, an angelic chorus, or a "Hallelujah" sample. Establishes the diegetic/non-diegetic dual layer.
+9. **Replace `Math.random()` jitter with hand-shaped variation** (A22). Each preset gets 3-5 micro-variants with distinct attack inflections (e.g., the trumpet has variants for "confident," "hesitant," "exhausted"). Selection via shuffle-bag, not stochastic.
+
+Items 5-9 are the gap between "audio works" and "audio is *designed*." Without them, even a fully shipped SFX library scores 5-6 on the Craft axis and caps the overall score at 6.
 
 ---
 
@@ -203,11 +262,11 @@ In `docs/PLAN.md` §F, replace the five-line "Audio critic" block (current text 
 ```markdown
 ### Audio critic
 
-Full rubric: [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md). v2 evolves v1 with five mechanism-level axes, seven hard gates (incl. NEW Library Absence, Visibility Bleed, Loudness Chaos, Autoplay Silence), and a required measurement step.
+Full rubric: [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md). v3 evolves v2 with a Sound Design Craft axis (audio-as-art): Murch quadrants, Sonnenschein timbre/frequency-as-character, Karen Collins aesthetic coherence, Farnell physical-narrative procedural model, Stalling iconic effects library, Foley performance-not-jitter, comic timing (set-up + punch), Wagner-derived leitmotif constraints, distinctive character per asset, diegetic vs non-diegetic layering. v2's five technical axes + seven gates remain unchanged.
 
-- **Axes (5, each 1-10):** Lifecycle Robustness, Variety & Game Feel, Mastering Quality, Resilience & Production Reality, Accessibility & Persistence.
+- **Axes (6, each 1-10):** Lifecycle Robustness, Variety & Game Feel, Mastering Quality, Resilience & Production Reality, Accessibility & Persistence, Sound Design Craft *(new in v3)*.
 - **Hard gates (7, any failure caps score at 4):** Audio Crash, Decode Failure, Mute Failure, Visibility Bleed, Autoplay Silence, Library Absence (when `sfx:generate` declared but manifest absent), Loudness Chaos.
-- **Required measurements:** AudioContext construction-site audit (grep), `visibilitychange` listener inspection, decode-failure handling grep, scheduling-clock check, mute toggle behavior test, manifest presence + schema, LUFS measurement on shipped samples.
+- **Required measurements:** v2 technical battery + v3 craft diagnostic (Murch quadrant inventory, spectral-shape audit via FFT, Stalling-test blind label exercise, comic-timing envelope inspection, Foley vs random-jitter audit, leitmotif palette constraints check, diegetic layer audit).
 - **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see AUDIO_CRITIC.md §3.5.
 - **Tools:** Read, Grep, Glob, Bash (read-only — `ffprobe`, `ffmpeg`), Playwright (for mute / visibilitychange / simulation scenarios).
 ```

@@ -378,13 +378,13 @@ Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v2 evolves v1 with eight
 
 ### Audio critic
 
-Full rubric: [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md). v2 evolves v1 with five mechanism-level axes, seven hard gates (incl. NEW Library Absence, Visibility Bleed, Loudness Chaos, Autoplay Silence), and a required measurement step.
+Full rubric: [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md). v3 evolves v2 with a Sound Design Craft axis (audio-as-art): Murch quadrants, Sonnenschein timbre, Collins aesthetic coherence, Farnell procedural-as-authored-behavior, Stalling iconic effects, Foley performance, comic timing, leitmotif constraints, distinctiveness, diegetic vs non-diegetic.
 
-- **Axes (5, each 1-10):** Lifecycle Robustness, Variety & Game Feel, Mastering Quality, Resilience & Production Reality, Accessibility & Persistence.
-- **Hard gates (7, any failure caps score at 4):** Audio Crash, Decode Failure, Mute Failure, Visibility Bleed, Autoplay Silence, Library Absence (when `sfx:generate` declared but manifest absent), Loudness Chaos.
-- **Required measurements:** AudioContext construction-site audit (grep), `visibilitychange` listener inspection, decode-failure handling grep, scheduling-clock check, mute toggle behavior test, manifest presence + schema, LUFS measurement on shipped samples.
+- **Axes (6, each 1-10):** Lifecycle Robustness, Variety & Game Feel, Mastering Quality, Resilience & Production Reality, Accessibility & Persistence, Sound Design Craft *(new in v3)*.
+- **Hard gates (7, any failure caps score at 4):** Audio Crash, Decode Failure, Mute Failure, Visibility Bleed, Autoplay Silence, Library Absence, Loudness Chaos.
+- **Required measurements:** v2 technical battery + v3 craft diagnostic (Murch quadrant inventory, spectral-shape FFT audit, Stalling-test blind labels, comic-timing envelope, Foley vs random-jitter, leitmotif palette constraints, diegetic layer audit).
 - **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see AUDIO_CRITIC.md §3.5.
-- **Tools:** Read, Grep, Glob, Bash (read-only — `ffprobe`, `ffmpeg`), Playwright (for mute / visibilitychange / simulation scenarios).
+- **Tools:** Read, Grep, Glob, Bash (read-only — `ffprobe`, `ffmpeg`), Playwright.
 
 ### Orchestrator parsing logic
 
