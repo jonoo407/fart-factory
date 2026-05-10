@@ -2,6 +2,18 @@ import { loadMuted } from './mute';
 
 let audioCtx: AudioContext | null = null;
 
+export interface FartSchedule {
+  cuePresent: boolean;
+  cueDurationMs: number;
+  mainStartOffsetMs: number;
+  mainDurationMs: number;
+}
+
+let lastSchedule: FartSchedule | null = null;
+export function getLastFartSchedule(): FartSchedule | null {
+  return lastSchedule;
+}
+
 function ensureAudio(): AudioContext | null {
   if (audioCtx) return audioCtx;
   try {
@@ -40,8 +52,34 @@ export function playFart(
   if (loadMuted()) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
+  // Comic-timing anticipation cue: a low-amplitude rumble for ~150ms,
+  // followed by ~50ms of silence, then the main fart. Per AUDIO_CRITIC.md
+  // §A24 (Brooks/Neale/Krutnik on set-up + payoff structure).
+  const cueDur = 0.15;
+  const cueGap = 0.05;
+  const mainOffset = cueDur + cueGap; // 0.20s before the main hit
   const dur = 0.3 + length * 0.25;
-  const now = ctx.currentTime;
+  const startedAt = ctx.currentTime;
+  const cueStart = startedAt;
+  const now = startedAt + mainOffset;
+
+  // Anticipation cue oscillator — quieter, lower frequency than main.
+  const cueGain = ctx.createGain();
+  cueGain.gain.value = 0.04 + volume * 0.015; // softer than main
+  cueGain.connect(ctx.destination);
+  const cueOsc = ctx.createOscillator();
+  cueOsc.type = 'triangle';
+  const cueFreq = 35 + temp * 3; // sits below the main baseFreq
+  cueOsc.frequency.setValueAtTime(cueFreq, cueStart);
+  // Slight rise during the cue to imply "build-up."
+  cueOsc.frequency.linearRampToValueAtTime(cueFreq + 8, cueStart + cueDur);
+  cueGain.gain.setValueAtTime(0.001, cueStart);
+  cueGain.gain.linearRampToValueAtTime(0.04 + volume * 0.015, cueStart + cueDur * 0.6);
+  cueGain.gain.linearRampToValueAtTime(0.001, cueStart + cueDur);
+  cueOsc.connect(cueGain);
+  cueOsc.start(cueStart);
+  cueOsc.stop(cueStart + cueDur);
+
   const master = ctx.createGain();
   master.gain.value = 0.15 + volume * 0.07;
   master.connect(ctx.destination);
@@ -116,5 +154,13 @@ export function playFart(
   }
 
   master.gain.linearRampToValueAtTime(0, now + dur + 0.5);
-  return dur;
+
+  lastSchedule = {
+    cuePresent: true,
+    cueDurationMs: Math.round(cueDur * 1000),
+    mainStartOffsetMs: Math.round(mainOffset * 1000),
+    mainDurationMs: Math.round(dur * 1000),
+  };
+
+  return dur + mainOffset;
 }

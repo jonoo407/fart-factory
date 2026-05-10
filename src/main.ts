@@ -1,7 +1,7 @@
 import './style.css';
 import { gradeFart, stinkEmoji, durationLabel } from './scoring/grade';
 import { addToHall, renderHall } from './state/hall';
-import { playFart, suspendAudio, resumeAudio, getAudioContext } from './audio/procedural';
+import { playFart, suspendAudio, resumeAudio, getAudioContext, getLastFartSchedule } from './audio/procedural';
 import { loadMuted, setMuted } from './audio/mute';
 import { spawnGas } from './visuals/gas';
 import { spawnSparkles } from './visuals/particles';
@@ -276,9 +276,11 @@ function init(): void {
   const w = window as unknown as {
     __audioCtxState?: () => string;
     __challengeProfile?: () => number[];
+    __lastFartSchedule?: () => unknown;
   };
   w.__audioCtxState = () => getAudioContext()?.state ?? 'none';
   w.__challengeProfile = () => [...getDailyChallenge().profile];
+  w.__lastFartSchedule = () => getLastFartSchedule();
 }
 
 if (document.readyState === 'loading') {
