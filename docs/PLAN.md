@@ -346,11 +346,14 @@ Orchestrator parses last line, `JSON.parse`. Malformed → re-prompt once: "Your
 ## F. Critic rubrics
 
 ### Quality critic
-- **Axes:** readability, modularity, accessibility, performance, kid-safety/content (each 1-10, final = average).
-- **Inputs:** `git diff HEAD`, changed files in full, `tests/` for the iteration.
-- **Tools:** Read, Grep, Glob, Bash (read-only).
-- **Penalize:** DOM string-concat with user input, new `any` types, tests passing without exercising new code, commented-out code, hard-coded API keys.
-- **Reward:** small focused modules, named constants, JSDoc on public APIs.
+
+Full rubric: [docs/QUALITY_CRITIC.md](QUALITY_CRITIC.md). v2 evolves v1 with six mechanism-level axes derived from per-axis checklists, nine hard gates (incl. NEW TDD Order, Fake-Test, XSS Injection, Audit, Complexity, Unjustified Dep), and a required tools-run measurement step.
+
+- **Axes (6, each 1-10 derived from checklists):** TDD Discipline, Type Safety, Code Health, Security & Dependencies, Performance & Bundles, Source-Level Accessibility.
+- **Hard gates (9, any failure caps score at 4):** any/Cast Escape, TDD Order, Fake-Test (Stryker), Hardcoded Secret, XSS Injection (with user-input taint), Empty Catch, Audit Vulnerability, Complexity (>10), Unjustified Dep.
+- **Required measurements:** `tsc --noEmit`, `vitest --coverage` (new-line ≥80%), Stryker mutation (≥60% on new code), ESLint with complexity rule, `madge --circular`, `npm audit --audit-level=high`, `vite build` size, `lighthouse` mobile perf, `gitleaks detect`, jsx-a11y (or HTML a11y) lint.
+- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see QUALITY_CRITIC.md §3.5.
+- **Tools:** Read, Grep, Glob, Bash (REQUIRED — runs the measurement battery), `git diff`/`git log` (REQUIRED for TDD ordering + dep-justification).
 
 ### Fun critic
 
