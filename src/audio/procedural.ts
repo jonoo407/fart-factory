@@ -164,3 +164,38 @@ export function playFart(
 
   return dur + mainOffset;
 }
+
+/**
+ * Non-diegetic celebration sting (audio principle A27 — Collins/Grimshaw on
+ * sound from outside the world commenting on it). Plays a brief major-triad
+ * arpeggio when the player nails a 100% match. NOT muted by mute toggle —
+ * wait, yes it IS, since mute is a global gesture: if the user is muted,
+ * everything is silent. Subject to visibilitychange suspend.
+ */
+export function playCelebrationSting(): number {
+  if (loadMuted()) return 0;
+  const ctx = ensureAudio();
+  if (!ctx) return 0;
+  const now = ctx.currentTime;
+  // Major triad up-arpeggio (C5 / E5 / G5 / C6) at 80ms intervals, 200ms decay.
+  const notes = [523.25, 659.25, 783.99, 1046.5];
+  const noteDur = 0.25;
+  const stride = 0.08;
+  const master = ctx.createGain();
+  master.gain.value = 0.18;
+  master.connect(ctx.destination);
+  for (let i = 0; i < notes.length; i++) {
+    const osc = ctx.createOscillator();
+    osc.type = i === notes.length - 1 ? 'sine' : 'triangle';
+    osc.frequency.value = notes[i]!;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, now + i * stride);
+    g.gain.exponentialRampToValueAtTime(0.5, now + i * stride + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + i * stride + noteDur);
+    osc.connect(g);
+    g.connect(master);
+    osc.start(now + i * stride);
+    osc.stop(now + i * stride + noteDur + 0.02);
+  }
+  return notes.length * stride + noteDur;
+}

@@ -1,7 +1,14 @@
 import './style.css';
 import { gradeFart, stinkEmoji, durationLabel } from './scoring/grade';
 import { addToHall, renderHall } from './state/hall';
-import { playFart, suspendAudio, resumeAudio, getAudioContext, getLastFartSchedule } from './audio/procedural';
+import {
+  playFart,
+  suspendAudio,
+  resumeAudio,
+  getAudioContext,
+  getLastFartSchedule,
+  playCelebrationSting,
+} from './audio/procedural';
 import { loadMuted, setMuted } from './audio/mute';
 import { spawnGas } from './visuals/gas';
 import { spawnSparkles } from './visuals/particles';
@@ -161,6 +168,10 @@ function onLaunch(): void {
   spawnGas(stink, volume);
   showReactions(total);
   const matchPct = renderChallengeMatch(vals);
+  if (matchPct === 100) {
+    // Non-diegetic celebratory sting — plays after the diegetic fart.
+    setTimeout(() => playCelebrationSting(), 600);
+  }
 
   const pool = total < 20 ? weakComments : comments;
   const line = pickFromPool(pool);
