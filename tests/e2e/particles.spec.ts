@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { useSandboxMode } from './_legacy-setup';
+
+useSandboxMode();
 
 /**
  * Tier 3 item 11 — Sparkle particles on S+.
@@ -57,6 +60,7 @@ test.describe('S+ sparkle particles', () => {
     await page.evaluate(() => {
       localStorage.clear();
       localStorage.setItem('fart_onboarding_seen', 'true');
+      localStorage.setItem('fart_mode', '"sandbox"');
     });
     await page.reload();
     for (const id of ['s1', 's2', 's3', 's4', 's5', 's6']) {

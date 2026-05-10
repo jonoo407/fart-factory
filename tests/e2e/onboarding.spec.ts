@@ -1,4 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { useSandboxMode } from './_legacy-setup';
+
+useSandboxMode();
 
 async function freshLoad(page: Page): Promise<void> {
   await page.goto('/');

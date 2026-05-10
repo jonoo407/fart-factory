@@ -100,3 +100,44 @@ All three flagged gaps closed. Session 2 totaled ~3h across phases A+B+C (~1.5h 
 - **Iter 2 fixup:** Audio critic scored 3 with 6 "blockers" — but all blockers describe pre-existing legacy code gaps (no mute, no visibilitychange, no try/catch around AudioContext) which are Tier 2 work, not regressions in this iteration. Per plan §F definition, blockers are "must fix before commit (a11y violation, crash, content-safety, broken test)" — these are none of those. Smallest TDD-honest fixup added: lockpoint #11, asserting Launch click creates AudioContext and throws no error. Closes the worst gap ("audio behavior entirely unlocked") without doing Tier 2 work. Audio re-grade: estimated ≥4 — still under min=6, but the listed blockers remain outside the §F definition; documenting the deviation rather than expanding scope mid-iteration.
 - **Iter 2 visual critic:** scored 6 (passes gate) but flagged legacy CSS issues (font sizes <14px on mobile, user-scalable=no, layout-thrashing keyframes, small touch targets). Those describe LEGACY CSS that won't ship in v2 — the port in 0.3 will rewrite. Logging as port-time TODOs.
 - **Iter 2 mobile/tablet projects** are now Chromium with viewport overrides (375×667, 768×1024) instead of webkit-based iPhone SE / iPad Mini, to avoid extra browser install. Naming kept ("mobile"/"tablet") for human intent; comment in playwright.config.ts explains why isMobile:false.
+
+---
+
+## food-mvp session (Tier 7 — full 13 phases A-M)
+
+**Branch:** `food-mvp` • **Start:** 2026-05-10 ~13:00Z • **Commits this session:** 14 (13 phase commits + 1 ship)
+
+| Phase | Items | Tests added | v5 score est. | Commit |
+|---|---|---|---|---|
+| A | catalogs + persistence | unit:32 | 3.5 | 2bf6264 |
+| B | mode toggle + Story shell | unit:5 e2e:4 | 4.0 | 0ef9bda |
+| C | pantry + plate + belly | unit:7 e2e:5 | 4.5 | bfbf87c |
+| D | recipe compute + Launch | unit:12 e2e:3 | 5.0 | 82a2e04 |
+| E | match scoring + areas + portrait | unit:8 e2e:4 | 6.0 | 9b82984 |
+| F | reaction tier + Hard Mode + trend | unit:6 e2e:4 | 6.5 | 7326fd5 |
+| G #48 | gold per-launch award | unit:6 e2e:3 | 6.5 | 7c67c85 |
+| G #49-51 | shop modal + daily roll + buy | unit:14 e2e:5 | 7.0 | 83dbefc |
+| H | discovery + Lab Notebook + Cook | unit:8 e2e:9 | 7.5 | 4216a4d |
+| I | research notes meta-progression | unit:15 e2e:5 | 7.5-8.0 | 8e168e8 |
+| J | legendary quests + claim + fanfare | unit:11 e2e:4 | 8.0 | 97a373e |
+| K | SFX seed catalog → 26 (audio gen pending) | unit:8 | 8.0 | 6195487 |
+| L | Disney-12 polish + reduce-motion fix | e2e:6 | **8.5** | 108a8cb |
+| M | smoke + flip default + report | e2e:1 | **8.5** | (this) |
+
+**Test totals:** 191 → **266 unit** / 63 → **125 desktop e2e** (1 mobile-touch skipped).
+
+**Key v5 gates cleared in this session:**
+- Dominant Strategy (was the v2 gating failure; 30-food combinatorics with cravings rotation + restrictions has no universal optimum)
+- Open Continuous Input (6 sliders → pick K of 30 foods)
+- Disjoint Systems (`evaluateMatch` is THE Story Mode scoring system; `gradeFart` survives only in Sandbox)
+- Displayed-Target Puzzle (Hard Mode hides cravings; warmer/colder trend provides verdict)
+- No-Failure (research notes from any <50% match — failure banks progression toward the same foods gold could buy faster)
+- Curiosity Gaps loop (discover → toast → notebook → cook-preset → re-experiment)
+- Goal Stacking (per-launch loop nested under daily shop nested under multi-day quests)
+
+**Mode default flipped to Story** in Phase M. 20 legacy v2 e2e specs updated via shared `_legacy-setup.ts::useSandboxMode()` helper that runs `page.addInitScript` to set `fart_mode = sandbox` before navigation. `mode-toggle.spec.ts` rewritten for the new direction.
+
+**Operator-pending:**
+- Run `npm run sfx:generate` to produce 12 new audio mp3s for Phase K seeds (audience-reaction × 6, food-eating × 4, fanfare × 2).
+- Open `food-mvp` → `main` PR and merge after CI green.
+- Re-test mobile-touch project after audio lands.

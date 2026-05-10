@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import { useSandboxMode } from './_legacy-setup';
+
+useSandboxMode();
 import AxeBuilder from '@axe-core/playwright';
 
 async function loadApp(page: import('@playwright/test').Page) {

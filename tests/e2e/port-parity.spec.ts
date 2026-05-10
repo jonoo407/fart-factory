@@ -1,4 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { useSandboxMode } from './_legacy-setup';
+
+useSandboxMode();
 
 /**
  * Tier 0.3 — Port parity tests.
