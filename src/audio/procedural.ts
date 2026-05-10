@@ -1,3 +1,5 @@
+import { loadMuted } from './mute';
+
 let audioCtx: AudioContext | null = null;
 
 function ensureAudio(): AudioContext | null {
@@ -15,6 +17,18 @@ function ensureAudio(): AudioContext | null {
   }
 }
 
+export function getAudioContext(): AudioContext | null {
+  return audioCtx;
+}
+
+export function suspendAudio(): void {
+  if (audioCtx && audioCtx.state === 'running') void audioCtx.suspend();
+}
+
+export function resumeAudio(): void {
+  if (audioCtx && audioCtx.state === 'suspended') void audioCtx.resume();
+}
+
 export function playFart(
   length: number,
   wetness: number,
@@ -23,6 +37,7 @@ export function playFart(
   temp: number,
   musical: number,
 ): number {
+  if (loadMuted()) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
   const dur = 0.3 + length * 0.25;

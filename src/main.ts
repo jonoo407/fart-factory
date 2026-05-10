@@ -1,7 +1,8 @@
 import './style.css';
 import { gradeFart, stinkEmoji, durationLabel } from './scoring/grade';
 import { addToHall, renderHall } from './state/hall';
-import { playFart } from './audio/procedural';
+import { playFart, suspendAudio, resumeAudio, getAudioContext } from './audio/procedural';
+import { loadMuted, setMuted } from './audio/mute';
 import { spawnGas } from './visuals/gas';
 import { spawnSparkles } from './visuals/particles';
 import {
@@ -178,12 +179,35 @@ function onRandom(): void {
   ($('launchBtn') as HTMLButtonElement | null)?.click();
 }
 
+function paintMuteBtn(btn: HTMLButtonElement, muted: boolean): void {
+  btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+  btn.textContent = muted ? '🔇' : '🔊';
+  btn.setAttribute('aria-label', muted ? 'Unmute audio' : 'Mute audio');
+}
+
+function wireMuteButton(): void {
+  const btn = $('muteBtn') as HTMLButtonElement | null;
+  if (!btn) return;
+  paintMuteBtn(btn, loadMuted());
+  btn.addEventListener('click', () => {
+    const next = !loadMuted();
+    setMuted(next);
+    paintMuteBtn(btn, next);
+    if (next) suspendAudio();
+    else resumeAudio();
+  });
+}
+
 function init(): void {
   wireSliderDisplay();
   $('launchBtn')?.addEventListener('click', onLaunch);
   $('randomBtn')?.addEventListener('click', onRandom);
+  wireMuteButton();
   renderHall();
   showOnboarding();
+  // Test/debug shim: expose AudioContext.state for E2E mute verification.
+  const w = window as unknown as { __audioCtxState?: () => string };
+  w.__audioCtxState = () => getAudioContext()?.state ?? 'none';
 }
 
 if (document.readyState === 'loading') {
