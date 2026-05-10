@@ -13,9 +13,53 @@ Session start: 2026-05-10T12:20:11.917Z
 | 7 | 4.15 | Combo streak counter (pure reducer + pulsing banner) | tests/unit/combo.test.ts, tests/e2e/combo.spec.ts | 9 | 8 | 9 | 7 | 8.25 | 0c6660d | ~52m |
 | 8 | 5.21+5.20 | Mobile haptics + Onboarding tutorial (3 steps, first-visit) | tests/unit/haptics.test.ts, tests/unit/onboarding.test.ts, tests/e2e/onboarding.spec.ts | 9 | 9 | 9 | 7 | 8.5 | (next) | ~76m |
 
-## Stop reason
+## Stop reason (session 1)
 Quality target hit: iter 7 avg 8.25 ≥8 AND iter 8 avg 8.5 ≥8 (two consecutive),
 elapsedMin ≈ 76 (> 60), zero blockers in either iteration.
+
+---
+
+## Session 2 — critic-rubric overhaul + fun/measurement iterations
+
+Session 2 start: 2026-05-10T16:15:48Z. Followed user critique that the v1 rubrics
+were over-rewarding spectacle and missing structural gameplay flaws. Two phases:
+
+### Phase A — critic redesign (8 commits, ~1.5h)
+Rewrote all four critics to v2/v3 with mechanism-level axes, hard gates, required
+measurement steps, and worked validation. See:
+- [docs/FUN_CRITIC.md](FUN_CRITIC.md) (v3: 8 axes + 7 gates incl. Hollow Score, Curiosity Gaps, Goal Stacking, Progression)
+- [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md) (v3: 6 axes + 7 gates + Sound Design Craft)
+- [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md) (v3: 9 axes + 9 gates + Art Direction)
+- [docs/QUALITY_CRITIC.md](QUALITY_CRITIC.md) (v2: 6 axes + 9 gates + measurement battery)
+
+### Phase B — game iterations under the new rubric (15 iters, ~40 min wall-clock)
+
+| # | Tier | Feature | Tests | Commit |
+|---|------|---------|-------|--------|
+| 9  | Audio | Mute toggle + localStorage + AudioContext suspend | mute.test.ts, mute.spec.ts | a1250bd |
+| 10 | Audio | visibilitychange suspend/resume | visibility.spec.ts | 9061716 |
+| 11 | Quality | vitest --coverage with thresholds (80/80/75/80) | (config) | 90a2b4f |
+| 12 | Visual | axe-core E2E spec at 3 viewports (zero violations) | axe.spec.ts | d57bb72 |
+| 13 | Fun | Daily-challenge target profile + match score (12 named profiles) | challenge.test.ts, challenge.spec.ts | 0127ea3 |
+| 14 | Fun | Per-axis directional hints (Mastermind-style audience feedback) | hints.spec.ts | 31d5b19 |
+| 15 | Audio | 200ms anticipation cue (Brooks/Stalling comic timing) | anticipation.spec.ts | 316febe |
+| 16 | Visual | Launch button wind-up/pop/settle (Disney 12 + Penner) | launch-motion.spec.ts | 902da47 |
+| 17 | Visual | docs/PALETTE.md + deterministic typeface stack (Comic Sans → Marker Felt → system-ui) | (docs) | a68d9cd |
+| 18 | Visual | footer 0.9em parity + touch-target spec → fixed 30px slider tracks | touch-targets.spec.ts | a718e22 |
+| 19 | Fun | Best-match persistence (per-UTC-day localStorage; meta-progression) | best-match.spec.ts | a60dc33 |
+| 20 | Fun | profile-master + perfect-match achievements (match ≥90 / =100) | (achievements.test.ts) | c770361 |
+| 21 | Fun+Visual | High-match reactive pulse on challenge card (V27 reactive variety) | reactive-variety.spec.ts | 57b5cfa |
+| 22 | Audio | Non-diegetic celebration sting on 100% match (A27 dual-layer) | (procedural integration) | 123ec35 |
+| 23 | Test | End-to-end gameplay smoke (3 converging launches → 100%) | gameplay-smoke.spec.ts | 2bb6f3c |
+
+### Phase B totals
+- Tests: 108 unit + 64 mobile e2e + 64 desktop e2e + 1 skipped (touch-target mobile-only). 109 → 108 unit pre/post (one structural cleanup); 41 → 64 desktop (+23). Pure additive.
+- New player-visible features: daily challenge with target profile + match score, per-axis directional hints, best-today persistence, profile-master/bullseye achievements, reactive challenge-card pulse on high match, non-diegetic celebration sting on perfect match, mute toggle + persistence, visibilitychange handling, anticipation cue on every launch, wind-up/pop/settle on Launch button.
+- New docs: FUN/AUDIO/VISUAL/QUALITY_CRITIC.md (rubrics), PALETTE.md (palette + type system).
+- v3 rubric scores on `2bb6f3c` HEAD: Fun 5 (was 2 at iter 8 under v3 — gained Curiosity, Progression, Goal Stacking, Endogenous Value mostly cleared; still has visible-target dominant strategy). Audio 6 (was 4 — Library Absence still failing pending SFX library, but Mute, Visibility, A24 cue, A27 sting all now passing). Visual 8 (was 7 — Touch-Target gate measured-pass, Art Direction up from 3 to 6 with Disney 12 motion + palette doc + typeface fix). Quality 7 (was 6 — coverage threshold + axe both green; Stryker / size-limit / ESLint complexity / Lighthouse still pending).
+
+### Stop reason (session 2)
+User-defined "1-2 hours autonomously": session ran ~40 min in iteration phase + ~1.5h in critic-redesign phase ≈ 2h total. Stopped after iter 23 (gameplay smoke) verified the integrated player loop end-to-end.
 
 ## Notes
 - *Iter 1: Fun & Audio critics returned 5 (neutral) explicitly because Tier 0.1 is pure toolchain scaffold — no game, no audio. Both reported zero blockers. Plan §F gate min<6 would normally trigger fix-up, but the fix would violate "minimum scope per iteration" (don't add features to scaffold step). Proceeding to commit; fun & audio re-grade after Tier 0.3 (legacy game ported into modules) and Tier 2 (audio pipeline).
