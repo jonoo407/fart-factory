@@ -3,14 +3,99 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>The Fart Factory</title>
+    <title>The Fart Factory 💨</title>
     <link rel="icon" href="data:," />
   </head>
   <body>
-    <main id="app">
-      <h1>The Fart Factory</h1>
-      <p>Loading…</p>
-    </main>
+    <div class="container">
+      <h1>💨 The Fart Factory 💨</h1>
+      <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
+
+      <div class="lab" role="group" aria-label="Fart parameters">
+        <div class="slider-group">
+          <label class="slider-label" for="s1">
+            <span>⏱️ Length <span class="val" id="v1" aria-live="off">5</span></span>
+            <span class="emoji-range">Quick Toot → Never-Ending</span>
+          </label>
+          <input type="range" id="s1" min="1" max="10" value="5" aria-label="Length, 1 to 10" />
+        </div>
+        <div class="slider-group">
+          <label class="slider-label" for="s2">
+            <span>💧 Wetness <span class="val" id="v2" aria-live="off">5</span></span>
+            <span class="emoji-range">Bone Dry → Swamp Mode</span>
+          </label>
+          <input type="range" id="s2" min="1" max="10" value="5" aria-label="Wetness, 1 to 10" />
+        </div>
+        <div class="slider-group">
+          <label class="slider-label" for="s3">
+            <span>🔊 Volume <span class="val" id="v3" aria-live="off">5</span></span>
+            <span class="emoji-range">Silent → Car Alarm</span>
+          </label>
+          <input type="range" id="s3" min="1" max="10" value="5" aria-label="Volume, 1 to 10" />
+        </div>
+        <div class="slider-group">
+          <label class="slider-label" for="s4">
+            <span>🦨 Stinkiness <span class="val" id="v4" aria-live="off">5</span></span>
+            <span class="emoji-range">Fresh Breeze → Biohazard</span>
+          </label>
+          <input type="range" id="s4" min="1" max="10" value="5" aria-label="Stinkiness, 1 to 10" />
+        </div>
+        <div class="slider-group">
+          <label class="slider-label" for="s5">
+            <span>🌡️ Temperature <span class="val" id="v5" aria-live="off">5</span></span>
+            <span class="emoji-range">Ice Cold → Volcanic</span>
+          </label>
+          <input type="range" id="s5" min="1" max="10" value="5" aria-label="Temperature, 1 to 10" />
+        </div>
+        <div class="slider-group">
+          <label class="slider-label" for="s6">
+            <span>🎵 Musical Quality <span class="val" id="v6" aria-live="off">5</span></span>
+            <span class="emoji-range">Monotone → Full Symphony</span>
+          </label>
+          <input type="range" id="s6" min="1" max="10" value="5" aria-label="Musical quality, 1 to 10" />
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button class="btn launch" id="launchBtn">🚀 LAUNCH FART</button>
+        <button class="btn random" id="randomBtn">🎲 Random</button>
+      </div>
+
+      <div class="reactions" id="reactions" aria-hidden="true"></div>
+      <div class="commentary" id="commentary" aria-live="polite"></div>
+
+      <div class="results" id="results">
+        <h2>📊 Fart Report Card</h2>
+        <div class="score-row"><span>💪 Impressiveness</span><span id="sc1">—</span></div>
+        <div class="score-row"><span>🦨 Stinkiness</span><span id="sc2">—</span></div>
+        <div class="stink-meter" aria-hidden="true">
+          <div class="stink-fill" id="stinkFill" style="width:100%"></div>
+        </div>
+        <div class="score-row"><span>🎵 Sound Quality</span><span id="sc3">—</span></div>
+        <div class="score-row"><span>⏱️ Duration</span><span id="sc4">—</span></div>
+        <div class="grade" id="grade">—</div>
+        <div style="text-align:center;font-size:.95em;color:#ffaaff" id="gradeDesc"></div>
+      </div>
+
+      <div class="hall">
+        <h2>🏆 Hall of Shame 🏆</h2>
+        <div id="hallList">
+          <div class="hall-empty">No legendary farts yet... Launch one!</div>
+        </div>
+      </div>
+
+      <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+    </div>
+
+    <div class="gas-overlay" id="gasOverlay" aria-hidden="true"></div>
+
+    <div
+      id="liveRegion"
+      role="status"
+      aria-live="polite"
+      style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden"
+    ></div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
