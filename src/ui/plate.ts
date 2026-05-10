@@ -64,7 +64,7 @@ export function remainingBelly(): number {
  * belly insufficient, or food not unlocked.
  * Returns true on success.
  */
-export function addFoodToPlate(foodId: string): { ok: boolean; reason?: string } {
+export function addFoodToPlate(foodId: string): { ok: boolean; reason?: string; slotIdx?: number } {
   if (!loadPantry().includes(foodId)) return { ok: false, reason: 'not-unlocked' };
   const food = getFood(foodId);
   if (!food) return { ok: false, reason: 'unknown-food' };
@@ -73,7 +73,7 @@ export function addFoodToPlate(foodId: string): { ok: boolean; reason?: string }
   if (food.bellyCost > remainingBelly()) return { ok: false, reason: 'insufficient-belly' };
   plate[emptyIdx] = foodId;
   bellySpentThisSession += food.bellyCost;
-  return { ok: true };
+  return { ok: true, slotIdx: emptyIdx };
 }
 
 /** Removes the food at the given slot. Refunds belly cost for this session. */
@@ -147,6 +147,24 @@ export function renderPantryGrid(): void {
       if (result.ok) {
         renderPlate();
         renderBellyMeter();
+        // Phase L #67 — Disney wind-up/pop/settle on the plate slot.
+        if (result.slotIdx !== undefined) {
+          const slot = $(`plateSlot${result.slotIdx + 1}`);
+          if (slot) {
+            slot.classList.remove('plate-slot-popping');
+            void slot.offsetWidth;
+            slot.classList.add('plate-slot-popping');
+            setTimeout(() => slot.classList.remove('plate-slot-popping'), 450);
+          }
+        }
+        // Phase L #66 — belly meter brief shrink.
+        const track = document.querySelector<HTMLElement>('.belly-track');
+        if (track) {
+          track.classList.remove('belly-deplete');
+          void track.offsetWidth;
+          track.classList.add('belly-deplete');
+          setTimeout(() => track.classList.remove('belly-deplete'), 420);
+        }
       } else {
         flashRefusal(el, result.reason ?? 'refused');
       }
@@ -265,7 +283,15 @@ export function renderAudiencePortrait(): void {
   const flavorEl = $('audienceFlavor');
   const cravingsEl = $('audienceCravings');
   const restrictionsEl = $('audienceRestrictions');
-  if (emojiEl) emojiEl.textContent = hardMode ? '❓' : aud.emoji;
+  if (emojiEl) {
+    emojiEl.textContent = hardMode ? '❓' : aud.emoji;
+    // Phase L #65 — always-on idle wobble. Reaction-face classes
+    // (audience-portrait-loved/liked/meh/disliked/evacuated) are added
+    // by `applyReactionFace` and reset by this function. Re-rendering
+    // strips any previous reaction class so each portrait refresh
+    // returns the portrait to neutral idle.
+    emojiEl.className = 'audience-portrait audience-portrait-idle';
+  }
   if (nameEl) nameEl.textContent = aud.name; // Name visible in both modes
   if (flavorEl) flavorEl.textContent = hardMode ? 'Their tastes are a mystery. Read the room.' : aud.flavor;
   if (cravingsEl) {
@@ -320,6 +346,29 @@ function trendLabel(trend: ReturnType<typeof audienceReaction>['trend']): string
   }
 }
 
+function applyReactionFace(tier: ReturnType<typeof audienceReaction>['tier']): void {
+  const emojiEl = $('audiencePortraitEmoji');
+  if (!emojiEl) return;
+  // Strip any prior reaction class.
+  emojiEl.classList.remove(
+    'audience-portrait-loved',
+    'audience-portrait-liked',
+    'audience-portrait-meh',
+    'audience-portrait-disliked',
+    'audience-portrait-evacuated',
+  );
+  emojiEl.classList.add(`audience-portrait-${tier}`);
+  // Also swap the emoji for an emotion glyph so the reaction is legible.
+  const emojiMap: Record<typeof tier, string> = {
+    loved:    '😍',
+    liked:    '🙂',
+    meh:      '😐',
+    disliked: '🤢',
+    evacuated:'💀',
+  };
+  emojiEl.textContent = emojiMap[tier];
+}
+
 function renderAudienceReaction(pct: number): void {
   const wrap = $('audienceReaction');
   const tierEl = $('audienceReactionTier');
@@ -328,6 +377,7 @@ function renderAudienceReaction(pct: number): void {
   if (wrap) wrap.removeAttribute('hidden');
   if (tierEl) tierEl.textContent = tierLabel(r.tier);
   if (trendEl) trendEl.textContent = trendLabel(r.trend);
+  applyReactionFace(r.tier);
 }
 
 function wireStoryHardModeButton(): void {

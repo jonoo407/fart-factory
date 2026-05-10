@@ -85,6 +85,40 @@ body {
   40%  { transform: scale(1);    box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); }
   100% { transform: scale(1);    box-shadow: 0 0 0   rgba(245, 158, 11, 0.0); }
 }
+/* Phase L #65 — idle wobble + reaction-face animations */
+.audience-portrait-idle {
+  animation: audience-idle-wobble 4s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes audience-idle-wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(3deg); }
+}
+.audience-portrait-loved    { animation: audience-loved 1.2s ease-out; }
+.audience-portrait-liked    { animation: audience-liked 0.8s ease-out; }
+.audience-portrait-meh      { animation: none; }
+.audience-portrait-disliked { animation: audience-disliked 0.9s ease-in-out; }
+.audience-portrait-evacuated{ animation: audience-evacuated 1.4s ease-in; }
+@keyframes audience-loved {
+  0%   { transform: scale(1)    rotate(0); }
+  30%  { transform: scale(1.25) rotate(-8deg); }
+  60%  { transform: scale(1.15) rotate(8deg); }
+  100% { transform: scale(1)    rotate(0); }
+}
+@keyframes audience-liked {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+@keyframes audience-disliked {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-4px) rotate(-3deg); }
+  75%      { transform: translateX(4px)  rotate(3deg); }
+}
+@keyframes audience-evacuated {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(8px) scale(0.9); opacity: 0.7; }
+}
+
 .audience-portrait {
   font-size: 3em;
   line-height: 1;
@@ -204,6 +238,13 @@ body {
   transition: width 0.3s ease;
 }
 .belly-value { font-size: 0.95em; color: #e6f0ff; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+/* Phase L #66 — brief vertical shrink + bounce on food-add */
+.belly-deplete { animation: belly-pulse 0.42s ease-out; }
+@keyframes belly-pulse {
+  0%   { transform: scaleY(1); }
+  40%  { transform: scaleY(0.7); }
+  100% { transform: scaleY(1); }
+}
 
 /* --- Plate --- */
 .plate-wrap { margin-bottom: 14px; }
@@ -238,6 +279,13 @@ body {
 }
 .plate-slot-filled .food-emoji { font-size: 1.8em; line-height: 1; }
 .plate-slot-filled .food-name { font-size: 0.75em; line-height: 1.1; text-align: center; }
+/* Phase L #67 — Disney wind-up/pop/settle on plate-add */
+.plate-slot-popping { animation: plate-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes plate-pop {
+  0%   { transform: scale(0.6) rotate(-6deg); }
+  60%  { transform: scale(1.15) rotate(4deg); }
+  100% { transform: scale(1)    rotate(0); }
+}
 
 /* --- Pantry grid --- */
 .pantry-wrap {}
@@ -291,7 +339,45 @@ body {
 .rarity-uncommon  { border-color: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.3); }
 .rarity-rare      { border-color: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
 .rarity-epic      { border-color: #a855f7; box-shadow: 0 0 14px rgba(168, 85, 247, 0.5); }
-.rarity-legendary { border-color: #f59e0b; box-shadow: 0 0 18px rgba(245, 158, 11, 0.6); }
+.rarity-legendary {
+  border-color: #f59e0b;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.6);
+  position: relative;
+  overflow: hidden;
+  animation: legendary-pulse 3s ease-in-out infinite;
+}
+/* Phase L #64 — sparkles via ::before / ::after layered emoji */
+.rarity-legendary::before {
+  content: '✨';
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  font-size: 0.8em;
+  animation: legendary-sparkle-a 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+.rarity-legendary::after {
+  content: '✨';
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  font-size: 0.65em;
+  animation: legendary-sparkle-b 3.4s ease-in-out infinite;
+  animation-delay: 0.8s;
+  pointer-events: none;
+}
+@keyframes legendary-pulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.6); }
+  50%      { box-shadow: 0 0 30px rgba(245, 158, 11, 0.95); }
+}
+@keyframes legendary-sparkle-a {
+  0%, 100% { opacity: 0.3; transform: scale(0.9) rotate(0deg); }
+  50%      { opacity: 1;   transform: scale(1.3) rotate(20deg); }
+}
+@keyframes legendary-sparkle-b {
+  0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg); }
+  50%      { opacity: 1;   transform: scale(1.2) rotate(-15deg); }
+}
 
 /* --- Shop modal --- */
 .shop-modal {
@@ -1294,8 +1380,7 @@ footer {
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.001ms !important;
   }
 }
