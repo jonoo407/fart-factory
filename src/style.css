@@ -1,6 +1,11 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+  /*
+   * V23 / docs/PALETTE.md §3: handwritten primary, handwritten Apple
+   * fallback, deterministic system-ui last-resort. Replaces the prior
+   * 'cursive' fallback which was non-deterministic across OSes.
+   */
+  font-family: 'Comic Sans MS', 'Marker Felt', system-ui, sans-serif;
   background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
   color: #fff;
   min-height: 100vh;
