@@ -111,6 +111,18 @@ function renderBestToday(): void {
   if (el) el.textContent = String(best);
 }
 
+function fireChallengeReactivePulse(pct: number): void {
+  if (pct < 90) return;
+  const card = $('challengeCard');
+  if (!card) return;
+  const tier = pct === 100 ? 'match-tier-2' : 'match-tier-1';
+  const allTiers = ['match-tier-1', 'match-tier-2'];
+  for (const t of allTiers) card.classList.remove(t);
+  void (card as HTMLElement).offsetWidth;
+  card.classList.add(tier);
+  setTimeout(() => card.classList.remove(tier), 1300);
+}
+
 function renderChallengeMatch(actual: number[]): number {
   const challenge = getDailyChallenge();
   const pct = computeMatch(actual, challenge.profile);
@@ -123,6 +135,7 @@ function renderChallengeMatch(actual: number[]): number {
   renderAxisHints(actual);
   recordMatch(pct);
   renderBestToday();
+  fireChallengeReactivePulse(pct);
   return pct;
 }
 
