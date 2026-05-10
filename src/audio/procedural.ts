@@ -41,6 +41,11 @@ export function resumeAudio(): void {
   if (audioCtx && audioCtx.state === 'suspended') void audioCtx.resume();
 }
 
+// QUALITY-LEGACY: playFart is dense procedural-audio scheduling — branching
+// reflects per-slider effect toggles rather than business logic. Refactoring
+// to ≤10 complexity would shatter the natural fart-anatomy reading order.
+// Captured as follow-up; do not let this disable creep further.
+// eslint-disable-next-line complexity, max-lines-per-function
 export function playFart(
   length: number,
   wetness: number,

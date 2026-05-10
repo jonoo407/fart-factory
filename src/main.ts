@@ -157,6 +157,87 @@ function fireLaunchButtonMotion(): void {
   setTimeout(() => btn.classList.remove('firing'), 650);
 }
 
+function showCommentary(total: number): void {
+  const pool = total < 20 ? weakComments : comments;
+  const line = pickFromPool(pool);
+  const cEl = $('commentary');
+  if (!cEl) return;
+  cEl.textContent = '';
+  setTimeout(() => {
+    cEl.textContent = '💬 "' + line + '"';
+  }, 500);
+}
+
+function clamp1to10(n: number): number {
+  return Math.min(10, Math.max(1, Math.round(n)));
+}
+
+function setText(id: string, text: string): void {
+  const el = $(id);
+  if (el) el.textContent = text;
+}
+
+function setStyle(id: string, prop: keyof CSSStyleDeclaration, value: string): void {
+  const el = $(id) as HTMLElement | null;
+  if (!el) return;
+  (el.style as unknown as Record<string, string>)[prop as string] = value;
+}
+
+function shakeBodyOnce(): void {
+  document.body.style.animation = 'none';
+  void document.body.offsetHeight;
+  document.body.style.animation = 'shake .5s';
+}
+
+function renderResultsCard(
+  vals: number[],
+  total: number,
+  g: { grade: string; desc: string; color: string },
+): void {
+  const [length, , volume, stink, temp, music] = vals;
+  const impressiveness = clamp1to10((volume + length + stink) / 3 + Math.random() * 2 - 1);
+  const soundQuality = clamp1to10((music + volume + temp) / 3 + Math.random() * 2 - 1);
+  setStyle('results', 'display', 'block');
+  setText('sc1', impressiveness + '/10 ' + '⭐'.repeat(Math.max(1, Math.ceil(impressiveness / 2))));
+  setText('sc2', stinkEmoji(stink) + ' ' + stink + '/10');
+  setStyle('stinkFill', 'width', 100 - stink * 10 + '%');
+  setText('sc3', soundQuality + '/10 ' + (soundQuality > 7 ? '🎶' : '🎵'));
+  setText('sc4', durationLabel(length));
+  const gradeEl = $('grade');
+  if (gradeEl) {
+    gradeEl.textContent = g.grade;
+    gradeEl.style.color = g.color;
+  }
+  setText('gradeDesc', g.desc);
+  setText('liveRegion', `Grade: ${g.grade}. ${g.desc}`);
+  if (total > 40) shakeBodyOnce();
+  if (g.grade === 'S+') spawnSparkles();
+}
+
+function updateCombo(grade: string): void {
+  const prev = combo;
+  combo = reduceCombo(combo, grade);
+  renderComboBanner(combo);
+  if (combo.count >= 3 && combo.count > prev.count) {
+    triggerHaptic(HAPTICS.combo);
+  }
+}
+
+function unlockAchievementsForLaunch(ctx: LaunchContext): void {
+  const owned = loadUnlocked();
+  const newly = evaluateLaunch(ctx, owned);
+  if (!newly.length) return;
+  for (const id of newly) owned.add(id);
+  saveUnlocked(owned);
+  let i = 0;
+  for (const id of newly) {
+    const a = getAchievement(id);
+    if (!a) continue;
+    setTimeout(() => showAchievementToast(a), i * 250);
+    i++;
+  }
+}
+
 function onLaunch(): void {
   const vals = readSliders();
   const [length, wetness, volume, stink, temp, music] = vals;
@@ -168,102 +249,25 @@ function onLaunch(): void {
   spawnGas(stink, volume);
   showReactions(total);
   const matchPct = renderChallengeMatch(vals);
-  if (matchPct === 100) {
-    // Non-diegetic celebratory sting — plays after the diegetic fart.
-    setTimeout(() => playCelebrationSting(), 600);
-  }
+  if (matchPct === 100) setTimeout(() => playCelebrationSting(), 600);
+  showCommentary(total);
 
-  const pool = total < 20 ? weakComments : comments;
-  const line = pickFromPool(pool);
-  const cEl = $('commentary');
-  if (cEl) {
-    cEl.textContent = '';
-    setTimeout(() => {
-      cEl.textContent = '💬 "' + line + '"';
-    }, 500);
-  }
-
-  const impressiveness = Math.min(
-    10,
-    Math.max(1, Math.round((volume + length + stink) / 3 + Math.random() * 2 - 1)),
-  );
-  const soundQuality = Math.min(
-    10,
-    Math.max(1, Math.round((music + volume + temp) / 3 + Math.random() * 2 - 1)),
-  );
   const g = gradeFart(total);
-
-  const res = $('results');
-  if (res) res.style.display = 'block';
-
-  const sc1 = $('sc1');
-  if (sc1) {
-    sc1.textContent =
-      impressiveness + '/10 ' + '⭐'.repeat(Math.max(1, Math.ceil(impressiveness / 2)));
-  }
-  const sc2 = $('sc2');
-  if (sc2) sc2.textContent = stinkEmoji(stink) + ' ' + stink + '/10';
-  const stinkFill = $('stinkFill');
-  if (stinkFill) stinkFill.style.width = 100 - stink * 10 + '%';
-  const sc3 = $('sc3');
-  if (sc3) sc3.textContent = soundQuality + '/10 ' + (soundQuality > 7 ? '🎶' : '🎵');
-  const sc4 = $('sc4');
-  if (sc4) sc4.textContent = durationLabel(length);
-  const gradeEl = $('grade');
-  if (gradeEl) {
-    gradeEl.textContent = g.grade;
-    gradeEl.style.color = g.color;
-  }
-  const gradeDesc = $('gradeDesc');
-  if (gradeDesc) gradeDesc.textContent = g.desc;
-
-  // Announce grade for screen readers
-  const live = $('liveRegion');
-  if (live) live.textContent = `Grade: ${g.grade}. ${g.desc}`;
-
-  if (total > 40) {
-    document.body.style.animation = 'none';
-    void document.body.offsetHeight;
-    document.body.style.animation = 'shake .5s';
-  }
-
-  if (g.grade === 'S+') {
-    spawnSparkles();
-  }
-
-  const prev = combo;
-  combo = reduceCombo(combo, g.grade);
-  renderComboBanner(combo);
-  if (combo.count >= 3 && combo.count > prev.count) {
-    triggerHaptic(HAPTICS.combo);
-  }
-
+  renderResultsCard(vals, total, g);
+  updateCombo(g.grade);
   addToHall(total, g.grade);
 
   launchesThisSession += 1;
-  const ctx: LaunchContext = {
+  unlockAchievementsForLaunch({
     sliders: vals,
     total,
     grade: g.grade,
     hallSize: loadHallEntries().length,
     launchesThisSession,
     match: matchPct,
-  };
-  const owned = loadUnlocked();
-  const newly = evaluateLaunch(ctx, owned);
-  if (newly.length) {
-    for (const id of newly) owned.add(id);
-    saveUnlocked(owned);
-    let i = 0;
-    for (const id of newly) {
-      const a = getAchievement(id);
-      if (!a) continue;
-      setTimeout(() => showAchievementToast(a), i * 250);
-      i++;
-    }
-  }
+  });
 
-  setTimeout(() => res?.scrollIntoView({ behavior: 'smooth' }), 600);
+  setTimeout(() => $('results')?.scrollIntoView({ behavior: 'smooth' }), 600);
 }
 
 function onRandom(): void {
