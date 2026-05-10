@@ -38,6 +38,7 @@ import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
 import { loadMode, setMode, type Mode } from './state/persistence';
 import { initStoryPantry } from './ui/plate';
+import { wireShop } from './ui/shop';
 import {
   comments,
   weakComments,
@@ -462,6 +463,7 @@ function init(): void {
   wireHardModeButton();
   wireModeButton();
   initStoryPantry(); // Story Mode pantry/plate/belly — hidden in Sandbox by CSS
+  wireShop();
   renderChallengeCard();
   renderBestToday();
   renderHall();

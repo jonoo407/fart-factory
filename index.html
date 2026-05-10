@@ -192,6 +192,20 @@
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
     </div>
 
+    <div id="shopModal" class="shop-modal" hidden role="dialog" aria-modal="true" aria-label="Pantry shop">
+      <div class="shop-modal-card">
+        <div class="shop-modal-header">
+          <h2>🛒 Pantry Shop</h2>
+          <button type="button" id="shopCloseBtn" class="shop-close" aria-label="Close shop">✕</button>
+        </div>
+        <div class="shop-modal-balance" aria-live="polite">
+          💰 You have <span id="shopBalance">0</span> gold
+        </div>
+        <div class="shop-offers" id="shopOffers"></div>
+        <div class="shop-modal-flavor">Offerings refresh each day. Common foods are already free in your pantry. Legendary foods unlock through quests.</div>
+      </div>
+    </div>
+
     <div class="gas-overlay" id="gasOverlay" aria-hidden="true"></div>
 
     <div
