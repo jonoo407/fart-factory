@@ -198,11 +198,22 @@ function wireMuteButton(): void {
   });
 }
 
+function wireVisibilityChange(): void {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      suspendAudio();
+    } else if (!loadMuted()) {
+      resumeAudio();
+    }
+  });
+}
+
 function init(): void {
   wireSliderDisplay();
   $('launchBtn')?.addEventListener('click', onLaunch);
   $('randomBtn')?.addEventListener('click', onRandom);
   wireMuteButton();
+  wireVisibilityChange();
   renderHall();
   showOnboarding();
   // Test/debug shim: expose AudioContext.state for E2E mute verification.
