@@ -351,6 +351,22 @@ This redesign clears the v4 gates and lifts axes:
 | Decision Quality axis | 2/10 | 7+/10 (interesting decisions per Sid Meier — multiple viable recipes, real tradeoffs) |
 | Curiosity Gaps axis | 4/10 | 8/10 (locked-but-visible foods, hidden recipes, audience preferences) |
 
+### Rarity color palette (instantly-readable convention)
+
+Foods, recipes, and audiences carry a **rarity tier** rendered with the gaming-canonical 5-color palette established by Diablo II (Blizzard 2000), standardized by World of Warcraft (2004), and re-used across League of Legends / Hearthstone / Borderlands / Slay the Spire / dozens more. Cultural fluency: any player who has touched an RPG since 2000 reads it without instruction.
+
+| Tier | Color | Hex | Visual signal |
+|---|---|---|---|
+| **Common** | Grey | `#9ca3af` (slate-400) | neutral border, no glow — "this is the floor" |
+| **Uncommon** | Green | `#22c55e` (green-500) | mild outer-glow, pleasant |
+| **Rare** | Blue | `#3b82f6` (blue-500) | distinct outer-glow, "interesting find" |
+| **Epic** | Purple | `#a855f7` (purple-500) | strong glow + slight pulse, "you should be excited" |
+| **Legendary** | Gold | `#f59e0b` (amber-500) | bright glow + sparkle particles + ambient pulse, "this is the moment" |
+
+These are CSS colors / box-shadows / borders — not new font weights or sizes. Implementation: a shared `.rarity-{tier}` class system that any element (food card, recipe entry, audience portrait, fart announcement) can inherit.
+
+The 5-color rarity palette is a **documented sub-palette** of `docs/PALETTE.md` — it overlaps with `reward` gold (legendary) but adds grey/green/blue/purple as semantic-tier-only colors. Per V16 (limited intentional palette), the full game palette is ≤6 *role-bearing* hue families plus this rarity sub-palette which is conventional and culturally pre-loaded.
+
 Concretely, the minimum-viable food redesign:
 
 1. **Inventory data structure** (`src/state/inventory.ts`). Catalog of ~30 named foods, each with: `id`, `name` (e.g. "Black Beans", "Pickled Egg"), `emoji`, `unlocked: boolean`, `properties: { wet, dry, stink, musical, length, volume, temp }` (each property 0-5 contribution rather than a slider value). Persists to localStorage as `fart_pantry`.
