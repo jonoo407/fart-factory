@@ -354,13 +354,13 @@ Orchestrator parses last line, `JSON.parse`. Malformed → re-prompt once: "Your
 
 ### Fun critic
 
-Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). The v1 rubric here certified the autonomous-session game as "high quality" while max-all-sliders was still the dominant strategy; v2 is stricter so degenerate gameplay can no longer pass.
+Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new axes (Progression, Goal Stacking, Curiosity Gaps), an Anticipation sub-test under Game Feel, and a new Hollow Score gate.
 
-- **Axes:** Decision Quality, Skill Curve, Game Feel, Failure & Recovery, Variation & Replay (each 1-10, average is the raw score).
-- **Hard gates** (any failure caps score at 4): Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety.
-- **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring. Critic must report each scenario's outcome.
-- **Schell Lens #39:** the four lens questions (especially "Are there dominant strategies?") must be answered verbatim per iteration.
-- **Output schema:** `{score, rationale, blockers, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6. Orchestrator's existing parsing below still reads `.score` and `.blockers`; new fields are additive.
+- **Axes (8, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression), Goal Stacking, Curiosity Gaps.
+- **Hard gates (7, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety, Hollow Score.
+- **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring.
+- **Schell Lens #39:** four questions answered verbatim per iteration.
+- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6. Orchestrator's existing parsing below still reads `.score` and `.blockers`; new fields are additive.
 - **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic
