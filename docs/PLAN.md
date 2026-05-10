@@ -353,11 +353,15 @@ Orchestrator parses last line, `JSON.parse`. Malformed → re-prompt once: "Your
 - **Reward:** small focused modules, named constants, JSDoc on public APIs.
 
 ### Fun critic
-- **Axes:** novelty, replayability, surprise, satisfaction, age-appropriateness (5-10yo).
-- **Inputs:** `docs/iteration-log.md` (history), changed UI files, commentary strings, achievements.
-- **Tools:** Read, Grep, Glob.
-- **Lens:** "Imagine an 8-year-old playing for 10 minutes. Will they laugh ≥3 times? Find ≥1 new thing to try?"
-- **Hard blocker:** any text a parent wouldn't want their kid reading.
+
+Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). The v1 rubric here certified the autonomous-session game as "high quality" while max-all-sliders was still the dominant strategy; v2 is stricter so degenerate gameplay can no longer pass.
+
+- **Axes:** Decision Quality, Skill Curve, Game Feel, Failure & Recovery, Variation & Replay (each 1-10, average is the raw score).
+- **Hard gates** (any failure caps score at 4): Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety.
+- **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring. Critic must report each scenario's outcome.
+- **Schell Lens #39:** the four lens questions (especially "Are there dominant strategies?") must be answered verbatim per iteration.
+- **Output schema:** `{score, rationale, blockers, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6. Orchestrator's existing parsing below still reads `.score` and `.blockers`; new fields are additive.
+- **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic
 - **Inputs:** Playwright screenshots at 375×667, 768×1024, 1440×900 (taken in step 4 to `tests/e2e/__snapshots__/iter-N-{vp}.png`), changed CSS, animation code.
