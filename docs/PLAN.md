@@ -71,12 +71,13 @@ E:\app_design\fart-factory\
 ├─ legacy/index.legacy.html    # frozen original
 ├─ src/
 │  ├─ main.ts
-│  ├─ ui/      (sliders, results, hall, reactions, live-region)
+│  ├─ ui/      (sliders, results, hall, reactions, live-region, shop, notebook, plate)
 │  ├─ audio/   (engine, procedural, sample-player, mixer, types)
-│  ├─ scoring/ (grade, scores, combos)
-│  ├─ state/   (hall, achievements, settings)
-│  ├─ visuals/ (gas-cloud, particles, mascot, shake)
-│  └─ content/ (commentary, reactions)
+│  ├─ scoring/ (grade, scores, combos, recipe — Tier 7)
+│  ├─ state/   (hall, achievements, settings, challenge, pantry, audiences,
+│  │            recipes, gold, research, containment, mode — Tier 7)
+│  ├─ visuals/ (gas-cloud, particles, mascot, shake, rarity-glow)
+│  └─ content/ (commentary, reactions, food-seeds, audience-seeds — Tier 7)
 ├─ public/
 │  ├─ sfx/manifest.json + *.mp3
 │  └─ favicon.svg
@@ -293,6 +294,73 @@ Each item: ETA / failing test / verification.
 25. **Axe-style a11y check via Playwright** (15m). Test: contrast violations. Verify: 0 critical axe issues at 3 viewports.
 
 Total ETA if every item shipped: ~7h. The 2h cap and quality target ensure we won't reach all 25 — by design, highest-value items ship first.
+
+---
+
+### Tier 7 — v3 Food-Mechanic Game (post-playtest redesign)
+
+**Context.** After the v2 overhaul shipped (iters 1-26, merged 2026-05-10 as `7db0c8e`), user playtested the deployed Pages build and rated it 3-4/10 on fun. The v5 Fun critic ([FUN_CRITIC.md §4](FUN_CRITIC.md#4-v5-applied-to-current-fart-factory-state)) confirms — 6 of 11 hard gates fail, 4 axes score ≤2. Root cause: the slider+grade input/output model is structurally broken. v3 game replaces it with a food-eating mechanic per FUN_CRITIC.md §4.5.
+
+**Scope.** Build MVP (items 7.1-7.12, ~24h total estimated, ~12 iters), then expand (items 7.13-7.17, ~10h) if user wants. Each iter follows the same RED-GREEN TDD + 4-critic loop from §E. Preserves the slider game as Sandbox Mode toggle so existing 125 unit + ~190 e2e tests stay green.
+
+**Target v5 score after MVP**: 6-7 (clears all 11 hard gates; min axis ≥4; multi-axis polish in subsequent iters).
+
+#### 7.1-7.12 — MVP iterations
+
+26. **Inventory + pantry persistence** (2h). Test: `pantry.test.ts` asserts catalog has ≥12 foods (8 common + 4 unlockable) each with `{id, name, emoji, rarity, properties: {wet, dry, stink, loud, musical, length, temp}, bellyCost}`. `loadPantry` returns array of unlocked food ids; `unlock(id)` persists. Verify: `localStorage.fart_pantry` is JSON array; corrupt JSON returns starter pantry; per-day reset doesn't touch unlocked list.
+
+27. **Audience archetypes catalog + daily rotation** (1.5h). Test: `audiences.test.ts` — ≥5 audiences with `{id, name, emoji, cravings: {wet, stink, ...}, restrictions?, portrait}`. `getDailyAudience(date)` deterministic per UTC day. Verify: same UTC date → same audience across reloads.
+
+28. **Rarity-color CSS system** (1h). Test: `rarity.spec.ts` — assert `.rarity-common` resolves to grey, `-uncommon` green, `-rare` blue, `-epic` purple, `-legendary` gold; glow intensity scales per tier; reduce-motion suppresses pulse. Verify: Playwright `getComputedStyle` matches PALETTE.md hex codes.
+
+29. **Plate + belly meter UI** (3h). Test: `plate.spec.ts` — pantry grid renders 8+ food cards; tap food → adds to plate (max 4 slots); tap slot → removes; belly meter shows starting 20 points; food adds subtract `bellyCost`; can't add if meter < cost. Verify: `localStorage.fart_belly_<date>` persists across reload; calendar reset restores 20.
+
+30. **Compute fart properties + synergy/conflict combinations** (2h). Test: `recipe.test.ts` — `computeFartFromPlate([beans, dairy])` produces `{stink: ≥6, wet: ≥5}` (synergy bonus); `[asparagus, cheese]` produces a flagged conflict (penalty); pure-additive base sums slider properties; 6+ named synergies + 3+ conflicts hardcoded. Verify: properties feed into existing `playFart()` for audio.
+
+31. **Containment area picker + modifiers** (2h). Test: `containment.spec.ts` — area picker shows 5-6 named areas; selecting "Library" applies `volume × -3 score penalty, stink × 1.5`; selecting "Elevator" applies `stink × 4, volume × 2`; same recipe scores differently per area. Verify: area persists for current session; reset on day rollover.
+
+32. **Match-against-cravings scoring + new Launch flow** (3h). Test: `audience-match.spec.ts` — launch with plate matching audience cravings → match% ≥ 80; launch with plate opposite → match% ≤ 30. Hard Mode hides cravings, shows reaction tier only. Verify: replaces `gradeFart()` for Story Mode; preserves it for Sandbox Mode (mode-toggle pattern). Single grading system in Story Mode = Disjoint Systems Gate cleared.
+
+33. **Score → gold currency + pantry shop UI** (3h). Test: `shop.spec.ts` — completing a launch with match% ≥ 70 awards gold proportional; shop modal renders 3 random uncommon foods purchasable; buying deducts gold + adds to pantry; rerolls daily. Verify: `localStorage.fart_gold` persistence; cap = unbounded for MVP.
+
+34. **Recipe discovery + Lab Notebook** (3h). Test: `recipes.test.ts` — recipe catalog has ≥10 entries; `matchesRecipe([beans, dairy, garlic])` returns 'Swamp Beast'. `recipes.spec.ts` — first time matching a recipe → toast notification + entry logged in Lab Notebook; subsequent matches don't re-toast. Verify: 4-6 starter recipes pre-known (tutorial); remaining are "hidden" until discovered.
+
+35. **Meaningful failure: research notes** (1.5h). Test: `research.test.ts` — low-match launch (≤ 30%) banks research notes 1-5 (proportional to non-zero effort spent); notes accumulate persistently; spending 20 notes unlocks the cheapest unowned food. Verify: failure no longer wipes session — even a bad day moves the long arc forward (P30 / Spelunky model).
+
+36. **Polish: rarity glows + audience portrait animations** (2h). Test: `polish.spec.ts` — food card with `rarity-rare` shows blue glow; audience portrait wobbles on launch; belly meter depletion has smooth animation; legendary food has sparkle particles. Verify: V20 wind-up/pop/settle motion applied to plate-add and shop-purchase; reduce-motion respected.
+
+37. **Sandbox Mode toggle (slider game preservation)** (1h). Test: `mode.spec.ts` — mode toggle button defaults to "Story (Food)"; switching to "Sandbox (Sliders)" reveals the iter-1-26 slider UI; all original 11 lock-points pass in Sandbox; mode persists across reload. Verify: `tests/e2e/characterization.spec.ts` + `port-parity.spec.ts` still green when Sandbox is the active mode.
+
+38. **End-to-end gameplay smoke + FINAL_REPORT_v3.md** (1.5h). Test: `gameplay-smoke-v3.spec.ts` — fresh visit; pick 3 starter foods that match daily audience cravings; launch; reach ≥70% match; buy a new food; discover a recipe; reload → state persists. Verify: `docs/FINAL_REPORT_v3.md` written.
+
+**MVP total ETA**: 24h across 12 iters. Parallel to Phase B of session 2 (~40 min per iter delivered), this is realistically 4-6 hours of active work — many iters are documentation + small refactors after the foundation lands at 7.1.
+
+**MVP target v5 score**: ≥6. Gate-by-gate check after 7.1-7.12:
+- Disjoint Systems Gate → cleared in 7.6 (single grading).
+- Open Continuous Input Gate → cleared in 7.4 (pick-K-of-N replaces sliders for Story Mode).
+- Loop-Only Gate → cleared in 7.7 (pantry growth = nameable arc).
+- Displayed-Target Puzzle Gate → cleared in 7.6 (Hard Mode hides cravings + recipes are discoverable in 7.8).
+- Hollow Score Gate → cleared in 7.7 (score → gold → in-system unlocks).
+- No-Failure Gate → cleared partially in 7.9 (research-notes meta-progression).
+- Plus all the v4 axes (Choice Architecture, System Integration) lift to ≥6.
+
+#### 7.13-7.17 — Expansion (post-MVP)
+
+39. **Expand pantry from 12 → 30 foods** (3h). Test: `pantry.test.ts` asserts ≥30 entries; ≥6 per rarity tier; ≥3 mood/affect tags per tier. Verify: legendary tier appears with multi-step unlock quests.
+
+40. **Expand audiences from 5 → 20** (3h). Test: `audiences.test.ts` asserts ≥20 archetypes; ≥3 with restriction clauses; portrait files exist in `public/audiences/`. Verify: 30-day rotation cycle.
+
+41. **Chance shop with random rare/epic offerings** (2h). Test: `shop.test.ts` asserts daily shop roll uses seeded RNG (deterministic per UTC date + player ID); rare/epic slots gated by player progression. Verify: pantry-shop offers a different curated subset each day.
+
+42. **Legendary multi-step unlock quests** (3h). Test: `quests.test.ts` asserts ≥5 legendary foods each with named multi-step requirements (e.g. "own 8 commons + 1 win this week"); quest progress shown in shop modal. Verify: legendary foods cannot appear in random shop rolls — quest-only.
+
+43. **Audio: ElevenLabs SFX seeds for outlandish foods + reactions** (2h, depends on API budget). Test: extend `scripts/sfx-seeds.ts` with 8-12 new prompts (audience laughter, audience evacuation, food-eating sounds, legendary-unlock fanfare); manifest grows. Verify: A28 Library Richness sub-test re-passes with ≥30 named effects across ≥4 affect tags.
+
+**Expansion total ETA**: ~13h across 5 iters. Target v5 score post-expansion: ≥8 (clears every gate, ≥7 on every axis except possibly Variation & Replay which scales with content).
+
+#### Stop conditions for the food iter session
+
+Same as §I — 60min quality target OR 120min hard. v3 game build will likely take multiple 1-2h sessions; commit on `food-mvp` branch (off `main`), one PR per landing tier (7.1-7.4 = foundation PR, 7.5-7.8 = gameplay PR, 7.9-7.12 = polish + smoke PR).
 
 ---
 
