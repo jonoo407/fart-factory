@@ -72,6 +72,14 @@ h1 {
   margin-bottom: 3px;
 }
 .slider-label .emoji-range { color: #aaffcc; font-size: 0.85em; }
+.slider-label .hint {
+  font-size: 1em;
+  min-width: 1.6em;
+  text-align: center;
+  display: inline-block;
+}
+.slider-label .hint[data-dir='ok'] { color: #ffd97a; }
+.slider-label .hint[data-intensity='3'] { font-size: 0.95em; }
 input[type=range] {
   width: 100%;
   height: 30px;

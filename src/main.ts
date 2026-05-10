@@ -15,7 +15,7 @@ import {
 import { loadHall as loadHallEntries } from './state/hall';
 import { showAchievementToast } from './ui/toast';
 import { reduceCombo, initialCombo, type ComboState } from './state/combo';
-import { getDailyChallenge, computeMatch } from './state/challenge';
+import { getDailyChallenge, computeMatch, axisHints, type AxisHint } from './state/challenge';
 import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
 import {
@@ -41,9 +41,11 @@ function wireSliderDisplay(): void {
   for (let i = 1; i <= 6; i++) {
     const s = $(`s${i}`) as HTMLInputElement | null;
     const v = $(`v${i}`);
+    const h = $(`hint${i}`);
     if (!s || !v) continue;
     s.addEventListener('input', () => {
       v.textContent = s.value;
+      if (h) h.textContent = '';
     });
   }
 }
@@ -76,6 +78,26 @@ function matchEmoji(pct: number): string {
   return '💀';
 }
 
+function hintEmoji(h: AxisHint): string {
+  if (h.dir === 'ok') return '🎯';
+  // intensity 1 (small), 2 (medium), 3 (far)
+  const arrow = h.dir === 'up' ? '⬆️' : '⬇️';
+  if (h.intensity >= 3) return arrow + arrow;
+  return arrow;
+}
+
+function renderAxisHints(actual: number[]): void {
+  const target = getDailyChallenge().profile;
+  const hints = axisHints(actual, target);
+  for (let i = 0; i < 6; i++) {
+    const el = $(`hint${i + 1}`);
+    if (!el) continue;
+    el.textContent = hintEmoji(hints[i]);
+    el.setAttribute('data-dir', hints[i].dir);
+    el.setAttribute('data-intensity', String(hints[i].intensity));
+  }
+}
+
 function renderChallengeMatch(actual: number[]): void {
   const challenge = getDailyChallenge();
   const pct = computeMatch(actual, challenge.profile);
@@ -85,6 +107,7 @@ function renderChallengeMatch(actual: number[]): void {
   if (wrap) wrap.removeAttribute('hidden');
   if (pctEl) pctEl.textContent = String(pct);
   if (emoji) emoji.textContent = ' ' + matchEmoji(pct);
+  renderAxisHints(actual);
 }
 
 function onLaunch(): void {

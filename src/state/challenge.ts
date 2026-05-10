@@ -44,3 +44,36 @@ export function computeMatch(actual: number[], target: number[]): number {
   }
   return Math.round((1 - total / MAX_DIFF) * 100);
 }
+
+export type HintDir = 'ok' | 'up' | 'down';
+export interface AxisHint {
+  dir: HintDir;
+  diff: number;
+  /** 0 = within tolerance band, 1 = small, 2 = medium, 3 = far. */
+  intensity: 0 | 1 | 2 | 3;
+}
+
+const TOLERANCE = 1; // diffs ≤ 1 read as "ok"
+
+function intensityFor(diff: number): 0 | 1 | 2 | 3 {
+  if (diff <= TOLERANCE) return 0;
+  if (diff <= 3) return 1;
+  if (diff <= 5) return 2;
+  return 3;
+}
+
+export function axisHints(actual: number[], target: number[]): AxisHint[] {
+  const out: AxisHint[] = [];
+  for (let i = 0; i < 6; i++) {
+    const a = actual[i] ?? 0;
+    const t = target[i] ?? 0;
+    const rawDiff = a - t;
+    const diff = Math.abs(rawDiff);
+    let dir: HintDir;
+    if (diff <= TOLERANCE) dir = 'ok';
+    else if (rawDiff > 0) dir = 'down';
+    else dir = 'up';
+    out.push({ dir, diff, intensity: intensityFor(diff) });
+  }
+  return out;
+}

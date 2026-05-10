@@ -3,6 +3,7 @@ import {
   CHALLENGES,
   getDailyChallenge,
   computeMatch,
+  axisHints,
 } from '../../src/state/challenge';
 
 describe('CHALLENGES catalog', () => {
@@ -66,5 +67,43 @@ describe('computeMatch', () => {
     expect(Number.isInteger(m)).toBe(true);
     expect(m).toBeGreaterThanOrEqual(0);
     expect(m).toBeLessThanOrEqual(100);
+  });
+});
+
+describe('axisHints', () => {
+  it('returns 6 hints with dir "ok" when actual === target', () => {
+    const hints = axisHints([5, 5, 5, 5, 5, 5], [5, 5, 5, 5, 5, 5]);
+    expect(hints).toHaveLength(6);
+    for (const h of hints) {
+      expect(h.dir).toBe('ok');
+      expect(h.diff).toBe(0);
+    }
+  });
+
+  it('returns dir "down" when actual > target (needs to come down)', () => {
+    const hints = axisHints([10, 5, 5, 5, 5, 5], [3, 5, 5, 5, 5, 5]);
+    expect(hints[0].dir).toBe('down');
+    expect(hints[0].diff).toBe(7);
+  });
+
+  it('returns dir "up" when actual < target (needs to go up)', () => {
+    const hints = axisHints([2, 5, 5, 5, 5, 5], [9, 5, 5, 5, 5, 5]);
+    expect(hints[0].dir).toBe('up');
+    expect(hints[0].diff).toBe(7);
+  });
+
+  it('marks small diffs (≤1) as "ok" tolerance band', () => {
+    const hints = axisHints([6, 5, 5, 5, 5, 5], [5, 5, 5, 5, 5, 5]);
+    expect(hints[0].dir).toBe('ok');
+    expect(hints[0].diff).toBe(1);
+  });
+
+  it('intensity scales with diff magnitude', () => {
+    const hints = axisHints([10, 1, 5, 5, 5, 5], [5, 5, 5, 5, 5, 5]);
+    expect(hints[0].intensity).toBeGreaterThan(0);
+    expect(hints[1].intensity).toBeGreaterThan(0);
+    // ≥3 difference is significant; both should show at least medium intensity.
+    expect(hints[0].intensity).toBeGreaterThanOrEqual(2);
+    expect(hints[1].intensity).toBeGreaterThanOrEqual(2);
   });
 });
