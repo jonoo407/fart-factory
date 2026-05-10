@@ -12,11 +12,14 @@ import {
   BELLY_CAPACITY,
   loadLastArea,
   setLastArea,
+  loadLastMatch,
+  setLastMatch,
 } from '../state/persistence';
 import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
+import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
@@ -230,33 +233,91 @@ function applyAreaModifiers(props: FoodProperties, area: Area): FoodProperties {
 
 export function renderAudiencePortrait(): void {
   const aud = getDailyAudience();
+  const hardMode = loadHardMode();
   const emojiEl = $('audiencePortraitEmoji');
   const nameEl = $('audienceName');
   const flavorEl = $('audienceFlavor');
   const cravingsEl = $('audienceCravings');
   const restrictionsEl = $('audienceRestrictions');
-  if (emojiEl) emojiEl.textContent = aud.emoji;
-  if (nameEl) nameEl.textContent = aud.name;
-  if (flavorEl) flavorEl.textContent = aud.flavor;
+  if (emojiEl) emojiEl.textContent = hardMode ? '❓' : aud.emoji;
+  if (nameEl) nameEl.textContent = aud.name; // Name visible in both modes
+  if (flavorEl) flavorEl.textContent = hardMode ? 'Their tastes are a mystery. Read the room.' : aud.flavor;
   if (cravingsEl) {
-    const c = aud.cravings;
-    const parts: string[] = [];
-    if (c.stink >= 3) parts.push(`stinky ${c.stink}/5`);
-    if (c.wet >= 3) parts.push(`wet ${c.wet}/5`);
-    if (c.dry >= 3) parts.push(`dry ${c.dry}/5`);
-    if (c.loud >= 3) parts.push(`loud ${c.loud}/5`);
-    if (c.musical >= 3) parts.push(`musical ${c.musical}/5`);
-    if (c.length >= 3) parts.push(`long ${c.length}/5`);
-    if (c.temp >= 4) parts.push(`hot ${c.temp}/5`);
-    cravingsEl.textContent = parts.length ? `Wants: ${parts.join(' · ')}` : 'No strong preferences.';
+    if (hardMode) {
+      cravingsEl.textContent = '';
+    } else {
+      const c = aud.cravings;
+      const parts: string[] = [];
+      if (c.stink >= 3) parts.push(`stinky ${c.stink}/5`);
+      if (c.wet >= 3) parts.push(`wet ${c.wet}/5`);
+      if (c.dry >= 3) parts.push(`dry ${c.dry}/5`);
+      if (c.loud >= 3) parts.push(`loud ${c.loud}/5`);
+      if (c.musical >= 3) parts.push(`musical ${c.musical}/5`);
+      if (c.length >= 3) parts.push(`long ${c.length}/5`);
+      if (c.temp >= 4) parts.push(`hot ${c.temp}/5`);
+      cravingsEl.textContent = parts.length ? `Wants: ${parts.join(' · ')}` : 'No strong preferences.';
+    }
   }
   if (restrictionsEl) {
-    if (aud.restrictions && aud.restrictions.length) {
+    if (hardMode) {
+      restrictionsEl.textContent = '';
+    } else if (aud.restrictions && aud.restrictions.length) {
       restrictionsEl.textContent = `🚫 ${aud.restrictions.join(' · ')}`;
     } else {
       restrictionsEl.textContent = '';
     }
   }
+  // Paint Hard Mode button.
+  const btn = $('storyHardModeBtn') as HTMLButtonElement | null;
+  if (btn) {
+    btn.setAttribute('aria-pressed', hardMode ? 'true' : 'false');
+    btn.textContent = hardMode ? '🧠 Hard ON' : '🧠 Hard';
+  }
+}
+
+function tierLabel(tier: ReturnType<typeof audienceReaction>['tier']): string {
+  switch (tier) {
+    case 'loved':     return '😍 The audience LOVES it!';
+    case 'liked':     return '🙂 They liked that.';
+    case 'meh':       return '😐 Mixed reactions.';
+    case 'disliked':  return '🤢 Several covered their nose.';
+    case 'evacuated': return '💀 The room is clearing out.';
+  }
+}
+
+function trendLabel(trend: ReturnType<typeof audienceReaction>['trend']): string {
+  switch (trend) {
+    case 'first':  return '';
+    case 'warmer': return ' 🔥 warmer';
+    case 'colder': return ' ❄️ colder';
+    case 'same':   return ' ➡️ same';
+  }
+}
+
+function renderAudienceReaction(pct: number): void {
+  const wrap = $('audienceReaction');
+  const tierEl = $('audienceReactionTier');
+  const trendEl = $('audienceReactionTrend');
+  const r = audienceReaction(pct, loadLastMatch());
+  if (wrap) wrap.removeAttribute('hidden');
+  if (tierEl) tierEl.textContent = tierLabel(r.tier);
+  if (trendEl) trendEl.textContent = trendLabel(r.trend);
+}
+
+function wireStoryHardModeButton(): void {
+  const btn = $('storyHardModeBtn') as HTMLButtonElement | null;
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const next = !loadHardMode();
+    setHardMode(next);
+    renderAudiencePortrait();
+    // Also re-render result panel hidden so the user has to launch again.
+    const result = $('storyResult');
+    if (result) result.setAttribute('hidden', '');
+    setLastMatch(null);
+    const reactionWrap = $('audienceReaction');
+    if (reactionWrap) reactionWrap.setAttribute('hidden', '');
+  });
 }
 
 function renderAreaGrid(): void {
@@ -294,20 +355,30 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
   const title = $('storyResultTitle');
   const effects = $('storyResultEffects');
   if (!wrap || !title || !effects) return;
-  wrap.removeAttribute('hidden');
+  const hardMode = loadHardMode();
   const aud = getDailyAudience();
   if (plateLen === 0) {
+    wrap.removeAttribute('hidden');
     title.innerHTML = '🌬️ A whisper. (Empty plate — the audience waits.)';
-  } else {
-    title.innerHTML = `${matchEmoji(m.pct)} <strong>${m.pct}%</strong> match for ${aud.emoji} ${aud.name} <span style="opacity:0.7">@ ${area.emoji} ${area.name}</span>`;
+    effects.innerHTML = '';
+    return;
   }
-  const lines: string[] = [];
-  for (const v of m.violations) lines.push(`🚫 Restriction violated: ${v} (-25%)`);
-  for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
-  for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
-  effects.innerHTML = lines.length
-    ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
-    : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
+  if (hardMode) {
+    // In Hard Mode, hide the match-% and per-rule violation list. Only
+    // synergies/conflicts are revealed (they're informative without
+    // disclosing the target). Audience-reaction strip carries the verdict.
+    wrap.setAttribute('hidden', '');
+  } else {
+    wrap.removeAttribute('hidden');
+    title.innerHTML = `${matchEmoji(m.pct)} <strong>${m.pct}%</strong> match for ${aud.emoji} ${aud.name} <span style="opacity:0.7">@ ${area.emoji} ${area.name}</span>`;
+    const lines: string[] = [];
+    for (const v of m.violations) lines.push(`🚫 Restriction violated: ${v} (-25%)`);
+    for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
+    for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
+    effects.innerHTML = lines.length
+      ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
+      : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
+  }
 }
 
 function onStoryLaunch(): void {
@@ -332,6 +403,10 @@ function onStoryLaunch(): void {
   renderPlate();
   renderBellyMeter();
   renderStoryResult(recipe, match, area, ingredientCount);
+  if (ingredientCount > 0) {
+    renderAudienceReaction(match.pct);
+    setLastMatch(match.pct);
+  }
 }
 
 function wireStoryLaunchButton(): void {
@@ -343,6 +418,7 @@ export function initStoryPantry(): void {
   renderAreaGrid();
   wirePlateSlots();
   wireStoryLaunchButton();
+  wireStoryHardModeButton();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();

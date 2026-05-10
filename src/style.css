@@ -89,6 +89,24 @@ body {
 .audience-cravings { font-size: 0.85em; color: #e6f0ff; margin-top: 4px; }
 .audience-restrictions { font-size: 0.8em; color: #ffaaaa; margin-top: 2px; }
 
+.audience-reaction {
+  background: rgba(20, 40, 80, 0.5);
+  border: 2px solid #aaccff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.05em;
+  color: #fff;
+}
+.audience-reaction-trend {
+  font-size: 0.85em;
+  font-weight: normal;
+  opacity: 0.85;
+  margin-left: 8px;
+}
+
 /* --- Containment area picker --- */
 .area-wrap { margin-bottom: 14px; }
 .area-label { font-size: 0.95em; color: #e6f0ff; margin-bottom: 6px; }
