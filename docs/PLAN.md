@@ -370,10 +370,14 @@ Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new a
 - **Hard blocker:** text under 14px on mobile, clipped elements, contrast failing AA, layout-thrashing keyframes (`width`/`height`/`top`/`left` animated instead of `transform`).
 
 ### Audio critic
-- **Inputs:** `public/sfx/manifest.json`, changed audio source files, `tests/unit/audio-procedural.test.ts` output.
-- **Axes:** variety (unique durations & checksums), distinctiveness (no two prompts collapse to similar text), crash safety (every code path either plays or no-ops cleanly), mute & hidden-tab handling (`document.visibilityState === 'hidden'` should suspend ctx).
-- **Tools:** Read, Grep, Bash (read-only).
-- **Hard blocker:** unhandled `audioCtx === null`, unhandled decode failure, mute mid-fart not stopping, no visibilitychange handler.
+
+Full rubric: [docs/AUDIO_CRITIC.md](AUDIO_CRITIC.md). v2 evolves v1 with five mechanism-level axes, seven hard gates (incl. NEW Library Absence, Visibility Bleed, Loudness Chaos, Autoplay Silence), and a required measurement step.
+
+- **Axes (5, each 1-10):** Lifecycle Robustness, Variety & Game Feel, Mastering Quality, Resilience & Production Reality, Accessibility & Persistence.
+- **Hard gates (7, any failure caps score at 4):** Audio Crash, Decode Failure, Mute Failure, Visibility Bleed, Autoplay Silence, Library Absence (when `sfx:generate` declared but manifest absent), Loudness Chaos.
+- **Required measurements:** AudioContext construction-site audit (grep), `visibilitychange` listener inspection, decode-failure handling grep, scheduling-clock check, mute toggle behavior test, manifest presence + schema, LUFS measurement on shipped samples.
+- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see AUDIO_CRITIC.md §3.5.
+- **Tools:** Read, Grep, Glob, Bash (read-only — `ffprobe`, `ffmpeg`), Playwright (for mute / visibilitychange / simulation scenarios).
 
 ### Orchestrator parsing logic
 
