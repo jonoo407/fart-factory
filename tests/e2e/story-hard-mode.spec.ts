@@ -25,10 +25,12 @@ test('Story Hard Mode toggle hides cravings + match %', async ({ page }) => {
   await page.click('#storyHardModeBtn');
   await expect(page.locator('#audienceCravings')).toHaveText('');
   await expect(page.locator('#audienceRestrictions')).toHaveText('');
-  // Launch with a known plate; match % panel should be hidden.
-  await page.locator('[data-food="beans"]').click();
-  await page.locator('[data-food="cheese"]').click();
+  // Launch with a plate that does NOT match any recipe (so no discovery
+  // toast steals the panel — Hard Mode intentionally surfaces discoveries
+  // even when it hides the match%).
+  await page.locator('[data-food="garlic"]').click();
   await page.click('#storyLaunchBtn');
+  // No match%, no synergies → result panel stays hidden in Hard Mode.
   await expect(page.locator('#storyResult')).toBeHidden();
 });
 

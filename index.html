@@ -39,6 +39,7 @@
         <div class="progression-strip" role="region" aria-label="Progression">
           <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
           <span class="progression-stat" aria-label="Research notes">📝 <span id="notesCount" aria-live="polite">0</span></span>
+          <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
         </div>
         <div class="belly-meter-wrap">
@@ -190,6 +191,20 @@
       </div>
 
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+    </div>
+
+    <div id="notebookModal" class="notebook-modal" hidden role="dialog" aria-modal="true" aria-label="Lab notebook">
+      <div class="notebook-modal-card">
+        <div class="notebook-modal-header">
+          <h2>📖 Lab Notebook</h2>
+          <button type="button" id="notebookCloseBtn" class="notebook-close" aria-label="Close notebook">✕</button>
+        </div>
+        <div class="notebook-modal-progress" aria-live="polite">
+          <span id="notebookProgressText">0 / 0 discovered</span>
+        </div>
+        <div class="notebook-recipes" id="notebookRecipes"></div>
+        <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
+      </div>
     </div>
 
     <div id="shopModal" class="shop-modal" hidden role="dialog" aria-modal="true" aria-label="Pantry shop">

@@ -20,6 +20,9 @@ import {
 import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
 import { awardGoldForLaunch } from '../scoring/reward';
+import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
+import { getRecipe } from '../state/recipes';
+import { renderNotebookCounter } from './notebook';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
@@ -360,7 +363,7 @@ function matchEmoji(pct: number): string {
   return '💀';
 }
 
-function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number): void {
+function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null): void {
   const wrap = $('storyResult');
   const title = $('storyResultTitle');
   const effects = $('storyResultEffects');
@@ -373,15 +376,33 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
     effects.innerHTML = '';
     return;
   }
+  const discoveryLine = (() => {
+    if (!discovery) return '';
+    const recipe = getRecipe(discovery.recipeId);
+    if (!recipe) return '';
+    if (discovery.freshlyDiscovered) {
+      return `<div class="story-result-discovery story-result-discovery-new">✨ NEW RECIPE: ${recipe.emoji} <strong>${recipe.name}</strong> — added to your lab notebook!</div>`;
+    }
+    return `<div class="story-result-discovery">📖 Recipe: ${recipe.emoji} ${recipe.name}</div>`;
+  })();
   if (hardMode) {
     // In Hard Mode, hide the match-% and per-rule violation list. Only
     // synergies/conflicts are revealed (they're informative without
     // disclosing the target). Audience-reaction strip carries the verdict.
-    wrap.setAttribute('hidden', '');
+    // Discovery toasts ARE shown in Hard Mode — they reveal what the
+    // player made, not what the audience wanted.
+    if (discoveryLine) {
+      wrap.removeAttribute('hidden');
+      title.innerHTML = discoveryLine;
+      effects.innerHTML = '';
+    } else {
+      wrap.setAttribute('hidden', '');
+    }
   } else {
     wrap.removeAttribute('hidden');
     title.innerHTML = `${matchEmoji(m.pct)} <strong>${m.pct}%</strong> match for ${aud.emoji} ${aud.name} <span style="opacity:0.7">@ ${area.emoji} ${area.name}</span>`;
     const lines: string[] = [];
+    if (discoveryLine) lines.push(discoveryLine);
     for (const v of m.violations) lines.push(`🚫 Restriction violated: ${v} (-25%)`);
     for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
     for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
@@ -400,6 +421,7 @@ function onStoryLaunch(): void {
   const propsAfterArea = applyAreaModifiers(recipe.props, area);
   const aud = getDailyAudience();
   const match = evaluateMatch(propsAfterArea, ids, aud.cravings, aud.restrictions);
+  const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
 
@@ -417,7 +439,8 @@ function onStoryLaunch(): void {
   renderPlate();
   renderBellyMeter();
   renderProgression();
-  renderStoryResult(recipe, match, area, ingredientCount);
+  renderNotebookCounter();
+  renderStoryResult(recipe, match, area, ingredientCount, discovery);
   if (ingredientCount > 0) {
     renderAudienceReaction(match.pct);
     setLastMatch(match.pct);
