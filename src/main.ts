@@ -5,6 +5,15 @@ import { playFart } from './audio/procedural';
 import { spawnGas } from './visuals/gas';
 import { spawnSparkles } from './visuals/particles';
 import {
+  evaluateLaunch,
+  loadUnlocked,
+  saveUnlocked,
+  getAchievement,
+  type LaunchContext,
+} from './state/achievements';
+import { loadHall as loadHallEntries } from './state/hall';
+import { showAchievementToast } from './ui/toast';
+import {
   comments,
   weakComments,
   showReactions,
@@ -37,6 +46,8 @@ function wireSliderDisplay(): void {
 function pickFromPool(pool: readonly string[]): string {
   return pool[Math.floor(Math.random() * pool.length)] ?? '';
 }
+
+let launchesThisSession = 0;
 
 function onLaunch(): void {
   const vals = readSliders();
@@ -106,6 +117,28 @@ function onLaunch(): void {
   }
 
   addToHall(total, g.grade);
+
+  launchesThisSession += 1;
+  const ctx: LaunchContext = {
+    sliders: vals,
+    total,
+    grade: g.grade,
+    hallSize: loadHallEntries().length,
+    launchesThisSession,
+  };
+  const owned = loadUnlocked();
+  const newly = evaluateLaunch(ctx, owned);
+  if (newly.length) {
+    for (const id of newly) owned.add(id);
+    saveUnlocked(owned);
+    let i = 0;
+    for (const id of newly) {
+      const a = getAchievement(id);
+      if (!a) continue;
+      setTimeout(() => showAchievementToast(a), i * 250);
+      i++;
+    }
+  }
 
   setTimeout(() => res?.scrollIntoView({ behavior: 'smooth' }), 600);
 }

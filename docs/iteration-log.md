@@ -8,7 +8,8 @@ Session start: 2026-05-10T12:20:11.917Z
 | 2 | 0.2 | Characterization E2E (11 lock-points × 3 vp = 33 green) | tests/e2e/characterization.spec.ts | 8 | 7 | 6 | 4** | 6.25 | 67c170a | ~22m |
 | 3 | 0.3 | Module migration scaffold + a11y bump (66/66 green) | tests/e2e/port-parity.spec.ts | 9 | 6 | 8 | 8 | 7.75 | 1582805 | ~28m |
 | 4 | 1.4-1.6 | Grade boundary + Hall corruption unit + ARIA live E2E (117 green) | tests/unit/grade.test.ts, tests/unit/hall.test.ts, tests/e2e/aria-live.spec.ts | 9 | 8 | 6 | 8 | 7.75 | 830a027 | ~33m |
-| 5 | 3.11 | Sparkle particles on S+ (28 emoji burst, reduced-motion safe) | tests/e2e/particles.spec.ts | 9 | 9 | 9 | 7 | 8.5 | (next) | ~38m |
+| 5 | 3.11 | Sparkle particles on S+ (28 emoji burst, reduced-motion safe) | tests/e2e/particles.spec.ts | 9 | 9 | 9 | 7 | 8.5 | c88d11b | ~38m |
+| 6 | 4.16 | Achievements (6 badges) + toast UI + persist + fixup | tests/unit/achievements.test.ts, tests/e2e/achievements.spec.ts | 9 | 8 | 8† | 7 | 8.0 | (next) | ~44m |
 
 ## Notes
 - *Iter 1: Fun & Audio critics returned 5 (neutral) explicitly because Tier 0.1 is pure toolchain scaffold — no game, no audio. Both reported zero blockers. Plan §F gate min<6 would normally trigger fix-up, but the fix would violate "minimum scope per iteration" (don't add features to scaffold step). Proceeding to commit; fun & audio re-grade after Tier 0.3 (legacy game ported into modules) and Tier 2 (audio pipeline).
