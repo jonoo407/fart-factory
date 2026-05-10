@@ -62,6 +62,40 @@ function intensityFor(diff: number): 0 | 1 | 2 | 3 {
   return 3;
 }
 
+// ----- Best-match persistence (per UTC day) -----
+
+export function matchKeyForDate(d: Date = new Date()): string {
+  // Use UTC year-month-day so the same calendar day yields the same key
+  // across times-of-day and (mostly) across timezones.
+  const yyyy = d.getUTCFullYear();
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  return `fart_best_${yyyy}-${mm}-${dd}`;
+}
+
+export function loadBestMatch(d: Date = new Date()): number {
+  try {
+    const raw = localStorage.getItem(matchKeyForDate(d));
+    if (raw === null) return 0;
+    const n = parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < 0 || n > 100) return 0;
+    return n;
+  } catch {
+    return 0;
+  }
+}
+
+export function recordMatch(match: number, d: Date = new Date()): number {
+  const prior = loadBestMatch(d);
+  const best = Math.max(prior, Math.round(match));
+  try {
+    localStorage.setItem(matchKeyForDate(d), String(best));
+  } catch {
+    // ignore storage errors (private mode, quota); pure-function safe.
+  }
+  return best;
+}
+
 export function axisHints(actual: number[], target: number[]): AxisHint[] {
   const out: AxisHint[] = [];
   for (let i = 0; i < 6; i++) {

@@ -15,7 +15,14 @@ import {
 import { loadHall as loadHallEntries } from './state/hall';
 import { showAchievementToast } from './ui/toast';
 import { reduceCombo, initialCombo, type ComboState } from './state/combo';
-import { getDailyChallenge, computeMatch, axisHints, type AxisHint } from './state/challenge';
+import {
+  getDailyChallenge,
+  computeMatch,
+  axisHints,
+  loadBestMatch,
+  recordMatch,
+  type AxisHint,
+} from './state/challenge';
 import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
 import {
@@ -98,6 +105,12 @@ function renderAxisHints(actual: number[]): void {
   }
 }
 
+function renderBestToday(): void {
+  const best = loadBestMatch();
+  const el = $('challengeBestPct');
+  if (el) el.textContent = String(best);
+}
+
 function renderChallengeMatch(actual: number[]): void {
   const challenge = getDailyChallenge();
   const pct = computeMatch(actual, challenge.profile);
@@ -108,6 +121,8 @@ function renderChallengeMatch(actual: number[]): void {
   if (pctEl) pctEl.textContent = String(pct);
   if (emoji) emoji.textContent = ' ' + matchEmoji(pct);
   renderAxisHints(actual);
+  recordMatch(pct);
+  renderBestToday();
 }
 
 function fireLaunchButtonMotion(): void {
@@ -282,6 +297,7 @@ function init(): void {
   wireMuteButton();
   wireVisibilityChange();
   renderChallengeCard();
+  renderBestToday();
   renderHall();
   showOnboarding();
   // Test/debug shims for E2E verification of internal state.

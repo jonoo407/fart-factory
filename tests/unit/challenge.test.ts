@@ -4,7 +4,12 @@ import {
   getDailyChallenge,
   computeMatch,
   axisHints,
+  loadBestMatch,
+  recordMatch,
+  matchKeyForDate,
 } from '../../src/state/challenge';
+
+import { beforeEach } from 'vitest';
 
 describe('CHALLENGES catalog', () => {
   it('contains at least 12 named challenges', () => {
@@ -67,6 +72,49 @@ describe('computeMatch', () => {
     expect(Number.isInteger(m)).toBe(true);
     expect(m).toBeGreaterThanOrEqual(0);
     expect(m).toBeLessThanOrEqual(100);
+  });
+});
+
+describe('best-match persistence', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('returns 0 when no match has been recorded for the day', () => {
+    const date = new Date('2026-05-10T12:00:00Z');
+    expect(loadBestMatch(date)).toBe(0);
+  });
+
+  it('persists the highest match value across calls', () => {
+    const date = new Date('2026-05-10T12:00:00Z');
+    recordMatch(50, date);
+    expect(loadBestMatch(date)).toBe(50);
+    recordMatch(90, date);
+    expect(loadBestMatch(date)).toBe(90);
+    // Lower match does not overwrite.
+    recordMatch(40, date);
+    expect(loadBestMatch(date)).toBe(90);
+  });
+
+  it('separates best matches per-date', () => {
+    const a = new Date('2026-05-10T12:00:00Z');
+    const b = new Date('2026-05-11T12:00:00Z');
+    recordMatch(80, a);
+    recordMatch(60, b);
+    expect(loadBestMatch(a)).toBe(80);
+    expect(loadBestMatch(b)).toBe(60);
+  });
+
+  it('matchKeyForDate is stable across times-of-day', () => {
+    const morning = new Date('2026-05-10T03:00:00Z');
+    const evening = new Date('2026-05-10T22:00:00Z');
+    expect(matchKeyForDate(morning)).toBe(matchKeyForDate(evening));
+  });
+
+  it('survives corrupt localStorage value', () => {
+    const date = new Date('2026-05-10T12:00:00Z');
+    localStorage.setItem(matchKeyForDate(date), 'not-a-number');
+    expect(loadBestMatch(date)).toBe(0);
   });
 });
 

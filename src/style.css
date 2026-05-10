@@ -69,6 +69,13 @@ h1 {
   color: #ffd97a;
 }
 .challenge-match-emoji { font-size: 1.2em; }
+.challenge-best {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 0.95em;
+  color: #ffe6b3;
+  opacity: 0.9;
+}
 .slider-group { margin: 8px 0; }
 .slider-label {
   display: flex;
