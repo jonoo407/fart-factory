@@ -38,6 +38,32 @@ Slider track gradient is decorative and treated as a single element.
 Other elements (hall border, results border, challenge border) use S=70-85%.
 This gives a clear focal hierarchy: Launch > lab > current event.
 
+### Rarity sub-palette (5 tiers — gaming canonical)
+
+For inventory items, recipes, and audience portraits the project uses the **classic Diablo II / WoW rarity palette**, one of the most culturally-pre-loaded color systems in interactive media. Anyone who's touched an RPG reads it without instruction.
+
+| Tier | Color | Hex | Tailwind reference | Visual signal |
+|---|---|---|---|---|
+| Common | Grey | `#9ca3af` | slate-400 | neutral border, no glow |
+| Uncommon | Green | `#22c55e` | green-500 | mild outer glow |
+| Rare | Blue | `#3b82f6` | blue-500 | distinct outer glow |
+| Epic | Purple | `#a855f7` | purple-500 | strong glow + slight pulse |
+| Legendary | Gold | `#f59e0b` | amber-500 | bright glow + sparkles + ambient pulse |
+
+**Origin**: Diablo II (Blizzard 2000) introduced the white→blue→yellow→gold convention; WoW 1.0 (2004) standardized grey→green→blue→purple→orange→gold; League of Legends, Hearthstone, Borderlands, Slay the Spire, and dozens of indie titles inherit some variant. Per V18 / V22 (single visual reference) the palette grounds the project in a tonal commitment recognizable to any player.
+
+**Relationship to the main 6-hue palette (§1)**:
+- Legendary gold = the existing `reward` family — same color, expanded usage.
+- Common grey, Uncommon green, Rare blue, Epic purple = additional *role-bearing* colors specifically for rarity. Per V16's "≤6 hue families with assigned roles," rarity tiers ARE assigned roles (one per tier) — this expands the palette responsibly.
+- Outside the rarity sub-palette, no use of grey / blue / purple in normal UI chrome (avoids tier confusion).
+
+**Color-only-information defense (V12)**: rarity is also conveyed by:
+- Glow intensity (none → soft → distinct → strong → sparkle).
+- Optional small icon next to the tier color (• ◆ ★ ✦ ✧).
+- Text label in the food's full-detail card.
+
+So rarity is never *only* communicated by color, satisfying WCAG 1.4.1.
+
 ### Color-only-information (V12)
 
 Every state distinction also carries a non-color signal:

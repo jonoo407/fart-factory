@@ -1,11 +1,22 @@
-# Fun Critic v3 — Rubric & Operationalization
+# Fun Critic v5 — Rubric & Operationalization
 
 > Applies to multi-agent overhaul iterations on `overhaul-v2`. Replaces the
 > seven-line block at `docs/PLAN.md` §F (the "Fun critic" subsection).
-> v3 evolves v2 (committed `4b9f7b3`) by adding axes and a gate for
-> long-term progression, goal stacking, anticipation design, curiosity
-> gaps, and endogenous value — gaps that v2's structural-failure focus
-> didn't surface.
+>
+> v5 evolves v4 after user feedback that the framework itself was
+> calibrated too generously: a polished-but-shallow build scored 7 under
+> v4 (and 3-4 under playtest). v5 makes three general-framework changes:
+> (a) 3 new game-agnostic axes (Personality / Surprise / Coherence) that
+> were missing, (b) a new aggregation formula `(min + mean) / 2` that
+> stops polish from compensating 1:1 for structural failure, and (c)
+> stricter calibration anchors. v4's axes/gates/principles all carry
+> forward unchanged.
+>
+> v4 evolved v3 after a user playtest of the shipped game revealed
+> structural-game failures my v3 rubric scored 7 on; v4 added 12 cited
+> principles (P20-P31), 2 new axes (System Integration, Choice
+> Architecture), and 4 new hard gates (Disjoint Systems, Open Continuous
+> Input, Loop-Only Design, Displayed-Target Puzzle).
 
 ---
 
@@ -23,7 +34,41 @@ The v1 fun critic in `docs/PLAN.md` §F awarded **fun=9** to iteration 5 ("spark
 
 **Observable in `docs/iteration-log.md`:** fun scores 5, 7, 6, 8, 9, 8, 8, 9 across iters 1-8. Not a single iteration cited a fun blocker. The critic has never blocked a commit on fun grounds, despite the user's clear judgment that the game isn't fun. The autonomous session terminated by hitting the §I "quality target" gate (two consecutive iterations averaging ≥8) — the v1 rubric thus literally certified the degenerate game as "high quality" and stopped iterating.
 
-### 1.1 What v3 adds to v2
+### 1.3 What v5 adds to v4 (framework calibration, not new specifics)
+
+After v4 shipped, user feedback was explicit: "the fun scoring is either weighted wrong or not critical enough." The four structural failures v4 names are real, but the framework still let the deployed build score around 7 on raw-mean aggregation when it played as a 3-4. The general framework needed three calibration fixes, distinct from adding more domain-specific principles:
+
+1. **3 new general axes** I never named, all game-agnostic:
+   - **Personality / Charm** (Disney's "Appeal"; McGraw & Warren's *benign violation* theory of humor). Does the game have a voice? Does it produce laughter, character, presence — not just polish? A craft-8 game with personality-2 has lost its soul.
+   - **Surprise & Delight** (Schell Lens #4 — referenced before but never an axis of its own). Distinct from Curiosity Gaps: curiosity is "I want to know what's behind that door"; surprise is "I did NOT expect this to happen." Twist mechanics, unexpected reactions, hidden behaviors that *reveal themselves at the moment of play*.
+   - **Aesthetic-Mechanical Coherence** (Schell Lens #16 — *Unification / Holographic Design*; Hunicke-LeBlanc-Zubek MDA's M→D→A causal chain). Does the mechanic *reinforce* the theme, or fight it? A fart game whose grading favors musical/elegant outputs over silly/gross ones is thematically dissonant.
+
+2. **Aggregation formula** changes from arithmetic mean → `(min_axis + mean) / 2`. The weakest axis now contributes half the raw score; polish on top of a broken foundation can no longer compensate 1:1. A build with 9 axes at 8 and one axis at 2 used to score 7.4; under v5 it scores 4.7. This catches the "gilded broken" pattern without adding new rules.
+
+3. **Calibration anchors recalibrated stricter**:
+   - Old: 7-8 = "solid mechanic with at least one interesting decision"
+   - New: 7-8 = "multiple interesting decisions; tight loop + nameable arc; characterful voice; replay value"
+   - Old: 5-6 = "has loop but with structural gaps"
+   - New: 5-6 = "playable but limited (loop works; one or two axes weak)"
+   - Old: 3-4 = "Default for any iteration that fails ≥1 hard gate"
+   - New: 3-4 = "flawed (multiple weak axes OR ≥1 hard gate)"
+
+The rest of the rubric — v4's 12 hard gates, all 31 cited principles, the required-simulation step, the Schell Lens #39 verbatim block — is unchanged. v5 is purely a framework-calibration update, not new game-specific content.
+
+### 1.2 What v4 added to v3
+
+After session 2's iter 24-26 shipped a daily challenge, Hard Mode, 14-sample SFX library, achievements, and best-today persistence, v3 scored the build at 7/10 on Fun. The user playtested the deployed game and said *"I'd give this a 3 or 4"* with four specific structural critiques:
+
+1. **Two parallel scoring systems unintegrated** — the original "total → grade" system from v1 still ran alongside the daily-challenge match%. Player can max all sliders and get S+ grade *regardless* of the daily challenge. v3 detected the visible-target dominant strategy in Hard Mode but didn't flag the disjoint-strategy issue across systems.
+2. **Open continuous input space** — six unbounded sliders 1-10 each. v3's Dominant Strategy gate caught this in spirit but didn't name the *input modality* as the root cause. The slider model itself precludes meaningful choice — switching to Hard Mode hides feedback but doesn't change the input space.
+3. **No inventory / no resource scarcity** — sliders are independently maxable. There's no budget, no pick-K-of-N, no combinatorial selection. v3 had Goal Stacking but not a check that the input space supports combinatorial choice.
+4. **No collection / no real save / no arc** — best-today is a single number per day; nothing unlocks, no recipes are discovered, no character grows. v3's Progression axis scored partially on best-today persistence, but persistence-of-one-number is not an arc.
+
+The user proposed: replace sliders with a **food-eating** mechanic (pick 3-5 foods from a growing inventory; foods have fart-properties; combinations produce emergent results; new foods unlock through play). That suggestion is operationalized below in §4.5.
+
+v4's mission: catch this class of structural failure. A cleanly-shipped slider game can pass v3 with a 7; under v4 it scores 3-4 because the *choice architecture* itself is broken regardless of polish.
+
+### 1.1 What v3 added to v2
 
 v2 caught the structural-collapse failures (dominant strategy, decision drought, no-failure, etc.). User stress-testing then exposed two further weaknesses. First, v2's prescription in §4.5 ("replace pure-sum scoring with target matching") was itself trivially soluble — once the target was visible on screen, the meta-strategy "match the displayed numbers" was a new dominant strategy. v3 doesn't fix the prescription's depth (that lives in §4.5 below), but it does add the rubric axes/gates that catch *that* class of failure too. Second, v2 had no axis for **long-term progression** (across-session mastery and content), no axis for **goal stacking** (concurrent multi-timescale goals), no axis for **curiosity gaps** (visible-but-inaccessible information), no sub-test for **anticipation design** (cue-to-payoff arc), and no gate for **endogenous value** (the score must feed into in-system consequences, not float as a hollow number). v3 adds three axes (Progression, Goal Stacking, Curiosity Gaps), one sub-test under Game Feel (Anticipation), and one new hard gate (Hollow Score). The v2 axes and gates remain unchanged.
 
@@ -54,12 +99,27 @@ Each axis and gate below traces to one or more cited principles.
 | P17 | **Endogenous value** — value generated by the game's own rule system vs. value imported from outside (real-money prizes, social bragging). A score must feed back into in-system consequences (unlocks, content, ability changes) to feel earned. | Bernard Suits, *The Grasshopper* (1978); Salen & Zimmerman, *Rules of Play* (MIT 2003) Ch. 7; Schell Lens #7 |
 | P18 | **Anticipation / appetitive design** — dopamine spikes on the *cue* predicting reward, not the reward itself; design must telegraph rewards, support near-miss states, and pace cue-to-payoff arcs (slot-style reveals, glowing chests, count-ups). | John Hopson, "Behavioral Game Design," Gamasutra 2001; Berridge & Robinson, "Parsing reward," *Trends in Neurosciences* 26 (2003) |
 | P19 | **Curiosity / information-gap theory** — curiosity is the aversive feeling of becoming aware of a gap between what one knows and what one *could* know; designs generate it via "collative variables" (novelty, complexity, surprise) and visible-but-inaccessible information. | George Loewenstein, "The psychology of curiosity," *Psychological Bulletin* 116 (1994); Daniel Berlyne, *Conflict, Arousal, and Curiosity* (McGraw-Hill 1960); Schell Lens #6 |
+| P20 | **Single-loop coherence / system integration** — when a game has multiple scoring/feedback systems, each must trace to ONE named central objective and reward correlated player behaviors. Parallel systems with independent dominant strategies are a structural failure. Test: name the central goal; list every scoring system; for each write the dominant strategy. PASS = all dominant strategies coincide. | Salen & Zimmerman, *Rules of Play* (MIT 2003) Ch. 3 on meaningful play; Daniel Cook, "Chemistry of Game Design" (Lostgarden 2007); Ian Schreiber, *Game Design Concepts* (course archive 2009) Level 3 |
+| P21 | **Decision-space typology** — classify the input space: (a) open continuous, (b) bounded discrete, (c) combinatorial selection (pick K of N), (d) budget-constrained allocation, (e) sequential. Open continuous spaces with no scarcity layer collapse to dominant uniform strategies ("max all" or "match displayed target"). | Greg Costikyan, *Uncertainty in Games* (MIT 2013, ISBN 978-0-262-01896-8) Ch. 2-3; Sid Meier GDC 2012 (already cited P1) sharpened with opportunity-cost criterion; Reiner Knizia design notes on *Modern Art* |
+| P22 | **Inventory as choice engine** — a bounded inventory converts continuous-input space into combinatorial AND ties moment-to-moment choice to long-arc progression. Pick-K-of-N with growing-N is the canonical engine. Unbounded resources eliminate both effects. | Mark Rosewater, "Lenticular Design" / "When Cards Go Bad" (Wizards.com 2003-2017); Eric Barone (ConcernedApe), GDC 2019 "Stardew Valley: Designing Game Feel"; Raph Koster, *A Theory of Fun* 2nd ed. (O'Reilly 2013, ISBN 978-1-449-36321-5) |
+| P23 | **Crafting / recipe / combination systems** — combinations are meaningful only if (a) ≥30% of pairs produce non-additive (synergy or conflict) results, (b) some recipes are *discovered* not displayed, (c) wrong combinations have a cost. Pure-additive combination is arithmetic, not crafting. | Daniel Cook, "Steambirds Postmortem" / "Game Design Theory I Wish I Had Known" (Lostgarden 2009/2012); Reiner Knizia, *Dice Games Properly Explained* (Blue Terrier 2010, ISBN 978-1-907110-10-8); Persson/Bergensten GDC 2011 "The Word of Notch: Minecraft" |
+| P24 | **Save system as persistent state** — save state is meaningful only if it stores ≥5 structured, player-modifiable fields (inventory, unlocked recipes, discovered combos, streak, character stats). A single number per day is not save-worthy. | Janet Murray, *Hamlet on the Holodeck* (MIT Press 2017 reissue, ISBN 978-0-262-53348-5) Ch. 4; Jesse Schell, *Art of Game Design* 3rd ed. (CRC 2019), Lens #74 (Persistent Realities); Costikyan (op. cit.) |
+| P25 | **Scarcity as cognitive engagement driver** — bounded resources increase decision quality and engagement; unbounded resources produce indifference (the cognitive-science "bandwidth tax" of irrelevance). | Sendhil Mullainathan & Eldar Shafir, *Scarcity: Why Having Too Little Means So Much* (Times Books 2013, ISBN 978-0-8050-9264-6); Dan Ariely, *Predictably Irrational* rev. ed. (Harper Perennial 2010, ISBN 978-0-06-135324-6) Ch. 1 |
+| P26 | **Loops vs arcs** — every viable game has BOTH a loop (per-session repeating action) AND an arc (across-session one-way progression). Loop-only design is structurally a slot machine. | Daniel Cook, "Loops and Arcs" (Lostgarden, May 2012); Schell Lens #45 (Story) and Lens #69 (Reward) |
+| P27 | **Combinatorial explosion as replay metric** — replayability = count of meaningfully distinct play-states reachable, where each non-dominated. A continuous-input game has infinite raw states but ~1 meaningful state. C(N,K) inventory has C(N,K) meaningful states. | Mark Rosewater, "Lenticular Design" (Wizards.com May 2014); Garfield, Elias, Gutschera, *Characteristics of Games* (MIT Press 2012, ISBN 978-0-262-01713-8) |
+| P28 | **Progressive disclosure / skill-atom layering (sharpened)** — mechanics introduced individually, mastered, then layered. Day-1-vs-day-7 set comparison: day 7 must include day-1 items AND new items must combine non-trivially with old items. | Anna Anthropy & Naomi Clark, *A Game Design Vocabulary* (Addison-Wesley 2014, ISBN 978-0-321-88692-7) Ch. 5 on Mario 1-1; Cook "Chemistry" (op. cit. P14) |
+| P29 | **Endogenous goal generation (sharpened)** — score must purchase something IN the game (unlocks, inventory, capability, narrative). Score that only changes a leaderboard number is exogenous. Trace each scoring output: does it drive in-game state change, or only a wall-of-numbers? | Bernard Suits, *The Grasshopper* (1978; Broadview 2014, ISBN 978-1-55481-156-4); Schell Lens #7 sharpened with trace-the-output test |
+| P30 | **Just-one-more-run compulsion / meaningful failure** — failure must advance some persistent counter (recipe discovered, item unlocked, lore revealed). Pure-reset failure produces fatigue; meta-progression failure (Spelunky/Hades/Slay the Spire model) produces "one more run." | John Hopson, "Behavioral Game Design" (Gamasutra 2001); Derek Yu, *Spelunky* (Boss Fight Books 2016, ISBN 978-1-940535-11-1) Ch. 6-8; Mark Brown "Game Maker's Toolkit" 2016 "What Makes a Good Roguelike" |
+| P31 | **Hidden information / deduction layer** — a game becomes a *puzzle* (vs. arithmetic exercise) only when relevant state is hidden and must be deduced through play. Displaying the optimization target eliminates the puzzle. | Reiner Knizia, *Dice Games Properly Explained* (op. cit. P23) on *Lost Cities*/*Tigris & Euphrates*; Loewenstein 1994 (sharpened from P19); design pattern of Mastermind / Codenames / Yokai |
+| P32 | **Personality / Appeal / Charm** — every named element (character, mascot, button-as-character, audience, AI opponent, in-game voice) must have personality: a recognizable signature beyond functional role. Per Disney "Appeal" — silhouettes, proportions, gestures must communicate identity. Per McGraw & Warren *benign violation* theory: humor arises from situations that simultaneously violate a norm AND are safe; this is how charm gets to comedy. A game scoring high on craft (Game Feel) but low on personality is technically polished and emotionally inert. | Frank Thomas & Ollie Johnston, *The Illusion of Life: Disney Animation* (Abbeville 1981, ISBN 0-89659-698-2) on the 12 Principles "Appeal"; A. Peter McGraw & Caleb Warren, "Benign Violations: Making Immoral Behavior Funny," *Psychological Science* 21 (2010); Andrew Loomis on figure design (Viking 1943); Sesame Workshop on character voice (Spinney *Wisdom of Big Bird* 2003). |
+| P33 | **Surprise & Delight** — distinct from curiosity gaps (P19). Curiosity is *aware ignorance* — "I want to know X." Surprise is *unaware revelation* — "I did NOT expect this to happen." Both engage the player but via different cognitive mechanisms. Surprise requires hidden behaviors that *reveal themselves at the moment of play*: twist mechanics, unexpected reactions, ambient interactions you didn't know were there, AI behaviors that astonish. The test: across 30 minutes of play, how many moments did the player *not predict in advance*? | Jesse Schell, *The Art of Game Design* Lens #4 (Surprise) — "What will surprise the player? Do the rules give players ways to surprise each other?"; Daniel Cook on "twist mechanics" and *Loops and Arcs* (Lostgarden 2007/2012); Mark Brown "Game Maker's Toolkit" 2018 episode on signal-vs-noise design. |
+| P34 | **Aesthetic-Mechanical Coherence / Holographic Design** — the theme and the mechanics must *reinforce* each other, not exist in parallel. The MDA chain (Mechanics → Dynamics → Aesthetics) describes one-way causality: mechanics produce aesthetics. The Holographic Design lens says it MUST also go the other way: the aesthetic frame should *constrain* mechanic choices. A fart game whose grading rewards *elegance* punishes silliness — thematic dissonance. A pet game whose AI is hostile betrays its premise. Per Schell: "every part of your game reinforces the theme." The test: name the theme; then for each mechanic, ask "does this mechanic make the theme stronger or weaker?" | Jesse Schell, *The Art of Game Design* 3rd ed. (CRC 2019) Lens #16 (The Lens of Unification / Holographic Design); Hunicke, LeBlanc, Zubek, *MDA: A Formal Approach to Game Design and Game Research* (AAAI 2004) on M→D→A causality; Will Wright GDC keynotes (2003-2007) on player-story coherence. |
 
 ---
 
-## 3. The v3 rubric
+## 3. The v4 rubric
 
-### 3.1 Eight mechanism-level axes
+### 3.1 Thirteen mechanism-level axes
 
 Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 
@@ -72,7 +132,12 @@ Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 | **Variation & Replay** | Is run N+1 meaningfully different from run N? Variation through changed mechanics / objectives, not just randomized cosmetics. | P4 (Discovery), P11 |
 | **Progression** | *Across sessions:* does the mastery curve continue past hour 1? Are new patterns introduced as old ones automate (P13)? Do new mechanics get layered on as content scales (P14)? **Meta-progression sub-test** (P15) — does losing a run still persist *something* (currency, unlock progress, journal entry)? | P13, P14, P15 |
 | **Goal Stacking** | Concurrent multi-timescale goals. Can the player answer all four — "what am I doing right now / next minute / this session / across sessions" — at the same time? Are goals concrete, achievable, rewarding (Schell #38 criteria)? | P16 |
-| **Curiosity Gaps** | Within the first 10 minutes, does the game plant ≥3 *visible* information gaps the player wants to close (locked-but-visible content, mystery icon, partial maps, hinted backstory)? Are collative variables (novelty, complexity, surprise) used deliberately? | P19 |
+| **Curiosity Gaps** | Within the first 10 minutes, does the game plant ≥3 *visible* information gaps the player wants to close (locked-but-visible content, mystery icon, partial maps, hinted backstory)? Are collative variables (novelty, complexity, surprise) used deliberately? **Hidden-information sub-test (P31):** is the optimal action computable from displayed information alone, or does it require deducing at least one hidden variable? | P19, P31 |
+| **System Integration** *(new in v4)* | If the game has multiple scoring/feedback systems, do all of them trace to a single named central objective AND share a dominant strategy? OR is at least one parallel system that can be maxed independently? Test: name the goal; list each scoring system; compute the dominant strategy of each. | P20 |
+| **Choice Architecture** *(new in v4)* | What is the input-space type — open continuous / bounded discrete / combinatorial pick-K-of-N / budget-constrained allocation / sequential? Is there a bounded inventory that grows? Are core resources scarce (using one precludes another)? Are combinations non-additive (synergy/conflict, not just sum)? Are recipes discoverable (P31)? Is failure meta-progressing (P30)? Is the save state ≥5 structured fields (P24)? | P21, P22, P23, P25, P30, P24 |
+| **Personality / Charm** *(new in v5)* | Does the game have a recognizable voice? Do characters / audiences / AI have distinct signatures beyond functional role (silhouettes, mannerisms, speech patterns, reactions)? Is there humor (per McGraw-Warren benign-violation: norm-violations that are safe), wit, character? Does the player describe the game with personality-words ("charming," "weird," "sassy") rather than just craft-words ("polished," "smooth")? Tested by: name the game's "voice" in one sentence; identify ≥3 elements that carry that voice. | P32 |
+| **Surprise & Delight** *(new in v5)* | Distinct from Curiosity Gaps. Does the game produce moments the player didn't see coming — twist mechanics, unexpected reactions, hidden behaviors revealing themselves at play time, AI choices that astonish? Across 30 minutes of play, count moments the player did not predict in advance. Aim ≥5. | P33 |
+| **Aesthetic-Mechanical Coherence** *(new in v5)* | Does the theme reinforce the mechanics, and vice versa? Does the grading system reward outcomes consistent with the theme (a fart game rewarding silly/gross; a stealth game rewarding patience; a horror game rewarding caution)? Or is there dissonance between what the game's *fiction* wants and what its *scoring* wants? Test per Schell #16: name the theme; for each scoring rule, ask "does this rule make the theme stronger or weaker?" | P34 |
 
 The age-appropriateness (kid-safety) check from v1 is preserved as a separate hard gate rather than a numeric axis (§3.2 gate 6).
 
@@ -86,7 +151,11 @@ A failure on **any** of these collapses the score to **≤4** regardless of the 
 4. **Feedback Gate.** If any player input lacks **both** visible AND audible response, FAIL (degraded-mode users can mute or screen-read; absence on both modalities at once is unacceptable for engagement).
 5. **No-Failure Gate.** If there is no fail state — no way to perform poorly — and the game does not explicitly self-classify as a sandbox toy in `docs/`, FAIL. ("You can always launch a fart" is the *absence* of a fail-state design choice, not the presence of one.)
 6. **Kid-Safety Gate** (preserved from v1). Any text or imagery a parent of a 5-10yo would not want their kid reading or seeing → FAIL.
-7. **Hollow Score Gate** (new in v3). If the game's primary score / currency / progress metric does not feed into ≥1 *in-system* consequence (unlocks, new content, mechanic changes, persistent character growth, narrative gating), FAIL. A high-score number that exists only for its own sake — or only for an external leaderboard — is *exogenous* in Suits' / Schell's #7 sense; the in-game value chain is hollow. Test: ask "what does score buy?" If the answer is "a place on a list," the gate fails. Backed by P17.
+7. **Hollow Score Gate** (new in v3). If the game's primary score / currency / progress metric does not feed into ≥1 *in-system* consequence (unlocks, new content, mechanic changes, persistent character growth, narrative gating), FAIL. A high-score number that exists only for its own sake — or only for an external leaderboard — is *exogenous* in Suits' / Schell's #7 sense; the in-game value chain is hollow. Test: ask "what does score buy?" If the answer is "a place on a list," the gate fails. Backed by P17, sharpened by P29.
+8. **Disjoint Systems Gate** (new in v4). If the game has ≥2 scoring/feedback systems AND any two of them have *independent dominant strategies* (i.e. there's a strategy that maxes system A while ignoring system B and vice versa), FAIL. The systems are parallel, not integrated. Test: list each system; for each, write the dominant strategy; check whether all dominant strategies coincide. Backed by P20.
+9. **Open Continuous Input Gate** (new in v4). If the input space is open continuous (e.g. independently-set sliders 1-10) AND there is no scarcity layer (budget cap, opposing cost, allocation constraint) AND the optimal action is a uniform fixed configuration ("max all" or "match displayed target"), FAIL. The input modality itself precludes meaningful choice — switching feedback mode (e.g. hiding the target) doesn't fix the underlying input. Backed by P21, P25.
+10. **Loop-Only Gate** (new in v4). If the across-session arc is unnameable (no growing inventory, no unlock chain, no narrative progress, no character growth — only "today's score") OR if the arc collapses to "rank on a leaderboard," FAIL. Pure-loop design with no arc is structurally a slot machine. Backed by P26. Test: name the arc in one sentence — "Across sessions, player goes from state A to state Z, never returning to A." If the answer is "your score number changes," fail.
+11. **Displayed-Target Puzzle Gate** (new in v4). If a game claims to be a puzzle / inference / matching challenge AND the optimal action is computable from displayed information alone (no hidden variable to deduce, no recipe to discover), FAIL. Visible-target matching is arithmetic, not deduction. Backed by P31. Sandbox / pure-skill games are exempt — this gate is for games whose stated mode is "match a target."
 
 ### 3.3 Schell Lens #39 — required verbatim
 
@@ -110,21 +179,60 @@ Before scoring, the critic MUST simulate at minimum four scenarios. For UI-touch
 
 If any uniform strategy (Mash-max, Mash-min) ties or exceeds the Domain-skill score, gate 1 (Dominant Strategy) automatically fails and the critic records the evidence.
 
-### 3.5 Calibration anchors
+### 3.5 Aggregation formula (new in v5)
 
-Anchors describe the *raw average across all 8 axes* before gate capping. Eight axes is harder to average ≥7 on than five; this is intentional — v3 is a higher bar.
+13 axes, each scored 1-10. The **raw score** is *not* the arithmetic mean — that formula let polish on one axis compensate 1:1 for structural failure on another, which is exactly the calibration drift v5 corrects.
+
+The new aggregation:
+
+```
+raw_score = round( (min_axis + mean_axes) / 2 )
+```
+
+Half-weight on the weakest axis, half on the average. Properties:
+
+- All axes at 8 → min=8, mean=8 → score 8. Polished + sound = 8.
+- 9 axes at 8, one axis at 2 → min=2, mean=7.5 → score **5**. (Old: 7.5.) Polish can lift modestly but can't hide the weak axis.
+- One axis at 9, rest at 4 → min=4, mean=4.4 → score 4. A single peak doesn't carry the build.
+- All axes at 4 → score 4. Average game.
+- 6 axes at 8, 7 axes at 2 → min=2, mean=4.8 → score **3**. Half good / half bad = closer to bad.
+
+After raw_score, **hard-gate capping** still applies: any gate failure caps the final score at 4. Both checks run; final = min(raw_score, gate_cap).
+
+Why this formula vs alternatives:
+- *Pure min*: too brutal — one axis-1 caps you at 1 forever even with everything else great.
+- *Geometric mean / harmonic mean*: penalize low axes but the math is harder to explain to a critic agent and the calibration is less intuitive.
+- *Weighted axes* (e.g. structural counts 2x): also valid, but requires constant adjustment as you add axes. The (min + mean) / 2 form is structurally robust to axis additions.
+
+For partial weighting on a small number of "structural" axes, see §3.5.1 below — but the default is plain (min + mean) / 2.
+
+#### 3.5.1 Structural-axis weighting (optional refinement)
+
+If structural axes (Decision Quality, Choice Architecture, System Integration, Progression) are weighted 1.5×, the formula becomes:
+
+```
+mean_axes = Σ(axis_score × weight) / Σ(weights)
+```
+
+This is optional. Default behavior treats all axes equally. Activate only for projects where structural foundation matters more than polish (most non-spectacle games).
+
+### 3.6 Calibration anchors (stricter in v5)
+
+Anchors describe the raw score from §3.5 (before any gate-cap). v5 calibration tightens v4's bands by ~1 point across the board — the deployed-build playtest showed v4's 7 was generous when the user's gut was 3-4.
 
 | Score | What it looks like |
 |---|---|
-| **9-10** | Polished short-form game scoring ≥7 on all 8 axes: clear interesting decisions, multi-orders-of-magnitude mastery curve (Koster), telegraphed rewards with near-misses, multi-modal feedback under 100ms, meaningful failure with sub-2s restart, mechanically varied content per run, persistent meta-progression, concurrent multi-timescale goals, ≥3 active curiosity gaps. Score feeds into in-system unlocks. Comparable to *Crossy Road*, *Threes*, *Slay the Spire* in design integrity (not in scope). |
-| **7-8** | Solid mechanic with at least one clear interesting decision, observable skill ceiling, juice + anticipation on inputs, some run-to-run variation, basic progression beyond the first session, score feeds *something* in-system. Plays for repeat sessions. |
-| **5-6** | Has a loop but with axis gaps: shallow decisions, weak skill curve, thin progression, or hollow-feeling score. Plays once but not twice. |
-| **3-4** | Loop is degenerate or trivial, OR the game fails ≥1 hard gate. Default for any iteration that fails any gate, regardless of per-axis average. |
-| **1-2** | No loop, or pure spectacle without gameplay. |
+| **9-10** | Excellent. ≥8 on every axis. Recognized as a "best of year" indie or hyper-casual game. *Slay the Spire*, *Threes*, *Stardew Valley*, *Crossy Road* in design integrity. Multiple interesting decisions per minute; characterful voice; replay value over weeks; aesthetic-mechanical coherence visible from the first screenshot. |
+| **7-8** | Very good. ≥6 on every axis AND ≥7 on most. Multiple interesting decisions; tight loop + nameable arc; characterful voice; replay value present; theme reinforces mechanics. Comparable to a steady-selling indie or popular roguelike. |
+| **5-6** | Playable but limited. Loop works AND has an arc, but one or two axes are weak. Plays once and a half. Mid-tier game-jam entry. |
+| **3-4** | Flawed. Multiple weak axes (≥3 axes scoring ≤4) OR ≥1 hard gate failure. Plays a few minutes then the gaps surface. Hobbyist prototype level. |
+| **1-2** | Broken / degenerate. No loop, no arc, OR multiple hard gates failing. |
+
+The deployed Fart Factory build (post iter 9-26) scored 7 under v4 and 3 under v5. The v5 number matches the user's playtest. **Polish (Game Feel = 8) cannot lift a build whose Choice Architecture is 1.**
 
 The score reflects **the game's current state including the new feature**, not the diff alone. Sparkle particles laid over a degenerate loop do not move 5 → 9; they move 5 → 5 because the gates still fail. A 3-step onboarding tutorial added on top of a hollow-score game does not move 5 → 9 either.
 
-### 3.6 Output schema
+### 3.7 Output schema
 
 Replaces v1's free-form `{score, rationale, blockers}` with a structured object. The orchestrator's parser at §F lines 376-385 still reads `.score` and `.blockers` unchanged; new fields are additive.
 
@@ -141,7 +249,18 @@ Replaces v1's free-form `{score, rationale, blockers}` with a structured object.
     "variationReplay": 0,
     "progression": 0,
     "goalStacking": 0,
-    "curiosityGaps": 0
+    "curiosityGaps": 0,
+    "systemIntegration": 0,
+    "choiceArchitecture": 0,
+    "personalityCharm": 0,
+    "surpriseDelight": 0,
+    "aestheticMechanicalCoherence": 0
+  },
+  "aggregation": {
+    "minAxis": 0,
+    "meanAxes": 0,
+    "rawScore": 0,
+    "gateCap": 10
   },
   "diagnostics": {
     "dominantStrategy": {
@@ -194,7 +313,7 @@ Replaces v1's free-form `{score, rationale, blockers}` with a structured object.
 
 The legacy 4-axis output `{score, rationale, blockers}` remains valid input to the orchestrator (it still parses min/avg). The richer `diagnostics` block is for human review of commit bodies and post-hoc auditing.
 
-### 3.7 Tools the critic may use
+### 3.8 Tools the critic may use
 
 - **Read, Grep, Glob** — same as v1.
 - **Playwright via shell (`npx playwright test`)** — REQUIRED to run the four simulation scenarios when the iteration touches game logic, UI, or scoring.
@@ -203,7 +322,24 @@ The legacy 4-axis output `{score, rationale, blockers}` remains valid input to t
 
 ---
 
-## 4. v2 applied to current Fart Factory state
+## 4. v4 applied to current Fart Factory state (post-iter-26 deployed build)
+
+(Applied as a worked example, evaluating commit `7db0c8e` on `main` — the
+deployed Pages build at https://jonoo407.github.io/fart-factory/ as of
+2026-05-10. v3 of this rubric scored this same build a 7. v4 scores it a
+**3** — matching the user's playtest gut score.)
+
+### v4.1 The four structural failures the user identified
+
+1. **Two parallel scoring systems.** `gradeFart(total)` at [src/scoring/grade.ts:8](src/scoring/grade.ts:8) maps `total = sum(sliders)` to a letter grade (F-/D/C/.../S+). Independently, `computeMatch(actual, target)` at [src/state/challenge.ts:99-103](src/state/challenge.ts:99) maps slider config to 0-100% closeness to the daily target. Both fire on every Launch. **Mash-all-sliders → S+ grade regardless of match%.** **Match-the-target → 100% match regardless of total.** Two systems, two strategies, zero integration. Disjoint Systems Gate (v4 #8) **FAILS**.
+
+2. **Open continuous input space.** Six independent sliders 1-10. No budget. No cap. No scarcity. Slider-7 doesn't exclude slider-8. Open Continuous Input Gate (v4 #9) **FAILS**.
+
+3. **No inventory / no resource scarcity.** Sliders are not items. No pick-K-of-N, no growing collection, no unlock chain. Choice Architecture axis: input space is type (a) open continuous; no inventory; no scarcity layer.
+
+4. **No save-worth-saving / no arc.** localStorage stores `fart_mute`, `fart_hard_mode`, `fart_onboarding_seen`, `fart_best_<date>`, `fart_achievements` (8 IDs), `fart_hall` (top 5 entries). That's structured but mostly *settings* — only `fart_best_<date>` and `fart_achievements` are arc-like, and the achievements unlock ~5 of 8 on the first mash-max launch. Loop-Only Gate (v4 #10) **FAILS** (no nameable arc beyond "your score number changes").
+
+### v4.2 v3-style simulation outputs (preserved for context)
 
 (Applied as a worked example, evaluating commit `11f58ec` on `overhaul-v2` — the head of the autonomous session per `docs/iteration-log.md` row 8.)
 
@@ -245,35 +381,127 @@ The legacy 4-axis output `{score, rationale, blockers}` remains valid input to t
   - Q3 — **dominant strategy exists?: yes**. Mash-max → S+.
   - Q4 — well placed? n/a; collapses at Q3.
 
-### 4.3 Per-axis scores
+### 4.3 v4 per-axis scores (10 axes)
 
-- Decision Quality: **1**. Zero interesting decisions; mash-max dominates.
-- Skill Curve: **1**. Floor = ceiling within session. Bushnell test fully fails.
-- Game Feel: **5**. Multi-modal feedback (visual + audio + haptic), screen shake on total>40, sparkles on S+, gas clouds — all solid. But the anticipation sub-test fails completely (no telegraphing, no near-miss states, no cue-to-payoff arc), dropping what would otherwise be a 7 down to 5.
-- Failure & Recovery: **2**. No fail state; restart fast (1 point retained for instant retry).
-- Variation & Replay: **3**. Only the commentary string varies. Achievements give weak goal pull but most unlock on first mash-max run.
-- **Progression: 1.** Across-session learning is zero — Koster's mastery curve doesn't exist because there's nothing new to chunk. Cook's atoms are absent — no new mechanics introduced over time. Meta-progression sub-test scores ~2 (Hall of Shame + a few unreachable achievements after run 1) but the across-session curve sub-test scores 0.
-- **Goal Stacking: 2.** Only "right now" is filled ("click Launch"). The other three timescales are absent. Even the "fill achievements" goal collapses to a single mash-max run.
-- **Curiosity Gaps: 1.** Zero visible info gaps. Berlyne's collative variables are not deployed. The game leaves nothing to wonder about.
+Note: scoring the **deployed** build (post iter 9-26), not the original v1 game. Iters 13-26 added daily challenge, axis hints, Hard Mode, SFX library, audience reactions, etc. on top of the slider model. The user's "3-4" critique is of the deployed build with all those features.
 
-Average: (1+1+5+2+3+1+2+1) / 8 = 16/8 = **2.0**.
+- Decision Quality: **2**. Hard Mode hides hints, but the input space is still 6 unbounded sliders; the optimal action under Hard Mode is "use the audience trend to bisect-search slider configs" — a real inference, but heavily mechanical. In Easy Mode, "match displayed target" or "max all" remain dominant.
+- Skill Curve: **3**. Hard Mode introduces some inference skill. But the same challenge profile played 10 times stops being interesting on launch ~3.
+- Game Feel: **8**. Multi-modal feedback excellent. Wind-up/pop/settle on Launch. 14 named SFX samples. Anticipation cue. Reactive challenge-card pulse on high match. Solid axis.
+- Failure & Recovery: **2**. There's no fail state. Even the "audience evacuated" reaction is just text — game doesn't end, no cost, retry is identical.
+- Variation & Replay: **5**. 12 daily challenges rotate; 14 SFX samples; per-axis hints + audience reactions add per-launch micro-variety. But no input-space variation across sessions.
+- **Progression: 2.** Best-today persistence is the only across-session signal. No collection, no inventory, no unlock chain. Achievements are 8 binary flags, most reachable on session 1.
+- **Goal Stacking: 3.** "Right now" (this launch) + "today" (beat your best, hit the challenge) exist. "Across sessions" is empty (no week-long collection, no streak counter that crosses days).
+- **Curiosity Gaps: 4.** Hard Mode's hidden target is a real Loewenstein info-gap. Daily challenge name without Hard Mode-style obscuration is partial. But no locked-but-visible content, no "?" zones, no recipe book to discover.
+- **System Integration: 1** *(new in v4)*. Two parallel scoring systems, both with independent dominant strategies. Disjoint Systems Gate fails outright.
+- **Choice Architecture: 1** *(new in v4)*. Input type (a) open continuous; no inventory; no scarcity; no combinatorial pick; no recipe layer; no meta-progression; save state has the structure but not the *content* — no inventory[], no unlocked_recipes[], no discovered_combos[].
+- **Personality / Charm: 4** *(new in v5)*. Commentary strings ("Your dog just packed a suitcase and left") have voice. Achievement names have personality ("Stink Lord", "Hall Filler"). Challenge profile names are evocative ("Swamp Beast", "Silent Killer"). But there's no recurring character; no narrator presence; no recognizable "voice" carried across screens. Modest personality, hampered by sliders being the central interaction (sliders have no personality).
+- **Surprise & Delight: 3** *(new in v5)*. The randomized commentary string after a launch is a small surprise. The reactive challenge-card pulse on high match is a small surprise. The non-diegetic celebration sting on 100% is a small surprise. But once the player has done 3-4 launches, no surprises remain — the system reveals all its tricks within minutes. No twist mechanics, no AI behaviors that astonish, no hidden interactions.
+- **Aesthetic-Mechanical Coherence: 3** *(new in v5)*. The fart theme + cartoon-lab visuals are *consistent*. But the grading mechanic doesn't reinforce the theme: a "Symphony Conductor" challenge rewards musical/elegant outputs from a *fart* game, which is dissonant with the silly/gross premise. The original "total → grade" system actively rewards mash-max (the most gross/loud), which IS thematically coherent — but the daily-challenge match% can punish exactly the kind of fart the theme says is funniest. Two systems pulling in different theme-directions = dissonance.
 
-### 4.4 Verdict
+Per-axis (13 axes): 2, 3, 8, 2, 5, 2, 3, 4, 1, 1, 4, 3, 3.
+- Min axis: **1** (System Integration, Choice Architecture).
+- Mean axes: (2+3+8+2+5+2+3+4+1+1+4+3+3) / 13 = 41/13 = **3.15**.
+- Raw score (new v5 aggregation): `round((1 + 3.15) / 2)` = round(2.08) = **2**.
 
-- **Hard gates failed**: dominantStrategy, bushnellFloorCeiling, decisionDrought, noFailure, **hollowScore**. **5 of 7.**
-- **v3 score: 2** (raw average 2.0 *and* gate-cap; both routes converge on 2).
-- **v2 score on the same artifact: 2** (raw 2.8, capped at 4 by gates; reported as 2 in v2's worked example).
-- **v1 score on the same artifact: 9** (iter 8). Delta v1→v3: **−7**.
+Compare:
+- v4 arithmetic-mean: 3.1 → reported 3 (gate-capped 4)
+- v5 (min+mean)/2: 2.08 → reported 2 (gate-capped 4, but raw is already below cap)
 
-The v1 → v3 delta is the proof that v3 catches what v1 missed. v3 vs v2 produces the same final score on the current Fart Factory but with **stronger diagnostics**: v2 said "fails 4 gates"; v3 says "fails 5 gates AND scores ≤2 on six of eight axes," with the new axes pointing at concrete missing mechanics (no progression, no goal stack, no curiosity gaps, score buys nothing). The next iteration's design work has more specific direction.
+Adding three more axes pulled mean down slightly (because the new axes scored 3-4); aggregation change pulled the score from 3 to 2 because the minimum (1) now dominates. Both effects align with the user's playtest: "this isn't really a game as is."
+
+### 4.4 v5 Verdict
+
+- **Hard gates failed (v5 keeps v4 set)**: bushnellFloorCeiling (#2 — partial), noFailure (#5), hollowScore (#7), disjointSystems (#8), openContinuousInput (#9), loopOnly (#10). **6 of 11 gates fail.** Dominant Strategy #1 weakly cleared by Hard Mode for the match system, not the grade system.
+- **v5 score: 2** (raw 2.08 by (min+mean)/2; min axis = 1; mean = 3.15. Gate cap at 4 doesn't apply because raw is already below it.)
+- **v4 score on the same artifact: 3** (raw 3.1 arithmetic mean, gate-capped at 4).
+- **v3 score on the same artifact: 7** (post-iter-26 deployed build).
+- **Delta v3 → v5: −5.** Same artifact, same code, three different rubric versions converging on what the user actually experienced.
+
+The v5 score of 2 corresponds to the calibration band "no loop / pure spectacle / multiple hard gates failing." Strictly, the build has a loop AND only "half-fails" the hard-gate count (6 of 11), so 2 is harsh — but the (min+mean)/2 aggregation is doing its job: a single-digit axis (Choice Architecture = 1) is anchoring the score, and Polish (Game Feel = 8) can no longer drag it up.
+
+The v3→v5 delta of -5 is the proof of three compounding effects:
+1. v3 missed *structural* failures the player experiences from launch #1 (System Integration, Choice Architecture). v4 added these axes — they scored 1.
+2. v4 missed three *general* fun axes (Personality, Surprise, Coherence). v5 added these — they scored 3-4 on this build.
+3. v3/v4's arithmetic-mean aggregation let Game Feel = 8 hide the structural 1s. v5's (min+mean)/2 stops that.
+
+This is consistent with the user's playtest verdict: *"this isn't really a game as is."*
 
 ### 4.5 Blockers (must address before fun ≥ 6)
 
-> v2 §4.5 prescribed "replace pure-sum scoring with target matching" as the single
-> highest-leverage fix. User stress-testing exposed that target matching alone is
-> *itself* a dominant-strategy game ("read the displayed target, drag each slider
-> to match"). v3 prescribes a layered design where multiple constraints stack so
-> no single trivial strategy emerges, and where the new v3 axes (Progression,
+> v4 supersedes the v3 §4.5 prescription. The user's playtest revealed that
+> the entire **choice architecture** is wrong, not just the scoring system.
+> Patches like Hard Mode (which v3 §4.5 #1 prescribed) treat the *feedback*
+> layer; the underlying *input* layer (six unbounded sliders) and *progression*
+> layer (one number per day) are structurally broken. v4 prescribes replacing
+> them with a combinatorial inventory + crafting model, which is what the user
+> proposed: **food-eating**.
+
+#### The food-eating redesign (v4 prescribed mechanic)
+
+Each round, the player picks 3-5 **foods** from a growing **inventory**. Foods have *fart-properties* (e.g. beans → wet+stinky, garlic → loud+stinky, dairy → wet+sustained, asparagus → musical+stinky). Foods *combine* with synergy/conflict bonuses. New foods unlock via play. Recipes are discoverable.
+
+This redesign clears the v4 gates and lifts axes:
+
+| v4 gate / axis | Slider game (current) | Food game (prescribed) |
+|---|---|---|
+| Open Continuous Input #9 | FAILS — 6 unbounded sliders | PASSES — pick 3-5 of N inventory items (combinatorial) |
+| Loop-Only #10 | FAILS — only "today's score" persists | PASSES — arc = "unlock all 30 foods + discover all recipes" |
+| Disjoint Systems #8 | FAILS — grade ⊥ match | PASSES — grade derived from match-against-craved-food, single objective |
+| Hollow Score #7 | FAILS — score buys nothing | PASSES — score → unlock new foods → expand recipe space |
+| Displayed-Target Puzzle #11 | FAILS — visible target is just arithmetic | PASSES — recipes hidden, audience cravings hidden, deduction layer real |
+| Choice Architecture axis | 1/10 | 7-9/10 (combinatorial; scarcity from limited slots; recipes discovered) |
+| Progression axis | 2/10 | 7-9/10 (inventory grows; recipes discovered persist; meta-progression P30) |
+| Decision Quality axis | 2/10 | 7+/10 (interesting decisions per Sid Meier — multiple viable recipes, real tradeoffs) |
+| Curiosity Gaps axis | 4/10 | 8/10 (locked-but-visible foods, hidden recipes, audience preferences) |
+
+### Rarity color palette (instantly-readable convention)
+
+Foods, recipes, and audiences carry a **rarity tier** rendered with the gaming-canonical 5-color palette established by Diablo II (Blizzard 2000), standardized by World of Warcraft (2004), and re-used across League of Legends / Hearthstone / Borderlands / Slay the Spire / dozens more. Cultural fluency: any player who has touched an RPG since 2000 reads it without instruction.
+
+| Tier | Color | Hex | Visual signal |
+|---|---|---|---|
+| **Common** | Grey | `#9ca3af` (slate-400) | neutral border, no glow — "this is the floor" |
+| **Uncommon** | Green | `#22c55e` (green-500) | mild outer-glow, pleasant |
+| **Rare** | Blue | `#3b82f6` (blue-500) | distinct outer-glow, "interesting find" |
+| **Epic** | Purple | `#a855f7` (purple-500) | strong glow + slight pulse, "you should be excited" |
+| **Legendary** | Gold | `#f59e0b` (amber-500) | bright glow + sparkle particles + ambient pulse, "this is the moment" |
+
+These are CSS colors / box-shadows / borders — not new font weights or sizes. Implementation: a shared `.rarity-{tier}` class system that any element (food card, recipe entry, audience portrait, fart announcement) can inherit.
+
+The 5-color rarity palette is a **documented sub-palette** of `docs/PALETTE.md` — it overlaps with `reward` gold (legendary) but adds grey/green/blue/purple as semantic-tier-only colors. Per V16 (limited intentional palette), the full game palette is ≤6 *role-bearing* hue families plus this rarity sub-palette which is conventional and culturally pre-loaded.
+
+Concretely, the minimum-viable food redesign:
+
+1. **Inventory data structure** (`src/state/inventory.ts`). Catalog of ~30 named foods, each with: `id`, `name` (e.g. "Black Beans", "Pickled Egg"), `emoji`, `unlocked: boolean`, `properties: { wet, dry, stink, musical, length, volume, temp }` (each property 0-5 contribution rather than a slider value). Persists to localStorage as `fart_pantry`.
+
+2. **Pick-K-of-N selection** (`src/state/recipe.ts` + UI). Replace the slider lab with a pantry grid showing unlocked foods. Player taps to add to a "plate" (max 4 slots). Each tap adds the food's properties to the brewing fart. Tapping a slot removes it.
+
+3. **Combination rules with synergy/conflict** (`computeFartFromRecipe(plate)`). Per P23: at least 30% of pairs produce non-additive results. Examples:
+   - Beans + Dairy → "Swamp Beast" pattern (wet/stink synergy, +bonus)
+   - Beans + Garlic → "Volcano" pattern (stink/heat synergy)
+   - Asparagus + Cheese → conflict (canceling), penalty
+   - Pickle + Egg → discovery: "Sulfur Bomb" (hidden combo, unlocks recipe entry)
+
+4. **Crave-of-the-day replaces target sliders**. Daily challenge becomes "today's audience craves a Swamp Beast" — the player must construct a recipe that matches the cravings. Cravings are hidden in Hard Mode (P31 deduction); shown as a profile-of-properties in Easy Mode.
+
+5. **Inventory expansion as primary progression** (P22, P28). Score from launches buys new foods at the "pantry shop" between runs. Day 1: 6 starter foods. Day 7: 12-15 foods (with combinations). Day 30: all 30 foods + recipes discovered.
+
+6. **Recipe book** (`src/state/recipes.ts`). Discovered combinations get logged into a "Lab Notebook" — Player can see "you've discovered 7 of 18 recipes." Some recipes need specific food combinations only revealed by trying. P23 + P31.
+
+7. **Meaningful failure** (P30). A run with a low match doesn't reset to zero — the player banks "research notes" toward the next food unlock. Failure progresses.
+
+8. **Single grading system** (P20). The "grade" letter is removed entirely. Score = match-quality of the recipe vs. crave. There's one number, not two. Disjoint Systems gate cleared.
+
+Items 1-3 are the minimum to pass gates 8/9/10/11. Items 4-8 lift the axes. Together, they would move v4 from 3 to 7-8 in a single substantial iteration.
+
+#### Why preserve the slider game?
+
+The slider game is the *legacy v1 game with v2/v3 polish* — keep it as a "Sandbox Mode" toggle (or as the legacy archive at `legacy/index.legacy.html`). The food game becomes the canonical Story / Daily Challenge mode. This way characterization tests of the slider game stay green and the project history is preserved without forcing a destructive rewrite.
+
+---
+
+> v3's §4.5 (preserved for context — these blockers are now superseded by v4's food redesign):
 > Goal Stacking, Endogenous Value, Curiosity Gaps) get concrete mechanisms.
 
 The minimum credible design that clears all 7 hard gates and lifts the average above 6:

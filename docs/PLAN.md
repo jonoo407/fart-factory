@@ -71,12 +71,13 @@ E:\app_design\fart-factory\
 ├─ legacy/index.legacy.html    # frozen original
 ├─ src/
 │  ├─ main.ts
-│  ├─ ui/      (sliders, results, hall, reactions, live-region)
+│  ├─ ui/      (sliders, results, hall, reactions, live-region, shop, notebook, plate)
 │  ├─ audio/   (engine, procedural, sample-player, mixer, types)
-│  ├─ scoring/ (grade, scores, combos)
-│  ├─ state/   (hall, achievements, settings)
-│  ├─ visuals/ (gas-cloud, particles, mascot, shake)
-│  └─ content/ (commentary, reactions)
+│  ├─ scoring/ (grade, scores, combos, recipe — Tier 7)
+│  ├─ state/   (hall, achievements, settings, challenge, pantry, audiences,
+│  │            recipes, gold, research, containment, mode — Tier 7)
+│  ├─ visuals/ (gas-cloud, particles, mascot, shake, rarity-glow)
+│  └─ content/ (commentary, reactions, food-seeds, audience-seeds — Tier 7)
 ├─ public/
 │  ├─ sfx/manifest.json + *.mp3
 │  └─ favicon.svg
@@ -296,6 +297,187 @@ Total ETA if every item shipped: ~7h. The 2h cap and quality target ensure we wo
 
 ---
 
+### Tier 7 — v3 Food-Mechanic Game (continuous iterative build)
+
+**Context.** After the v2 overhaul shipped (iters 1-26, merged 2026-05-10 as `7db0c8e`), user playtested the deployed Pages build and rated it 3-4/10 on fun. The v5 Fun critic ([FUN_CRITIC.md §4](FUN_CRITIC.md#44-v5-verdict)) scored it 2 — 6 of 11 hard gates fail, 4 axes score ≤2. Root cause: the slider+grade input/output model is structurally broken. v3 game replaces it with a food-eating mechanic per FUN_CRITIC.md §4.5.
+
+**Scope.** One continuous iterative build — no MVP-then-expand split. ~40 items across 13 phases, ~55h estimated. Each item is one TDD cycle (failing test → minimal implementation → green → commit). Each phase ends with a v5 critic checkpoint (run the new rubric on the cumulative state) to course-correct before the next phase. Preserves the slider game as Sandbox Mode toggle so existing 125 unit + ~190 e2e tests stay green.
+
+**Target progression**: every phase the v5 score should rise by ≥0.5 points. By Phase L the v5 score reaches ≥8. If a phase doesn't move the v5 score, that's a signal the phase's design needs revision *before* moving on — the long-running, thoughtful, iterative discipline.
+
+#### Phase A — Foundation: types, catalogs, persistence (5 items, ~6h)
+
+26. **Food catalog: full 30 entries across 5 rarity tiers** (~2h). Test: `pantry.test.ts` — 30 entries; 6 per rarity tier (common/uncommon/rare/epic/legendary); each `{id, name, emoji, rarity, properties: {wet, dry, stink, loud, musical, length, temp}, bellyCost, mood?, unlocked: boolean}`. Verify: types compile strict; no duplicate ids; sum of properties is bounded so no food dominates alone.
+
+27. **Audience archetypes catalog: 20 named entries** (~2h). Test: `audiences.test.ts` — 20 archetypes with `{id, name, emoji, cravings: {wet, stink, ...}, restrictions?: string[], portrait}`. `getDailyAudience(date)` deterministic per UTC day; cycles through all 20 over 20 days. Verify: ≥3 audiences have restriction clauses ("no dairy"/"must include fermented"); each has a unique portrait emoji.
+
+28. **Recipe catalog: 30+ entries including 5+ legendary** (~1.5h). Test: `recipes.test.ts` — 30 recipes with `{id, name, ingredients: foodId[2..4], emoji, hidden: boolean, legendaryUnlock?: QuestSpec}`. 6 are pre-known (tutorial-visible); 24 are hidden (discover by combination). 5 legendary recipes have multi-step `legendaryUnlock` requirements.
+
+29. **Containment areas catalog: 6 areas with modifiers** (~30m). Test: `containment.test.ts` — 6 areas with `{id, name, emoji, modifiers: {stink: number, volume: number}}`. Examples: Under Covers (stink ×3, volume ×0.3), Library (volume penalty), Elevator (stink ×4, volume ×2), Outside (stink ×0.5, volume ×1.5), Throne Room (musical ×2, stink ×0.4), Space Station (everything ×0.5).
+
+30. **Persistence schema for all v3 state** (~1h). Test: `state.test.ts` covers `loadPantry`, `loadGold`, `loadResearchNotes`, `loadDiscoveredRecipes`, `loadMode`, `loadBellyForDate`. Corruption-safe returns. Verify: `tests/e2e/persistence-v3.spec.ts` round-trips state across reloads.
+
+**Phase A checkpoint**: v5 critic run on the data-only build. Expected score ≈ 3 (no gameplay yet, but catalogs in place suggest direction). Game still plays as legacy v2 slider mode — Sandbox Mode is default until Phase B ships.
+
+#### Phase B — Mode toggle + Story-Mode shell (3 items, ~3h)
+
+31. **Mode toggle button + persistence** (~1h). Test: `mode.spec.ts` — toggle button renders; defaults to Sandbox (slider mode) for existing users, Story for new visitors; persists via `localStorage.fart_mode`. Verify: existing characterization + port-parity specs continue to pass in Sandbox.
+
+32. **Story Mode shell (empty pantry/plate placeholder)** (~1h). Test: `story-shell.spec.ts` — switching to Story Mode renders the lab area replaced by a "Coming Soon: your pantry" placeholder; Sandbox controls hidden. Verify: switching back to Sandbox restores all original UI.
+
+33. **Hide legacy challenge card in Story Mode** (~1h). Test: `story-shell.spec.ts` — challenge card from iter 13 is hidden in Story Mode (will be replaced by audience portrait in Phase D). Verify: no DOM elements visible from both modes simultaneously.
+
+**Phase B checkpoint**: v5 critic. Expected score still ≈ 3 (Story Mode is empty). The point of this phase is structural isolation so Phase C-L don't break Sandbox.
+
+#### Phase C — Pantry + plate + belly meter UI (4 items, ~6h)
+
+34. **Pantry grid renders unlocked foods** (~2h). Test: `pantry-ui.spec.ts` — grid renders one card per unlocked food; locked foods show greyed teasers with "?" emoji + rarity-color hint. Verify: 8 starter common foods unlocked on first visit; rest greyed.
+
+35. **Plate UI with 4 drop slots** (~1.5h). Test: `plate.spec.ts` — plate area has 4 visible slots; each can hold zero or one food card. Tap food in pantry → moves to first empty slot; tap food on plate → returns to pantry. Verify: max 4 foods at any time; visual state matches model.
+
+36. **Belly meter (20 points/day, depletes on add, daily reset)** (~1.5h). Test: `belly.spec.ts` — belly meter starts at 20; adding a food with bellyCost 3 reduces to 17; can't add a food whose cost exceeds remaining belly. Daily reset (UTC midnight) restores to 20. Verify: `localStorage.fart_belly_<YYYY-MM-DD>` persists.
+
+37. **Tap-to-add interactions + audio cue** (~1h). Test: `plate-interactions.spec.ts` — tapping a food triggers a "munch" sound (placeholder until Phase J), short squash animation on the card, slot becomes occupied. Verify: ARIA `aria-pressed` toggles on the food card; keyboard navigation supports Space/Enter to add.
+
+**Phase C checkpoint**: v5 critic. Player can SEE the inventory and PICK foods to a plate. No scoring yet — Game Feel ≈ 6, Choice Architecture rises to ~4. Expected v5 score: 4.
+
+#### Phase D — Recipe computation + new launch flow (4 items, ~5h)
+
+38. **`computeFartFromPlate(foods)` base additive sum** (~1h). Test: `recipe.test.ts` — passing a plate of foods sums their `properties` field-by-field. Empty plate → all zeros. Single food → that food's properties. Verify: pure function; no side effects.
+
+39. **Synergy bonuses: 10+ named pairs/triples** (~2h). Test: `recipe.test.ts` — `Beans + Dairy` adds +2 to stink, +2 to wet (synergy: "Swamp Beast"); `Garlic + Onion + Cheese` adds +3 to stink (synergy: "Triple Threat"); etc. ≥10 named synergies, each in a catalog `SYNERGIES`. Verify: synergies fire only when ALL ingredients in the rule are present.
+
+40. **Conflict penalties: 5+ named pairs** (~1.5h). Test: `recipe.test.ts` — `Asparagus + Lemon` zeros out musical (canceling); `Pickle + Egg` triggers a flagged-discovery (special-case recipe match); `Ice + Hot Pepper` cancels temp. Verify: each conflict has a named effect — not silent negative numbers.
+
+41. **Launch button reads plate → calls playFart with computed properties** (~30m). Test: `story-launch.spec.ts` — clicking Launch in Story Mode reads the plate, computes fart properties, calls existing `playFart()` with synergy-adjusted values. Verify: audio still fires; cue + main still scheduled; existing audio E2Es still pass.
+
+**Phase D checkpoint**: v5 critic. The plate IS now the input. computeFart replaces sliders. Choice Architecture rises to ~6 (combinatorial pick + non-additive). Decision Quality rises to ~5. Expected v5 score: 5.
+
+#### Phase E — Containment area + new scoring system (3 items, ~4h)
+
+42. **Containment area picker UI** (~1.5h). Test: `containment.spec.ts` — 6 area buttons render; selecting one highlights it + persists `localStorage.fart_area_<date>`. Verify: area is required before Launch (defaults to "Outside"); changing area updates the area-modifier preview.
+
+43. **Apply area modifiers to fart properties** (~1h). Test: `recipe.test.ts` — `applyContainmentModifiers(props, area)` multiplies properties per area's modifier table. Verify: Library multiplies volume by 0.5 + applies a -3 score modifier; Elevator multiplies stink by 4.
+
+44. **Match-against-cravings score (replaces gradeFart in Story Mode)** (~1.5h). Test: `audience-match.spec.ts` — match% = closeness of (fart_props after area mod) to (today's audience cravings), 0-100. Verify: removing the legacy `gradeFart()` call in Story Mode does not break Sandbox; new score panel renders in Story.
+
+**Phase E checkpoint**: v5 critic. Disjoint Systems Gate now CLEARS (single grading in Story Mode). Open Continuous Input Gate CLEARS (pick-K-of-N replaces sliders for Story). System Integration axis rises to 7+. Expected v5 score: 6.
+
+#### Phase F — Audience reactions + Hard Mode (3 items, ~4h)
+
+45. **Audience portrait + reaction tier UI** (~2h). Test: `audience.spec.ts` — audience portrait renders today's archetype's emoji + name + (in Easy Mode) cravings list. After launch, reaction tier appears (loved / liked / meh / disliked / evacuated) per match%. Verify: speech-bubble animation; portrait wobbles on launch.
+
+46. **Hard Mode toggle (hide cravings + match%)** (~1h). Test: `hard-mode.spec.ts` — in Story Mode + Hard Mode, cravings hidden; match% hidden; only audience reaction tier visible. Verify: Displayed-Target Puzzle Gate clears in Hard Mode.
+
+47. **Warmer/colder trend across launches** (~1h). Test: `trend.spec.ts` — subsequent launches show "🔥 warmer" or "❄️ colder" relative to prior launch in the same day. Trend resets on daily rollover or mode toggle.
+
+**Phase F checkpoint**: v5 critic. Displayed-Target Puzzle Gate clears (in Hard Mode). Curiosity Gaps axis rises to ≥6 (hidden cravings + hidden recipes + audience archetypes are all info gaps). Expected v5 score: 6-7.
+
+#### Phase G — Currency + pantry shop (4 items, ~5h)
+
+48. **Gold currency + per-launch award** (~1h). Test: `gold.test.ts` — match% ≥ 50 awards `gold = floor(match / 10)`; match% < 50 awards 0; cumulative gold persists. Verify: gold counter renders in the Story Mode header.
+
+49. **Pantry shop modal UI** (~1.5h). Test: `shop.spec.ts` — Shop button in Story Mode opens a modal with 3 offered foods + their prices in gold; close button closes; modal is keyboard accessible (Tab + Esc).
+
+50. **Daily shop rolls: 3 random uncommon + 1 rare + 0-1 epic** (~1.5h). Test: `shop.test.ts` — `rollDailyShop(date)` deterministic per UTC date; tier mix depends on player's `progressionLevel` (computed from total unlocks + recipes discovered). Verify: same player + same date → same offerings across reloads.
+
+51. **Buy flow: deduct gold, unlock food** (~1h). Test: `shop.spec.ts` — tapping a food in the shop modal calls `buyFood(id)`: deducts price, adds id to `unlocked` pantry, persists. UI updates immediately. Verify: shop offering grays out after purchase; out of gold disables button.
+
+**Phase G checkpoint**: v5 critic. Hollow Score Gate clears (score → gold → in-system unlocks). Progression axis rises to ≥6 (across-session inventory growth). Loop-Only Gate clears (nameable arc: "unlock all 30 foods"). Expected v5 score: 7.
+
+#### Phase H — Recipe discovery + Lab Notebook (3 items, ~4h)
+
+52. **Recipe matching on launch** (~1.5h). Test: `recipe-match.spec.ts` — when launching with a plate that exactly matches a recipe's ingredients, the recipe is "discovered" (toast notif + persistent record). Verify: same recipe doesn't re-toast on subsequent matches.
+
+53. **Lab Notebook modal UI** (~1.5h). Test: `notebook.spec.ts` — Notebook button opens a modal showing all 30 recipes; discovered ones display name + ingredients + tap-to-fill; undiscovered show "??? — keep experimenting" with rarity color hint.
+
+54. **Recipe-as-preset (tap to auto-fill plate)** (~1h). Test: `notebook.spec.ts` — tapping a discovered recipe in the notebook auto-clears the plate then fills it with that recipe's ingredients (if all are unlocked and belly allows). Verify: missing ingredient → toast "you don't have X yet"; insufficient belly → toast "not enough belly today."
+
+**Phase H checkpoint**: v5 critic. Recipe discovery + Lab Notebook = significant Curiosity Gaps + Goal Stacking lifts. Decision Quality rises (recipes are interesting strategic choices). Expected v5 score: 7-8.
+
+#### Phase I — Meta-progression: research notes (3 items, ~3h)
+
+55. **Research notes currency + failure-banking** (~1h). Test: `research.test.ts` — match% < 50 awards `research_notes = floor((100 - match) / 20)`. Verify: low-match runs (including total flops) still bank notes — failure progresses (P30).
+
+56. **Research-note unlock paths for cheaper foods** (~1h). Test: `research.test.ts` — each common food has a `researchUnlockCost`; spending notes unlocks it without gold. Verify: separate from gold purchase path; both routes valid for non-legendary foods.
+
+57. **Research notes counter + spend UI** (~1h). Test: `research.spec.ts` — Notes counter in header; clicking opens "Research" panel listing common foods unlockable with notes + their costs. Verify: spending notes deducts immediately + unlocks food.
+
+**Phase I checkpoint**: v5 critic. No-Failure Gate clears (failure → research notes → progression). Bushnell Floor=Ceiling Gate progresses (skilled players unlock faster). Expected v5 score: 7-8.
+
+#### Phase J — Legendary multi-step quests (3 items, ~3.5h)
+
+58. **Quest definitions: 5+ legendary foods with multi-step requirements** (~1.5h). Test: `quests.test.ts` — each legendary food has a `legendaryUnlock` with steps: "own ≥10 common foods", "discover ≥5 recipes", "win 3 audience matches this week", etc. Verify: quest progress computed deterministically from save state.
+
+59. **Quest progress UI in shop modal** (~1.5h). Test: `quests.spec.ts` — legendary tab in shop shows each legendary food + progress bars for its quest steps + a locked "Claim" button. Verify: claim button enables only when all steps complete; clicking it unlocks the food + plays a fanfare.
+
+60. **Audience portrait reactions for legendary launches** (~30m). Test: `legendary.spec.ts` — launching a recipe using a legendary food triggers a special audience reaction (extra animation + gold particles). Verify: subtle but recognizable; doesn't interrupt the core launch flow.
+
+**Phase J checkpoint**: v5 critic. Surprise & Delight axis ≥6 (legendary unlocks + fanfares are real surprises). Expected v5 score: 7-8.
+
+#### Phase K — Audio: new ElevenLabs SFX seeds (3 items, ~3h)
+
+61. **Audience-reaction SFX seeds (laughter, evacuation, applause)** (~1h). Test: extend `scripts/sfx-seeds.ts` with 6 new audience seeds (granny-cackle, royal-court-applause, frat-howl, haunted-mansion-moan, alien-tourists-gasp, toddler-giggle). Verify: re-run `npm run sfx:generate`; manifest grows; A28 Library Richness passes with ≥20 named effects.
+
+62. **Food-eating sounds + recipe-discovery sting** (~1h). Test: extend seeds with 5-6 food-eating sounds (chomp, slurp, sizzle, crunch) + a recipe-discovery sting (4-note jingle). Verify: `playFoodEatSound(food)` called from plate-add interaction; recipe discovery sting plays via `playSample('recipe-sting')`.
+
+63. **Legendary-unlock fanfare** (~1h). Test: extend seeds with `legendary-fanfare.mp3` — a 3-second triumphant brass/choir sting. Verify: plays on legendary food unlock + on legendary recipe launch.
+
+**Phase K checkpoint**: v5 critic. Audio rubric (separate from Fun) rises substantially; Personality / Charm axis on Fun rises to ≥6 (named audience voices, distinctive food sounds). Expected v5 score: 8.
+
+#### Phase L — Visual polish + animations (4 items, ~4h)
+
+64. **Rarity glow CSS + sparkle particles for legendary** (~1h). Test: `rarity.spec.ts` — `.rarity-legendary` food cards show ambient gold pulse + 3-5 sparkle emoji at random positions. Verify: reduce-motion suppresses all animations.
+
+65. **Audience portrait animations: idle wobble + reaction faces** (~1.5h). Test: `audience-animation.spec.ts` — portrait has subtle idle wobble (3-5° rotation, 4s loop); after launch, transitions to "reaction face" (replace emoji per tier: loved 😍, evacuated 💀). Verify: smooth transitions, reduce-motion safe.
+
+66. **Belly meter depletion animation** (~30m). Test: `belly-anim.spec.ts` — adding a food triggers a brief shrink animation on the meter bar; daily reset triggers a restore animation. Verify: CSS-only, transform-based.
+
+67. **Wind-up/pop/settle on plate-add and shop-purchase** (~1h). Test: `polish.spec.ts` — adding a food triggers the Disney-12 wind-up/pop/settle on the food card; shop purchase triggers it on the purchased card. Verify: V20 from VISUAL_CRITIC.md.
+
+**Phase L checkpoint**: v5 critic. Game Feel axis ≥8 (multi-modal anticipation + polish); Personality / Charm + Surprise & Delight + Aesthetic-Mechanical Coherence all ≥6. Expected v5 score: 8.
+
+#### Phase M — Ship: verification + report (3 items, ~2h)
+
+68. **End-to-end gameplay smoke (v3 flow)** (~1h). Test: `gameplay-smoke-v3.spec.ts` — fresh visit; switch to Story Mode; pick 3 starter foods that suit today's audience cravings; pick Containment Area; Launch; reach ≥70% match; receive gold; buy a new uncommon food from shop; discover a recipe (toast + notebook entry); switch to Hard Mode + retry → audience reaction visible without cravings; reload → all state persists.
+
+69. **v5 critic final re-validation on full build** (~30m). Run the v5 rubric on the full Story Mode build. Expected: ≥8 across all axes, ≤1 hard gate failing (likely Kid-Safety or Loudness Chaos already cleared in v2 phase). Verify: `axisScores` JSON written to `.session/v5-final-scores.json`.
+
+70. **`docs/FINAL_REPORT_v3.md` + iteration-log entries** (~30m). Test: docs exist with: feature inventory, test counts, v3-vs-v5 score progression chart, deploy steps. Verify: linked from README; commit-pushed to `food-mvp` branch.
+
+**Phase M checkpoint**: SHIP. v5 final score ≥8. PR opened to merge `food-mvp` → `main`.
+
+---
+
+**Tier 7 total ETA**: ~55h across 45 items in 13 phases. Realistic cadence:
+- 3-4 sessions of 6-8h each (1 phase per session) → 2-3 weeks
+- OR 8-10 sessions of 2-3h each → 4-6 weeks
+- OR autonomous-style ~40m per item → ~10 hours of focused tool-time
+
+**v5 score trajectory** (target after each phase):
+
+| Phase | Items | v5 score target | Key gate cleared |
+|---|---|---|---|
+| A — Foundation | 26-30 | 3 | (data only, no gameplay) |
+| B — Mode shell | 31-33 | 3 | Story mode shell isolated |
+| C — Pantry/plate UI | 34-37 | 4 | Choice Architecture rises |
+| D — Recipe computation | 38-41 | 5 | Open Continuous Input cleared |
+| E — Scoring swap | 42-44 | 6 | Disjoint Systems + System Integration cleared |
+| F — Audience + Hard Mode | 45-47 | 6-7 | Displayed-Target Puzzle cleared (in Hard Mode) |
+| G — Gold + shop | 48-51 | 7 | Hollow Score + Loop-Only cleared |
+| H — Recipe discovery | 52-54 | 7-8 | Curiosity Gaps + Goal Stacking lift |
+| I — Research notes | 55-57 | 7-8 | No-Failure cleared (failure progresses) |
+| J — Legendary quests | 58-60 | 7-8 | Surprise & Delight axis ≥6 |
+| K — New SFX | 61-63 | 8 | Personality / Charm axis ≥6 |
+| L — Polish | 64-67 | 8 | Game Feel axis ≥8 |
+| M — Ship | 68-70 | ≥8 | All 11 gates pass, ≥7 on all 13 axes |
+
+**Stop conditions per session**: same as §I — work toward the next phase's checkpoint, then `npm test && npx playwright test`, run v5 critic on cumulative state, commit + write iteration-log entry. If v5 score doesn't move ≥0.5 in a phase, pause and revise design before continuing.
+
+**Workflow**: branch `food-mvp` off `main`. Per-phase PR (13 PRs total — A through M). Each PR has its own checkpoint test + critic-run summary in the body. Merge to `main` only when each phase's checkpoint passes. Pages deploy auto-triggers per existing `.github/workflows/deploy.yml`.
+
+---
+
 ## E. Iteration loop architecture
 
 Orchestrator = the main Claude Code session at `E:\app_design\fart-factory`. State in `.session/`. **Per iteration:**
@@ -357,13 +539,14 @@ Full rubric: [docs/QUALITY_CRITIC.md](QUALITY_CRITIC.md). v2 evolves v1 with six
 
 ### Fun critic
 
-Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new axes (Progression, Goal Stacking, Curiosity Gaps), an Anticipation sub-test under Game Feel, and a new Hollow Score gate.
+Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v5 evolves v4 with 3 new game-agnostic axes (Personality, Surprise, Coherence), a new aggregation formula `(min + mean) / 2` that stops polish from compensating for structural failure, and stricter calibration anchors. v4 evolved v3 with 2 new structural-architecture axes + 4 new hard gates.
 
-- **Axes (8, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression), Goal Stacking, Curiosity Gaps.
-- **Hard gates (7, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety, Hollow Score.
+- **Axes (13, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression + inventory growth), Goal Stacking, Curiosity Gaps (incl. hidden-information), System Integration *(v4)*, Choice Architecture *(v4)*, **Personality / Charm** *(v5)*, **Surprise & Delight** *(v5)*, **Aesthetic-Mechanical Coherence** *(v5)*.
+- **Aggregation (v5):** raw_score = round((min_axis + mean_axes) / 2). Polish on one axis can no longer compensate 1:1 for structural failure on another. Hard-gate caps still apply on top.
+- **Hard gates (11, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox), Kid-Safety, Hollow Score, Disjoint Systems *(v4)*, Open Continuous Input *(v4)*, Loop-Only Design *(v4)*, Displayed-Target Puzzle *(v4)*.
 - **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring.
 - **Schell Lens #39:** four questions answered verbatim per iteration.
-- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6. Orchestrator's existing parsing below still reads `.score` and `.blockers`; new fields are additive.
+- **Output schema:** `{score, rationale, blockers, axisScores, aggregation: {minAxis, meanAxes, rawScore, gateCap}, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.7.
 - **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic
