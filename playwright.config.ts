@@ -15,15 +15,28 @@ export default defineConfig({
   projects: [
     {
       name: 'mobile',
-      use: { ...devices['iPhone SE'], viewport: { width: 375, height: 667 } },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 375, height: 667 },
+        isMobile: false,
+        hasTouch: true,
+      },
     },
     {
       name: 'tablet',
-      use: { ...devices['iPad Mini'], viewport: { width: 768, height: 1024 } },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 768, height: 1024 },
+        isMobile: false,
+        hasTouch: true,
+      },
     },
     {
       name: 'desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1440, height: 900 },
+      },
     },
   ],
   webServer: {
