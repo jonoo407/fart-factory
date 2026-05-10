@@ -173,6 +173,21 @@ body {
 .rarity-epic      { border-color: #a855f7; box-shadow: 0 0 14px rgba(168, 85, 247, 0.5); }
 .rarity-legendary { border-color: #f59e0b; box-shadow: 0 0 18px rgba(245, 158, 11, 0.6); }
 
+/* --- Story Launch button + result panel --- */
+.story-launch-wrap { margin: 16px 0; text-align: center; }
+#storyLaunchBtn { width: 100%; }
+.story-result {
+  background: rgba(50, 0, 50, 0.4);
+  border: 2px solid #ff00ff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  color: #fff;
+}
+.story-result-row { font-weight: bold; margin-bottom: 6px; }
+.story-result-effects { font-size: 0.9em; }
+.story-result-effect { margin-top: 4px; color: #ffd97a; }
+
 /* Sandbox-only elements hidden in Story Mode (legacy slider chrome). */
 body[data-mode='story'] .challenge,
 body[data-mode='story'] .lab,

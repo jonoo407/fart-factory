@@ -11,6 +11,10 @@ import {
   spendBelly,
   BELLY_CAPACITY,
 } from '../state/persistence';
+import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
+import { playFart } from '../audio/procedural';
+import { triggerHaptic, HAPTICS } from './haptics';
+import { spawnGas } from '../visuals/gas';
 
 const SLOTS = 4;
 
@@ -181,8 +185,74 @@ export function wirePlateSlots(): void {
   }
 }
 
+function clampUiAxis(n: number): number {
+  return Math.max(1, Math.min(10, Math.round(n)));
+}
+
+/**
+ * Maps recipe-result properties (each 0-15 typical range after sums + synergies)
+ * to the slider 1-10 space that existing playFart consumes. Per PLAN.md §D
+ * Phase D item 41 — Launch button reads plate, computes fart, calls existing
+ * playFart. Phase E will introduce containment-area modifiers and audience-
+ * match scoring; this step just wires the audio.
+ */
+function recipeToSliderInputs(r: RecipeResult): [number, number, number, number, number, number] {
+  // Original playFart signature: (length, wetness, volume, stinkiness, temp, musical)
+  const p = r.props;
+  return [
+    clampUiAxis(p.length),
+    clampUiAxis(p.wet - p.dry / 2 + 5), // wet-vs-dry composite mapped near middle
+    clampUiAxis(p.loud + 3),
+    clampUiAxis(p.stink),
+    clampUiAxis(p.temp + 3),
+    clampUiAxis(p.musical + 2),
+  ];
+}
+
+function renderStoryResult(r: RecipeResult): void {
+  const wrap = $('storyResult');
+  const title = $('storyResultTitle');
+  const effects = $('storyResultEffects');
+  if (!wrap || !title || !effects) return;
+  wrap.removeAttribute('hidden');
+  const plateLen = plateIngredientIds().length;
+  title.textContent = plateLen === 0
+    ? '🌬️ A whisper. (Empty plate.)'
+    : `🎉 Launched ${plateLen}-ingredient recipe`;
+  const lines: string[] = [];
+  for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
+  for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
+  effects.innerHTML = lines.length
+    ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
+    : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
+}
+
+function onStoryLaunch(): void {
+  const ids = plateIngredientIds();
+  const r = computeFartFromPlate(ids);
+  const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(r);
+
+  triggerHaptic(HAPTICS.launch);
+  playFart(length, wetness, volume, stink, temp, musical);
+  spawnGas(stink, volume);
+
+  // Persist the belly cost actually incurred this session.
+  commitBellySpend();
+
+  // After launch, clear plate so player can build the next recipe.
+  clearPlate();
+  renderPlate();
+  renderBellyMeter();
+  renderStoryResult(r);
+}
+
+function wireStoryLaunchButton(): void {
+  $('storyLaunchBtn')?.addEventListener('click', onStoryLaunch);
+}
+
 export function initStoryPantry(): void {
   wirePlateSlots();
+  wireStoryLaunchButton();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();
