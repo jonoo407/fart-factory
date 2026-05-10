@@ -11,6 +11,22 @@
       <h1>💨 The Fart Factory 💨</h1>
       <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
 
+      <div id="challengeCard" class="challenge" role="region" aria-label="Today's challenge">
+        <div class="challenge-row">
+          <span class="challenge-emoji" id="challengeEmoji">🎯</span>
+          <div class="challenge-text">
+            <div class="challenge-label">🎯 Today's Challenge:
+              <span class="challenge-name" id="challengeName">—</span>
+            </div>
+            <div class="challenge-hint" id="challengeHint">—</div>
+          </div>
+        </div>
+        <div class="challenge-match" id="challengeMatch" aria-live="polite" hidden>
+          Match: <span id="challengeMatchPct">—</span>%
+          <span class="challenge-match-emoji" id="challengeMatchEmoji"></span>
+        </div>
+      </div>
+
       <div class="lab" role="group" aria-label="Fart parameters">
         <div class="slider-group">
           <label class="slider-label" for="s1">

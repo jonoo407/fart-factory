@@ -15,6 +15,7 @@ import {
 import { loadHall as loadHallEntries } from './state/hall';
 import { showAchievementToast } from './ui/toast';
 import { reduceCombo, initialCombo, type ComboState } from './state/combo';
+import { getDailyChallenge, computeMatch } from './state/challenge';
 import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
 import {
@@ -66,6 +67,26 @@ function renderComboBanner(state: ComboState): void {
   }
 }
 
+function matchEmoji(pct: number): string {
+  if (pct >= 95) return '🎯💥';
+  if (pct >= 85) return '🔥';
+  if (pct >= 70) return '👍';
+  if (pct >= 50) return '🤏';
+  if (pct >= 30) return '😬';
+  return '💀';
+}
+
+function renderChallengeMatch(actual: number[]): void {
+  const challenge = getDailyChallenge();
+  const pct = computeMatch(actual, challenge.profile);
+  const wrap = $('challengeMatch');
+  const pctEl = $('challengeMatchPct');
+  const emoji = $('challengeMatchEmoji');
+  if (wrap) wrap.removeAttribute('hidden');
+  if (pctEl) pctEl.textContent = String(pct);
+  if (emoji) emoji.textContent = ' ' + matchEmoji(pct);
+}
+
 function onLaunch(): void {
   const vals = readSliders();
   const [length, wetness, volume, stink, temp, music] = vals;
@@ -75,6 +96,7 @@ function onLaunch(): void {
   playFart(length, wetness, volume, stink, temp, music);
   spawnGas(stink, volume);
   showReactions(total);
+  renderChallengeMatch(vals);
 
   const pool = total < 20 ? weakComments : comments;
   const line = pickFromPool(pool);
@@ -208,17 +230,32 @@ function wireVisibilityChange(): void {
   });
 }
 
+function renderChallengeCard(): void {
+  const c = getDailyChallenge();
+  const nameEl = $('challengeName');
+  const hintEl = $('challengeHint');
+  const emojiEl = $('challengeEmoji');
+  if (nameEl) nameEl.textContent = c.name;
+  if (hintEl) hintEl.textContent = c.hint;
+  if (emojiEl) emojiEl.textContent = c.emoji;
+}
+
 function init(): void {
   wireSliderDisplay();
   $('launchBtn')?.addEventListener('click', onLaunch);
   $('randomBtn')?.addEventListener('click', onRandom);
   wireMuteButton();
   wireVisibilityChange();
+  renderChallengeCard();
   renderHall();
   showOnboarding();
-  // Test/debug shim: expose AudioContext.state for E2E mute verification.
-  const w = window as unknown as { __audioCtxState?: () => string };
+  // Test/debug shims for E2E verification of internal state.
+  const w = window as unknown as {
+    __audioCtxState?: () => string;
+    __challengeProfile?: () => number[];
+  };
   w.__audioCtxState = () => getAudioContext()?.state ?? 'none';
+  w.__challengeProfile = () => [...getDailyChallenge().profile];
 }
 
 if (document.readyState === 'loading') {
