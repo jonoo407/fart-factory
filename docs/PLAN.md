@@ -368,11 +368,11 @@ Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new a
 
 ### Visual critic
 
-Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v2 evolves v1 with eight mechanism-level axes, nine hard gates (incl. NEW Touch-Target, Viewport-Zoom, Reduced-Motion, Focus-Visible, Color-Only, CLS), and a required tools-run measurement step (axe-core + Lighthouse + Playwright traces).
+Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v3 evolves v2 with an Art Direction axis (visuals-as-art): Disney 12 Principles, Bacher palette, Itten/Albers color theory, shape language, UI motion wind-up/pop/settle, single visual reference commitment, typography as voice, Penner easing equations, Vignelli restraint, McCloud visual storytelling.
 
-- **Axes (8, each 1-10):** Contrast & Color, Touch & Tap Ergonomics, Typography, Motion Safety & Performance, Focus & Keyboard, Layout Stability, Hierarchy & Affordance, Kid-Appropriateness.
-- **Hard gates (9, any failure caps score at 4):** WCAG-Contrast, Touch-Target, Viewport-Zoom, Layout-Thrash, Reduced-Motion, Focus-Visible, Min-Body-Size (tiered: primary 14px / meta 12px), Color-Only, CLS.
-- **Required measurements:** axe-core at 3 viewports; Lighthouse mobile (LCP/CLS/INP/a11y); Playwright touch-target audit; Playwright reduce-motion verification; Playwright focus indicator audit; deuteranopia simulator on screenshots; Flesch-Kincaid reading level on visible strings.
+- **Axes (9, each 1-10):** Contrast & Color, Touch & Tap Ergonomics, Typography, Motion Safety & Performance, Focus & Keyboard, Layout Stability, Hierarchy & Affordance, Kid-Appropriateness, Art Direction *(new in v3)*.
+- **Hard gates (9, any failure caps score at 4):** WCAG-Contrast, Touch-Target, Viewport-Zoom, Layout-Thrash, Reduced-Motion, Focus-Visible, Min-Body-Size, Color-Only, CLS.
+- **Required measurements:** v2 measurement battery + v3 craft diagnostic (palette inventory, Disney-12 audit per animation, wind-up/pop/settle inspection, typeface count + fallback determinism, easing-curve catalog, shape-language proportion, blind-screenshot identifiability, label-hidden state readability).
 - **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see VISUAL_CRITIC.md §3.5.
 - **Tools:** Read, Grep, Glob, Playwright (REQUIRED with @axe-core/playwright), Lighthouse CLI, screenshot inspection.
 

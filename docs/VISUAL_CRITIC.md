@@ -1,9 +1,12 @@
-# Visual Critic v2 — Rubric & Operationalization
+# Visual Critic v3 — Rubric & Operationalization
 
 > Applies to multi-agent overhaul iterations on `overhaul-v2`. Replaces the
 > five-line block at `docs/PLAN.md` §F (the "Visual critic" subsection).
-> Same v1→v2 redesign approach as `docs/FUN_CRITIC.md` and
-> `docs/AUDIO_CRITIC.md`.
+> Same v1→v2→v3 redesign approach as `docs/FUN_CRITIC.md` and
+> `docs/AUDIO_CRITIC.md`. v3 adds an Art Direction axis covering visuals-
+> as-art (Disney 12 Principles / Bacher production design / Itten color
+> theory / Vignelli restraint / Bringhurst typography / McCloud visual
+> storytelling) — the aesthetic dimension v2 didn't measure.
 
 ---
 
@@ -22,9 +25,13 @@ The v1 visual critic in `docs/PLAN.md` §F gave **visual=9** to iterations 5, 7,
 
 **Observable in `docs/iteration-log.md`:** visual scores 6, 6, 8, 6, 9, 8, 9, 9 across iters 1-8. The 9s are at iters 5, 7, 8 — at no point did the rubric require axe-core or Lighthouse to substantiate them.
 
+### 1.1 What v3 adds to v2
+
+v2 caught technical visuals (contrast, touch targets, viewport zoom, layout-thrash, reduce-motion, focus, body-size, color-only, CLS). User stress-test exposed a further class v2 doesn't reach: **art direction.** A page could pass every v2 gate (axe-clean, Lighthouse-perfect, all touch targets ≥44×44, transform-only animations) and still look like a Bootstrap form with rainbow accents — chaotic palette, inert animations (scale 0.95 + snap-back), three handwritten typefaces stacked, no shape language, no committed visual reference. v3 adds an eighth axis — **Art Direction** — backed by 12 cited principles spanning Disney's 12 Principles of Animation (Thomas & Johnston 1981), production design (Hans Bacher *Dream Worlds*, Mary Blair, Pixar color scripts), color theory (Itten, Albers), shape language, character/appeal (Loomis), UI-animation wind-up/pop/settle (Val Head), staging (Storaro/Deakins), kid-game visual precedents (Sesame, *Crossy Road*, *Untitled Goose Game*, *Cuphead*), typography as voice (Bringhurst/Spiekermann), Penner easing equations (Nabors *Animation at Work*), Vignelli/Rand restraint, and McCloud visual storytelling. The axis maps Annie / BAFTA Best Artistic Achievement criteria into operationalizable lens-questions. v2 axes/gates remain unchanged; v3 is purely additive.
+
 ---
 
-## 2. Design principles backing v2
+## 2. Design principles backing v3
 
 Each axis and gate below traces to one or more cited principles. Principles are V1-V14 (parallel to FUN_CRITIC.md's P1-P19 and AUDIO_CRITIC.md's A1-A15).
 
@@ -44,12 +51,24 @@ Each axis and gate below traces to one or more cited principles. Principles are 
 | V12 | **Color-only-information / color-blindness** — information must not be conveyed by color alone; ~8% of males have CVD (mostly deuteranopia). | W3C WCAG 2.2 SC 1.4.1 (Level A); Cynthia Brewer, *ColorBrewer 2.0* (Penn State 2002); NCBI Webvision color-vision deficiencies table. |
 | V13 | **Typography for kids: minimum body 16px, line-length 45-75ch, line-height 1.4-1.6** — early-reader legibility benefits from larger body type and rounded sans-serifs with high x-height. | Robert Bringhurst, *The Elements of Typographic Style* 4th ed. (Hartley & Marks 2013); WCAG 2.2 SC 1.4.12 Text Spacing; Material Design 3 type scale (Body Large = 16px). |
 | V14 | **Kid-specific UI heuristics** — errorless interaction; sub-100ms tap-to-feedback; one primary action per screen; no IAP/ads on kids' apps; reading level ≤Grade 3 for ages 5-10. | Sesame Workshop UX research practice; BBC Global Experience Language (GEL) Children's Design Principles; Common Sense Media 14-point app review rubric; Sesame Workshop, ACM Computers in Entertainment 2003. |
+| V15 | **Disney 12 Principles of Animation (UI subset)** — Squash & Stretch, Anticipation, Staging, Slow-In/Slow-Out, Arcs, Follow-Through & Overlapping, Secondary Action, Timing, Exaggeration, Appeal. UI animations should pass ≥4 of 6 applicable principles. | Frank Thomas & Ollie Johnston, *The Illusion of Life: Disney Animation* (Abbeville 1981, ISBN 0-89659-698-2). |
+| V16 | **Limited intentional palette** — production has ≤6 hue families with assigned narrative roles (hero / antagonist / ambient / accent / danger / reward); hues outside the palette are forbidden or reserved for specific story beats. | Hans Bacher, *Dream Worlds: Production Design for Animation* (Focal 2007); Mary Blair concept paintings for Disney's *Cinderella* (1950); Ralph Eggleston, color script for *Finding Nemo* in *The Art of Finding Nemo* (Chronicle 2003). |
+| V17 | **Color theory: scheme, saturation hierarchy, value structure** — colors related by named scheme (complementary / analogous / triadic / tetradic); saturation hierarchy with no more than 3 fully-saturated elements simultaneously; readable as 3-tone grayscale (dark / midtone / light). | Johannes Itten, *The Art of Color* (Reinhold 1961); Josef Albers, *Interaction of Color* (Yale UP 1963, ISBN 0-300-01846-0). |
+| V18 | **Visual identity / shape language** — production picks a dominant shape vocabulary (rounded / geometric / asymmetric); ≥70% of borders/clip-paths/SVG primitives derive from one family. Blind-screenshot test: cropped frame is identifiable as *this* game vs generic Bootstrap dashboard. | Hans Bacher, *Dream Worlds* (2007); Lou Romano, color script for *The Incredibles* in *The Art of The Incredibles* (Chronicle 2004). |
+| V19 | **Character / appeal** — every named element has personality via asymmetry, exaggerated proportions, or distinctive silhouette. Silhouette test: rendered as solid black at 32×32, still recognizable. | Disney 12's "Appeal" (Thomas & Johnston 1981); Andrew Loomis, *Figure Drawing for All It's Worth* (Viking 1943). |
+| V20 | **UI animation: wind-up / pop / settle** — meaningful interactive animations have three beats: anticipation (~80-120ms wind-up moving opposite the final direction), the pop (action with stretch on leading edge, ~150-250ms), the settle (overshoot + bounce, ~200-400ms). | Disney 12 (Anticipation, Squash & Stretch, Follow-Through); Val Head, *Designing Interface Animation* (Rosenfeld Media 2016, ISBN 1-933820-31-6) ch. 3. |
+| V21 | **Staging / focal hierarchy** — at any moment, exactly one element is the focal point via value contrast, saturation isolation, or scale. Squint test: blur the screen — does ONE element jump out, or do 3+ compete? | Disney 12 (Staging); Vittorio Storaro, *Writing With Light* (Electa 2001-2003); Roger Deakins commentary tracks on directing the eye. |
+| V22 | **Single visual reference commitment** — the game can be described in one phrase (e.g., "1930s rubberhose," "low-poly," "kid's notebook doodle") and ≥80% of visual elements pull from that single reference. *Crossy Road* / *Cuphead* / *Untitled Goose Game* each commit to one. | Andy Sum on *Crossy Road* (GDC 2015); Studio MDHR, *The Art of Cuphead* (Dark Horse 2020, ISBN 1-50671-313-7); House House on *Untitled Goose Game*; Caroll Spinney, *The Wisdom of Big Bird* (Villard 2003) on Sesame's craft. |
+| V23 | **Typography as voice** — typeface choice is a tonal commitment; ≤2 typefaces per design unless a third has a defended role; cross-platform fallback determinism (`cursive` is non-deterministic). | Robert Bringhurst, *The Elements of Typographic Style* 4th ed. (Hartley & Marks 2012, ISBN 0-88179-212-0); Erik Spiekermann, *Stop Stealing Sheep & Find Out How Type Works* 3rd ed. (Adobe Press 2014, ISBN 0-321-93428-7). |
+| V24 | **Animation timing & rhythm** — easing curves communicate physicality (Penner equations: back/elastic/bounce); ≤4 distinct curves with named roles; rhythm has composed beats (wind-up : pop : settle), not random durations. | Robert Penner, *Programming Macromedia Flash MX* (McGraw-Hill 2002, ISBN 0-07-222356-8) ch. 7 easing equations; Rachel Nabors, *Animation at Work* (A Book Apart 2017, ISBN 1-937557-65-7). |
+| V25 | **Negative space / breathing room** — empty space is content, not absence. Vignelli's "rule of three" (≤3 weights / ≤3 sizes / ≤3 colors per layout); kid-game density 3-7 interactive elements per viewport; remove any decorative element — does the design collapse, or was it filler? | Massimo Vignelli, *The Vignelli Canon* (Lars Müller 2010, ISBN 3-03778-225-6); Paul Rand, *A Designer's Art* (Yale UP 1985, ISBN 0-300-05553-6). |
+| V26 | **Visual storytelling — show, don't tell** — visual vocabulary communicates state without text labels. Hide all labels: ≥70% of states/affordances should remain understandable. Icons share line weight, corner treatment, abstraction level. | Scott McCloud, *Understanding Comics: The Invisible Art* (Tundra/Kitchen Sink 1993, ISBN 0-06-097625-X) chs. 2-3 on iconic abstraction. |
 
 ---
 
-## 3. The v2 rubric
+## 3. The v3 rubric
 
-### 3.1 Eight mechanism-level axes
+### 3.1 Nine mechanism-level axes
 
 Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 
@@ -63,6 +82,7 @@ Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 | **Layout Stability** | Lighthouse mobile LCP ≤2.5s, CLS ≤0.1, INP ≤200ms; explicit dimensions on media; reserved space for dynamically-injected toasts/banners. | V8, V9 |
 | **Hierarchy & Affordance** | One visually-dominant primary CTA per screen; every clickable has a signifier (button shape, cursor:pointer, icon); consistent grouping per Gestalt proximity/similarity. | V10, V11 |
 | **Kid-Appropriateness** | Reading level ≤Grade 3 (Flesch-Kincaid) on primary UI strings; no IAP/ads CTAs; tap-to-feedback under 100ms; one primary action per screen. | V14 |
+| **Art Direction** *(new in v3)* | Visuals-as-art: ≤6 hue families with documented roles; named color scheme (Itten); ≥4/6 Disney-12 principles in interactive animations; UI motion has wind-up/pop/settle; one dominant shape language; named single visual reference; ≤2 typefaces (cross-platform-deterministic); ≤4 named easing curves; Vignelli rule-of-three observed; ≥70% of states readable with text hidden (McCloud). | V15-V26 |
 
 ### 3.2 Nine hard gates (auto-fail to ≤4)
 
@@ -129,7 +149,8 @@ Same shape as `FUN_CRITIC.md` §3.6 / `AUDIO_CRITIC.md` §3.5.
     "focusKeyboard": 0,
     "layoutStability": 0,
     "hierarchyAffordance": 0,
-    "kidAppropriateness": 0
+    "kidAppropriateness": 0,
+    "artDirection": 0
   },
   "diagnostics": {
     "axeViolations": [],
@@ -145,7 +166,24 @@ Same shape as `FUN_CRITIC.md` §3.6 / `AUDIO_CRITIC.md` §3.5.
     "readingLevelGrade": 0,
     "primaryCTAsPerScreen": 0,
     "tapToFeedbackMs": 0,
-    "screenshotPaths": ["tests/e2e/__snapshots__/iter-N-{mobile,tablet,desktop}.png"]
+    "screenshotPaths": ["tests/e2e/__snapshots__/iter-N-{mobile,tablet,desktop}.png"],
+    "artDirection": {
+      "hueFamiliesUsed": 0,
+      "paletteScheme": "<named scheme | none>",
+      "fullySaturatedSimultaneous": 0,
+      "valueTiers": "<dark/mid/light distribution>",
+      "shapeLanguageDominantPct": 0,
+      "blindScreenshotIdentifiable": false,
+      "namedVisualReference": "<one phrase | absent>",
+      "disney12PrincipalsPerAnimation": 0,
+      "windUpPopSettleAnimations": 0,
+      "typefaceCount": 0,
+      "fallbackDeterministic": false,
+      "easingCurvesNamed": [],
+      "decorativeElementsRemovableWithoutCollapse": 0,
+      "labelHiddenStatesReadablePct": 0,
+      "iconLineWeightConsistent": false
+    }
   },
   "hardGatesFailed": []
 }
@@ -205,6 +243,29 @@ Evaluating commit `11f58ec` on `overhaul-v2`. Worked-validation evidence is part
 - **Color-only state indicators**: grade letters are unique strings (`F-`, `D`, `C`, `C+`, `B`, `B+`, `A`, `A+`, `S+` — see [src/scoring/grade.ts:8-16](src/scoring/grade.ts:8)) AND each has a unique color. Both signals carry the state. **Gate 8 PASSES.** (Note: stinkiness emoji backup also serves this role.)
 - **Layout-thrash sources for CLS**: achievement toasts inserted into `.achievement-host` ([src/style.css:286-297](src/style.css:286)) which has `position: fixed` and is OUT of normal flow — toast injection does NOT shift content. ✓ Onboarding overlay similarly `position: fixed; inset: 0`. ✓ No `<img>` mascot to cause dimension shifts. CLS from source inspection is likely ≤0.1, but **Lighthouse must be run live** to confirm gate 9.
 - **Color contrast (V1)** — needs axe-core to confirm. Visual inspection: white text on dark navy gradient is fine; commentary `#ffff88` on dark navy ≈10:1 ✓; `.val` black on `#00ff00` background ≈14:1 ✓; `.hall-empty` was raised to `#ffcc88` per port (originally `#aa8844`) — likely passes 4.5:1 against `rgba(80,50,0,0.3)` background but this is borderline. **Gate 1 requires axe to confirm.**
+- **Art Direction (new in v3)**:
+  - **Hue families used** (V16): inspect [src/style.css](src/style.css) sample — navy gradient (blue), neon green border (`#00ff00`), red-orange Launch (`#ff0000`-`#ff6600`), purple Random (`#9b59b6`-`#8e44ad`), pink results border (`#ff00ff`), gold Hall (`#ffaa00`-`#ffcc00`), yellow commentary (`#ffff88`), light cream hall-empty (`#ffcc88`), gold-orange achievement toast, neon green onboarding border (`#00ff88`), orange combo banner (`#ff5722`/`#ff9800`/`#ffc107`). **8+ hue families** simultaneously visible. **Fail V16.** No documented role per hue.
+  - **Palette scheme** (V17): no named color scheme. Hues are not on a complementary / analogous / triadic geometry — they're scattered. Multiple elements at S=100% L=50% (#00ff00 lime, #ff00ff magenta, #ffff00 hint, #ff0000 launch). **Fail V17.** Itten's vibrating-boundary phenomenon is happening on the Launch button and the lab panel border.
+  - **Fully saturated simultaneous**: ≥4 visible at once (lab border #00ff00, launch gradient #ff0000, results border #ff00ff, hall border #ffaa00). Itten's hierarchy violated. **Fail V17 saturation hierarchy sub-test.**
+  - **Value structure**: convert mentally to grayscale — most elements land in the dark-mid range due to dark backgrounds; but the saturated borders all read as similar mid-light values. No clean dark/midtone/light hierarchy.
+  - **Shape language dominant %** (V18): mixed `border-radius: 12-20px` (rounded rectangles for buttons + cards), `border-radius: 50%` (circles for slider thumbs), and rounded-rectangle gas clouds (radial gradients). ~70% rounded-rectangle, ~20% circles, ~10% organic blobs (gas clouds). The dominant family is rounded rectangles, which is reasonable. **Pass V18 narrowly.**
+  - **Blind-screenshot identifiable** (V18 follow-up): ambiguous — neon-cartoon-lab vibe is recognizable, but the chaotic palette would also fit "any kid-coded HTML game with bright colors." Marginal.
+  - **Named visual reference** (V22): no single phrase commits the design. Could be described as "neon arcade meets cartoon laboratory meets kids' chalkboard meets emoji confetti" — four references. **Fail V22.**
+  - **Disney-12 principles per animation** (V15): inspect each `@keyframes`:
+    - `react`: scale + rotate. Score: Squash&Stretch (no — uniform scale), Anticipation (no), Slow-In/Slow-Out (default ease only), Arcs (no — straight scale), Follow-Through (no — hard stop), Secondary Action (no). **1/6.**
+    - `float` (gas cloud): scale + translateY + opacity. Has a slow-in/slow-out via 50% keyframe. **1-2/6.**
+    - `shake`: linear translate. **0/6** (mechanical buzzing).
+    - `comboPulse`: scale 1→1.05→1, ease-in-out, infinite. **1/6** (timing only).
+    - `toastIn`/`toastOut`: translateY + opacity. **2/6** (timing + slow-in/out).
+    - `sparkleBurst`: translate + scale + rotate over 1.8s ease-out. **2-3/6** (timing + arcs via combined transforms + exaggeration).
+    - `onboardingFade`: opacity only. **1/6.**
+    - **Average: ~1.4/6. Fail V15** (need ≥4/6 average).
+  - **Wind-up/pop/settle animations** (V20): `.btn:active { transform: scale(0.95) }` with `transition: transform 0.1s` is the canonical "two states, linear time, no anticipation, no overshoot" anti-pattern. Zero buttons exhibit wind-up + pop + settle. **Fail V20.**
+  - **Typeface count** (V23): three handwritten-register faces stacked — `'Comic Sans MS', 'Chalkboard SE', cursive`. **Fail V23 (≤2 typefaces with defended roles).** Cross-platform fallback non-deterministic: `cursive` on iOS without manual install resolves to system Apple Chancery / Snell Roundhand — three different voices on three machines.
+  - **Easing curves named** (V24): inspect — `transition: transform 0.1s` (default ease), `ease`, `ease-in-out`, `ease-out`. No Penner-named curves (back/elastic/bounce). All animations feel "default" — none has a personality of its own. **Fail V24** (≤4 distinct curves with named roles).
+  - **Decorative elements removable without collapse** (V25): glowing borders on every card, gradient backgrounds, rainbow slider track, text-shadows on h1, particles on launch — at least 4-5 elements are pure decoration. The crop test would remove most without collapse. The "no breathing room" Vignelli failure. **Fail V25.**
+  - **Label-hidden states readable %** (V26): hide every text label and inspect. Sliders without labels are still parseable as draggable controls (gradient track + circular thumb). The lab panel and results panel are bordered cards — distinguishable. But the grade letter, the hall entries, the achievement toast contents, the commentary — all collapse to undifferentiated rectangles or empty space. Estimated **40-50% readable, below the 70% target.** **Fail V26.**
+  - **Icon line weight consistent**: emoji-heavy design (no custom icons). Emoji rendering is system-dependent. No bespoke icon set. The app punts on icon design.
 
 ### 4.2 Per-axis scores (source-evidence and pending live measurements)
 
@@ -216,16 +277,18 @@ Evaluating commit `11f58ec` on `overhaul-v2`. Worked-validation evidence is part
 - **Layout Stability: 6.** Source inspection suggests low CLS (toasts/onboarding `position: fixed`). But Lighthouse never run; INP and LCP unknown. Without measurement, cap at 6.
 - **Hierarchy & Affordance: 7.** Launch is the visually-dominant CTA (1.4em font, gradient background, larger boxshadow). Random is secondary (smaller-feeling gradient, less visual weight). Sliders have signifiers (gradient track, white circular thumb, focus ring). Onboarding tutorial uses one Next per step. ✓ on the BBC-GEL "one primary action" rule.
 - **Kid-Appropriateness: 6.** Reading level not measured. Spot-check of UI strings: "LAUNCH FART", "Random", "Fart Report Card", "Hall of Shame", "Launch" — all Grade 1-2. Commentary strings vary: "That fart had CHAPTERS." (Grade 3-4) is fine; "The Geneva Convention would like a word." (Grade 6-7 due to "Geneva Convention" complexity) is above the ≤Grade 3 target. Tap-to-feedback measured: synchronous click handler at [src/main.ts:182](src/main.ts:182) → `playFart` called immediately, audio + visuals fire same frame. Likely <100ms but unmeasured. No IAP/ads ✓. One primary action per screen ✓ (except onboarding has Skip + Next, but Next is dominant).
+- **Art Direction: 3** *(new in v3)*. Eight of twelve craft sub-tests fail (palette intentionality, color scheme, saturation hierarchy, named visual reference, Disney-12 principles per animation averaging 1.4/6, wind-up/pop/settle absent, typeface count + fallback determinism, easing curves named, breathing room / Vignelli rule-of-three, label-hidden states readability). Three pass (shape language narrowly, value structure marginally, Kid-Appropriateness section's primary CTA). The build is **uncommitted on craft**: multi-reference, multi-palette, multi-typeface, multi-saturation. Single most diagnostic failure: there is no one-phrase answer to "what is this game's visual world?" The fix is *reduction*, not addition.
 
-Average: (7+9+7+9+7+6+7+6) / 8 = 58/8 = **7.25**.
+Average: (7+9+7+9+7+6+7+6+3) / 9 = 61/9 = **6.78**.
 
 ### 4.3 Verdict
 
 - **Hard gates failed**: zero from source inspection. Live tool measurements (axe-core, Lighthouse) may surface contrast or CLS findings; until run, gate verdicts are *provisional pass with TODO*.
-- **v2 score: 7** (raw 7.25 → rounds to 7; would be 7-8 with measurements green, 4 if any gate fires).
-- **v1 score on the same artifact: 9** (iter 8). Delta: **−2**.
+- **v3 score: 7** (raw 6.78 → rounds to 7; the new Art Direction axis pulls average from v2's 7.25 to 6.78).
+- **v2 score on the same artifact: 7.** Delta v2→v3: −0.5 raw (rounds to same final integer), but Art Direction axis exposes 8 specific craft sub-test failures the technical axes didn't surface.
+- **v1 score on the same artifact: 9** (iter 8). Delta v1→v3: **−2**.
 
-The v1→v2 delta is smaller for visual than for fun (-7) or audio (-3) because the iter 0.3 port and iter-6 fixup *did* address the major v1 TODOs (transform-only animations, `user-scalable=no` removed, `.ach-desc` font size). The delta of -2 still reflects v2's refusal to award 9 without measurements run — measurements that v1 did not require.
+The v3 delta is more about **specific diagnosis** than score. v2 said "axe + Lighthouse measurements MUST run before claiming ≥8." v3 adds: "AND the design is uncommitted on craft — chaotic palette, inert UI animations, three handwritten typefaces, no named visual reference, breathing room violated." Even when the v2 measurements ship clean, score caps at 8 max (not 9) because Art Direction is 3/10. To clear 9-10, the design must commit to a single visual reference, document a ≤6-hue palette, replace inert `scale 0.95` button presses with wind-up/pop/settle motion, drop to ≤2 typefaces, and apply Vignelli reduction.
 
 ### 4.4 Measurements that MUST run on next iteration to justify ≥8
 
@@ -240,13 +303,23 @@ Without these, score is capped at 7 even on a clean source. v1 critic happily ga
 
 ### 4.5 Blockers (must address before visual ≥ 8)
 
+**v2 technical blockers (still required):**
 1. **Add an axe-core E2E test.** Drop `tests/e2e/axe.spec.ts` running `@axe-core/playwright` against `/fart-factory/` at 3 viewports; assert zero critical/serious violations. Closes gate 1 measurement.
 2. **Add a Lighthouse CI check.** Either a pre-push hook or a Playwright-driven Lighthouse run; track LCP/CLS/INP across iterations. Closes gates 8/9 measurement.
 3. **Add a touch-target Playwright spec.** Already cheap given existing infrastructure; iterate every interactive element and assert dimensions.
 4. **Raise `footer` font to 0.9em** for parity with `.ach-desc`. Pure consistency — meta-tier is fine but parity is cleaner.
 5. **Reading-level lint on commentary.** Drop `tests/unit/reading-level.test.ts` running Flesch-Kincaid on every commentary string; flag any above Grade 5; allow ≤Grade 5 for "comedy strings" (commentary is allowed to use 'Geneva Convention' once or twice for adult laughs) but UI strings must be ≤Grade 3.
 
-These five items, addressed together, would likely move visual to **9** under v2 by both passing all gates AND substantiating each axis with measurement evidence.
+**v3 craft blockers (additional, must clear for visual ≥ 8-9):**
+6. **Pick one visual reference and commit** (V22). One phrase: "neon-cartoon laboratory" or "kid's chalkboard with periodic-table vibes" or "1960s sci-fi B-movie poster" or "Saturday-morning cartoon mad scientist." Then make ≥80% of visuals pull from that reference. Right now the design hedges across four references; this single decision drives every other craft fix.
+7. **Document a ≤6-hue palette** (V16). `docs/PALETTE.md` listing hex codes + assigned roles. Suggested for a fart-themed kids' lab: bg-deep (navy `#0f3460`), accent-lab (lime `#00ff88`), warning-stink (orange `#ff6600`), reward-gold (`#ffcc00`), error-skunk (`#ff0099`), neutral-text (`#fff`). Six hues, six roles. All current colors must be auditioned against this palette; non-conformers either reassigned or removed. Vignelli rule-of-three (≤3 simultaneously fully-saturated).
+8. **Replace `scale(0.95)` button-presses with wind-up/pop/settle** (V20, V24). Use Penner `easeOutBack` for the pop, `easeOutBounce` for the settle. Codify as a CSS class: `.btn-press { animation: press-windup 80ms, press-pop 200ms 80ms, press-settle 300ms 280ms; }`. Apply to Launch and Random. Same approach for slider thumb on drag-end.
+9. **Drop typeface stack to ≤2 with deterministic fallback** (V23). Either commit to ONE handwritten face (`'Comic Sans MS', system-ui` — single face, deterministic system fallback) or pair a display face with a body face (`'Bangers', 'Comic Sans MS', cursive` for headlines + `system-ui` for body). The current three-handwritten stack reads as indecisive.
+10. **Add wind-up/pop/settle to Launch animation** (V15, V20). On Launch click, the button should: (a) squash 80ms (anticipation), (b) explode outward via stretch + scale 200ms (the pop), (c) overshoot + settle via spring 300ms. Pair with a "wind-up" audio cue (see AUDIO_CRITIC.md §4.4 #6). Disney's "Anticipation" + "Squash & Stretch" + "Follow-Through" all in one button.
+11. **Apply Vignelli reduction** (V25). Audit every gradient, glow, text-shadow, and decorative border. Remove ≥30% of decorative ink. Keep glow on the *one* primary CTA per screen (Launch). Remove from secondary controls. Negative space is content.
+12. **Add icon vocabulary or delete icons** (V26). Either commission/draw a custom set of icons that share line weight + corner treatment + abstraction level (the slider thumb deserves a fart-cloud icon, not a generic white circle), or remove decorative icons and rely on labels.
+
+Items 6-7 are the keystone — the palette doc + visual reference commitment cascade through every other craft fix. Without them, items 8-12 are local touch-ups on a still-uncommitted design. Items 6-12 together would lift Art Direction from 3 to 7-8, and the overall visual score from 7 to 8-9.
 
 ---
 
@@ -257,11 +330,11 @@ Replace PLAN.md §F's five-line "Visual critic" block with:
 ```markdown
 ### Visual critic
 
-Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v2 evolves v1 with eight mechanism-level axes, nine hard gates (incl. NEW Touch-Target, Viewport-Zoom, Reduced-Motion, Focus-Visible, Color-Only, CLS), and a required tools-run measurement step (axe-core + Lighthouse + Playwright traces).
+Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v3 evolves v2 with an Art Direction axis (visuals-as-art): Disney 12 Principles, Bacher palette, Itten/Albers color theory, shape language, character/appeal, wind-up/pop/settle UI motion, single visual reference commitment, typography as voice, Penner easing equations, Vignelli restraint, McCloud visual storytelling. v2's eight technical axes + nine gates remain unchanged.
 
-- **Axes (8, each 1-10):** Contrast & Color, Touch & Tap Ergonomics, Typography, Motion Safety & Performance, Focus & Keyboard, Layout Stability, Hierarchy & Affordance, Kid-Appropriateness.
-- **Hard gates (9, any failure caps score at 4):** WCAG-Contrast, Touch-Target, Viewport-Zoom, Layout-Thrash, Reduced-Motion, Focus-Visible, Min-Body-Size (tiered: primary 14px / meta 12px), Color-Only, CLS.
-- **Required measurements:** axe-core at 3 viewports; Lighthouse mobile (LCP/CLS/INP/a11y); Playwright touch-target audit; Playwright reduce-motion verification; Playwright focus indicator audit; deuteranopia simulator on screenshots; Flesch-Kincaid reading level on visible strings.
+- **Axes (9, each 1-10):** Contrast & Color, Touch & Tap Ergonomics, Typography, Motion Safety & Performance, Focus & Keyboard, Layout Stability, Hierarchy & Affordance, Kid-Appropriateness, Art Direction *(new in v3)*.
+- **Hard gates (9, any failure caps score at 4):** WCAG-Contrast, Touch-Target, Viewport-Zoom, Layout-Thrash, Reduced-Motion, Focus-Visible, Min-Body-Size, Color-Only, CLS.
+- **Required measurements:** v2 measurement battery + v3 craft diagnostic (palette inventory + named scheme; Disney-12 audit per animation; wind-up/pop/settle inspection; typeface count + cross-platform fallback test; easing-curve catalog; shape-language proportion; blind-screenshot identifiability; label-hidden state readability %).
 - **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see VISUAL_CRITIC.md §3.5.
 - **Tools:** Read, Grep, Glob, Playwright (REQUIRED with @axe-core/playwright), Lighthouse CLI, screenshot inspection.
 ```
