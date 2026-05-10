@@ -357,13 +357,13 @@ Full rubric: [docs/QUALITY_CRITIC.md](QUALITY_CRITIC.md). v2 evolves v1 with six
 
 ### Fun critic
 
-Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new axes (Progression, Goal Stacking, Curiosity Gaps), an Anticipation sub-test under Game Feel, and a new Hollow Score gate.
+Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v4 evolves v3 with two new axes (System Integration, Choice Architecture) and four new hard gates (Disjoint Systems, Open Continuous Input, Loop-Only Design, Displayed-Target Puzzle) — closing the structural-game gaps a user playtest exposed in v3.
 
-- **Axes (8, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression), Goal Stacking, Curiosity Gaps.
-- **Hard gates (7, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety, Hollow Score.
+- **Axes (10, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression + inventory growth), Goal Stacking, Curiosity Gaps (incl. hidden-information sub-test), **System Integration** *(v4)*, **Choice Architecture** *(v4)*.
+- **Hard gates (11, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety, Hollow Score, **Disjoint Systems** *(v4)*, **Open Continuous Input** *(v4)*, **Loop-Only Design** *(v4)*, **Displayed-Target Puzzle** *(v4)*.
 - **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring.
 - **Schell Lens #39:** four questions answered verbatim per iteration.
-- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6. Orchestrator's existing parsing below still reads `.score` and `.blockers`; new fields are additive.
+- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6.
 - **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic
