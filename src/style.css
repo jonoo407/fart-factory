@@ -209,6 +209,23 @@ footer {
   animation: sparkleBurst 1.8s ease-out forwards;
   will-change: transform, opacity;
 }
+.combo-banner {
+  text-align: center;
+  margin: 8px 0;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #ff5722, #ff9800, #ffc107);
+  color: #1a0a2e;
+  font-weight: bold;
+  font-size: 1.1em;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255, 152, 0, 0.6);
+  animation: comboPulse 1.4s ease-in-out infinite;
+}
+.combo-banner[hidden] { display: none !important; }
+@keyframes comboPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
 .achievement-host {
   position: fixed;
   top: 12px;

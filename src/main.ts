@@ -13,6 +13,7 @@ import {
 } from './state/achievements';
 import { loadHall as loadHallEntries } from './state/hall';
 import { showAchievementToast } from './ui/toast';
+import { reduceCombo, initialCombo, type ComboState } from './state/combo';
 import {
   comments,
   weakComments,
@@ -48,6 +49,19 @@ function pickFromPool(pool: readonly string[]): string {
 }
 
 let launchesThisSession = 0;
+let combo: ComboState = initialCombo();
+
+function renderComboBanner(state: ComboState): void {
+  const el = $('comboBanner');
+  if (!el) return;
+  if (state.count >= 3) {
+    el.textContent = `🔥 ${state.count}-FART STREAK! Peak: ${state.peak}`;
+    el.removeAttribute('hidden');
+  } else {
+    el.textContent = '';
+    el.setAttribute('hidden', '');
+  }
+}
 
 function onLaunch(): void {
   const vals = readSliders();
@@ -115,6 +129,9 @@ function onLaunch(): void {
   if (g.grade === 'S+') {
     spawnSparkles();
   }
+
+  combo = reduceCombo(combo, g.grade);
+  renderComboBanner(combo);
 
   addToHall(total, g.grade);
 
