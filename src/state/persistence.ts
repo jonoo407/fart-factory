@@ -175,3 +175,55 @@ export function spendBelly(cost: number, d: Date = new Date()): { ok: boolean; r
 }
 
 export const BELLY_CAPACITY = BELLY_MAX;
+
+// ----- Best-match high-water marks (Phase J quest steps) -----
+//
+// Per-audience best match% (ratchets up only — never decreases). Used by
+// quests like "score 90%+ at any audience" or "win with Haunted Mansion".
+
+const KEY_BEST_MATCH_PREFIX = 'fart_best_';
+const KEY_BEST_OVERALL = 'fart_best_overall';
+const KEY_BEST_HARD = 'fart_best_hard';
+
+const validPct = (v: unknown): v is number =>
+  typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
+
+export function loadBestMatch(audienceId: string): number {
+  return safeLoad<number>(`${KEY_BEST_MATCH_PREFIX}${audienceId}`, 0, validPct);
+}
+
+export function bumpBestMatch(audienceId: string, pct: number): number {
+  if (!validPct(pct)) return loadBestMatch(audienceId);
+  const cur = loadBestMatch(audienceId);
+  if (pct <= cur) return cur;
+  safeSave(`${KEY_BEST_MATCH_PREFIX}${audienceId}`, pct);
+  return pct;
+}
+
+export function loadBestMatchOverall(): number {
+  return safeLoad<number>(KEY_BEST_OVERALL, 0, validPct);
+}
+
+export function setBestMatchOverall(pct: number): void {
+  if (validPct(pct)) safeSave(KEY_BEST_OVERALL, pct);
+}
+
+export function bumpBestMatchOverall(pct: number): number {
+  if (!validPct(pct)) return loadBestMatchOverall();
+  const cur = loadBestMatchOverall();
+  if (pct <= cur) return cur;
+  safeSave(KEY_BEST_OVERALL, pct);
+  return pct;
+}
+
+export function loadBestHard(): number {
+  return safeLoad<number>(KEY_BEST_HARD, 0, validPct);
+}
+
+export function bumpBestHard(pct: number): number {
+  if (!validPct(pct)) return loadBestHard();
+  const cur = loadBestHard();
+  if (pct <= cur) return cur;
+  safeSave(KEY_BEST_HARD, pct);
+  return pct;
+}

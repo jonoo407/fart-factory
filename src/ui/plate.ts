@@ -16,6 +16,9 @@ import {
   setLastMatch,
   loadGold,
   loadResearchNotes,
+  bumpBestMatch,
+  bumpBestMatchOverall,
+  bumpBestHard,
 } from '../state/persistence';
 import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
@@ -245,6 +248,15 @@ function applyAreaModifiers(props: FoodProperties, area: Area): FoodProperties {
 
 // ----- Audience portrait + area picker -----
 
+function flashLegendaryFanfare(): void {
+  const wrap = document.querySelector<HTMLElement>('.audience-wrap');
+  if (!wrap) return;
+  wrap.classList.remove('audience-wrap-legendary');
+  void wrap.offsetWidth;
+  wrap.classList.add('audience-wrap-legendary');
+  setTimeout(() => wrap.classList.remove('audience-wrap-legendary'), 1600);
+}
+
 export function renderAudiencePortrait(): void {
   const aud = getDailyAudience();
   const hardMode = loadHardMode();
@@ -430,11 +442,23 @@ function onStoryLaunch(): void {
   playFart(length, wetness, volume, stink, temp, musical);
   spawnGas(stink, volume);
 
+  // Phase J item 60 — legendary fanfare on the audience portrait.
+  const hasLegendary = ids.some((id) => {
+    const f = getFood(id);
+    return f && f.rarity === 'legendary';
+  });
+  if (hasLegendary) {
+    flashLegendaryFanfare();
+  }
+
   commitBellySpend();
 
   if (ingredientCount > 0) {
     awardGoldForLaunch(match.pct);
     awardResearchForLaunch(match.pct);
+    bumpBestMatch(aud.id, match.pct);
+    bumpBestMatchOverall(match.pct);
+    if (loadHardMode()) bumpBestHard(match.pct);
   }
 
   clearPlate();

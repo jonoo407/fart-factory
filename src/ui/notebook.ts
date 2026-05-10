@@ -8,10 +8,11 @@
  */
 
 import { RECIPES, getRecipe, type Recipe } from '../state/recipes';
-import { loadDiscoveredRecipes } from '../state/persistence';
-import { getFood } from '../state/food';
-import { addFoodToPlate, renderPlate, renderBellyMeter, _resetPlateAndBelly } from './plate';
+import { loadDiscoveredRecipes, loadPantry } from '../state/persistence';
+import { FOODS, getFood } from '../state/food';
+import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
 import { recipeProgress } from '../scoring/discovery';
+import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -108,9 +109,68 @@ function cookRecipe(recipeId: string): void {
   closeNotebook();
 }
 
+function renderLegendaryQuests(): void {
+  const grid = $('legendaryQuests');
+  if (!grid) return;
+  const unlocked = new Set(loadPantry());
+  grid.innerHTML = LEGENDARY_QUESTS.map((q) => {
+    const food = FOODS.find((f) => f.id === q.foodId);
+    if (!food) return '';
+    const prog = questProgress(q);
+    const allDone = prog.steps.every((s) => s.done);
+    const isUnlocked = unlocked.has(q.foodId);
+    const stepHtml = prog.steps.map((s) => {
+      const isPct = s.kind === 'best-overall' || s.kind === 'best-hard';
+      const valueText = isPct ? `${s.current}/${s.target}%` : `${s.current}/${s.target}`;
+      const pctClass = s.done ? ' quest-step-done' : '';
+      return `<li class="quest-step${pctClass}"><span class="quest-step-label">${s.label}</span><span class="quest-step-value">${valueText}</span></li>`;
+    }).join('');
+    let actionHtml = '';
+    if (isUnlocked) {
+      actionHtml = `<button type="button" class="quest-claimed-badge" disabled>✓ Unlocked</button>`;
+    } else if (allDone) {
+      actionHtml = `<button type="button" class="quest-claim-btn" data-food="${q.foodId}" aria-label="Claim ${food.name}">🏆 CLAIM</button>`;
+    } else {
+      actionHtml = `<button type="button" class="quest-claim-btn" data-food="${q.foodId}" aria-disabled="true" aria-label="Quest incomplete">Locked</button>`;
+    }
+    return `<div class="legendary-quest rarity-legendary" data-food="${q.foodId}">
+      <span class="legendary-quest-emoji">${food.emoji}</span>
+      <span class="legendary-quest-name">${food.name}</span>
+      ${actionHtml}
+      <ul class="legendary-quest-steps">${stepHtml}</ul>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll<HTMLButtonElement>('.quest-claim-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-food');
+      if (!id) return;
+      const r = attemptClaimLegendary(id);
+      if (r.ok) {
+        // Re-render legendary quests (this card flips to "Unlocked"), pantry,
+        // progression strip. The notebook modal stays open so the player sees
+        // the fanfare. Phase L will add particles.
+        renderLegendaryQuests();
+        renderPantryGrid();
+        renderProgression();
+      } else {
+        // Refusal flash on the card.
+        const card = btn.closest<HTMLElement>('.legendary-quest');
+        if (card) {
+          card.classList.remove('shop-offer-refused');
+          void card.offsetWidth;
+          card.classList.add('shop-offer-refused');
+          setTimeout(() => card.classList.remove('shop-offer-refused'), 600);
+        }
+      }
+    });
+  });
+}
+
 export function openNotebook(): void {
   renderNotebookCounter();
   renderRecipes();
+  renderLegendaryQuests();
   $('notebookModal')?.removeAttribute('hidden');
 }
 
