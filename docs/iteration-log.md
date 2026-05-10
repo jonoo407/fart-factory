@@ -10,7 +10,12 @@ Session start: 2026-05-10T12:20:11.917Z
 | 4 | 1.4-1.6 | Grade boundary + Hall corruption unit + ARIA live E2E (117 green) | tests/unit/grade.test.ts, tests/unit/hall.test.ts, tests/e2e/aria-live.spec.ts | 9 | 8 | 6 | 8 | 7.75 | 830a027 | ~33m |
 | 5 | 3.11 | Sparkle particles on S+ (28 emoji burst, reduced-motion safe) | tests/e2e/particles.spec.ts | 9 | 9 | 9 | 7 | 8.5 | c88d11b | ~38m |
 | 6 | 4.16 | Achievements (6 badges) + toast UI + persist + fixup | tests/unit/achievements.test.ts, tests/e2e/achievements.spec.ts | 9 | 8 | 8† | 7 | 8.0 | ff7732e | ~44m |
-| 7 | 4.15 | Combo streak counter (pure reducer + pulsing banner) | tests/unit/combo.test.ts, tests/e2e/combo.spec.ts | 9 | 8 | 9 | 7 | 8.25 | (next) | ~52m |
+| 7 | 4.15 | Combo streak counter (pure reducer + pulsing banner) | tests/unit/combo.test.ts, tests/e2e/combo.spec.ts | 9 | 8 | 9 | 7 | 8.25 | 0c6660d | ~52m |
+| 8 | 5.21+5.20 | Mobile haptics + Onboarding tutorial (3 steps, first-visit) | tests/unit/haptics.test.ts, tests/unit/onboarding.test.ts, tests/e2e/onboarding.spec.ts | 9 | 9 | 9 | 7 | 8.5 | (next) | ~76m |
+
+## Stop reason
+Quality target hit: iter 7 avg 8.25 ≥8 AND iter 8 avg 8.5 ≥8 (two consecutive),
+elapsedMin ≈ 76 (> 60), zero blockers in either iteration.
 
 ## Notes
 - *Iter 1: Fun & Audio critics returned 5 (neutral) explicitly because Tier 0.1 is pure toolchain scaffold — no game, no audio. Both reported zero blockers. Plan §F gate min<6 would normally trigger fix-up, but the fix would violate "minimum scope per iteration" (don't add features to scaffold step). Proceeding to commit; fun & audio re-grade after Tier 0.3 (legacy game ported into modules) and Tier 2 (audio pipeline).

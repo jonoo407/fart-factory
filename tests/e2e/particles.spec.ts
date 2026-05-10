@@ -11,7 +11,10 @@ import { test, expect } from '@playwright/test';
 test.describe('S+ sparkle particles', () => {
   test('S+ spawns at least 20 sparkle nodes', async ({ page }) => {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('fart_onboarding_seen', 'true');
+    });
     await page.reload();
     for (const id of ['s1', 's2', 's3', 's4', 's5', 's6']) {
       await page.evaluate(
@@ -31,7 +34,10 @@ test.describe('S+ sparkle particles', () => {
 
   test('B grade does NOT spawn sparkle nodes', async ({ page }) => {
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('fart_onboarding_seen', 'true');
+    });
     await page.reload();
     // Defaults are all 5 → total 30 → grade B
     await page.click('#launchBtn');
@@ -48,7 +54,10 @@ test.describe('S+ sparkle particles', () => {
     const context = await browser.newContext({ reducedMotion: 'reduce' });
     const page = await context.newPage();
     await page.goto('/');
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      localStorage.clear();
+      localStorage.setItem('fart_onboarding_seen', 'true');
+    });
     await page.reload();
     for (const id of ['s1', 's2', 's3', 's4', 's5', 's6']) {
       await page.evaluate(

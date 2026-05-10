@@ -10,7 +10,10 @@ import { test, expect, type Page } from '@playwright/test';
 
 async function loadApp(page: Page): Promise<void> {
   await page.goto('/');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem('fart_onboarding_seen', 'true');
+  });
   await page.reload();
   await page.waitForSelector('#launchBtn');
 }

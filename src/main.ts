@@ -14,6 +14,8 @@ import {
 import { loadHall as loadHallEntries } from './state/hall';
 import { showAchievementToast } from './ui/toast';
 import { reduceCombo, initialCombo, type ComboState } from './state/combo';
+import { triggerHaptic, HAPTICS } from './ui/haptics';
+import { showOnboarding } from './ui/onboarding';
 import {
   comments,
   weakComments,
@@ -68,6 +70,7 @@ function onLaunch(): void {
   const [length, wetness, volume, stink, temp, music] = vals;
   const total = vals.reduce((a, b) => a + b, 0);
 
+  triggerHaptic(HAPTICS.launch);
   playFart(length, wetness, volume, stink, temp, music);
   spawnGas(stink, volume);
   showReactions(total);
@@ -130,8 +133,12 @@ function onLaunch(): void {
     spawnSparkles();
   }
 
+  const prev = combo;
   combo = reduceCombo(combo, g.grade);
   renderComboBanner(combo);
+  if (combo.count >= 3 && combo.count > prev.count) {
+    triggerHaptic(HAPTICS.combo);
+  }
 
   addToHall(total, g.grade);
 
@@ -176,6 +183,7 @@ function init(): void {
   $('launchBtn')?.addEventListener('click', onLaunch);
   $('randomBtn')?.addEventListener('click', onRandom);
   renderHall();
+  showOnboarding();
 }
 
 if (document.readyState === 'loading') {
