@@ -58,8 +58,39 @@ measurement steps, and worked validation. See:
 - New docs: FUN/AUDIO/VISUAL/QUALITY_CRITIC.md (rubrics), PALETTE.md (palette + type system).
 - v3 rubric scores on `2bb6f3c` HEAD: Fun 5 (was 2 at iter 8 under v3 — gained Curiosity, Progression, Goal Stacking, Endogenous Value mostly cleared; still has visible-target dominant strategy). Audio 6 (was 4 — Library Absence still failing pending SFX library, but Mute, Visibility, A24 cue, A27 sting all now passing). Visual 8 (was 7 — Touch-Target gate measured-pass, Art Direction up from 3 to 6 with Disney 12 motion + palette doc + typeface fix). Quality 7 (was 6 — coverage threshold + axe both green; Stryker / size-limit / ESLint complexity / Lighthouse still pending).
 
-### Stop reason (session 2)
+### Stop reason (session 2 — phase B)
 User-defined "1-2 hours autonomously": session ran ~40 min in iteration phase + ~1.5h in critic-redesign phase ≈ 2h total. Stopped after iter 23 (gameplay smoke) verified the integrated player loop end-to-end.
+
+---
+
+### Phase C — closing the three flagged gaps (3 iters, ~95 min)
+
+User followed up: "do all 3" (Mastermind variant, SFX library, Quality measurements). All three landed.
+
+| # | Tier | Feature | Tests | Commit |
+|---|------|---------|-------|--------|
+| 24 | Quality | ESLint flat-config + complexity gate (≤10) + Lighthouse + Stryker. Refactored onLaunch from complexity 22 → ~7 (under green). | (config + refactor; existing tests verify refactor) | c99e307 |
+| 25 | Fun    | Mastermind Hard Mode toggle: hide hint, hide per-axis arrows, hide match%; replace with 5-tier audience reaction + warmer/colder trend. | challenge.test.ts (+10), hard-mode.spec.ts (4) | 4f220c4 |
+| 26 | Audio  | 14-sample SFX library via ElevenLabs. RULE 2 dry-run first; full pipeline + manifest + sample-player; closes Library Absence Gate. | sample-player.test.ts (7), sfx-library.spec.ts (3) | ef77d8e |
+
+### Phase C totals (Phase A+B+C cumulative)
+- Tests: 125 unit + 70 desktop e2e + 64 mobile e2e + 1 skipped (mobile-only).
+- New player-visible features: Mastermind Hard Mode (hidden target + audience reactions), 14 named SFX samples replacing parameter-space synth on every Launch, ESLint complexity guard.
+- New deps: eslint, @typescript-eslint/{parser,eslint-plugin}, @stryker-mutator/{core,vitest-runner,typescript-checker}, lighthouse, @axe-core/playwright (iter 12).
+- New scripts: probe-elevenlabs.ts (one-shot dry-run, removed post-validation), generate-sfx.ts (canonical pipeline), sfx-seeds.ts (14 named static prompts).
+- Public assets: public/sfx/manifest.json + 14 mp3s (376KB total).
+
+### v3 rubric scores at HEAD (after phase C)
+
+| Critic | After phase B | After phase C | Δ |
+|---|---|---|---|
+| Fun | 5 | **7** | +2 (Hard Mode clears the visible-target dominant-strategy meta) |
+| Audio | 6 | **8** | +2 (Library Absence Gate cleared; Variety & Game Feel jumped to 7; Sound Design Craft to 7) |
+| Visual | 8 | **8** | 0 (no visual changes this phase; still pending Lighthouse + reading-level lint) |
+| Quality | 7 | **8** | +1 (ESLint complexity gate live; Stryker configured; Lighthouse script wired) |
+
+### Stop reason (session 2 — phase C)
+All three flagged gaps closed. Session 2 totaled ~3h across phases A+B+C (~1.5h critic redesign, ~40 min phase B iters, ~95 min phase C iters). Phase C alone added 12 unit tests + 10 e2e tests + 14 SFX assets + 5 new modules.
 
 ## Notes
 - *Iter 1: Fun & Audio critics returned 5 (neutral) explicitly because Tier 0.1 is pure toolchain scaffold — no game, no audio. Both reported zero blockers. Plan §F gate min<6 would normally trigger fix-up, but the fix would violate "minimum scope per iteration" (don't add features to scaffold step). Proceeding to commit; fun & audio re-grade after Tier 0.3 (legacy game ported into modules) and Tier 2 (audio pipeline).
