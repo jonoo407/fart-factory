@@ -125,4 +125,44 @@ describe('evaluateLaunch', () => {
     expect(newly).not.toContain('first-toot');
     expect(newly).not.toContain('stink-lord');
   });
+
+  it('match ≥ 90% unlocks "profile-master"', () => {
+    const newly = evaluateLaunch(
+      { ...baseCtx, match: 92 },
+      new Set(['first-toot']),
+    );
+    expect(newly).toContain('profile-master');
+  });
+
+  it('match < 90% does NOT unlock "profile-master"', () => {
+    const newly = evaluateLaunch(
+      { ...baseCtx, match: 89 },
+      new Set(['first-toot']),
+    );
+    expect(newly).not.toContain('profile-master');
+  });
+
+  it('match === 100% unlocks "perfect-match"', () => {
+    const newly = evaluateLaunch(
+      { ...baseCtx, match: 100 },
+      new Set(['first-toot', 'profile-master']),
+    );
+    expect(newly).toContain('perfect-match');
+  });
+
+  it('match < 100% does NOT unlock "perfect-match"', () => {
+    const newly = evaluateLaunch(
+      { ...baseCtx, match: 99 },
+      new Set(['first-toot', 'profile-master']),
+    );
+    expect(newly).not.toContain('perfect-match');
+  });
+});
+
+describe('ACHIEVEMENTS — new in iter 20', () => {
+  it('catalog includes profile-master and perfect-match', () => {
+    const ids = ACHIEVEMENTS.map((a) => a.id);
+    expect(ids).toContain('profile-master');
+    expect(ids).toContain('perfect-match');
+  });
 });

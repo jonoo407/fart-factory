@@ -11,6 +11,9 @@ export interface LaunchContext {
   grade: string;
   hallSize: number;
   launchesThisSession: number;
+  /** Daily-challenge match percentage 0..100 for this launch. Optional for
+   *  back-compat; defaults to 0 if not provided. */
+  match?: number;
 }
 
 export const ACHIEVEMENTS: readonly Achievement[] = [
@@ -50,6 +53,18 @@ export const ACHIEVEMENTS: readonly Achievement[] = [
     emoji: '🏆',
     desc: 'Filled all 5 Hall of Shame slots.',
   },
+  {
+    id: 'profile-master',
+    name: 'Profile Master',
+    emoji: '🎯',
+    desc: 'Hit 90% or higher match on the daily challenge.',
+  },
+  {
+    id: 'perfect-match',
+    name: 'Bullseye',
+    emoji: '🎯💥',
+    desc: 'Nailed a 100% match on the daily challenge.',
+  },
 ];
 
 const STORAGE_KEY = 'fart_achievements';
@@ -74,6 +89,7 @@ export function evaluateLaunch(
   alreadyUnlocked: Set<string>,
 ): string[] {
   const newly: string[] = [];
+  const match = ctx.match ?? 0;
   const candidates: Array<[id: string, condition: boolean]> = [
     ['first-toot', ctx.launchesThisSession >= 1],
     ['s-tier', ctx.grade === 'S+'],
@@ -81,6 +97,8 @@ export function evaluateLaunch(
     ['symphony', ctx.sliders[5] === 10],
     ['loud-and-proud', ctx.total >= 50],
     ['hall-filler', ctx.hallSize >= 5],
+    ['profile-master', match >= 90],
+    ['perfect-match', match === 100],
   ];
   for (const [id, ok] of candidates) {
     if (ok && !alreadyUnlocked.has(id)) newly.push(id);

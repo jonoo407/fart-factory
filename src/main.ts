@@ -111,7 +111,7 @@ function renderBestToday(): void {
   if (el) el.textContent = String(best);
 }
 
-function renderChallengeMatch(actual: number[]): void {
+function renderChallengeMatch(actual: number[]): number {
   const challenge = getDailyChallenge();
   const pct = computeMatch(actual, challenge.profile);
   const wrap = $('challengeMatch');
@@ -123,6 +123,7 @@ function renderChallengeMatch(actual: number[]): void {
   renderAxisHints(actual);
   recordMatch(pct);
   renderBestToday();
+  return pct;
 }
 
 function fireLaunchButtonMotion(): void {
@@ -146,7 +147,7 @@ function onLaunch(): void {
   playFart(length, wetness, volume, stink, temp, music);
   spawnGas(stink, volume);
   showReactions(total);
-  renderChallengeMatch(vals);
+  const matchPct = renderChallengeMatch(vals);
 
   const pool = total < 20 ? weakComments : comments;
   const line = pickFromPool(pool);
@@ -222,6 +223,7 @@ function onLaunch(): void {
     grade: g.grade,
     hallSize: loadHallEntries().length,
     launchesThisSession,
+    match: matchPct,
   };
   const owned = loadUnlocked();
   const newly = evaluateLaunch(ctx, owned);
