@@ -364,10 +364,14 @@ Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v3 evolves v2 with three new a
 - **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic
-- **Inputs:** Playwright screenshots at 375×667, 768×1024, 1440×900 (taken in step 4 to `tests/e2e/__snapshots__/iter-N-{vp}.png`), changed CSS, animation code.
-- **Axes:** readability (contrast, text size), polish (alignment, spacing), implied animation smoothness, kid-vibes.
-- **Tools:** Read, Glob, image-viewing on screenshot files.
-- **Hard blocker:** text under 14px on mobile, clipped elements, contrast failing AA, layout-thrashing keyframes (`width`/`height`/`top`/`left` animated instead of `transform`).
+
+Full rubric: [docs/VISUAL_CRITIC.md](VISUAL_CRITIC.md). v2 evolves v1 with eight mechanism-level axes, nine hard gates (incl. NEW Touch-Target, Viewport-Zoom, Reduced-Motion, Focus-Visible, Color-Only, CLS), and a required tools-run measurement step (axe-core + Lighthouse + Playwright traces).
+
+- **Axes (8, each 1-10):** Contrast & Color, Touch & Tap Ergonomics, Typography, Motion Safety & Performance, Focus & Keyboard, Layout Stability, Hierarchy & Affordance, Kid-Appropriateness.
+- **Hard gates (9, any failure caps score at 4):** WCAG-Contrast, Touch-Target, Viewport-Zoom, Layout-Thrash, Reduced-Motion, Focus-Visible, Min-Body-Size (tiered: primary 14px / meta 12px), Color-Only, CLS.
+- **Required measurements:** axe-core at 3 viewports; Lighthouse mobile (LCP/CLS/INP/a11y); Playwright touch-target audit; Playwright reduce-motion verification; Playwright focus indicator audit; deuteranopia simulator on screenshots; Flesch-Kincaid reading level on visible strings.
+- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see VISUAL_CRITIC.md §3.5.
+- **Tools:** Read, Grep, Glob, Playwright (REQUIRED with @axe-core/playwright), Lighthouse CLI, screenshot inspection.
 
 ### Audio critic
 
