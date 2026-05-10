@@ -7,6 +7,9 @@ import {
   loadBestMatch,
   recordMatch,
   matchKeyForDate,
+  loadHardMode,
+  setHardMode,
+  audienceReaction,
 } from '../../src/state/challenge';
 
 import { beforeEach } from 'vitest';
@@ -115,6 +118,66 @@ describe('best-match persistence', () => {
     const date = new Date('2026-05-10T12:00:00Z');
     localStorage.setItem(matchKeyForDate(date), 'not-a-number');
     expect(loadBestMatch(date)).toBe(0);
+  });
+});
+
+describe('Hard Mode toggle', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('defaults to false', () => {
+    expect(loadHardMode()).toBe(false);
+  });
+
+  it('persists true via setHardMode', () => {
+    setHardMode(true);
+    expect(loadHardMode()).toBe(true);
+  });
+
+  it('round-trips false explicitly', () => {
+    setHardMode(true);
+    setHardMode(false);
+    expect(loadHardMode()).toBe(false);
+  });
+
+  it('returns false on corrupt value', () => {
+    localStorage.setItem('fart_hard_mode', '{not json');
+    expect(loadHardMode()).toBe(false);
+  });
+});
+
+describe('audienceReaction', () => {
+  it('tiers match% into 5 named bands', () => {
+    expect(audienceReaction(95, null).tier).toBe('loved');
+    expect(audienceReaction(80, null).tier).toBe('liked');
+    expect(audienceReaction(60, null).tier).toBe('meh');
+    expect(audienceReaction(40, null).tier).toBe('disliked');
+    expect(audienceReaction(15, null).tier).toBe('evacuated');
+  });
+
+  it('tier boundaries are inclusive at the lower bound', () => {
+    expect(audienceReaction(90, null).tier).toBe('loved');
+    expect(audienceReaction(70, null).tier).toBe('liked');
+    expect(audienceReaction(50, null).tier).toBe('meh');
+    expect(audienceReaction(30, null).tier).toBe('disliked');
+    expect(audienceReaction(29, null).tier).toBe('evacuated');
+  });
+
+  it("trend is 'first' when no prior match exists", () => {
+    expect(audienceReaction(50, null).trend).toBe('first');
+  });
+
+  it("trend is 'warmer' when match% increased vs prior", () => {
+    expect(audienceReaction(80, 60).trend).toBe('warmer');
+  });
+
+  it("trend is 'colder' when match% decreased vs prior", () => {
+    expect(audienceReaction(40, 80).trend).toBe('colder');
+  });
+
+  it("trend is 'same' when match% unchanged", () => {
+    expect(audienceReaction(50, 50).trend).toBe('same');
   });
 });
 

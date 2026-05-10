@@ -20,6 +20,14 @@
             </div>
             <div class="challenge-hint" id="challengeHint">—</div>
           </div>
+          <button type="button" id="hardModeBtn" class="hard-mode-btn"
+                  aria-pressed="false" aria-label="Toggle Hard Mode (hide hints)">
+            🧠 Hard
+          </button>
+        </div>
+        <div class="audience" id="audience" hidden aria-live="polite">
+          <span class="audience-tier" id="audienceTier"></span>
+          <span class="audience-trend" id="audienceTrend"></span>
         </div>
         <div class="challenge-match" id="challengeMatch" aria-live="polite" hidden>
           Match: <span id="challengeMatchPct">—</span>%

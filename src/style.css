@@ -76,6 +76,45 @@ h1 {
   color: #ffe6b3;
   opacity: 0.9;
 }
+.hard-mode-btn {
+  flex: 0 0 auto;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffd97a;
+  border: 1px solid rgba(255, 217, 122, 0.4);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 0.95em;
+  font-weight: bold;
+  cursor: pointer;
+  min-height: 44px;
+  min-width: 44px;
+  transition: background 0.15s, border-color 0.15s;
+}
+.hard-mode-btn[aria-pressed='true'] {
+  background: rgba(255, 100, 100, 0.25);
+  color: #ffaaaa;
+  border-color: rgba(255, 100, 100, 0.6);
+}
+.hard-mode-btn:focus-visible {
+  outline: 3px solid #ffeb3b;
+  outline-offset: 3px;
+}
+.audience {
+  text-align: center;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.05em;
+  color: #fff;
+}
+.audience-trend {
+  font-size: 0.9em;
+  font-weight: normal;
+  opacity: 0.85;
+}
 /* Reactive variety per V27: high-match celebratory pulse on the
  * challenge card. Tier 1 (≥90%): warm gold pulse. Tier 2 (=100%):
  * brighter flash + stronger pulse. transform/opacity-only — V7-safe. */

@@ -96,6 +96,48 @@ export function recordMatch(match: number, d: Date = new Date()): number {
   return best;
 }
 
+// ----- Hard Mode (Mastermind variant) state -----
+
+const HARD_MODE_KEY = 'fart_hard_mode';
+
+export function loadHardMode(): boolean {
+  try {
+    const raw = localStorage.getItem(HARD_MODE_KEY);
+    if (raw === null) return false;
+    return JSON.parse(raw) === true;
+  } catch {
+    return false;
+  }
+}
+
+export function setHardMode(on: boolean): void {
+  localStorage.setItem(HARD_MODE_KEY, JSON.stringify(on));
+}
+
+// ----- Audience reactions (Hard-Mode aggregate feedback) -----
+
+export interface AudienceReaction {
+  /** 'loved' / 'liked' / 'meh' / 'disliked' / 'evacuated' — coarse 5-tier. */
+  tier: 'loved' | 'liked' | 'meh' | 'disliked' | 'evacuated';
+  /** Trend vs prior launch: 'warmer' (closer), 'colder' (further), 'first' (no prior), 'same' (same match%). */
+  trend: 'warmer' | 'colder' | 'first' | 'same';
+}
+
+export function audienceReaction(matchPct: number, priorMatchPct: number | null): AudienceReaction {
+  let tier: AudienceReaction['tier'];
+  if (matchPct >= 90) tier = 'loved';
+  else if (matchPct >= 70) tier = 'liked';
+  else if (matchPct >= 50) tier = 'meh';
+  else if (matchPct >= 30) tier = 'disliked';
+  else tier = 'evacuated';
+  let trend: AudienceReaction['trend'];
+  if (priorMatchPct === null) trend = 'first';
+  else if (matchPct > priorMatchPct) trend = 'warmer';
+  else if (matchPct < priorMatchPct) trend = 'colder';
+  else trend = 'same';
+  return { tier, trend };
+}
+
 export function axisHints(actual: number[], target: number[]): AxisHint[] {
   const out: AxisHint[] = [];
   for (let i = 0; i < 6; i++) {
