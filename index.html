@@ -17,12 +17,29 @@
       </div>
       <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
 
-      <!-- Story Mode shell (Tier 7 Phase B). Currently a placeholder.
-           Pantry/plate UI lands in Phase C. -->
+      <!-- Story Mode shell (Tier 7). Pantry + plate + belly meter. -->
       <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
-        <div class="story-placeholder">
-          🍴 <strong>Story Mode coming online…</strong>
-          <p>Tap <code>🥪 Sandbox</code> above to use the classic slider lab while the kitchen is being built.</p>
+        <div class="belly-meter-wrap">
+          <span class="belly-label">🍽️ Belly:</span>
+          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20" aria-label="Belly capacity">
+            <div class="belly-fill" id="bellyFill" style="width:100%"></div>
+          </div>
+          <span class="belly-value"><span id="bellyValue">20</span>/<span id="bellyCap">20</span></span>
+        </div>
+
+        <div class="plate-wrap" role="group" aria-label="Plate">
+          <div class="plate-label">🍴 Plate (tap a slot to remove):</div>
+          <div class="plate" id="plate">
+            <button type="button" class="plate-slot" id="plateSlot1" data-slot="0" aria-label="Plate slot 1 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot2" data-slot="1" aria-label="Plate slot 2 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot3" data-slot="2" aria-label="Plate slot 3 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot4" data-slot="3" aria-label="Plate slot 4 (empty)">＋</button>
+          </div>
+        </div>
+
+        <div class="pantry-wrap" role="region" aria-label="Pantry">
+          <div class="pantry-label">📦 Pantry (tap to add to plate):</div>
+          <div class="pantry-grid" id="pantryGrid"></div>
         </div>
       </div>
 
