@@ -138,6 +138,38 @@ body {
 .area-card .area-emoji { font-size: 1.7em; line-height: 1; }
 .area-card .area-name { font-size: 0.75em; line-height: 1.1; text-align: center; }
 
+/* --- Progression strip (gold + research notes + Shop) --- */
+.progression-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(40, 20, 70, 0.35);
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 14px;
+}
+.progression-stat {
+  font-weight: bold;
+  color: #ffe79a;
+  font-size: 1.05em;
+}
+.progression-stat:nth-child(2) {
+  color: #aaffe2;
+}
+.shop-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #a855f7, #6b21a8);
+  border: 2px solid #d8b4fe;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+.shop-btn:hover { filter: brightness(1.1); }
+.shop-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* --- Belly meter --- */
 .belly-meter-wrap {
   display: flex;

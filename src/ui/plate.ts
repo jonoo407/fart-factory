@@ -14,9 +14,12 @@ import {
   setLastArea,
   loadLastMatch,
   setLastMatch,
+  loadGold,
+  loadResearchNotes,
 } from '../state/persistence';
 import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
+import { awardGoldForLaunch } from '../scoring/reward';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
@@ -178,6 +181,13 @@ export function renderBellyMeter(): void {
   if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
   if (value) value.textContent = String(r);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
+}
+
+export function renderProgression(): void {
+  const goldEl = $('goldCount');
+  const notesEl = $('notesCount');
+  if (goldEl) goldEl.textContent = String(loadGold());
+  if (notesEl) notesEl.textContent = String(loadResearchNotes());
 }
 
 export function wirePlateSlots(): void {
@@ -399,9 +409,14 @@ function onStoryLaunch(): void {
 
   commitBellySpend();
 
+  if (ingredientCount > 0) {
+    awardGoldForLaunch(match.pct);
+  }
+
   clearPlate();
   renderPlate();
   renderBellyMeter();
+  renderProgression();
   renderStoryResult(recipe, match, area, ingredientCount);
   if (ingredientCount > 0) {
     renderAudienceReaction(match.pct);
@@ -422,6 +437,7 @@ export function initStoryPantry(): void {
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();
+  renderProgression();
 }
 
 // Test-only reset hook.
