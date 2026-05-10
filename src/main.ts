@@ -3,6 +3,7 @@ import { gradeFart, stinkEmoji, durationLabel } from './scoring/grade';
 import { addToHall, renderHall } from './state/hall';
 import { playFart } from './audio/procedural';
 import { spawnGas } from './visuals/gas';
+import { spawnSparkles } from './visuals/particles';
 import {
   comments,
   weakComments,
@@ -98,6 +99,10 @@ function onLaunch(): void {
     document.body.style.animation = 'none';
     void document.body.offsetHeight;
     document.body.style.animation = 'shake .5s';
+  }
+
+  if (g.grade === 'S+') {
+    spawnSparkles();
   }
 
   addToHall(total, g.grade);
