@@ -36,6 +36,7 @@ import {
 } from './state/challenge';
 import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
+import { loadMode, setMode, type Mode } from './state/persistence';
 import {
   comments,
   weakComments,
@@ -422,6 +423,35 @@ function wireHardModeButton(): void {
   });
 }
 
+// ----- Tier 7 Phase B: mode toggle -----
+
+function applyMode(mode: Mode): void {
+  document.body.setAttribute('data-mode', mode);
+  const story = $('storyShell');
+  if (story) {
+    if (mode === 'story') story.removeAttribute('hidden');
+    else story.setAttribute('hidden', '');
+  }
+  const btn = $('modeBtn') as HTMLButtonElement | null;
+  if (btn) {
+    const isStory = mode === 'story';
+    btn.setAttribute('aria-pressed', isStory ? 'true' : 'false');
+    btn.textContent = isStory ? '🥪 Sandbox' : '🍴 Story';
+    btn.setAttribute('aria-label', isStory ? 'Switch to Sandbox slider mode' : 'Switch to Story food mode');
+  }
+}
+
+function wireModeButton(): void {
+  const btn = $('modeBtn') as HTMLButtonElement | null;
+  if (!btn) return;
+  applyMode(loadMode());
+  btn.addEventListener('click', () => {
+    const next: Mode = loadMode() === 'story' ? 'sandbox' : 'story';
+    setMode(next);
+    applyMode(next);
+  });
+}
+
 function init(): void {
   wireSliderDisplay();
   $('launchBtn')?.addEventListener('click', onLaunch);
@@ -429,6 +459,7 @@ function init(): void {
   wireMuteButton();
   wireVisibilityChange();
   wireHardModeButton();
+  wireModeButton();
   renderChallengeCard();
   renderBestToday();
   renderHall();

@@ -8,8 +8,23 @@
   </head>
   <body>
     <div class="container">
-      <h1>💨 The Fart Factory 💨</h1>
+      <div class="header-row">
+        <h1>💨 The Fart Factory 💨</h1>
+        <button type="button" id="modeBtn" class="mode-btn"
+                aria-label="Switch game mode" aria-pressed="false">
+          🍴 Story
+        </button>
+      </div>
       <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
+
+      <!-- Story Mode shell (Tier 7 Phase B). Currently a placeholder.
+           Pantry/plate UI lands in Phase C. -->
+      <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
+        <div class="story-placeholder">
+          🍴 <strong>Story Mode coming online…</strong>
+          <p>Tap <code>🥪 Sandbox</code> above to use the classic slider lab while the kitchen is being built.</p>
+        </div>
+      </div>
 
       <div id="challengeCard" class="challenge" role="region" aria-label="Today's challenge">
         <div class="challenge-row">

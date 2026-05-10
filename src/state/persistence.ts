@@ -113,9 +113,12 @@ export function markRecipeDiscovered(id: string): { added: boolean; list: string
 // ----- Mode (story / sandbox) -----
 
 export function loadMode(): Mode {
+  // Tier 7 Phase B: default = 'sandbox' so existing 125 unit + ~190 e2e
+  // tests stay green. Will flip default to 'story' in Phase M when the
+  // food game is feature-complete (per PLAN.md §D Tier 7).
   return safeLoad<Mode>(
     KEY_MODE,
-    'story',
+    'sandbox',
     (v): v is Mode => v === 'story' || v === 'sandbox',
   );
 }

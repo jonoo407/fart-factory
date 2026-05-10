@@ -98,18 +98,18 @@ describe('Discovered recipes', () => {
 });
 
 describe('Mode toggle', () => {
-  it('defaults to story', () => {
-    expect(loadMode()).toBe('story');
+  it('defaults to sandbox during food-mvp build phases (test-preserving)', () => {
+    expect(loadMode()).toBe('sandbox');
   });
   it('round-trips story and sandbox', () => {
-    setMode('sandbox');
-    expect(loadMode()).toBe('sandbox');
     setMode('story');
     expect(loadMode()).toBe('story');
+    setMode('sandbox');
+    expect(loadMode()).toBe('sandbox');
   });
   it('returns default on corrupt value', () => {
     localStorage.setItem('fart_mode', '"weird"');
-    expect(loadMode()).toBe('story');
+    expect(loadMode()).toBe('sandbox');
   });
 });
 
