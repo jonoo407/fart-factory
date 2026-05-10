@@ -110,11 +110,23 @@ function renderChallengeMatch(actual: number[]): void {
   renderAxisHints(actual);
 }
 
+function fireLaunchButtonMotion(): void {
+  const btn = $('launchBtn');
+  if (!btn) return;
+  // restart-able animation: remove the class, force reflow, re-add.
+  btn.classList.remove('firing');
+  void (btn as HTMLElement).offsetWidth;
+  btn.classList.add('firing');
+  // Clean up after the animation so it can be retriggered.
+  setTimeout(() => btn.classList.remove('firing'), 650);
+}
+
 function onLaunch(): void {
   const vals = readSliders();
   const [length, wetness, volume, stink, temp, music] = vals;
   const total = vals.reduce((a, b) => a + b, 0);
 
+  fireLaunchButtonMotion();
   triggerHaptic(HAPTICS.launch);
   playFart(length, wetness, volume, stink, temp, music);
   spawnGas(stink, volume);

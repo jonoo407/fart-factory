@@ -126,6 +126,22 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
 }
 .btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
 .btn:active { transform: scale(0.95); }
+/*
+ * Launch button wind-up / pop / settle motion (Disney 12 — Anticipation,
+ * Squash & Stretch, Follow-Through). 80ms windup (squash down), 200ms pop
+ * (stretch up + bright glow), 320ms settle (overshoot bounce back to rest).
+ * Total ~600ms. transform/opacity-only to stay GPU-composited (V7).
+ */
+.launch.firing { animation: launchWindupPopSettle 600ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
+@keyframes launchWindupPopSettle {
+  0%   { transform: scale(1); }
+  13%  { transform: scaleX(1.05) scaleY(0.85); } /* squash (windup, ~80ms) */
+  20%  { transform: scaleX(1.05) scaleY(0.85); }
+  45%  { transform: scaleX(0.92) scaleY(1.18); box-shadow: 0 4px 35px rgba(255, 220, 100, 0.95); } /* stretch + glow pop (~200ms) */
+  70%  { transform: scale(1.06); }
+  85%  { transform: scale(0.97); } /* slight overshoot bounce */
+  100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); }
+}
 .launch {
   background: linear-gradient(135deg, #ff0000, #ff6600);
   color: #fff;
