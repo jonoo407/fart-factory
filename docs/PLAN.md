@@ -357,13 +357,14 @@ Full rubric: [docs/QUALITY_CRITIC.md](QUALITY_CRITIC.md). v2 evolves v1 with six
 
 ### Fun critic
 
-Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v4 evolves v3 with two new axes (System Integration, Choice Architecture) and four new hard gates (Disjoint Systems, Open Continuous Input, Loop-Only Design, Displayed-Target Puzzle) — closing the structural-game gaps a user playtest exposed in v3.
+Full rubric: [docs/FUN_CRITIC.md](FUN_CRITIC.md). v5 evolves v4 with 3 new game-agnostic axes (Personality, Surprise, Coherence), a new aggregation formula `(min + mean) / 2` that stops polish from compensating for structural failure, and stricter calibration anchors. v4 evolved v3 with 2 new structural-architecture axes + 4 new hard gates.
 
-- **Axes (10, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression + inventory growth), Goal Stacking, Curiosity Gaps (incl. hidden-information sub-test), **System Integration** *(v4)*, **Choice Architecture** *(v4)*.
-- **Hard gates (11, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox declaration), Kid-Safety, Hollow Score, **Disjoint Systems** *(v4)*, **Open Continuous Input** *(v4)*, **Loop-Only Design** *(v4)*, **Displayed-Target Puzzle** *(v4)*.
+- **Axes (13, each 1-10):** Decision Quality, Skill Curve, Game Feel (incl. Anticipation), Failure & Recovery, Variation & Replay, Progression (incl. meta-progression + inventory growth), Goal Stacking, Curiosity Gaps (incl. hidden-information), System Integration *(v4)*, Choice Architecture *(v4)*, **Personality / Charm** *(v5)*, **Surprise & Delight** *(v5)*, **Aesthetic-Mechanical Coherence** *(v5)*.
+- **Aggregation (v5):** raw_score = round((min_axis + mean_axes) / 2). Polish on one axis can no longer compensate 1:1 for structural failure on another. Hard-gate caps still apply on top.
+- **Hard gates (11, any failure caps score at 4):** Dominant Strategy, Bushnell Floor=Ceiling, Decision Drought, Feedback Density, No-Failure (without sandbox), Kid-Safety, Hollow Score, Disjoint Systems *(v4)*, Open Continuous Input *(v4)*, Loop-Only Design *(v4)*, Displayed-Target Puzzle *(v4)*.
 - **Required simulation:** four scenarios (Mash-max, Mash-min, Median, Domain-skill) before scoring.
 - **Schell Lens #39:** four questions answered verbatim per iteration.
-- **Output schema:** `{score, rationale, blockers, axisScores, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.6.
+- **Output schema:** `{score, rationale, blockers, axisScores, aggregation: {minAxis, meanAxes, rawScore, gateCap}, diagnostics, hardGatesFailed}` — see FUN_CRITIC.md §3.7.
 - **Tools:** Read, Grep, Glob, Bash (read-only), Playwright (required for simulation when the iteration touches game logic, UI, or scoring).
 
 ### Visual critic

@@ -1,13 +1,22 @@
-# Fun Critic v4 — Rubric & Operationalization
+# Fun Critic v5 — Rubric & Operationalization
 
 > Applies to multi-agent overhaul iterations on `overhaul-v2`. Replaces the
 > seven-line block at `docs/PLAN.md` §F (the "Fun critic" subsection).
-> v4 evolves v3 after a user playtest of the shipped game ("I'd give this a
-> 3 or 4") revealed structural-game failures my v3 rubric scored 7 on. v4
-> adds 12 cited principles (P20-P31), 2 new axes (System Integration,
-> Choice Architecture), and 4 new hard gates (Disjoint Systems, Open
-> Continuous Input, Loop-Only Design, Displayed-Target Puzzle). The v3
-> axes/gates remain unchanged — v4 is layered on top.
+>
+> v5 evolves v4 after user feedback that the framework itself was
+> calibrated too generously: a polished-but-shallow build scored 7 under
+> v4 (and 3-4 under playtest). v5 makes three general-framework changes:
+> (a) 3 new game-agnostic axes (Personality / Surprise / Coherence) that
+> were missing, (b) a new aggregation formula `(min + mean) / 2` that
+> stops polish from compensating 1:1 for structural failure, and (c)
+> stricter calibration anchors. v4's axes/gates/principles all carry
+> forward unchanged.
+>
+> v4 evolved v3 after a user playtest of the shipped game revealed
+> structural-game failures my v3 rubric scored 7 on; v4 added 12 cited
+> principles (P20-P31), 2 new axes (System Integration, Choice
+> Architecture), and 4 new hard gates (Disjoint Systems, Open Continuous
+> Input, Loop-Only Design, Displayed-Target Puzzle).
 
 ---
 
@@ -25,7 +34,28 @@ The v1 fun critic in `docs/PLAN.md` §F awarded **fun=9** to iteration 5 ("spark
 
 **Observable in `docs/iteration-log.md`:** fun scores 5, 7, 6, 8, 9, 8, 8, 9 across iters 1-8. Not a single iteration cited a fun blocker. The critic has never blocked a commit on fun grounds, despite the user's clear judgment that the game isn't fun. The autonomous session terminated by hitting the §I "quality target" gate (two consecutive iterations averaging ≥8) — the v1 rubric thus literally certified the degenerate game as "high quality" and stopped iterating.
 
-### 1.2 What v4 adds to v3
+### 1.3 What v5 adds to v4 (framework calibration, not new specifics)
+
+After v4 shipped, user feedback was explicit: "the fun scoring is either weighted wrong or not critical enough." The four structural failures v4 names are real, but the framework still let the deployed build score around 7 on raw-mean aggregation when it played as a 3-4. The general framework needed three calibration fixes, distinct from adding more domain-specific principles:
+
+1. **3 new general axes** I never named, all game-agnostic:
+   - **Personality / Charm** (Disney's "Appeal"; McGraw & Warren's *benign violation* theory of humor). Does the game have a voice? Does it produce laughter, character, presence — not just polish? A craft-8 game with personality-2 has lost its soul.
+   - **Surprise & Delight** (Schell Lens #4 — referenced before but never an axis of its own). Distinct from Curiosity Gaps: curiosity is "I want to know what's behind that door"; surprise is "I did NOT expect this to happen." Twist mechanics, unexpected reactions, hidden behaviors that *reveal themselves at the moment of play*.
+   - **Aesthetic-Mechanical Coherence** (Schell Lens #16 — *Unification / Holographic Design*; Hunicke-LeBlanc-Zubek MDA's M→D→A causal chain). Does the mechanic *reinforce* the theme, or fight it? A fart game whose grading favors musical/elegant outputs over silly/gross ones is thematically dissonant.
+
+2. **Aggregation formula** changes from arithmetic mean → `(min_axis + mean) / 2`. The weakest axis now contributes half the raw score; polish on top of a broken foundation can no longer compensate 1:1. A build with 9 axes at 8 and one axis at 2 used to score 7.4; under v5 it scores 4.7. This catches the "gilded broken" pattern without adding new rules.
+
+3. **Calibration anchors recalibrated stricter**:
+   - Old: 7-8 = "solid mechanic with at least one interesting decision"
+   - New: 7-8 = "multiple interesting decisions; tight loop + nameable arc; characterful voice; replay value"
+   - Old: 5-6 = "has loop but with structural gaps"
+   - New: 5-6 = "playable but limited (loop works; one or two axes weak)"
+   - Old: 3-4 = "Default for any iteration that fails ≥1 hard gate"
+   - New: 3-4 = "flawed (multiple weak axes OR ≥1 hard gate)"
+
+The rest of the rubric — v4's 12 hard gates, all 31 cited principles, the required-simulation step, the Schell Lens #39 verbatim block — is unchanged. v5 is purely a framework-calibration update, not new game-specific content.
+
+### 1.2 What v4 added to v3
 
 After session 2's iter 24-26 shipped a daily challenge, Hard Mode, 14-sample SFX library, achievements, and best-today persistence, v3 scored the build at 7/10 on Fun. The user playtested the deployed game and said *"I'd give this a 3 or 4"* with four specific structural critiques:
 
@@ -81,12 +111,15 @@ Each axis and gate below traces to one or more cited principles.
 | P29 | **Endogenous goal generation (sharpened)** — score must purchase something IN the game (unlocks, inventory, capability, narrative). Score that only changes a leaderboard number is exogenous. Trace each scoring output: does it drive in-game state change, or only a wall-of-numbers? | Bernard Suits, *The Grasshopper* (1978; Broadview 2014, ISBN 978-1-55481-156-4); Schell Lens #7 sharpened with trace-the-output test |
 | P30 | **Just-one-more-run compulsion / meaningful failure** — failure must advance some persistent counter (recipe discovered, item unlocked, lore revealed). Pure-reset failure produces fatigue; meta-progression failure (Spelunky/Hades/Slay the Spire model) produces "one more run." | John Hopson, "Behavioral Game Design" (Gamasutra 2001); Derek Yu, *Spelunky* (Boss Fight Books 2016, ISBN 978-1-940535-11-1) Ch. 6-8; Mark Brown "Game Maker's Toolkit" 2016 "What Makes a Good Roguelike" |
 | P31 | **Hidden information / deduction layer** — a game becomes a *puzzle* (vs. arithmetic exercise) only when relevant state is hidden and must be deduced through play. Displaying the optimization target eliminates the puzzle. | Reiner Knizia, *Dice Games Properly Explained* (op. cit. P23) on *Lost Cities*/*Tigris & Euphrates*; Loewenstein 1994 (sharpened from P19); design pattern of Mastermind / Codenames / Yokai |
+| P32 | **Personality / Appeal / Charm** — every named element (character, mascot, button-as-character, audience, AI opponent, in-game voice) must have personality: a recognizable signature beyond functional role. Per Disney "Appeal" — silhouettes, proportions, gestures must communicate identity. Per McGraw & Warren *benign violation* theory: humor arises from situations that simultaneously violate a norm AND are safe; this is how charm gets to comedy. A game scoring high on craft (Game Feel) but low on personality is technically polished and emotionally inert. | Frank Thomas & Ollie Johnston, *The Illusion of Life: Disney Animation* (Abbeville 1981, ISBN 0-89659-698-2) on the 12 Principles "Appeal"; A. Peter McGraw & Caleb Warren, "Benign Violations: Making Immoral Behavior Funny," *Psychological Science* 21 (2010); Andrew Loomis on figure design (Viking 1943); Sesame Workshop on character voice (Spinney *Wisdom of Big Bird* 2003). |
+| P33 | **Surprise & Delight** — distinct from curiosity gaps (P19). Curiosity is *aware ignorance* — "I want to know X." Surprise is *unaware revelation* — "I did NOT expect this to happen." Both engage the player but via different cognitive mechanisms. Surprise requires hidden behaviors that *reveal themselves at the moment of play*: twist mechanics, unexpected reactions, ambient interactions you didn't know were there, AI behaviors that astonish. The test: across 30 minutes of play, how many moments did the player *not predict in advance*? | Jesse Schell, *The Art of Game Design* Lens #4 (Surprise) — "What will surprise the player? Do the rules give players ways to surprise each other?"; Daniel Cook on "twist mechanics" and *Loops and Arcs* (Lostgarden 2007/2012); Mark Brown "Game Maker's Toolkit" 2018 episode on signal-vs-noise design. |
+| P34 | **Aesthetic-Mechanical Coherence / Holographic Design** — the theme and the mechanics must *reinforce* each other, not exist in parallel. The MDA chain (Mechanics → Dynamics → Aesthetics) describes one-way causality: mechanics produce aesthetics. The Holographic Design lens says it MUST also go the other way: the aesthetic frame should *constrain* mechanic choices. A fart game whose grading rewards *elegance* punishes silliness — thematic dissonance. A pet game whose AI is hostile betrays its premise. Per Schell: "every part of your game reinforces the theme." The test: name the theme; then for each mechanic, ask "does this mechanic make the theme stronger or weaker?" | Jesse Schell, *The Art of Game Design* 3rd ed. (CRC 2019) Lens #16 (The Lens of Unification / Holographic Design); Hunicke, LeBlanc, Zubek, *MDA: A Formal Approach to Game Design and Game Research* (AAAI 2004) on M→D→A causality; Will Wright GDC keynotes (2003-2007) on player-story coherence. |
 
 ---
 
 ## 3. The v4 rubric
 
-### 3.1 Ten mechanism-level axes
+### 3.1 Thirteen mechanism-level axes
 
 Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 
@@ -102,6 +135,9 @@ Each scored 1-10, average is the raw score, then capped by hard gates (§3.2).
 | **Curiosity Gaps** | Within the first 10 minutes, does the game plant ≥3 *visible* information gaps the player wants to close (locked-but-visible content, mystery icon, partial maps, hinted backstory)? Are collative variables (novelty, complexity, surprise) used deliberately? **Hidden-information sub-test (P31):** is the optimal action computable from displayed information alone, or does it require deducing at least one hidden variable? | P19, P31 |
 | **System Integration** *(new in v4)* | If the game has multiple scoring/feedback systems, do all of them trace to a single named central objective AND share a dominant strategy? OR is at least one parallel system that can be maxed independently? Test: name the goal; list each scoring system; compute the dominant strategy of each. | P20 |
 | **Choice Architecture** *(new in v4)* | What is the input-space type — open continuous / bounded discrete / combinatorial pick-K-of-N / budget-constrained allocation / sequential? Is there a bounded inventory that grows? Are core resources scarce (using one precludes another)? Are combinations non-additive (synergy/conflict, not just sum)? Are recipes discoverable (P31)? Is failure meta-progressing (P30)? Is the save state ≥5 structured fields (P24)? | P21, P22, P23, P25, P30, P24 |
+| **Personality / Charm** *(new in v5)* | Does the game have a recognizable voice? Do characters / audiences / AI have distinct signatures beyond functional role (silhouettes, mannerisms, speech patterns, reactions)? Is there humor (per McGraw-Warren benign-violation: norm-violations that are safe), wit, character? Does the player describe the game with personality-words ("charming," "weird," "sassy") rather than just craft-words ("polished," "smooth")? Tested by: name the game's "voice" in one sentence; identify ≥3 elements that carry that voice. | P32 |
+| **Surprise & Delight** *(new in v5)* | Distinct from Curiosity Gaps. Does the game produce moments the player didn't see coming — twist mechanics, unexpected reactions, hidden behaviors revealing themselves at play time, AI choices that astonish? Across 30 minutes of play, count moments the player did not predict in advance. Aim ≥5. | P33 |
+| **Aesthetic-Mechanical Coherence** *(new in v5)* | Does the theme reinforce the mechanics, and vice versa? Does the grading system reward outcomes consistent with the theme (a fart game rewarding silly/gross; a stealth game rewarding patience; a horror game rewarding caution)? Or is there dissonance between what the game's *fiction* wants and what its *scoring* wants? Test per Schell #16: name the theme; for each scoring rule, ask "does this rule make the theme stronger or weaker?" | P34 |
 
 The age-appropriateness (kid-safety) check from v1 is preserved as a separate hard gate rather than a numeric axis (§3.2 gate 6).
 
@@ -143,21 +179,60 @@ Before scoring, the critic MUST simulate at minimum four scenarios. For UI-touch
 
 If any uniform strategy (Mash-max, Mash-min) ties or exceeds the Domain-skill score, gate 1 (Dominant Strategy) automatically fails and the critic records the evidence.
 
-### 3.5 Calibration anchors
+### 3.5 Aggregation formula (new in v5)
 
-Anchors describe the *raw average across all 8 axes* before gate capping. Eight axes is harder to average ≥7 on than five; this is intentional — v3 is a higher bar.
+13 axes, each scored 1-10. The **raw score** is *not* the arithmetic mean — that formula let polish on one axis compensate 1:1 for structural failure on another, which is exactly the calibration drift v5 corrects.
+
+The new aggregation:
+
+```
+raw_score = round( (min_axis + mean_axes) / 2 )
+```
+
+Half-weight on the weakest axis, half on the average. Properties:
+
+- All axes at 8 → min=8, mean=8 → score 8. Polished + sound = 8.
+- 9 axes at 8, one axis at 2 → min=2, mean=7.5 → score **5**. (Old: 7.5.) Polish can lift modestly but can't hide the weak axis.
+- One axis at 9, rest at 4 → min=4, mean=4.4 → score 4. A single peak doesn't carry the build.
+- All axes at 4 → score 4. Average game.
+- 6 axes at 8, 7 axes at 2 → min=2, mean=4.8 → score **3**. Half good / half bad = closer to bad.
+
+After raw_score, **hard-gate capping** still applies: any gate failure caps the final score at 4. Both checks run; final = min(raw_score, gate_cap).
+
+Why this formula vs alternatives:
+- *Pure min*: too brutal — one axis-1 caps you at 1 forever even with everything else great.
+- *Geometric mean / harmonic mean*: penalize low axes but the math is harder to explain to a critic agent and the calibration is less intuitive.
+- *Weighted axes* (e.g. structural counts 2x): also valid, but requires constant adjustment as you add axes. The (min + mean) / 2 form is structurally robust to axis additions.
+
+For partial weighting on a small number of "structural" axes, see §3.5.1 below — but the default is plain (min + mean) / 2.
+
+#### 3.5.1 Structural-axis weighting (optional refinement)
+
+If structural axes (Decision Quality, Choice Architecture, System Integration, Progression) are weighted 1.5×, the formula becomes:
+
+```
+mean_axes = Σ(axis_score × weight) / Σ(weights)
+```
+
+This is optional. Default behavior treats all axes equally. Activate only for projects where structural foundation matters more than polish (most non-spectacle games).
+
+### 3.6 Calibration anchors (stricter in v5)
+
+Anchors describe the raw score from §3.5 (before any gate-cap). v5 calibration tightens v4's bands by ~1 point across the board — the deployed-build playtest showed v4's 7 was generous when the user's gut was 3-4.
 
 | Score | What it looks like |
 |---|---|
-| **9-10** | Polished short-form game scoring ≥7 on all 8 axes: clear interesting decisions, multi-orders-of-magnitude mastery curve (Koster), telegraphed rewards with near-misses, multi-modal feedback under 100ms, meaningful failure with sub-2s restart, mechanically varied content per run, persistent meta-progression, concurrent multi-timescale goals, ≥3 active curiosity gaps. Score feeds into in-system unlocks. Comparable to *Crossy Road*, *Threes*, *Slay the Spire* in design integrity (not in scope). |
-| **7-8** | Solid mechanic with at least one clear interesting decision, observable skill ceiling, juice + anticipation on inputs, some run-to-run variation, basic progression beyond the first session, score feeds *something* in-system. Plays for repeat sessions. |
-| **5-6** | Has a loop but with axis gaps: shallow decisions, weak skill curve, thin progression, or hollow-feeling score. Plays once but not twice. |
-| **3-4** | Loop is degenerate or trivial, OR the game fails ≥1 hard gate. Default for any iteration that fails any gate, regardless of per-axis average. |
-| **1-2** | No loop, or pure spectacle without gameplay. |
+| **9-10** | Excellent. ≥8 on every axis. Recognized as a "best of year" indie or hyper-casual game. *Slay the Spire*, *Threes*, *Stardew Valley*, *Crossy Road* in design integrity. Multiple interesting decisions per minute; characterful voice; replay value over weeks; aesthetic-mechanical coherence visible from the first screenshot. |
+| **7-8** | Very good. ≥6 on every axis AND ≥7 on most. Multiple interesting decisions; tight loop + nameable arc; characterful voice; replay value present; theme reinforces mechanics. Comparable to a steady-selling indie or popular roguelike. |
+| **5-6** | Playable but limited. Loop works AND has an arc, but one or two axes are weak. Plays once and a half. Mid-tier game-jam entry. |
+| **3-4** | Flawed. Multiple weak axes (≥3 axes scoring ≤4) OR ≥1 hard gate failure. Plays a few minutes then the gaps surface. Hobbyist prototype level. |
+| **1-2** | Broken / degenerate. No loop, no arc, OR multiple hard gates failing. |
+
+The deployed Fart Factory build (post iter 9-26) scored 7 under v4 and 3 under v5. The v5 number matches the user's playtest. **Polish (Game Feel = 8) cannot lift a build whose Choice Architecture is 1.**
 
 The score reflects **the game's current state including the new feature**, not the diff alone. Sparkle particles laid over a degenerate loop do not move 5 → 9; they move 5 → 5 because the gates still fail. A 3-step onboarding tutorial added on top of a hollow-score game does not move 5 → 9 either.
 
-### 3.6 Output schema
+### 3.7 Output schema
 
 Replaces v1's free-form `{score, rationale, blockers}` with a structured object. The orchestrator's parser at §F lines 376-385 still reads `.score` and `.blockers` unchanged; new fields are additive.
 
@@ -174,7 +249,18 @@ Replaces v1's free-form `{score, rationale, blockers}` with a structured object.
     "variationReplay": 0,
     "progression": 0,
     "goalStacking": 0,
-    "curiosityGaps": 0
+    "curiosityGaps": 0,
+    "systemIntegration": 0,
+    "choiceArchitecture": 0,
+    "personalityCharm": 0,
+    "surpriseDelight": 0,
+    "aestheticMechanicalCoherence": 0
+  },
+  "aggregation": {
+    "minAxis": 0,
+    "meanAxes": 0,
+    "rawScore": 0,
+    "gateCap": 10
   },
   "diagnostics": {
     "dominantStrategy": {
@@ -227,7 +313,7 @@ Replaces v1's free-form `{score, rationale, blockers}` with a structured object.
 
 The legacy 4-axis output `{score, rationale, blockers}` remains valid input to the orchestrator (it still parses min/avg). The richer `diagnostics` block is for human review of commit bodies and post-hoc auditing.
 
-### 3.7 Tools the critic may use
+### 3.8 Tools the critic may use
 
 - **Read, Grep, Glob** — same as v1.
 - **Playwright via shell (`npx playwright test`)** — REQUIRED to run the four simulation scenarios when the iteration touches game logic, UI, or scoring.
@@ -309,17 +395,35 @@ Note: scoring the **deployed** build (post iter 9-26), not the original v1 game.
 - **Curiosity Gaps: 4.** Hard Mode's hidden target is a real Loewenstein info-gap. Daily challenge name without Hard Mode-style obscuration is partial. But no locked-but-visible content, no "?" zones, no recipe book to discover.
 - **System Integration: 1** *(new in v4)*. Two parallel scoring systems, both with independent dominant strategies. Disjoint Systems Gate fails outright.
 - **Choice Architecture: 1** *(new in v4)*. Input type (a) open continuous; no inventory; no scarcity; no combinatorial pick; no recipe layer; no meta-progression; save state has the structure but not the *content* — no inventory[], no unlocked_recipes[], no discovered_combos[].
+- **Personality / Charm: 4** *(new in v5)*. Commentary strings ("Your dog just packed a suitcase and left") have voice. Achievement names have personality ("Stink Lord", "Hall Filler"). Challenge profile names are evocative ("Swamp Beast", "Silent Killer"). But there's no recurring character; no narrator presence; no recognizable "voice" carried across screens. Modest personality, hampered by sliders being the central interaction (sliders have no personality).
+- **Surprise & Delight: 3** *(new in v5)*. The randomized commentary string after a launch is a small surprise. The reactive challenge-card pulse on high match is a small surprise. The non-diegetic celebration sting on 100% is a small surprise. But once the player has done 3-4 launches, no surprises remain — the system reveals all its tricks within minutes. No twist mechanics, no AI behaviors that astonish, no hidden interactions.
+- **Aesthetic-Mechanical Coherence: 3** *(new in v5)*. The fart theme + cartoon-lab visuals are *consistent*. But the grading mechanic doesn't reinforce the theme: a "Symphony Conductor" challenge rewards musical/elegant outputs from a *fart* game, which is dissonant with the silly/gross premise. The original "total → grade" system actively rewards mash-max (the most gross/loud), which IS thematically coherent — but the daily-challenge match% can punish exactly the kind of fart the theme says is funniest. Two systems pulling in different theme-directions = dissonance.
 
-Raw average: (2+3+8+2+5+2+3+4+1+1) / 10 = 31/10 = **3.1**.
+Per-axis (13 axes): 2, 3, 8, 2, 5, 2, 3, 4, 1, 1, 4, 3, 3.
+- Min axis: **1** (System Integration, Choice Architecture).
+- Mean axes: (2+3+8+2+5+2+3+4+1+1+4+3+3) / 13 = 41/13 = **3.15**.
+- Raw score (new v5 aggregation): `round((1 + 3.15) / 2)` = round(2.08) = **2**.
 
-### 4.4 v4 Verdict
+Compare:
+- v4 arithmetic-mean: 3.1 → reported 3 (gate-capped 4)
+- v5 (min+mean)/2: 2.08 → reported 2 (gate-capped 4, but raw is already below cap)
 
-- **Hard gates failed (v4)**: bushnellFloorCeiling (#2 — partial), noFailure (#5), hollowScore (#7), **disjointSystems (#8 NEW)**, **openContinuousInput (#9 NEW)**, **loopOnly (#10 NEW)**. **6 of 11 gates fail.** (Dominant Strategy #1 weakly cleared by Hard Mode for the *match* system, not the *grade* system; counted half-failure.)
-- **v4 score: 3** (raw 3.1, gate-capped at 4 — both routes converge near 3-4. Matches the user's playtest gut score.)
+Adding three more axes pulled mean down slightly (because the new axes scored 3-4); aggregation change pulled the score from 3 to 2 because the minimum (1) now dominates. Both effects align with the user's playtest: "this isn't really a game as is."
+
+### 4.4 v5 Verdict
+
+- **Hard gates failed (v5 keeps v4 set)**: bushnellFloorCeiling (#2 — partial), noFailure (#5), hollowScore (#7), disjointSystems (#8), openContinuousInput (#9), loopOnly (#10). **6 of 11 gates fail.** Dominant Strategy #1 weakly cleared by Hard Mode for the match system, not the grade system.
+- **v5 score: 2** (raw 2.08 by (min+mean)/2; min axis = 1; mean = 3.15. Gate cap at 4 doesn't apply because raw is already below it.)
+- **v4 score on the same artifact: 3** (raw 3.1 arithmetic mean, gate-capped at 4).
 - **v3 score on the same artifact: 7** (post-iter-26 deployed build).
-- **Delta v3 → v4: −4.** Same artifact, same code, two different rubrics — v4 catches what v3 missed.
+- **Delta v3 → v5: −5.** Same artifact, same code, three different rubric versions converging on what the user actually experienced.
 
-The v3→v4 delta is the proof that v4 catches structural-game failures v3 didn't surface. v3 was rewarding the iter 13-26 *features* (daily challenge UI, hints, Hard Mode, SFX library, achievements, reactive pulse) without auditing whether the *underlying choice architecture* supported a real game. v4 audits the architecture: 6/11 gates fail because the slider model + dual scoring is structurally unsound. Polish on top doesn't fix the foundation.
+The v5 score of 2 corresponds to the calibration band "no loop / pure spectacle / multiple hard gates failing." Strictly, the build has a loop AND only "half-fails" the hard-gate count (6 of 11), so 2 is harsh — but the (min+mean)/2 aggregation is doing its job: a single-digit axis (Choice Architecture = 1) is anchoring the score, and Polish (Game Feel = 8) can no longer drag it up.
+
+The v3→v5 delta of -5 is the proof of three compounding effects:
+1. v3 missed *structural* failures the player experiences from launch #1 (System Integration, Choice Architecture). v4 added these axes — they scored 1.
+2. v4 missed three *general* fun axes (Personality, Surprise, Coherence). v5 added these — they scored 3-4 on this build.
+3. v3/v4's arithmetic-mean aggregation let Game Feel = 8 hide the structural 1s. v5's (min+mean)/2 stops that.
 
 This is consistent with the user's playtest verdict: *"this isn't really a game as is."*
 
