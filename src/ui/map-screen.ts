@@ -30,14 +30,12 @@ function renderMapCanvas(): void {
   const hot = dailyHotLocation();
   const currentId = loadLastArea();
 
-  const pins = AREAS.map((a) => {
+  function pinHtml(a: typeof AREAS[number]): string {
     const unlocked = isLocationUnlocked(a);
     const isHot = hot?.id === a.id && unlocked;
     const isCurrent = a.id === currentId;
     const region = regionMetaFor(a.region);
-    const lockedHint = unlocked
-      ? ''
-      : `Locked — ${region.unlockHint}`;
+    const lockedHint = unlocked ? '' : `Locked — ${region.unlockHint}`;
     const label = `${a.emoji} ${a.name}`;
     const ariaLabel = unlocked
       ? `${label} (${a.region}) — tap to travel`
@@ -60,18 +58,28 @@ function renderMapCanvas(): void {
       <span class="map-pin-name">${a.name}</span>
       ${lockIcon}
     </button>`;
-  }).join('');
+  }
 
-  // Region labels (decorative tags placed at canonical region positions).
-  const regionLabels = REGIONS.map((r) => {
-    const cx = r.id === 'hometown' ? 18 : r.id === 'city' ? 44 : r.id === 'wilderness' ? 36 : r.id === 'royal' ? 75 : 88;
-    const cy = r.id === 'hometown' ? 60 : r.id === 'city' ? 30 : r.id === 'wilderness' ? 10 : 50 - (r.id === 'cosmic' ? 30 : 0);
-    return `<div class="map-region-label" style="left:${cx}%; top:${cy}%" data-region="${r.id}">
+  // Build interleaved region label + pins so the mobile-list-view reads
+  // correctly. On desktop, the labels still get absolute-positioned (inline
+  // styles) while pins are positioned by their own mapX/mapY.
+  const regionLabelPositions: Record<string, { cx: number; cy: number }> = {
+    hometown:   { cx: 18, cy: 60 },
+    city:       { cx: 44, cy: 30 },
+    wilderness: { cx: 36, cy: 10 },
+    royal:      { cx: 75, cy: 50 },
+    cosmic:     { cx: 88, cy: 20 },
+  };
+  const groups = REGIONS.map((r) => {
+    const pos = regionLabelPositions[r.id]!;
+    const label = `<div class="map-region-label" style="left:${pos.cx}%; top:${pos.cy}%" data-region="${r.id}">
       ${r.emoji} ${r.name}
     </div>`;
+    const regionPins = AREAS.filter((a) => a.region === r.id).map(pinHtml).join('');
+    return label + regionPins;
   }).join('');
 
-  canvas.innerHTML = regionLabels + pins;
+  canvas.innerHTML = groups;
 
   canvas.querySelectorAll<HTMLButtonElement>('.map-pin').forEach((btn) => {
     btn.addEventListener('click', () => {
