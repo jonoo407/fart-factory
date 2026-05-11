@@ -60,10 +60,11 @@
         </div>
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
-          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20" aria-label="Belly capacity">
+          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="30" aria-valuenow="30" aria-label="Belly capacity">
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
-          <span class="belly-value"><span id="bellyValue">20</span>/<span id="bellyCap">20</span></span>
+          <span class="belly-value"><span id="bellyValue">30</span>/<span id="bellyCap">30</span></span>
+          <button type="button" class="rest-btn" id="restBtn" hidden aria-label="Rest: spend 10 research notes to refill belly">💤 Rest</button>
         </div>
 
         <div id="kitchenOverlay" class="kitchen-overlay" hidden role="region" aria-label="Kitchen prep">

@@ -112,11 +112,10 @@ export function audiencePoolForLocation(loc: Area): Audience[] {
 
 // ----- Daily hot-location -----
 
-function utcDaySeed(d: Date): number {
-  const yyyy = d.getUTCFullYear();
-  const mm = d.getUTCMonth() + 1;
-  const dd = d.getUTCDate();
-  return yyyy * 10_000 + mm * 100 + dd;
+import { currentEncounterIdx, encounterSeed } from './run-state';
+
+function hotSpotSeed(idx: number): number {
+  return encounterSeed(idx) ^ 0xb3c4d5e6;
 }
 
 function mulberry32(seed: number): () => number {
@@ -130,10 +129,15 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-export function dailyHotLocation(d: Date = new Date()): Area | null {
+/**
+ * Today's "Hot Spot" — one of the player's unlocked locations gets +20%
+ * gold reward (or 3× in GamePlus). Now anchored to encounter idx, not date.
+ */
+export function dailyHotLocation(_d?: Date, idx?: number): Area | null {
   const pool = unlockedLocations();
   if (pool.length === 0) return null;
-  const rng = mulberry32(utcDaySeed(d) + 7);
-  const idx = Math.floor(rng() * pool.length);
-  return pool[idx] ?? null;
+  const i = idx ?? currentEncounterIdx();
+  const rng = mulberry32(hotSpotSeed(i));
+  const j = Math.floor(rng() * pool.length);
+  return pool[j] ?? null;
 }

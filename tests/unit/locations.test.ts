@@ -154,22 +154,18 @@ describe('dailyHotLocation (Phase Q item 84)', () => {
     expect(unlocked.map((l) => l.id)).toContain(hot!.id);
   });
 
-  it('is deterministic per UTC day', () => {
-    const d = new Date('2026-05-12T12:00:00Z');
-    const a = dailyHotLocation(d);
-    const b = dailyHotLocation(d);
+  it('is deterministic per encounter idx', () => {
+    const a = dailyHotLocation(undefined, 5);
+    const b = dailyHotLocation(undefined, 5);
     expect(a?.id).toBe(b?.id);
   });
 
-  it('different days CAN yield different hot locations (smoke test over many days)', () => {
+  it('different encounters CAN yield different hot locations (smoke test)', () => {
     const ids = new Set<string>();
     for (let i = 0; i < 30; i++) {
-      const d = new Date(Date.UTC(2026, 0, 1) + i * 86_400_000);
-      const hot = dailyHotLocation(d);
+      const hot = dailyHotLocation(undefined, i);
       if (hot) ids.add(hot.id);
     }
-    // With Hometown's 4 unlocked locations, we should see ≥2 distinct hots
-    // across 30 days.
     expect(ids.size).toBeGreaterThanOrEqual(2);
   });
 });

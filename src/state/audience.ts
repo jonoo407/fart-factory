@@ -59,17 +59,17 @@ export const AUDIENCES: readonly Audience[] = [
   { id: 'mystery-guest',     name: 'The Mystery Guest',    emoji: '❓', cravings: c(3, 2, 3, 3, 3, 3, 3),                                          flavor: 'You can\'t tell what they want. You have to feel it.' },
 ];
 
-function dayOfYear(d: Date): number {
-  const start = Date.UTC(d.getUTCFullYear(), 0, 0);
-  const ms = d.getTime() - start;
-  return Math.floor(ms / 86_400_000);
-}
+import { currentEncounterIdx } from './run-state';
 
-export function getDailyAudience(d: Date = new Date(), pool?: readonly Audience[]): Audience {
+/**
+ * Audience for the given encounter idx. Optional pool — if omitted, uses
+ * the global AUDIENCES catalog.
+ *
+ * GamePlus effect (when fart_gameplus flag is set): each encounter rolls
+ * 2 audience positions instead of 1, so the rotation cycles twice as fast.
+ */
+export function audienceForEncounter(idx: number = currentEncounterIdx(), pool?: readonly Audience[]): Audience {
   const arr = pool && pool.length > 0 ? pool : AUDIENCES;
-  // P12: GamePlus splits the UTC day at noon — twice the audience rotation rate.
-  // The check is done via a dynamic read of localStorage (boss-progress.ts) to
-  // keep audience.ts free of UI/state dependencies.
   let gamePlus = false;
   try {
     const raw = localStorage.getItem('fart_gameplus');
@@ -77,11 +77,13 @@ export function getDailyAudience(d: Date = new Date(), pool?: readonly Audience[
   } catch {
     gamePlus = false;
   }
-  const base = dayOfYear(d);
-  const idx = gamePlus
-    ? (base * 2 + (d.getUTCHours() < 12 ? 0 : 1)) % arr.length
-    : base % arr.length;
-  return arr[idx]!;
+  const step = gamePlus ? 2 : 1;
+  return arr[(idx * step) % arr.length]!;
+}
+
+/** Legacy wrapper for callers still using `getDailyAudience()`. */
+export function getDailyAudience(_d: Date = new Date(), pool?: readonly Audience[]): Audience {
+  return audienceForEncounter(currentEncounterIdx(), pool);
 }
 
 export function getAudience(id: string): Audience | undefined {

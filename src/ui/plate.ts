@@ -32,6 +32,7 @@ import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from 
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
+import { attemptRestRefill, REST_NOTES_COST } from '../scoring/rest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -221,6 +222,39 @@ export function renderBellyMeter(): void {
   if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
   if (value) value.textContent = String(r);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
+  // Rest button: show when belly is below ~33% AND player has enough notes.
+  const restBtn = $('restBtn');
+  if (restBtn) {
+    const lowBelly = r < BELLY_CAPACITY / 3;
+    const canAfford = loadResearchNotes() >= REST_NOTES_COST;
+    if (lowBelly) {
+      restBtn.removeAttribute('hidden');
+      restBtn.setAttribute('aria-disabled', canAfford ? 'false' : 'true');
+      restBtn.textContent = canAfford
+        ? `💤 Rest (-${REST_NOTES_COST}📝)`
+        : `💤 Rest (need ${REST_NOTES_COST}📝)`;
+    } else {
+      restBtn.setAttribute('hidden', '');
+    }
+  }
+}
+
+function wireRestButton(): void {
+  const btn = $('restBtn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    if (btn.getAttribute('aria-disabled') === 'true') return;
+    const result = attemptRestRefill();
+    if (result.ok) {
+      renderBellyMeter();
+      renderProgression();
+    } else {
+      btn.classList.remove('rest-btn-refused');
+      void btn.offsetWidth;
+      btn.classList.add('rest-btn-refused');
+      setTimeout(() => btn.classList.remove('rest-btn-refused'), 600);
+    }
+  });
 }
 
 export function renderProgression(): void {
@@ -676,6 +710,7 @@ export function initStoryPantry(): void {
   wireStoryLaunchButton();
   wireStoryHardModeButton();
   wireAreaChangeButton();
+  wireRestButton();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();

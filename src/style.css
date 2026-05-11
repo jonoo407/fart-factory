@@ -239,6 +239,26 @@ body {
   transition: width 0.3s ease;
 }
 .belly-value { font-size: 0.95em; color: #e6f0ff; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.rest-btn {
+  background: linear-gradient(135deg, #14b8a6, #0d6964);
+  border: 2px solid #5eead4;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.82em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  min-height: 44px;
+}
+.rest-btn:hover { filter: brightness(1.1); }
+.rest-btn[aria-disabled='true'] {
+  background: #444;
+  border-color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.rest-btn-refused { animation: shop-refuse 0.6s ease-out; }
+.rest-btn[hidden] { display: none; }
 /* Phase L #66 — brief vertical shrink + bounce on food-add */
 .belly-deplete { animation: belly-pulse 0.42s ease-out; }
 @keyframes belly-pulse {

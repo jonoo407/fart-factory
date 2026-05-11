@@ -146,32 +146,42 @@ export function setLastMatch(pct: number | null): void {
   safeSave(KEY_LAST_MATCH, pct);
 }
 
-// ----- Belly meter (per UTC day) -----
+// ----- Belly meter (per encounter, not per UTC day) -----
+//
+// Per PLAN_v5 redesign: belly is now anchored to the encounter idx
+// (currentEncounterIdx from run-state.ts), not the calendar date.
+// When the player taps "Move On" → incrementEncounter() bumps the idx,
+// and loadBelly() returns BELLY_MAX (fresh belly for the new encounter).
+// No real-world clock anywhere.
 
-const KEY_BELLY_PREFIX = 'fart_belly_';
-const BELLY_MAX = 20;
+import { currentEncounterIdx } from './run-state';
 
-function bellyKey(d: Date = new Date()): string {
-  const yyyy = d.getUTCFullYear();
-  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
-  return `${KEY_BELLY_PREFIX}${yyyy}-${mm}-${dd}`;
+const KEY_BELLY_PREFIX = 'fart_belly_e_';
+const BELLY_MAX = 30;
+
+function bellyKey(idx: number = currentEncounterIdx()): string {
+  return `${KEY_BELLY_PREFIX}${idx}`;
 }
 
-export function loadBelly(d: Date = new Date()): number {
+export function loadBelly(idx?: number): number {
   return safeLoad<number>(
-    bellyKey(d),
+    bellyKey(idx),
     BELLY_MAX,
     (v): v is number => typeof v === 'number' && v >= 0 && v <= BELLY_MAX,
   );
 }
 
-export function spendBelly(cost: number, d: Date = new Date()): { ok: boolean; remaining: number } {
-  const cur = loadBelly(d);
+export function spendBelly(cost: number, idx?: number): { ok: boolean; remaining: number } {
+  const cur = loadBelly(idx);
   if (cost > cur) return { ok: false, remaining: cur };
   const next = cur - cost;
-  safeSave(bellyKey(d), next);
+  safeSave(bellyKey(idx), next);
   return { ok: true, remaining: next };
+}
+
+/** Force-refill belly for the current encounter (e.g. Power Nap activity). */
+export function refillBelly(idx?: number): void {
+  safeSave(bellyKey(idx), BELLY_MAX);
 }
 
 export const BELLY_CAPACITY = BELLY_MAX;

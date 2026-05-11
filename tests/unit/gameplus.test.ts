@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getDailyAudience } from '../../src/state/audience';
+import { audienceForEncounter, AUDIENCES } from '../../src/state/audience';
 import { setGamePlusUnlocked } from '../../src/state/boss-progress';
 import { hotSpotGoldMultiplier } from '../../src/scoring/gameplus';
 import { dailyHotLocation } from '../../src/state/location-progress';
@@ -10,21 +10,24 @@ beforeEach(() => {
 });
 
 describe('GamePlus effects (P12)', () => {
-  it('audience rotation cycles 2× faster when GamePlus is on (same day, AM vs PM differs)', () => {
+  it('audience rotation steps 2 per encounter when GamePlus is on', () => {
     setGamePlusUnlocked(true);
-    const morning = new Date('2026-05-12T03:00:00Z');
-    const afternoon = new Date('2026-05-12T15:00:00Z');
-    const amAud = getDailyAudience(morning);
-    const pmAud = getDailyAudience(afternoon);
-    // GamePlus splits the day at 12:00 UTC → AM and PM audiences differ.
-    expect(amAud.id).not.toBe(pmAud.id);
+    const a0 = audienceForEncounter(0);
+    const a1 = audienceForEncounter(1);
+    // Encounter 1 in GamePlus should be 2 positions ahead of encounter 0,
+    // i.e., position 2 in the catalog (not position 1).
+    const expected = AUDIENCES[2 % AUDIENCES.length]!.id;
+    expect(a1.id).toBe(expected);
+    expect(a0.id).not.toBe(a1.id);
   });
 
-  it('audience rotation stays normal (one per UTC day) when GamePlus is OFF', () => {
+  it('audience rotation steps 1 per encounter when GamePlus is OFF', () => {
     setGamePlusUnlocked(false);
-    const morning = new Date('2026-05-12T03:00:00Z');
-    const afternoon = new Date('2026-05-12T15:00:00Z');
-    expect(getDailyAudience(morning).id).toBe(getDailyAudience(afternoon).id);
+    const a0 = audienceForEncounter(0);
+    const a1 = audienceForEncounter(1);
+    const expected = AUDIENCES[1 % AUDIENCES.length]!.id;
+    expect(a1.id).toBe(expected);
+    expect(a0.id).not.toBe(a1.id);
   });
 
   it('hotSpotGoldMultiplier returns 3 when launching at the daily hot spot AND GamePlus is on', () => {

@@ -9,21 +9,34 @@
  *   fart_ferment_rack = [{foodId, startedAt: ISOString}]
  */
 
+import { currentEncounterIdx } from './run-state';
+
 const KEY = 'fart_ferment_rack';
 
 export const FERMENT_RACK_SIZE = 3;
+/**
+ * TTL counted in encounters, not real-world days. Per PLAN_v5 redesign.
+ * 7 encounters before a placed-but-unclaimed ferment spoils.
+ */
 export const FERMENT_TTL_DAYS = 7;
 
 export interface FermentSlot {
   foodId: string;
-  /** ISO date string of when fermentation started. */
+  /** ISO date string of when fermentation started (kept for backcompat). */
   startedAt: string;
+  /** Encounter idx at placement (post-PLAN_v5; preferred). Optional for legacy reads. */
+  startedAtIdx?: number;
 }
 
 function isFermentSlot(v: unknown): v is FermentSlot {
   if (!v || typeof v !== 'object') return false;
   const o = v as Record<string, unknown>;
   return typeof o.foodId === 'string' && typeof o.startedAt === 'string';
+}
+
+function slotStartIdx(slot: FermentSlot): number {
+  // Prefer the encounter-idx anchor if present; fall back to 0.
+  return typeof slot.startedAtIdx === 'number' ? slot.startedAtIdx : 0;
 }
 
 function safeLoad(): FermentSlot[] {
@@ -46,10 +59,6 @@ function safeSave(rack: FermentSlot[]): void {
   }
 }
 
-function utcDay(d: Date): number {
-  return Math.floor(d.getTime() / 86_400_000);
-}
-
 export function loadFermentRack(): FermentSlot[] {
   return safeLoad();
 }
@@ -58,32 +67,37 @@ export type AddResult =
   | { ok: true }
   | { ok: false; reason: 'rack-full' };
 
-export function addToFermentRack(foodId: string, when: Date = new Date()): AddResult {
+export function addToFermentRack(foodId: string, when: Date = new Date(), idx?: number): AddResult {
   const cur = safeLoad();
   if (cur.length >= FERMENT_RACK_SIZE) return { ok: false, reason: 'rack-full' };
-  cur.push({ foodId, startedAt: when.toISOString() });
+  cur.push({
+    foodId,
+    startedAt: when.toISOString(),
+    startedAtIdx: idx ?? currentEncounterIdx(),
+  });
   safeSave(cur);
   return { ok: true };
 }
 
-export function getReadyFerments(today: Date = new Date()): FermentSlot[] {
-  const todayUtc = utcDay(today);
-  return safeLoad().filter((slot) => {
-    const startUtc = utcDay(new Date(slot.startedAt));
-    return startUtc < todayUtc;
-  });
+/**
+ * A ferment is "ready" if the current encounter idx is past its placement idx.
+ * I.e., place at idx N → ready at idx N+1.
+ */
+export function getReadyFerments(_today?: Date, idx?: number): FermentSlot[] {
+  const i = idx ?? currentEncounterIdx();
+  return safeLoad().filter((slot) => slotStartIdx(slot) < i);
 }
 
 export type ClaimResult =
   | { ok: true; originalFoodId: string }
   | { ok: false; reason: 'invalid-slot' | 'not-ready' };
 
-export function claimFerment(slotIdx: number, today: Date = new Date()): ClaimResult {
+export function claimFerment(slotIdx: number, _today?: Date, idx?: number): ClaimResult {
   const cur = safeLoad();
   if (slotIdx < 0 || slotIdx >= cur.length) return { ok: false, reason: 'invalid-slot' };
   const slot = cur[slotIdx]!;
-  const startUtc = utcDay(new Date(slot.startedAt));
-  if (startUtc >= utcDay(today)) return { ok: false, reason: 'not-ready' };
+  const i = idx ?? currentEncounterIdx();
+  if (slotStartIdx(slot) >= i) return { ok: false, reason: 'not-ready' };
   cur.splice(slotIdx, 1);
   safeSave(cur);
   return { ok: true, originalFoodId: slot.foodId };
@@ -115,14 +129,14 @@ export function incrementFermentClaims(): number {
 }
 
 /**
- * Remove ferments older than FERMENT_TTL_DAYS. Returns the count removed.
+ * Remove ferments older than FERMENT_TTL_DAYS encounters. Returns count removed.
  */
-export function clearExpired(now: Date = new Date()): number {
+export function clearExpired(_now?: Date, idx?: number): number {
+  const i = idx ?? currentEncounterIdx();
   const cur = safeLoad();
-  const nowUtc = utcDay(now);
   const kept = cur.filter((slot) => {
-    const ageDays = nowUtc - utcDay(new Date(slot.startedAt));
-    return ageDays <= FERMENT_TTL_DAYS;
+    const age = i - slotStartIdx(slot);
+    return age <= FERMENT_TTL_DAYS;
   });
   safeSave(kept);
   return cur.length - kept.length;
