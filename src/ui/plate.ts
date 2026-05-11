@@ -18,10 +18,13 @@ import {
   bumpBestMatch,
   bumpBestMatchOverall,
   bumpBestHard,
+  addGold,
+  addResearchNotes,
 } from '../state/persistence';
 import type { RecipeResult } from '../scoring/fart-recipe';
 import { resolveLaunchProps } from '../scoring/launch-resolver';
-import { evaluateMatch, type MatchResult } from '../scoring/match';
+import { evaluateMatch, computeMatchBreakdown, type MatchResult, type AxisBreakdown } from '../scoring/match';
+import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus, tierLabel as criticalLabel, type CriticalTier } from '../scoring/critical-tier';
 import { awardGoldForLaunch } from '../scoring/reward';
 import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
@@ -346,6 +349,22 @@ function showKitchenUnlockToast(): void {
   if (kb) kb.removeAttribute('hidden');
 }
 
+function showCriticalSplash(tier: CriticalTier): void {
+  const splash = document.getElementById('criticalSplash');
+  if (!splash) return;
+  splash.innerHTML = `<div class="critical-splash-card critical-${tier}">
+    <div class="critical-splash-label">${criticalLabel(tier)}</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('critical-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('critical-splash-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('critical-splash-show');
+  }, 1800);
+}
+
 function showDiscoverySplash(recipeId: string): void {
   const splash = document.getElementById('discoverySplash');
   if (!splash) return;
@@ -489,6 +508,10 @@ function renderAudienceReaction(pct: number): void {
   // P3: tier-specific audience SFX (silent until operator runs sfx:generate).
   const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
   if (reactionSfx) void playEventSfx(reactionSfx, 5);
+  // T1.3: emoji particles per tier
+  void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
+    spawnReactionParticles(r.tier);
+  });
 }
 
 function wireStoryHardModeButton(): void {
@@ -557,7 +580,30 @@ function matchEmoji(pct: number): string {
   return '💀';
 }
 
-function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null): void {
+function axisEmoji(axis: AxisBreakdown['axis']): string {
+  switch (axis) {
+    case 'wet': return '💧';
+    case 'dry': return '🌵';
+    case 'stink': return '🦨';
+    case 'loud': return '🔊';
+    case 'musical': return '🎵';
+    case 'length': return '⏱';
+    case 'temp': return '🌡';
+  }
+}
+
+function renderBreakdown(breakdown: AxisBreakdown[]): string {
+  // Sort: mismatched axes (cost > 0) first, descending cost, then matched ones.
+  const sorted = [...breakdown].sort((a, b) => b.cost - a.cost);
+  return sorted.map((row) => {
+    if (row.matched) {
+      return `<div class="breakdown-row breakdown-matched">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} ✓</div>`;
+    }
+    return `<div class="breakdown-row breakdown-miss">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} <span class="breakdown-cost">-${row.cost}</span></div>`;
+  }).join('');
+}
+
+function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null, breakdown?: AxisBreakdown[]): void {
   const wrap = $('storyResult');
   const title = $('storyResultTitle');
   const effects = $('storyResultEffects');
@@ -600,9 +646,14 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
     for (const v of m.violations) lines.push(`🚫 Restriction violated: ${v} (-25%)`);
     for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
     for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
-    effects.innerHTML = lines.length
+    const linesHtml = lines.length
       ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
       : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
+    // T1.1: per-axis breakdown (cause-effect)
+    const breakdownHtml = breakdown
+      ? `<details class="breakdown-details" open><summary>📊 Match breakdown — why ${m.pct}%?</summary><div class="breakdown-grid">${renderBreakdown(breakdown)}</div></details>`
+      : '';
+    effects.innerHTML = linesHtml + breakdownHtml;
   }
 }
 
@@ -652,6 +703,7 @@ function onStoryLaunch(): void {
     ? aud.restrictions.slice(1)
     : aud.restrictions;
   const match = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
+  const breakdown = computeMatchBreakdown(propsAfterArea, aud.cravings);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
@@ -672,9 +724,17 @@ function onStoryLaunch(): void {
 
   commitBellySpend();
 
+  // T1.2: classify critical tier (PERFECT/GREAT/OK/BAD/DISASTER)
+  const tier = classifyCriticalTier(match);
+
   if (ingredientCount > 0) {
     awardGoldForLaunch(match.pct, areaId, goldMultiplierFromBuffs());
     awardResearchForLaunch(match.pct);
+    // T1.2: critical bonus — PERFECT/GREAT add gold; DISASTER adds consolation notes.
+    const goldBonus = criticalGoldBonus(tier);
+    const notesBonus = criticalNotesBonus(tier);
+    if (goldBonus > 0) addGold(goldBonus);
+    if (notesBonus > 0) addResearchNotes(notesBonus);
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
     // Hard Mode tracking — but Meditation buff forces Easy Mode for this launch.
@@ -684,6 +744,10 @@ function onStoryLaunch(): void {
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
       showKitchenUnlockToast();
+    }
+    // T1.2: critical-tier visual splash.
+    if (tier === 'perfect' || tier === 'great' || tier === 'disaster') {
+      showCriticalSplash(tier);
     }
     // PLAN_v5 Phase 6: buffs consumed after the launch they applied to.
     consumeBuffs();
@@ -700,7 +764,7 @@ function onStoryLaunch(): void {
   if (discovery && discovery.freshlyDiscovered) {
     showDiscoverySplash(discovery.recipeId);
   }
-  renderStoryResult(recipe, match, area, ingredientCount, discovery);
+  renderStoryResult(recipe, match, area, ingredientCount, discovery, breakdown);
   renderFirstLaunchHint(); // P7: re-render in case it should now hide
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
