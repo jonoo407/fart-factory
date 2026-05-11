@@ -27,7 +27,7 @@ import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
-import { isArenaActive, submitArenaLaunch } from './boss-arena';
+import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
@@ -542,6 +542,8 @@ function onStoryLaunch(): void {
   renderProgression();
   renderNotebookCounter();
   renderStoryResult(recipe, match, area, ingredientCount, discovery);
+  // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
+  maybeShowBossUnlockToast();
   if (ingredientCount > 0) {
     renderAudienceReaction(match.pct);
     setLastMatch(match.pct);

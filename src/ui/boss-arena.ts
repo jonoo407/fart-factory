@@ -222,3 +222,34 @@ function handleDefeat(): void {
 export function wireArena(): void {
   $('arenaCloseBtn')?.addEventListener('click', closeArena);
 }
+
+/**
+ * Phase P item 79 — fire a once-per-boss toast when a boss becomes newly
+ * unlocked. Called by `onStoryLaunch` after every launch.
+ */
+export function maybeShowBossUnlockToast(): void {
+  // Lazy import to avoid circular dep at module-load.
+  import('../state/boss-progress').then(({ loadBossUnlockToastSeen, markBossUnlockToastSeen }) => {
+    for (const b of BOSSES) {
+      if (!isBossUnlocked(b)) continue;
+      if (loadBossUnlockToastSeen(b.id)) continue;
+      // Newly unlocked.
+      markBossUnlockToastSeen(b.id);
+      showToast(`🏆 ${b.emoji} ${b.name} is ready to fight! Check the Notebook.`);
+      return; // one toast per launch
+    }
+  });
+}
+
+function showToast(message: string): void {
+  const toast = $('bossUnlockToast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.removeAttribute('hidden');
+  toast.classList.remove('boss-unlock-toast-enter');
+  void toast.offsetWidth;
+  toast.classList.add('boss-unlock-toast-enter');
+  setTimeout(() => {
+    toast.setAttribute('hidden', '');
+  }, 5000);
+}
