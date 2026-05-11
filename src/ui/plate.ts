@@ -26,6 +26,11 @@ import { resolveLaunchProps } from '../scoring/launch-resolver';
 import { evaluateMatch, computeMatchBreakdown, type MatchResult, type AxisBreakdown } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus, tierLabel as criticalLabel, type CriticalTier } from '../scoring/critical-tier';
 import { awardGoldForLaunch } from '../scoring/reward';
+import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
+import { loadStreak, recordLaunchForStreak, streakGoldMultiplier } from '../scoring/streak';
+import { recordFoodUse, applyMasteryBonuses } from '../scoring/food-mastery';
+import { unlockFood } from '../state/persistence';
+import { encounterSeed, currentEncounterIdx } from '../state/run-state';
 import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
@@ -349,6 +354,26 @@ function showKitchenUnlockToast(): void {
   if (kb) kb.removeAttribute('hidden');
 }
 
+function showLootDropSplash(food: { id: string; name: string; emoji: string; rarity: string }): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-${food.rarity}">
+    <div class="discovery-splash-banner">✨ LOOT DROP ✨</div>
+    <div class="discovery-splash-emoji">${food.emoji}</div>
+    <div class="discovery-splash-name">${food.name}</div>
+    <div class="discovery-splash-desc">The audience handed you a snack!</div>
+    <div class="discovery-splash-hint">📦 Added to your pantry</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('discovery-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('discovery-splash-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('discovery-splash-show');
+  }, 3200);
+}
+
 function showCriticalSplash(tier: CriticalTier): void {
   const splash = document.getElementById('criticalSplash');
   if (!splash) return;
@@ -505,6 +530,17 @@ function renderAudienceReaction(pct: number): void {
   if (tierEl) tierEl.textContent = tierLabel(r.tier);
   if (trendEl) trendEl.textContent = trendLabel(r.trend);
   applyReactionFace(r.tier);
+  // T2.2: streak counter visible in the reaction strip.
+  const streakEl = $('audienceReactionStreak');
+  if (streakEl) {
+    const s = loadStreak();
+    if (s >= 2) {
+      streakEl.removeAttribute('hidden');
+      streakEl.textContent = s >= 10 ? `🌟 LEGENDARY STREAK ×${s}` : s >= 5 ? `🔥🔥 Streak ×${s}` : `🔥 Streak ×${s}`;
+    } else {
+      streakEl.setAttribute('hidden', '');
+    }
+  }
   // P3: tier-specific audience SFX (silent until operator runs sfx:generate).
   const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
   if (reactionSfx) void playEventSfx(reactionSfx, 5);
@@ -670,7 +706,9 @@ function onStoryLaunch(): void {
   // PLAN_v5 Phase 6: apply active buffs BEFORE area modifiers, so the
   // buff deltas are propagated through the area multipliers naturally.
   const propsWithBuffs = applyActiveBuffs(resolved.props);
-  const propsAfterArea = applyAreaModifiers(propsWithBuffs, area);
+  // T2.3: apply per-food mastery bonuses (Master+ foods get +1 on their highest axis).
+  const propsWithMastery = applyMasteryBonuses(propsWithBuffs, ids);
+  const propsAfterArea = applyAreaModifiers(propsWithMastery, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -728,13 +766,29 @@ function onStoryLaunch(): void {
   const tier = classifyCriticalTier(match);
 
   if (ingredientCount > 0) {
-    awardGoldForLaunch(match.pct, areaId, goldMultiplierFromBuffs());
+    // T2.2: streak multiplier + buff multiplier combine for total gold mult.
+    const newStreak = recordLaunchForStreak(match.pct);
+    const streakMult = streakGoldMultiplier(newStreak);
+    const buffMult = goldMultiplierFromBuffs();
+    awardGoldForLaunch(match.pct, areaId, streakMult * buffMult);
     awardResearchForLaunch(match.pct);
     // T1.2: critical bonus — PERFECT/GREAT add gold; DISASTER adds consolation notes.
     const goldBonus = criticalGoldBonus(tier);
     const notesBonus = criticalNotesBonus(tier);
     if (goldBonus > 0) addGold(goldBonus);
     if (notesBonus > 0) addResearchNotes(notesBonus);
+    // T2.3: record food uses for mastery
+    recordFoodUse(ids);
+    // T2.1: roll loot drop on PERFECT (chance scales with legendary on plate)
+    if (tier === 'perfect') {
+      const seed = encounterSeed(currentEncounterIdx()) ^ Date.now();
+      const chance = dropChanceForLaunch(tier, hasLegendary);
+      const drop = rollLootDrop(chance, seed);
+      if (drop) {
+        unlockFood(drop.id);
+        showLootDropSplash(drop);
+      }
+    }
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
     // Hard Mode tracking — but Meditation buff forces Easy Mode for this launch.

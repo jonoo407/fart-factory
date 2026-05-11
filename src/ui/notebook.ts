@@ -14,6 +14,7 @@ import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, render
 import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
 import { renderBossList } from './boss-arena';
+import { loadFoodMastery, masteryLevel, masteryLabel } from '../scoring/food-mastery';
 import { loadGamePlusUnlocked } from '../state/boss-progress';
 
 function $(id: string): HTMLElement | null {
@@ -173,11 +174,41 @@ function renderLegendaryQuests(): void {
   });
 }
 
+function renderMasteryList(): void {
+  const grid = $('masteryList');
+  if (!grid) return;
+  const unlocked = new Set(loadPantry());
+  const rows = FOODS.filter((f) => unlocked.has(f.id))
+    .map((f) => {
+      const uses = loadFoodMastery(f.id);
+      const lvl = masteryLevel(uses);
+      const lvlText = masteryLabel(lvl);
+      // Progress to next level: thresholds 0, 10, 25, 50, 100
+      const thresholds = [0, 10, 25, 50, 100];
+      let next = 100;
+      for (const t of thresholds) {
+        if (uses < t) { next = t; break; }
+      }
+      const prev = thresholds[thresholds.indexOf(next) - 1] ?? 0;
+      const pctToNext = next > prev ? Math.min(100, ((uses - prev) / (next - prev)) * 100) : 100;
+      return `<div class="mastery-row rarity-${f.rarity}">
+        <span class="mastery-emoji">${f.emoji}</span>
+        <span class="mastery-name">${f.name}</span>
+        <span class="mastery-level">${lvlText}</span>
+        <span class="mastery-uses">${uses} use${uses === 1 ? '' : 's'}</span>
+        <div class="mastery-bar"><div class="mastery-bar-fill" style="width:${pctToNext}%"></div></div>
+      </div>`;
+    })
+    .join('');
+  grid.innerHTML = rows || '<div class="mastery-empty">No food mastery yet. Use foods in launches to level them up.</div>';
+}
+
 export function openNotebook(): void {
   renderNotebookCounter();
   renderRecipes();
   renderLegendaryQuests();
   renderBossList();
+  renderMasteryList();
   $('notebookModal')?.removeAttribute('hidden');
 }
 
