@@ -9,7 +9,12 @@
 
 import { BOSSES, getBoss, type Boss } from '../state/bosses';
 import { AUDIENCES, type Audience } from '../state/audience';
-import { isBossUnlocked, loadBossesDefeated } from '../state/boss-progress';
+import {
+  isBossUnlocked,
+  loadBossesDefeated,
+  loadBossUnlockToastSeen,
+  markBossUnlockToastSeen,
+} from '../state/boss-progress';
 import {
   createBossRunState,
   evaluateBossRound,
@@ -228,17 +233,13 @@ export function wireArena(): void {
  * unlocked. Called by `onStoryLaunch` after every launch.
  */
 export function maybeShowBossUnlockToast(): void {
-  // Lazy import to avoid circular dep at module-load.
-  import('../state/boss-progress').then(({ loadBossUnlockToastSeen, markBossUnlockToastSeen }) => {
-    for (const b of BOSSES) {
-      if (!isBossUnlocked(b)) continue;
-      if (loadBossUnlockToastSeen(b.id)) continue;
-      // Newly unlocked.
-      markBossUnlockToastSeen(b.id);
-      showToast(`🏆 ${b.emoji} ${b.name} is ready to fight! Check the Notebook.`);
-      return; // one toast per launch
-    }
-  });
+  for (const b of BOSSES) {
+    if (!isBossUnlocked(b)) continue;
+    if (loadBossUnlockToastSeen(b.id)) continue;
+    markBossUnlockToastSeen(b.id);
+    showToast(`🏆 ${b.emoji} ${b.name} is ready to fight! Check the Notebook.`);
+    return; // one toast per launch
+  }
 }
 
 function showToast(message: string): void {
