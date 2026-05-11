@@ -27,6 +27,7 @@ import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
+import { playEventSfx, playEventSfxOneOf, FOOD_EATING_SFX, AUDIENCE_REACTION_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -153,6 +154,8 @@ export function renderPantryGrid(): void {
       }
       const result = addFoodToPlate(id);
       if (result.ok) {
+        // P3: random food-eating cue (silent until operator runs sfx:generate).
+        void playEventSfxOneOf(FOOD_EATING_SFX, 4);
         renderPlate();
         renderBellyMeter();
         // Phase L #67 — Disney wind-up/pop/settle on the plate slot.
@@ -386,6 +389,9 @@ function renderAudienceReaction(pct: number): void {
   if (tierEl) tierEl.textContent = tierLabel(r.tier);
   if (trendEl) trendEl.textContent = trendLabel(r.trend);
   applyReactionFace(r.tier);
+  // P3: tier-specific audience SFX (silent until operator runs sfx:generate).
+  const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
+  if (reactionSfx) void playEventSfx(reactionSfx, 5);
 }
 
 function wireStoryHardModeButton(): void {
@@ -534,6 +540,7 @@ function onStoryLaunch(): void {
   });
   if (hasLegendary) {
     flashLegendaryFanfare();
+    void playEventSfx(LEGENDARY_FANFARE_SFX, 7);
   }
 
   commitBellySpend();

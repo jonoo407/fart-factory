@@ -25,6 +25,7 @@ import {
 } from '../scoring/boss-match';
 import { dispatchBossReward } from '../scoring/boss-reward';
 import { renderPantryGrid, renderProgression } from './plate';
+import { playEventSfx, QUEST_CLAIMED_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -206,6 +207,8 @@ export function submitArenaLaunch(launch: BossLaunchInput): void {
 function handleVictory(): void {
   if (!currentBoss) return;
   const reward = dispatchBossReward(currentBoss);
+  // P3: victory fanfare SFX (silent until operator runs sfx:generate).
+  void playEventSfx(reward.firstWin ? LEGENDARY_FANFARE_SFX : QUEST_CLAIMED_SFX, 8);
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
