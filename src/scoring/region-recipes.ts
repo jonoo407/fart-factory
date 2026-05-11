@@ -12,24 +12,26 @@
  */
 
 import { loadDiscoveredRecipes } from '../state/persistence';
-import { RECIPES } from '../state/recipes';
+import { RECIPES, getRecipe } from '../state/recipes';
 import type { Region } from '../state/containment';
 
 /**
- * Until recipes carry a `region` field, we credit each discovered recipe
- * to Hometown (the starter region). Future-tagged recipes will use their
- * declared region.
+ * Per PLAN_v5 P11: recipes now carry a `region` field. Look it up;
+ * default to 'hometown' if missing (legendary recipes are cross-region
+ * and don't tag).
  */
-function regionOfRecipe(_recipeId: string): Region {
-  // TODO: when recipes get region tags, return r.region.
-  return 'hometown';
+function regionOfRecipe(recipeId: string): Region | null {
+  const r = getRecipe(recipeId);
+  if (!r || !r.region) return null;
+  return r.region;
 }
 
 export function discoveredRecipesByRegion(region: Region): number {
   const discovered = loadDiscoveredRecipes();
   let count = 0;
   for (const id of discovered) {
-    if (regionOfRecipe(id) === region) count++;
+    const r = regionOfRecipe(id);
+    if (r === region) count++;
   }
   return count;
 }

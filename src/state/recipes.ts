@@ -10,6 +10,7 @@
  */
 
 import type { Rarity } from './food';
+import type { Region } from './containment';
 
 export interface Recipe {
   id: string;
@@ -26,40 +27,43 @@ export interface Recipe {
   legendaryUnlock?: {
     steps: string[]; // human-readable requirements
   };
+  /** Per PLAN_v5 P11: which region this recipe thematically belongs to.
+   * Legendary recipes leave this off (cross-region by design). */
+  region?: Region;
 }
 
 export const RECIPES: readonly Recipe[] = [
   // ====== Pre-known recipes (tutorial / shown in notebook from day 1) ======
-  { id: 'swamp-beast',    name: 'Swamp Beast',    emoji: '🐊', rarity: 'common',   hidden: false, ingredients: ['beans', 'cheese'],                                description: 'The classic wet stinker.' },
-  { id: 'silent-killer',  name: 'Silent Killer',  emoji: '🥷', rarity: 'common',   hidden: false, ingredients: ['egg', 'garlic'],                                  description: 'Quiet but devastating.' },
-  { id: 'mouse-squeak',   name: 'Mouse Squeak',   emoji: '🐭', rarity: 'common',   hidden: false, ingredients: ['onion', 'cabbage'],                               description: 'Brief and surprising.' },
-  { id: 'trumpet-blast',  name: 'Trumpet Blast',  emoji: '🎺', rarity: 'common',   hidden: false, ingredients: ['beans', 'cabbage'],                               description: 'Loud and proud.' },
-  { id: 'sad-trombone',   name: 'Sad Trombone',   emoji: '🎷', rarity: 'common',   hidden: false, ingredients: ['cheese', 'onion'],                                description: 'Womp womp.' },
+  { id: 'swamp-beast',    name: 'Swamp Beast',    emoji: '🐊', rarity: 'common',   hidden: false, region: 'hometown', ingredients: ['beans', 'cheese'],                                description: 'The classic wet stinker.' },
+  { id: 'silent-killer',  name: 'Silent Killer',  emoji: '🥷', rarity: 'common',   hidden: false, region: 'hometown', ingredients: ['egg', 'garlic'],                                  description: 'Quiet but devastating.' },
+  { id: 'mouse-squeak',   name: 'Mouse Squeak',   emoji: '🐭', rarity: 'common',   hidden: false, region: 'hometown', ingredients: ['onion', 'cabbage'],                               description: 'Brief and surprising.' },
+  { id: 'trumpet-blast',  name: 'Trumpet Blast',  emoji: '🎺', rarity: 'common',   hidden: false, region: 'hometown', ingredients: ['beans', 'cabbage'],                               description: 'Loud and proud.' },
+  { id: 'sad-trombone',   name: 'Sad Trombone',   emoji: '🎷', rarity: 'common',   hidden: false, region: 'hometown', ingredients: ['cheese', 'onion'],                                description: 'Womp womp.' },
 
-  // ====== Hidden uncommon recipes ======
-  { id: 'sulfur-bomb',    name: 'Sulfur Bomb',    emoji: '💣', rarity: 'uncommon', hidden: true,  ingredients: ['egg', 'pickle'],                                  description: 'Vinegar + sulfur.' },
-  { id: 'fermented-fury', name: 'Fermented Fury', emoji: '⚡', rarity: 'uncommon', hidden: true,  ingredients: ['kimchi', 'cabbage'],                              description: 'The Korean classic.' },
-  { id: 'ocean-deep',     name: 'Ocean Deep',     emoji: '🌊', rarity: 'uncommon', hidden: true,  ingredients: ['sardines', 'pickle'],                             description: 'Salt of the earth.' },
-  { id: 'asparagus-symphony', name: 'Asparagus Symphony', emoji: '🎼', rarity: 'uncommon', hidden: true, ingredients: ['asparagus', 'cheese'],                     description: 'Musical and surprising.' },
-  { id: 'spicy-rumble',   name: 'Spicy Rumble',   emoji: '🔥', rarity: 'uncommon', hidden: true,  ingredients: ['hot-pepper', 'beans'],                            description: 'The slow burn.' },
-  { id: 'green-thunder',  name: 'Green Thunder',  emoji: '🥬', rarity: 'uncommon', hidden: true,  ingredients: ['broccoli', 'cabbage', 'onion'],                   description: 'Triple-green concentrate.' },
+  // ====== Hidden uncommon recipes (mixed regions) ======
+  { id: 'sulfur-bomb',    name: 'Sulfur Bomb',    emoji: '💣', rarity: 'uncommon', hidden: true, region: 'city',       ingredients: ['egg', 'pickle'],                                  description: 'Vinegar + sulfur.' },
+  { id: 'fermented-fury', name: 'Fermented Fury', emoji: '⚡', rarity: 'uncommon', hidden: true, region: 'city',       ingredients: ['kimchi', 'cabbage'],                              description: 'The Korean classic.' },
+  { id: 'ocean-deep',     name: 'Ocean Deep',     emoji: '🌊', rarity: 'uncommon', hidden: true, region: 'wilderness', ingredients: ['sardines', 'pickle'],                             description: 'Salt of the earth.' },
+  { id: 'asparagus-symphony', name: 'Asparagus Symphony', emoji: '🎼', rarity: 'uncommon', hidden: true, region: 'royal',  ingredients: ['asparagus', 'cheese'],                     description: 'Musical and surprising.' },
+  { id: 'spicy-rumble',   name: 'Spicy Rumble',   emoji: '🔥', rarity: 'uncommon', hidden: true, region: 'wilderness', ingredients: ['hot-pepper', 'beans'],                            description: 'The slow burn.' },
+  { id: 'green-thunder',  name: 'Green Thunder',  emoji: '🥬', rarity: 'uncommon', hidden: true, region: 'wilderness', ingredients: ['broccoli', 'cabbage', 'onion'],                   description: 'Triple-green concentrate.' },
 
-  // ====== Hidden rare recipes (need 3 ingredients usually) ======
-  { id: 'volcano',        name: 'Volcano',        emoji: '🌋', rarity: 'rare',     hidden: true,  ingredients: ['hot-pepper', 'beans', 'cheese'],                  description: 'Hot, sustained, smelly.' },
-  { id: 'aristocrat',     name: 'The Aristocrat', emoji: '🎩', rarity: 'rare',     hidden: true,  ingredients: ['aged-stilton', 'asparagus', 'kombucha'],          description: 'Refined and musical.' },
-  { id: 'champagne-pop',  name: 'Champagne Pop',  emoji: '🍾', rarity: 'rare',     hidden: true,  ingredients: ['kombucha', 'pickle'],                             description: 'Brief, fizzy, bright.' },
-  { id: 'tiny-toot',      name: 'Tiny Toot',      emoji: '🤏', rarity: 'rare',     hidden: true,  ingredients: ['onion', 'garlic', 'pickle'],                      description: 'Restrained excellence.' },
-  { id: 'thunder-roll',   name: 'Thunder Roll',   emoji: '⛈️', rarity: 'rare',     hidden: true,  ingredients: ['ghost-pepper', 'beans', 'cabbage'],               description: 'Big rumble.' },
-  { id: 'dragon-belch',   name: 'Dragon Belch',   emoji: '🐉', rarity: 'rare',     hidden: true,  ingredients: ['ghost-pepper', 'kohlrabi'],                       description: 'Hot, loud, brassy.' },
-  { id: 'duck-quack',     name: 'Duck Quack',     emoji: '🦆', rarity: 'rare',     hidden: true,  ingredients: ['durian', 'cabbage'],                              description: 'Brassy with raspberry.' },
+  // ====== Hidden rare recipes (3 ingredients usually) ======
+  { id: 'volcano',        name: 'Volcano',        emoji: '🌋', rarity: 'rare',     hidden: true, region: 'wilderness', ingredients: ['hot-pepper', 'beans', 'cheese'],                  description: 'Hot, sustained, smelly.' },
+  { id: 'aristocrat',     name: 'The Aristocrat', emoji: '🎩', rarity: 'rare',     hidden: true, region: 'royal',      ingredients: ['aged-stilton', 'asparagus', 'kombucha'],          description: 'Refined and musical.' },
+  { id: 'champagne-pop',  name: 'Champagne Pop',  emoji: '🍾', rarity: 'rare',     hidden: true, region: 'city',       ingredients: ['kombucha', 'pickle'],                             description: 'Brief, fizzy, bright.' },
+  { id: 'tiny-toot',      name: 'Tiny Toot',      emoji: '🤏', rarity: 'rare',     hidden: true, region: 'hometown',   ingredients: ['onion', 'garlic', 'pickle'],                      description: 'Restrained excellence.' },
+  { id: 'thunder-roll',   name: 'Thunder Roll',   emoji: '⛈️', rarity: 'rare',     hidden: true, region: 'wilderness', ingredients: ['ghost-pepper', 'beans', 'cabbage'],               description: 'Big rumble.' },
+  { id: 'dragon-belch',   name: 'Dragon Belch',   emoji: '🐉', rarity: 'rare',     hidden: true, region: 'wilderness', ingredients: ['ghost-pepper', 'kohlrabi'],                       description: 'Hot, loud, brassy.' },
+  { id: 'duck-quack',     name: 'Duck Quack',     emoji: '🦆', rarity: 'rare',     hidden: true, region: 'wilderness', ingredients: ['durian', 'cabbage'],                              description: 'Brassy with raspberry.' },
 
-  // ====== Hidden epic recipes (3-4 ingredients, often need uncommon/rare) ======
-  { id: 'skunk-whisper',  name: 'Skunk Whisper',  emoji: '🦨', rarity: 'epic',     hidden: true,  ingredients: ['stinky-tofu', 'pickled-egg', 'garlic'],           description: 'Wet, quiet, biohazard-grade.' },
-  { id: 'never-ending',   name: 'Never Ending',   emoji: '♾️', rarity: 'epic',     hidden: true,  ingredients: ['natto', 'cabbage', 'beans'],                      description: 'Slowly running out of breath.' },
-  { id: 'machine-gun',    name: 'Machine Gun',    emoji: '🔫', rarity: 'epic',     hidden: true,  ingredients: ['hakarl', 'pickled-egg', 'kimchi'],                description: 'Rapid staccato.' },
-  { id: 'symphony',       name: 'Symphony',       emoji: '🎻', rarity: 'epic',     hidden: true,  ingredients: ['asparagus', 'kombucha', 'casu-marzu'],            description: 'Harmonized fart movements.' },
-  { id: 'haunted-howl',   name: 'Haunted Howl',   emoji: '👻', rarity: 'epic',     hidden: true,  ingredients: ['lutefisk', 'durian', 'aged-stilton'],             description: 'Spirits of dinners past.' },
-  { id: 'royal-finale',   name: 'The Royal Finale', emoji: '👑', rarity: 'epic',  hidden: true,  ingredients: ['kviek-yogurt', 'asparagus', 'aged-stilton'],        description: 'Long, musical, untouchable.' },
+  // ====== Hidden epic recipes ======
+  { id: 'skunk-whisper',  name: 'Skunk Whisper',  emoji: '🦨', rarity: 'epic',     hidden: true, region: 'city',       ingredients: ['stinky-tofu', 'pickled-egg', 'garlic'],           description: 'Wet, quiet, biohazard-grade.' },
+  { id: 'never-ending',   name: 'Never Ending',   emoji: '♾️', rarity: 'epic',     hidden: true, region: 'cosmic',     ingredients: ['natto', 'cabbage', 'beans'],                      description: 'Slowly running out of breath.' },
+  { id: 'machine-gun',    name: 'Machine Gun',    emoji: '🔫', rarity: 'epic',     hidden: true, region: 'city',       ingredients: ['hakarl', 'pickled-egg', 'kimchi'],                description: 'Rapid staccato.' },
+  { id: 'symphony',       name: 'Symphony',       emoji: '🎻', rarity: 'epic',     hidden: true, region: 'royal',      ingredients: ['asparagus', 'kombucha', 'casu-marzu'],            description: 'Harmonized fart movements.' },
+  { id: 'haunted-howl',   name: 'Haunted Howl',   emoji: '👻', rarity: 'epic',     hidden: true, region: 'cosmic',     ingredients: ['lutefisk', 'durian', 'aged-stilton'],             description: 'Spirits of dinners past.' },
+  { id: 'royal-finale',   name: 'The Royal Finale', emoji: '👑', rarity: 'epic',  hidden: true,  region: 'royal',      ingredients: ['kviek-yogurt', 'asparagus', 'aged-stilton'],        description: 'Long, musical, untouchable.' },
 
   // ====== Hidden legendary recipes (quest-gated for unlock; multi-step) ======
   { id: 'forbidden-blast', name: 'The Forbidden Blast', emoji: '☠️', rarity: 'legendary', hidden: true,
