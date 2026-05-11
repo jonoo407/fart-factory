@@ -28,6 +28,7 @@ import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
 import { playEventSfx, playEventSfxOneOf, FOOD_EATING_SFX, AUDIENCE_REACTION_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
+import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -432,6 +433,28 @@ function wireStoryHardModeButton(): void {
   });
 }
 
+/** P7: first-launch hint banner — render before #audienceReaction. */
+export function renderFirstLaunchHint(): void {
+  const banner = $('firstLaunchHint');
+  if (!banner) return;
+  if (!shouldShowHint()) {
+    banner.setAttribute('hidden', '');
+    return;
+  }
+  const aud = currentAudience();
+  const recs = recommendFoodsForAudience(aud, new Set(loadPantry()));
+  if (recs.length === 0) {
+    banner.setAttribute('hidden', '');
+    return;
+  }
+  const chips = recs.map((f) => `<span class="hint-chip">${f.emoji} ${f.name}</span>`).join('');
+  banner.innerHTML = `
+    <span class="hint-prefix">💡 Try these for ${aud.emoji} ${aud.name}:</span>
+    ${chips}
+  `;
+  banner.removeAttribute('hidden');
+}
+
 function renderAreaDisplay(): void {
   const el = $('areaCurrentName');
   if (!el) return;
@@ -573,6 +596,7 @@ function onStoryLaunch(): void {
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
     if (loadHardMode()) bumpBestHard(match.pct);
+    incrementLaunchCount(); // P7: count for first-launch hint visibility
   }
 
   clearPlate();
@@ -586,6 +610,7 @@ function onStoryLaunch(): void {
     showDiscoverySplash(discovery.recipeId);
   }
   renderStoryResult(recipe, match, area, ingredientCount, discovery);
+  renderFirstLaunchHint(); // P7: re-render in case it should now hide
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
   if (ingredientCount > 0) {
@@ -622,6 +647,7 @@ export function initStoryPantry(): void {
   renderPlate();
   renderBellyMeter();
   renderProgression();
+  renderFirstLaunchHint(); // P7: show hint on initial load for new players
 }
 
 // Test-only reset hook.
