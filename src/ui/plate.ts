@@ -19,7 +19,8 @@ import {
   bumpBestMatchOverall,
   bumpBestHard,
 } from '../state/persistence';
-import { computeFartFromPlate, type RecipeResult } from '../scoring/fart-recipe';
+import type { RecipeResult } from '../scoring/fart-recipe';
+import { resolveLaunchProps } from '../scoring/launch-resolver';
 import { evaluateMatch, type MatchResult } from '../scoring/match';
 import { awardGoldForLaunch } from '../scoring/reward';
 import { awardResearchForLaunch } from '../scoring/research';
@@ -27,7 +28,7 @@ import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
-import { isKitchenOpen, tryAddToPrep } from './kitchen';
+import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
@@ -483,10 +484,14 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
 function onStoryLaunch(): void {
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
-  const recipe = computeFartFromPlate(ids);
+  // P1: resolve launch through prep-aware path. If treatments are
+  // persisted from a Kitchen send, they apply here; otherwise raw.
+  const treatments = loadPlateTreatments();
+  const resolved = resolveLaunchProps(ids, treatments);
+  const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
-  const propsAfterArea = applyAreaModifiers(recipe.props, area);
+  const propsAfterArea = applyAreaModifiers(resolved.props, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -506,6 +511,7 @@ function onStoryLaunch(): void {
       targetAudienceIdx: targetIdx !== null && !Number.isNaN(targetIdx) ? targetIdx : null,
     });
     clearPlate();
+    clearPlateTreatments(); // P1: treatments consumed by the arena launch too
     renderPlate();
     renderBellyMeter();
     return;
@@ -541,6 +547,7 @@ function onStoryLaunch(): void {
   }
 
   clearPlate();
+  clearPlateTreatments(); // P1: one-shot consumption — next launch is raw unless re-prepped
   renderPlate();
   renderBellyMeter();
   renderProgression();
