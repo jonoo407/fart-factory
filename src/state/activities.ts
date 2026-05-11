@@ -18,7 +18,7 @@
 import type { FoodProperties } from './food';
 import { encounterSeed, rngBetween } from './run-state';
 
-export type BuffKind = 'property' | 'gold-multiplier' | 'cancel-restriction' | 'easy-mode';
+export type BuffKind = 'property' | 'gold-multiplier' | 'cancel-restriction';
 
 export interface PropertyBuff {
   kind: 'property';
@@ -34,11 +34,7 @@ export interface CancelRestrictionBuff {
   kind: 'cancel-restriction';
 }
 
-export interface EasyModeBuff {
-  kind: 'easy-mode';
-}
-
-export type Buff = PropertyBuff | GoldMultiplierBuff | CancelRestrictionBuff | EasyModeBuff;
+export type Buff = PropertyBuff | GoldMultiplierBuff | CancelRestrictionBuff;
 
 export type ImmediateEffect =
   | { kind: 'refill-belly'; amount: number } // +N to belly right now
@@ -136,8 +132,8 @@ export const ACTIVITIES: readonly Activity[] = [
     id: 'meditation',
     name: 'Meditation',
     emoji: '🧘',
-    description: 'Center yourself. Next launch: Hard Mode behaves as Easy.',
-    buff: { kind: 'easy-mode' },
+    description: 'Center yourself. Next launch: +1 musical, +1 length (steadier under pressure).',
+    buff: { kind: 'property', delta: { musical: 1, length: 1 } },
   },
 ];
 

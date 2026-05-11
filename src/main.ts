@@ -28,11 +28,7 @@ import {
   axisHints,
   loadBestMatch,
   recordMatch,
-  loadHardMode,
-  setHardMode,
-  audienceReaction,
   type AxisHint,
-  type AudienceReaction,
 } from './state/challenge';
 import { triggerHaptic, HAPTICS } from './ui/haptics';
 import { showOnboarding } from './ui/onboarding';
@@ -115,57 +111,21 @@ function hintEmoji(h: AxisHint): string {
 function renderAxisHints(actual: number[]): void {
   const target = getDailyChallenge().profile;
   const hints = axisHints(actual, target);
-  const hardMode = loadHardMode();
   for (let i = 0; i < 6; i++) {
     const el = $(`hint${i + 1}`);
     if (!el) continue;
-    if (hardMode) {
-      // Hard Mode hides per-axis arrows entirely — audience reactions
-      // are the only feedback. Forces inference from aggregate signal.
-      el.textContent = '';
-      el.setAttribute('data-dir', '');
-      el.setAttribute('data-intensity', '');
-    } else {
-      el.textContent = hintEmoji(hints[i]);
-      el.setAttribute('data-dir', hints[i].dir);
-      el.setAttribute('data-intensity', String(hints[i].intensity));
-    }
+    el.textContent = hintEmoji(hints[i]);
+    el.setAttribute('data-dir', hints[i].dir);
+    el.setAttribute('data-intensity', String(hints[i].intensity));
   }
 }
 
-function tierEmoji(tier: AudienceReaction['tier']): string {
-  switch (tier) {
-    case 'loved':      return '😍 The audience loves it!';
-    case 'liked':      return '🙂 They liked that.';
-    case 'meh':        return '😐 Mixed reactions.';
-    case 'disliked':   return '🤢 Several covered their nose.';
-    case 'evacuated':  return '💀 The room is clearing out.';
-  }
-}
-
-function trendEmoji(trend: AudienceReaction['trend']): string {
-  switch (trend) {
-    case 'first':  return '';
-    case 'warmer': return '  🔥 warmer';
-    case 'colder': return '  ❄️ colder';
-    case 'same':   return '  ➡️ same';
-  }
-}
-
-let lastMatchPct: number | null = null;
-
-function renderAudience(matchPct: number): void {
+function renderAudience(_matchPct: number): void {
+  // V8 T6 — audience reactions used to surface only in Hard Mode (the
+  // hidden-target variant). With Hard Mode gone, the sandbox just shows
+  // the match% and axis hints; the reaction strip stays hidden.
   const wrap = $('audience');
-  const tierEl = $('audienceTier');
-  const trendEl = $('audienceTrend');
-  if (!loadHardMode()) {
-    if (wrap) wrap.setAttribute('hidden', '');
-    return;
-  }
-  const r = audienceReaction(matchPct, lastMatchPct);
-  if (wrap) wrap.removeAttribute('hidden');
-  if (tierEl) tierEl.textContent = tierEmoji(r.tier);
-  if (trendEl) trendEl.textContent = trendEmoji(r.trend);
+  if (wrap) wrap.setAttribute('hidden', '');
 }
 
 function renderBestToday(): void {
@@ -189,24 +149,17 @@ function fireChallengeReactivePulse(pct: number): void {
 function renderChallengeMatch(actual: number[]): number {
   const challenge = getDailyChallenge();
   const pct = computeMatch(actual, challenge.profile);
-  const hardMode = loadHardMode();
   const wrap = $('challengeMatch');
   const pctEl = $('challengeMatchPct');
   const emoji = $('challengeMatchEmoji');
-  if (hardMode) {
-    // Hard Mode hides the numeric match% — audience reactions only.
-    if (wrap) wrap.setAttribute('hidden', '');
-  } else {
-    if (wrap) wrap.removeAttribute('hidden');
-    if (pctEl) pctEl.textContent = String(pct);
-    if (emoji) emoji.textContent = ' ' + matchEmoji(pct);
-  }
+  if (wrap) wrap.removeAttribute('hidden');
+  if (pctEl) pctEl.textContent = String(pct);
+  if (emoji) emoji.textContent = ' ' + matchEmoji(pct);
   renderAxisHints(actual);
   renderAudience(pct);
   recordMatch(pct);
   renderBestToday();
   fireChallengeReactivePulse(pct);
-  lastMatchPct = pct;
   return pct;
 }
 
@@ -374,21 +327,6 @@ function wireVisibilityChange(): void {
   });
 }
 
-function applyHardModeToCard(): void {
-  const card = $('challengeCard');
-  const hintEl = $('challengeHint');
-  const hard = loadHardMode();
-  if (card) {
-    if (hard) card.classList.add('hard-mode');
-    else card.classList.remove('hard-mode');
-  }
-  // In Hard Mode, hide the descriptive hint (the player only sees the name).
-  if (hintEl) {
-    if (hard) hintEl.setAttribute('hidden', '');
-    else hintEl.removeAttribute('hidden');
-  }
-}
-
 function renderChallengeCard(): void {
   const c = getDailyChallenge();
   const nameEl = $('challengeName');
@@ -397,37 +335,6 @@ function renderChallengeCard(): void {
   if (nameEl) nameEl.textContent = c.name;
   if (hintEl) hintEl.textContent = c.hint;
   if (emojiEl) emojiEl.textContent = c.emoji;
-  applyHardModeToCard();
-}
-
-function paintHardModeBtn(btn: HTMLButtonElement, on: boolean): void {
-  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-  btn.textContent = on ? '🧠 Hard ON' : '🧠 Hard';
-}
-
-function wireHardModeButton(): void {
-  const btn = $('hardModeBtn') as HTMLButtonElement | null;
-  if (!btn) return;
-  paintHardModeBtn(btn, loadHardMode());
-  btn.addEventListener('click', () => {
-    const next = !loadHardMode();
-    setHardMode(next);
-    paintHardModeBtn(btn, next);
-    applyHardModeToCard();
-    // Reset trend baseline when toggling — prior pct from a different mode
-    // is misleading.
-    lastMatchPct = null;
-    // Hide the audience strip if turning off; clear hints if turning on.
-    const audWrap = $('audience');
-    if (audWrap && !next) audWrap.setAttribute('hidden', '');
-    for (let i = 1; i <= 6; i++) {
-      const h = $(`hint${i}`);
-      if (h) h.textContent = '';
-    }
-    // Hide the explicit match% display if turning hard mode on.
-    const matchWrap = $('challengeMatch');
-    if (matchWrap && next) matchWrap.setAttribute('hidden', '');
-  });
 }
 
 // ----- Tier 7 Phase B: mode toggle -----
@@ -465,7 +372,6 @@ function init(): void {
   $('randomBtn')?.addEventListener('click', onRandom);
   wireMuteButton();
   wireVisibilityChange();
-  wireHardModeButton();
   wireModeButton();
   initStoryPantry(); // Story Mode pantry/plate/belly — hidden in Sandbox by CSS
   wireShop();

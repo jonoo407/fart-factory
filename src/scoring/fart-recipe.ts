@@ -10,6 +10,7 @@
 
 import type { FoodProperties } from '../state/food';
 import { getFood } from '../state/food';
+import { matchRecipe, getRecipe } from '../state/recipes';
 
 const ZERO: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
 
@@ -132,6 +133,20 @@ export function computeFartFromPlate(ingredientIds: string[]): RecipeResult {
     if (ingredientsPresent(s.ingredients, ingredientIds)) {
       props = s.apply(props);
       triggeredSynergies.push(s.name);
+    }
+  }
+  // V8 T7.b — Named Fart bonus. Applied AFTER synergies, BEFORE conflicts.
+  // Each axis bonus is added then clamped to [0, 5] so a stacked match
+  // can't push the property vector beyond the in-game ceiling.
+  const namedFartId = matchRecipe(ingredientIds);
+  if (namedFartId) {
+    const recipe = getRecipe(namedFartId);
+    if (recipe?.bonus) {
+      for (const [axis, delta] of Object.entries(recipe.bonus)) {
+        const a = axis as keyof FoodProperties;
+        props[a] = Math.max(0, Math.min(5, props[a] + (delta as number)));
+      }
+      triggeredSynergies.push(`Named Fart: ${recipe.name}`);
     }
   }
   const triggeredConflicts: string[] = [];

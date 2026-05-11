@@ -15,7 +15,6 @@ import {
   loadDiscoveredRecipes,
   loadPantry,
   loadBestMatchOverall,
-  loadBestHard,
   unlockFood,
 } from './persistence';
 import { FOODS, getFood } from './food';
@@ -28,8 +27,7 @@ export type QuestStepKind =
   | 'unlock-epic'         // current = unlocked.filter(rarity=epic).length
   | 'discover-recipes-rare' // discovered recipes whose rarity is rare
   | 'discover-recipes-epic' // discovered recipes whose rarity is epic
-  | 'best-overall'        // current = loadBestMatchOverall()
-  | 'best-hard';          // current = loadBestHard()
+  | 'best-overall';       // current = loadBestMatchOverall()
 
 export interface QuestStep {
   kind: QuestStepKind;
@@ -64,7 +62,7 @@ export const LEGENDARY_QUESTS: readonly Quest[] = [
     steps: [
       { kind: 'discover-recipes', target: 15, label: 'Discover 15 recipes' },
       { kind: 'unlock-rare', target: 2, label: 'Unlock 2 rare foods' },
-      { kind: 'best-hard', target: 80, label: 'Score ≥80% in Hard Mode' },
+      { kind: 'best-overall', target: 85, label: 'Score ≥85% match' },
     ],
   },
   {
@@ -88,7 +86,7 @@ export const LEGENDARY_QUESTS: readonly Quest[] = [
     steps: [
       { kind: 'discover-recipes', target: 20, label: 'Discover 20 recipes' },
       { kind: 'unlock-rare', target: 3, label: 'Unlock 3 rare foods' },
-      { kind: 'best-hard', target: 80, label: 'Score ≥80% in Hard Mode' },
+      { kind: 'best-overall', target: 95, label: 'Score ≥95% match' },
     ],
   },
 ];
@@ -139,9 +137,6 @@ function evalStep(step: QuestStep): QuestStepProgress {
       break;
     case 'best-overall':
       current = loadBestMatchOverall();
-      break;
-    case 'best-hard':
-      current = loadBestHard();
       break;
   }
   return {

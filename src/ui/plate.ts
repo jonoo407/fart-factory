@@ -20,7 +20,6 @@ import {
   loadResearchNotes,
   bumpBestMatch,
   bumpBestMatchOverall,
-  bumpBestHard,
   addGold,
   addResearchNotes,
 } from '../state/persistence';
@@ -45,7 +44,8 @@ import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from 
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
-import { applyActiveBuffs, consumeBuffs, goldMultiplierFromBuffs, isEasyModeForceFromBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
+import { applyActiveBuffs, consumeBuffs, goldMultiplierFromBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
+import { applyLegendaryProps } from '../scoring/legendary-buffs';
 import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
@@ -54,7 +54,7 @@ import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments 
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
-import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
+import { audienceReaction } from '../state/challenge';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
@@ -506,54 +506,23 @@ function flashLegendaryFanfare(): void {
 
 export function renderAudiencePortrait(): void {
   const aud = currentAudience();
-  const hardMode = loadHardMode();
   const emojiEl = $('audiencePortraitEmoji');
   const nameEl = $('audienceName');
   const flavorEl = $('audienceFlavor');
+  // V8 T6 — Hard/Easy mode toggle removed. Prose hint replaces the
+  // literal cravings/restrictions exposition; the audience's `description`
+  // field IS the hint, with clue density baked in via difficultyTier.
   const cravingsEl = $('audienceCravings');
   const restrictionsEl = $('audienceRestrictions');
   if (emojiEl) {
-    emojiEl.textContent = hardMode ? '❓' : aud.emoji;
-    // Phase L #65 — always-on idle wobble. Reaction-face classes
-    // (audience-portrait-loved/liked/meh/disliked/evacuated) are added
-    // by `applyReactionFace` and reset by this function. Re-rendering
-    // strips any previous reaction class so each portrait refresh
-    // returns the portrait to neutral idle.
-    emojiEl.className = 'audience-portrait audience-portrait-idle';
+    emojiEl.textContent = aud.emoji;
+    emojiEl.className = `audience-portrait audience-portrait-idle audience-portrait-tier-${aud.difficultyTier}`;
   }
-  if (nameEl) nameEl.textContent = aud.name; // Name visible in both modes
-  if (flavorEl) flavorEl.textContent = hardMode ? 'Their tastes are a mystery. Read the room.' : aud.flavor;
-  if (cravingsEl) {
-    if (hardMode) {
-      cravingsEl.textContent = '';
-    } else {
-      const c = aud.cravings;
-      const parts: string[] = [];
-      if (c.stink >= 3) parts.push(`stinky ${c.stink}/5`);
-      if (c.wet >= 3) parts.push(`wet ${c.wet}/5`);
-      if (c.dry >= 3) parts.push(`dry ${c.dry}/5`);
-      if (c.loud >= 3) parts.push(`loud ${c.loud}/5`);
-      if (c.musical >= 3) parts.push(`musical ${c.musical}/5`);
-      if (c.length >= 3) parts.push(`long ${c.length}/5`);
-      if (c.temp >= 4) parts.push(`hot ${c.temp}/5`);
-      cravingsEl.textContent = parts.length ? `Wants: ${parts.join(' · ')}` : 'No strong preferences.';
-    }
-  }
-  if (restrictionsEl) {
-    if (hardMode) {
-      restrictionsEl.textContent = '';
-    } else if (aud.restrictions && aud.restrictions.length) {
-      restrictionsEl.textContent = `🚫 ${aud.restrictions.join(' · ')}`;
-    } else {
-      restrictionsEl.textContent = '';
-    }
-  }
-  // Paint Hard Mode button.
-  const btn = $('storyHardModeBtn') as HTMLButtonElement | null;
-  if (btn) {
-    btn.setAttribute('aria-pressed', hardMode ? 'true' : 'false');
-    btn.textContent = hardMode ? '🧠 Hard ON' : '🧠 Hard';
-  }
+  if (nameEl) nameEl.textContent = aud.name;
+  if (flavorEl) flavorEl.textContent = aud.description;
+  // Hide legacy cravings/restrictions DOM (T6 — exposition is gone).
+  if (cravingsEl) cravingsEl.textContent = '';
+  if (restrictionsEl) restrictionsEl.textContent = '';
 }
 
 function tierEmoji(tier: ReturnType<typeof audienceReaction>['tier']): string {
@@ -633,21 +602,6 @@ function renderAudienceReaction(pct: number): void {
   });
 }
 
-function wireStoryHardModeButton(): void {
-  const btn = $('storyHardModeBtn') as HTMLButtonElement | null;
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const next = !loadHardMode();
-    setHardMode(next);
-    renderAudiencePortrait();
-    // Also re-render result panel hidden so the user has to launch again.
-    const result = $('storyResult');
-    if (result) result.setAttribute('hidden', '');
-    setLastMatch(null);
-    const reactionWrap = $('audienceReaction');
-    if (reactionWrap) reactionWrap.setAttribute('hidden', '');
-  });
-}
 
 /** P7: first-launch hint banner — render before #audienceReaction. */
 export function renderFirstLaunchHint(): void {
@@ -733,7 +687,6 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
   const effects = $('storyResultEffects');
   const profile = $('fartProfile');
   if (!wrap || !title || !effects) return;
-  const hardMode = loadHardMode();
   const aud = currentAudience();
   if (plateLen === 0) {
     wrap.removeAttribute('hidden');
@@ -762,20 +715,7 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
     }
     return `<div class="story-result-discovery">📖 Recipe: ${recipe.emoji} ${recipe.name}</div>`;
   })();
-  if (hardMode) {
-    // In Hard Mode, hide the match-% and per-rule violation list. Only
-    // synergies/conflicts are revealed (they're informative without
-    // disclosing the target). Audience-reaction strip carries the verdict.
-    // Discovery toasts ARE shown in Hard Mode — they reveal what the
-    // player made, not what the audience wanted.
-    if (discoveryLine) {
-      wrap.removeAttribute('hidden');
-      title.innerHTML = discoveryLine;
-      effects.innerHTML = '';
-    } else {
-      wrap.setAttribute('hidden', '');
-    }
-  } else {
+  {
     wrap.removeAttribute('hidden');
     title.innerHTML = `${matchEmoji(m.pct)} <strong>${m.pct}%</strong> match for ${aud.emoji} ${aud.name} <span style="opacity:0.7">@ ${area.emoji} ${area.name}</span>`;
     const lines: string[] = [];
@@ -809,7 +749,9 @@ function onStoryLaunch(): void {
   const propsWithBuffs = applyActiveBuffs(resolved.props);
   // T2.3: apply per-food mastery bonuses (Master+ foods get +1 on their highest axis).
   const propsWithMastery = applyMasteryBonuses(propsWithBuffs, ids);
-  const propsAfterArea = applyAreaModifiers(propsWithMastery, area);
+  // V8 T7.d: apply permanent legendary-codex passives (e.g. Cosmic Symphony → +1 musical).
+  const propsWithLegendary = applyLegendaryProps(propsWithMastery);
+  const propsAfterArea = applyAreaModifiers(propsWithLegendary, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -910,8 +852,6 @@ function onStoryLaunch(): void {
     }
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
-    // Hard Mode tracking — but Meditation buff forces Easy Mode for this launch.
-    if (loadHardMode() && !isEasyModeForceFromBuffs()) bumpBestHard(match.pct);
     incrementLaunchCount(); // P7: count for first-launch hint visibility
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {
@@ -988,7 +928,6 @@ export function initStoryPantry(): void {
   renderAreaDisplay();
   wirePlateSlots();
   wireStoryLaunchButton();
-  wireStoryHardModeButton();
   wireAreaChangeButton();
   wireMoveOnButton();
   wirePantryShowLockedToggle();

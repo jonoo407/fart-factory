@@ -58,7 +58,7 @@ function countAudienceWins(): number {
   let n = 0;
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith('fart_best_') && k !== 'fart_best_overall' && k !== 'fart_best_hard') {
+    if (k && k.startsWith('fart_best_') && k !== 'fart_best_overall') {
       try {
         const v = JSON.parse(localStorage.getItem(k) ?? '0');
         if (typeof v === 'number' && v >= 50) n++;

@@ -17,6 +17,7 @@ import { renderBossList } from './boss-arena';
 import { loadFoodMastery } from '../scoring/food-mastery';
 import { loadDiscoveredAxes } from '../state/axis-discovery';
 import { renderFieldGuideEntryHtml } from './field-guide';
+import { renderLegendaryCodex, wireCodexPicker } from './codex';
 import { loadTrophies } from '../state/trophies';
 import { getBoss } from '../state/bosses';
 import { loadGamePlusUnlocked } from '../state/boss-progress';
@@ -131,7 +132,7 @@ function renderLegendaryQuests(): void {
     const allDone = prog.steps.every((s) => s.done);
     const isUnlocked = unlocked.has(q.foodId);
     const stepHtml = prog.steps.map((s) => {
-      const isPct = s.kind === 'best-overall' || s.kind === 'best-hard';
+      const isPct = s.kind === 'best-overall';
       const valueText = isPct ? `${s.current}/${s.target}%` : `${s.current}/${s.target}`;
       const pctClass = s.done ? ' quest-step-done' : '';
       return `<li class="quest-step${pctClass}"><span class="quest-step-label">${s.label}</span><span class="quest-step-value">${valueText}</span></li>`;
@@ -230,6 +231,7 @@ export function openNotebook(): void {
   renderLegendaryQuests();
   renderBossList();
   renderFieldGuide();
+  renderLegendaryCodex();
   renderTrophyList();
   $('notebookModal')?.removeAttribute('hidden');
 }
@@ -245,6 +247,7 @@ export function wireNotebook(): void {
   $('notebookModal')?.addEventListener('click', (ev) => {
     if (ev.target === $('notebookModal')) closeNotebook();
   });
+  wireCodexPicker();
 }
 
 // Re-export for callers that want to refresh the counter after a launch.

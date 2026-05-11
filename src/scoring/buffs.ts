@@ -73,10 +73,6 @@ export function goldMultiplierFromBuffs(): number {
   return mult;
 }
 
-export function isEasyModeForceFromBuffs(): boolean {
-  return loadActiveBuffs().some((a) => a.buff?.kind === 'easy-mode');
-}
-
 export function cancelOneRestrictionFromBuffs(): boolean {
   return loadActiveBuffs().some((a) => a.buff?.kind === 'cancel-restriction');
 }

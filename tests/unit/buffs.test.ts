@@ -5,7 +5,6 @@ import {
   setActiveBuff,
   loadActiveBuffs,
   goldMultiplierFromBuffs,
-  isEasyModeForceFromBuffs,
   cancelOneRestrictionFromBuffs,
 } from '../../src/scoring/buffs';
 import type { FoodProperties } from '../../src/state/food';
@@ -56,10 +55,12 @@ describe('Non-property buff queries', () => {
     expect(goldMultiplierFromBuffs()).toBe(1.2);
   });
 
-  it('isEasyModeForceFromBuffs reflects the Meditation buff', () => {
-    expect(isEasyModeForceFromBuffs()).toBe(false);
+  it('Meditation buff adds +1 musical and +1 length (V8 T6 repurpose)', () => {
+    // After Hard Mode removal, Meditation became a property buff instead.
     setActiveBuff('meditation');
-    expect(isEasyModeForceFromBuffs()).toBe(true);
+    const result = applyActiveBuffs({ ...zero, musical: 1, length: 1 });
+    expect(result.musical).toBe(2);
+    expect(result.length).toBe(2);
   });
 
   it('cancelOneRestrictionFromBuffs reflects the Long Shower buff', () => {

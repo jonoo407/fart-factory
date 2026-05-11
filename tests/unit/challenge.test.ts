@@ -7,8 +7,6 @@ import {
   loadBestMatch,
   recordMatch,
   matchKeyForDate,
-  loadHardMode,
-  setHardMode,
   audienceReaction,
 } from '../../src/state/challenge';
 
@@ -118,32 +116,6 @@ describe('best-match persistence', () => {
     const date = new Date('2026-05-10T12:00:00Z');
     localStorage.setItem(matchKeyForDate(date), 'not-a-number');
     expect(loadBestMatch(date)).toBe(0);
-  });
-});
-
-describe('Hard Mode toggle', () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
-
-  it('defaults to false', () => {
-    expect(loadHardMode()).toBe(false);
-  });
-
-  it('persists true via setHardMode', () => {
-    setHardMode(true);
-    expect(loadHardMode()).toBe(true);
-  });
-
-  it('round-trips false explicitly', () => {
-    setHardMode(true);
-    setHardMode(false);
-    expect(loadHardMode()).toBe(false);
-  });
-
-  it('returns false on corrupt value', () => {
-    localStorage.setItem('fart_hard_mode', '{not json');
-    expect(loadHardMode()).toBe(false);
   });
 });
 

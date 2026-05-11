@@ -17,6 +17,7 @@
 
 import { addGold } from '../state/persistence';
 import { hotSpotGoldMultiplier } from './gameplus';
+import { legendaryGoldMultiplier } from './legendary-buffs';
 
 export function goldForMatch(pct: number): number {
   if (!Number.isFinite(pct) || pct < 50) return 0;
@@ -32,5 +33,6 @@ export function goldForMatch(pct: number): number {
 export function awardGoldForLaunch(pct: number, locationId?: string, extraMult = 1): number {
   const base = goldForMatch(pct);
   const hotMult = locationId ? hotSpotGoldMultiplier(locationId) : 1;
-  return addGold(Math.floor(base * hotMult * extraMult));
+  const legendaryMult = legendaryGoldMultiplier();
+  return addGold(Math.floor(base * hotMult * extraMult * legendaryMult));
 }

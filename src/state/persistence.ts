@@ -212,7 +212,6 @@ export const BELLY_CAPACITY = BELLY_MAX;
 
 const KEY_BEST_MATCH_PREFIX = 'fart_best_';
 const KEY_BEST_OVERALL = 'fart_best_overall';
-const KEY_BEST_HARD = 'fart_best_hard';
 
 const validPct = (v: unknown): v is number =>
   typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 100;
@@ -245,14 +244,3 @@ export function bumpBestMatchOverall(pct: number): number {
   return pct;
 }
 
-export function loadBestHard(): number {
-  return safeLoad<number>(KEY_BEST_HARD, 0, validPct);
-}
-
-export function bumpBestHard(pct: number): number {
-  if (!validPct(pct)) return loadBestHard();
-  const cur = loadBestHard();
-  if (pct <= cur) return cur;
-  safeSave(KEY_BEST_HARD, pct);
-  return pct;
-}

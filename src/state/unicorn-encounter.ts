@@ -18,6 +18,8 @@ export const UNICORN_AUDIENCE: Audience = {
   emoji: '🦄',
   cravings: { wet: 3, dry: 2, stink: 3, loud: 2, musical: 5, length: 3, temp: 2 },
   flavor: 'A unicorn wanders in. It is chewing a daisy. It does not appear to have come for the show.',
+  description: 'A unicorn wanders in. It is chewing a daisy. It hums to itself. You feel that you must impress it musically, perhaps. Or not. It is hard to say.',
+  difficultyTier: 'boss',
 };
 
 /**

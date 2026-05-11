@@ -96,25 +96,7 @@ export function recordMatch(match: number, d: Date = new Date()): number {
   return best;
 }
 
-// ----- Hard Mode (Mastermind variant) state -----
-
-const HARD_MODE_KEY = 'fart_hard_mode';
-
-export function loadHardMode(): boolean {
-  try {
-    const raw = localStorage.getItem(HARD_MODE_KEY);
-    if (raw === null) return false;
-    return JSON.parse(raw) === true;
-  } catch {
-    return false;
-  }
-}
-
-export function setHardMode(on: boolean): void {
-  localStorage.setItem(HARD_MODE_KEY, JSON.stringify(on));
-}
-
-// ----- Audience reactions (Hard-Mode aggregate feedback) -----
+// ----- Audience reactions (used by the result panel reaction strip) -----
 
 export interface AudienceReaction {
   /** 'loved' / 'liked' / 'meh' / 'disliked' / 'evacuated' — coarse 5-tier. */

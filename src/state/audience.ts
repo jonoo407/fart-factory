@@ -1,15 +1,22 @@
 /**
  * Audience archetypes catalog for Tier 7 Story Mode. 20 named characters
- * who sit down to judge each daily fart launch. Per PLAN.md §D.A.27.
+ * who sit down to judge each fart launch. Per PLAN.md §D.A.27.
  *
- * Per FUN_CRITIC.md §4 axes: replaces the abstract "daily challenge" with
- * named characters carrying voice/personality (Personality / Charm axis),
- * adds restriction clauses for interesting decisions (Decision Quality),
- * and rotates deterministically per UTC day (Goal Stacking — across
- * sessions, you'll see every audience).
+ * V8 T6 — Hard/Easy mode is gone. Each audience now carries a `description`
+ * blurb (1-2 sentences of funny in-character prose with embedded clues),
+ * and a `difficultyTier` that controls clue density:
+ *
+ *   easy   — 4 of 7 axes hinted qualitatively ("very", "barely")
+ *   medium — 3 of 7 axes, restrictions paraphrased
+ *   hard   — 2 of 7 axes, restrictions hinted via vibe only
+ *   boss   — 1 of 7 axes + cryptic, no restrictions stated
+ *
+ * No description leaks literal n/5 numbers. The prose IS the hint.
  */
 
 import type { FoodProperties } from './food';
+
+export type DifficultyTier = 'easy' | 'medium' | 'hard' | 'boss';
 
 export interface Audience {
   id: string;
@@ -22,8 +29,12 @@ export interface Audience {
    * Examples: "no-dairy", "must-include-fermented", "min-foods:3".
    */
   restrictions?: string[];
-  /** One-line personality. Shown under the portrait in Easy Mode. */
+  /** Legacy short flavor (kept for tooltips/tests; the new prose is `description`). */
   flavor: string;
+  /** V8 T6 — funny 1-2 sentence in-character blurb. Clue density scales with tier. */
+  description: string;
+  /** V8 T6 — drives clue density in `description`. */
+  difficultyTier: DifficultyTier;
 }
 
 const c = (
@@ -37,26 +48,201 @@ const c = (
 ): FoodProperties => ({ wet, dry, stink, loud, musical, length, temp });
 
 export const AUDIENCES: readonly Audience[] = [
-  { id: 'granny-edna',       name: 'Granny Edna',          emoji: '👵', cravings: c(1, 2, 1, 1, 3, 2, 1),                                          flavor: 'Polite. Mild. Almost imperceptible.' },
-  { id: 'royal-court',       name: 'The Royal Court',      emoji: '👑', cravings: c(0, 3, 1, 1, 5, 4, 2), restrictions: ['no-wet'],                flavor: 'Long, musical, dignified. NO fermentation.' },
-  { id: 'frat-bros',         name: 'The Frat Bros',        emoji: '🍺', cravings: c(3, 1, 4, 5, 0, 4, 2), restrictions: ['min-foods:3'],            flavor: 'Louder is better. Bigger is better.' },
-  { id: 'haunted-mansion',   name: 'The Haunted Mansion',  emoji: '👻', cravings: c(2, 1, 5, 1, 1, 4, 0), restrictions: ['need-cursed-or-rare'],    flavor: 'Eerie. Drawn-out. Mortal flesh need not apply.' },
-  { id: 'alien-tourists',    name: 'Alien Tourists',       emoji: '👽', cravings: c(2, 2, 3, 2, 4, 3, 4),                                          flavor: 'They\'ve never smelled anything like it. Surprise them.' },
-  { id: 'toddler-bday',      name: 'Toddler Birthday Party', emoji: '🎂', cravings: c(2, 1, 1, 4, 3, 2, 1),                                        flavor: 'Loud and funny noises win the day.' },
-  { id: 'goth-teens',        name: 'Goth Teens',           emoji: '🖤', cravings: c(1, 2, 4, 1, 2, 4, 1),                                          flavor: 'Brooding. Quiet. Profoundly stinky.' },
-  { id: 'kindergarten',      name: 'Kindergarten Class',   emoji: '🎈', cravings: c(2, 1, 2, 3, 2, 2, 2),                                          flavor: 'Giggles. Wonder. Mild surprise.' },
-  { id: 'skunk-society',     name: 'The Skunk Society',    emoji: '🦨', cravings: c(3, 1, 5, 1, 1, 3, 1), restrictions: ['min-stink:4'],            flavor: 'Quiet but unmistakable. Their motto: "Do No Harm. But Do."' },
-  { id: 'opera-house',       name: 'The Opera House',      emoji: '🎭', cravings: c(0, 3, 1, 1, 5, 5, 2),                                          flavor: 'Soprano-grade musicality. Drama mandatory.' },
-  { id: 'wrestling-fans',    name: 'Wrestling Fans',       emoji: '🤼', cravings: c(3, 1, 3, 5, 1, 3, 3),                                          flavor: 'BIG. THEATRICAL. UNPREDICTABLE.' },
-  { id: 'librarians',        name: 'Librarians',           emoji: '📚', cravings: c(1, 2, 3, 0, 2, 3, 1), restrictions: ['max-loud:2'],             flavor: 'Loud anything is forbidden. Silence amplifies stink.' },
-  { id: 'volcano-cult',      name: 'The Volcano Cult',     emoji: '🌋', cravings: c(0, 2, 4, 4, 1, 4, 5),                                          flavor: 'Hot. Loud. Worthy of the magma god.' },
-  { id: 'pet-rescue',        name: 'Pet Rescue Volunteers', emoji: '🐕', cravings: c(2, 1, 1, 2, 3, 2, 1), restrictions: ['max-stink:2'],          flavor: 'The dogs are sensitive. Keep it subtle.' },
-  { id: 'astronauts',        name: 'Astronauts',           emoji: '🚀', cravings: c(1, 3, 1, 1, 3, 4, 2), restrictions: ['no-wet'],                 flavor: 'Confined quarters. Long missions. Subtle and musical wins.' },
-  { id: 'food-critics',      name: 'Food Critics',         emoji: '🍽️', cravings: c(3, 1, 4, 2, 3, 4, 3),                                          flavor: 'They want notes. Complexity. Finish.' },
-  { id: 'baby-shower',       name: 'Baby Shower',          emoji: '🍼', cravings: c(1, 2, 1, 1, 4, 2, 1),                                          flavor: 'Polite. Whimsical. Not in front of the baby.' },
-  { id: 'punk-show',         name: 'Punk Rock Show',       emoji: '🤘', cravings: c(2, 1, 3, 5, 1, 3, 4),                                          flavor: 'Fast. Loud. Unapologetic.' },
-  { id: 'silent-monks',      name: 'Silent Monks',         emoji: '🧘', cravings: c(0, 4, 2, 0, 4, 5, 1), restrictions: ['max-loud:1'],             flavor: 'Patient. Contemplative. A whisper says everything.' },
-  { id: 'mystery-guest',     name: 'The Mystery Guest',    emoji: '❓', cravings: c(3, 2, 3, 3, 3, 3, 3),                                          flavor: 'You can\'t tell what they want. You have to feel it.' },
+  // ============ EASY (5) — Hometown starter pool, clearest hints ============
+  {
+    id: 'granny-edna',
+    name: 'Granny Edna',
+    emoji: '👵',
+    cravings: c(1, 2, 1, 1, 3, 2, 1),
+    flavor: 'Polite. Mild. Almost imperceptible.',
+    description: 'Edna prefers a polite little hum — nothing too loud, nothing too long, just a tidy tune she can pretend not to hear.',
+    difficultyTier: 'easy',
+  },
+  {
+    id: 'toddler-bday',
+    name: 'Toddler Birthday Party',
+    emoji: '🎂',
+    cravings: c(2, 1, 1, 4, 3, 2, 1),
+    flavor: 'Loud and funny noises win the day.',
+    description: 'A cake-smeared mob who reward the LOUDEST, silliest, most musical raspberry in the room. Quiet farts get a juice-box thrown at them.',
+    difficultyTier: 'easy',
+  },
+  {
+    id: 'baby-shower',
+    name: 'Baby Shower',
+    emoji: '🍼',
+    cravings: c(1, 2, 1, 1, 4, 2, 1),
+    flavor: 'Polite. Whimsical. Not in front of the baby.',
+    description: 'A whimsical, hush-toned crowd who want something musical and adorable — the kind of toot a stuffed bear might do. Nothing rude in front of the baby.',
+    difficultyTier: 'easy',
+  },
+  {
+    id: 'kindergarten',
+    name: 'Kindergarten Class',
+    emoji: '🎈',
+    cravings: c(2, 1, 2, 3, 2, 2, 2),
+    flavor: 'Giggles. Wonder. Mild surprise.',
+    description: 'Twenty five-year-olds wired on cookies. They want a fart that surprises them — a little loud, a little wet, a little musical, but not scary. Giggles are the goal.',
+    difficultyTier: 'easy',
+  },
+  {
+    id: 'pet-rescue',
+    name: 'Pet Rescue Volunteers',
+    emoji: '🐕',
+    cravings: c(2, 1, 1, 2, 3, 2, 1),
+    restrictions: ['max-stink:2'],
+    flavor: 'The dogs are sensitive. Keep it subtle.',
+    description: 'Sweet folks with sweeter rescue dogs. They love a musical little burble — but please, the puppies have delicate noses, so go easy on anything *aromatic*.',
+    difficultyTier: 'easy',
+  },
+
+  // ============ MEDIUM (9) — City + Wilderness, 3 axes + paraphrased restrictions ============
+  {
+    id: 'frat-bros',
+    name: 'The Frat Bros',
+    emoji: '🍺',
+    cravings: c(3, 1, 4, 5, 0, 4, 2),
+    restrictions: ['min-foods:3'],
+    flavor: 'Louder is better. Bigger is better.',
+    description: "Chad and the boys are chanting for something LOUD, NASTY, and BIG — and if your plate's looking thin, don't even bother walking in.",
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'goth-teens',
+    name: 'Goth Teens',
+    emoji: '🖤',
+    cravings: c(1, 2, 4, 1, 2, 4, 1),
+    flavor: 'Brooding. Quiet. Profoundly stinky.',
+    description: 'They sigh, they brood, and they reward a quiet, drawn-out fart that smells like a damp graveyard. Loud is so basic.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'alien-tourists',
+    name: 'Alien Tourists',
+    emoji: '👽',
+    cravings: c(2, 2, 3, 2, 4, 3, 4),
+    flavor: "They've never smelled anything like it. Surprise them.",
+    description: 'The tourists from Zorptron-7 want something warm, musical, and just stinky enough to write home about — anything earthly will do.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'wrestling-fans',
+    name: 'Wrestling Fans',
+    emoji: '🤼',
+    cravings: c(3, 1, 3, 5, 1, 3, 3),
+    flavor: 'BIG. THEATRICAL. UNPREDICTABLE.',
+    description: 'They want THEATRICS — a wet, hot slam of a fart, loud enough to shake the cheap seats. Bonus for body-slam aftermath.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'punk-show',
+    name: 'Punk Rock Show',
+    emoji: '🤘',
+    cravings: c(2, 1, 3, 5, 1, 3, 4),
+    flavor: 'Fast. Loud. Unapologetic.',
+    description: 'The pit is moshing. They want LOUD, FAST, and HOT — no apology, no encore, no mercy.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'skunk-society',
+    name: 'The Skunk Society',
+    emoji: '🦨',
+    cravings: c(3, 1, 5, 1, 1, 3, 1),
+    restrictions: ['min-stink:4'],
+    flavor: 'Quiet but unmistakable. Their motto: "Do No Harm. But Do."',
+    description: 'A hush-voiced fellowship of connoisseurs. They reward something quietly wet but UNAPOLOGETICALLY pungent — if you can\'t bring the stink, kindly leave.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'food-critics',
+    name: 'Food Critics',
+    emoji: '🍽️',
+    cravings: c(3, 1, 4, 2, 3, 4, 3),
+    flavor: 'They want notes. Complexity. Finish.',
+    description: 'They scribble notes. A long, complex fart with stinky finish and a hint of melody. They will absolutely take a second sniff.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'volcano-cult',
+    name: 'The Volcano Cult',
+    emoji: '🌋',
+    cravings: c(0, 2, 4, 4, 1, 4, 5),
+    flavor: 'Hot. Loud. Worthy of the magma god.',
+    description: 'Robed devotees of Mt. Smelly. They want SEARING heat, thunderous volume, and a long pungent plume — fit to be offered to the magma god.',
+    difficultyTier: 'medium',
+  },
+  {
+    id: 'haunted-mansion',
+    name: 'The Haunted Mansion',
+    emoji: '👻',
+    cravings: c(2, 1, 5, 1, 1, 4, 0),
+    restrictions: ['need-cursed-or-rare'],
+    flavor: 'Eerie. Drawn-out. Mortal flesh need not apply.',
+    description: 'The ghosts demand something foul, drawn-out, and *unworldly* — only the rarer or cursed ingredients in your pantry will satisfy.',
+    difficultyTier: 'medium',
+  },
+
+  // ============ HARD (4) — Royal pool, 2 axes + vibe-only restrictions ============
+  {
+    id: 'librarians',
+    name: 'Librarians',
+    emoji: '📚',
+    cravings: c(1, 2, 3, 0, 2, 3, 1),
+    restrictions: ['max-loud:2'],
+    flavor: 'Loud anything is forbidden. Silence amplifies stink.',
+    description: 'A pages-rustling sort of crowd. They reward what they can almost-not-hear — discreet, lingering, slightly musty.',
+    difficultyTier: 'hard',
+  },
+  {
+    id: 'royal-court',
+    name: 'The Royal Court',
+    emoji: '👑',
+    cravings: c(0, 3, 1, 1, 5, 4, 2),
+    restrictions: ['no-wet'],
+    flavor: 'Long, musical, dignified. NO fermentation.',
+    description: 'The court is gathered. They expect a long aria of a fart — refined, dignified, and dry as a bone. A damp note here would be… *unforgivable*.',
+    difficultyTier: 'hard',
+  },
+  {
+    id: 'opera-house',
+    name: 'The Opera House',
+    emoji: '🎭',
+    cravings: c(0, 3, 1, 1, 5, 5, 2),
+    flavor: 'Soprano-grade musicality. Drama mandatory.',
+    description: 'A standing-room crowd at La Scala. They want soprano-grade melody, held for the full third act — anything else gets thrown roses, the bad way.',
+    difficultyTier: 'hard',
+  },
+  {
+    id: 'astronauts',
+    name: 'Astronauts',
+    emoji: '🚀',
+    cravings: c(1, 3, 1, 1, 3, 4, 2),
+    restrictions: ['no-wet'],
+    flavor: 'Confined quarters. Long missions. Subtle and musical wins.',
+    description: 'Three crewmates, one tin can, 200 days from home. They\'ll thank you for something dry, melodic, and long — *please*, nothing damp in here.',
+    difficultyTier: 'hard',
+  },
+
+  // ============ BOSS (2) — 1 axis + cryptic, no restrictions stated ============
+  {
+    id: 'silent-monks',
+    name: 'Silent Monks',
+    emoji: '🧘',
+    cravings: c(0, 4, 2, 0, 4, 5, 1),
+    restrictions: ['max-loud:1'],
+    flavor: 'Patient. Contemplative. A whisper says everything.',
+    description: 'The Abbot has not spoken in forty years. He will know if you breathe wrong.',
+    difficultyTier: 'boss',
+  },
+  {
+    id: 'mystery-guest',
+    name: 'The Mystery Guest',
+    emoji: '❓',
+    cravings: c(3, 2, 3, 3, 3, 3, 3),
+    flavor: "You can't tell what they want. You have to feel it.",
+    description: 'A figure in the back row. They want what every audience wants, all at once, balanced. There is no wrong answer — only a less-correct one.',
+    difficultyTier: 'boss',
+  },
 ];
 
 import { currentEncounterIdx } from './run-state';
