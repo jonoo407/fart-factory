@@ -59,15 +59,31 @@ export const AUDIENCES: readonly Audience[] = [
   { id: 'mystery-guest',     name: 'The Mystery Guest',    emoji: '❓', cravings: c(3, 2, 3, 3, 3, 3, 3),                                          flavor: 'You can\'t tell what they want. You have to feel it.' },
 ];
 
-function dayOfYear(d: Date): number {
-  const start = Date.UTC(d.getUTCFullYear(), 0, 0);
-  const ms = d.getTime() - start;
-  return Math.floor(ms / 86_400_000);
+import { currentEncounterIdx } from './run-state';
+
+/**
+ * Audience for the given encounter idx. Optional pool — if omitted, uses
+ * the global AUDIENCES catalog.
+ *
+ * GamePlus effect (when fart_gameplus flag is set): each encounter rolls
+ * 2 audience positions instead of 1, so the rotation cycles twice as fast.
+ */
+export function audienceForEncounter(idx: number = currentEncounterIdx(), pool?: readonly Audience[]): Audience {
+  const arr = pool && pool.length > 0 ? pool : AUDIENCES;
+  let gamePlus = false;
+  try {
+    const raw = localStorage.getItem('fart_gameplus');
+    gamePlus = raw !== null && JSON.parse(raw) === true;
+  } catch {
+    gamePlus = false;
+  }
+  const step = gamePlus ? 2 : 1;
+  return arr[(idx * step) % arr.length]!;
 }
 
-export function getDailyAudience(d: Date = new Date()): Audience {
-  const idx = dayOfYear(d) % AUDIENCES.length;
-  return AUDIENCES[idx]!;
+/** Legacy wrapper for callers still using `getDailyAudience()`. */
+export function getDailyAudience(_d: Date = new Date(), pool?: readonly Audience[]): Audience {
+  return audienceForEncounter(currentEncounterIdx(), pool);
 }
 
 export function getAudience(id: string): Audience | undefined {

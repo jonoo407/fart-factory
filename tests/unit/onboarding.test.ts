@@ -18,6 +18,24 @@ describe('TUTORIAL_STEPS', () => {
       expect(s.body.length).toBeGreaterThan(0);
     }
   });
+
+  it('teaches the food game, not the v2 slider game (P2 regression)', () => {
+    // Onboarding must describe pantry / plate / audience / launch — the v4
+    // Story Mode UI — not "Move the six sliders".
+    const allText = TUTORIAL_STEPS.map((s) => `${s.title} ${s.body}`).join(' ').toLowerCase();
+    expect(allText).not.toContain('slider');
+    expect(allText).toMatch(/pantry|plate|food|audience|cravings/);
+  });
+
+  it('mentions the launch action', () => {
+    const allText = TUTORIAL_STEPS.map((s) => `${s.title} ${s.body}`).join(' ').toLowerCase();
+    expect(allText).toMatch(/launch/);
+  });
+
+  it('mentions the progression rewards (gold or research notes)', () => {
+    const allText = TUTORIAL_STEPS.map((s) => `${s.title} ${s.body}`).join(' ').toLowerCase();
+    expect(allText).toMatch(/gold|notes/);
+  });
 });
 
 describe('shouldShowOnboarding', () => {

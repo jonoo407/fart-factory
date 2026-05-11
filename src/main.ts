@@ -41,6 +41,9 @@ import { initStoryPantry } from './ui/plate';
 import { wireShop } from './ui/shop';
 import { wireNotebook } from './ui/notebook';
 import { wireResearch } from './ui/research';
+import { wireArena } from './ui/boss-arena';
+import { wireMap } from './ui/map-screen';
+import { wireKitchen } from './ui/kitchen';
 import {
   comments,
   weakComments,
@@ -468,6 +471,9 @@ function init(): void {
   wireShop();
   wireNotebook();
   wireResearch();
+  wireArena();
+  wireMap();
+  wireKitchen();
   renderChallengeCard();
   renderBestToday();
   renderHall();

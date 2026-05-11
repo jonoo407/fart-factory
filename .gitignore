@@ -30,3 +30,7 @@ Thumbs.db
 # Claude Code local-only settings (project settings.json IS committed; user-local overrides are not)
 .claude/settings.local.json
 .claude/worktrees/
+
+# Stryker mutation testing sandboxes + reports
+.stryker-tmp/
+reports/mutation/

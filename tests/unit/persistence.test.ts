@@ -126,31 +126,27 @@ describe('Last area + last match (trend)', () => {
   });
 });
 
-describe('Belly meter (per-UTC-day)', () => {
-  it('defaults to BELLY_CAPACITY for the date', () => {
-    expect(loadBelly(new Date('2026-05-10T12:00:00Z'))).toBe(BELLY_CAPACITY);
+describe('Belly meter (per-encounter, post-PLAN_v5 redesign)', () => {
+  it('defaults to BELLY_CAPACITY for the current encounter', () => {
+    expect(loadBelly(0)).toBe(BELLY_CAPACITY);
   });
 
   it('spendBelly deducts when sufficient', () => {
-    const date = new Date('2026-05-10T12:00:00Z');
-    const r = spendBelly(3, date);
+    const r = spendBelly(3, 0);
     expect(r.ok).toBe(true);
     expect(r.remaining).toBe(BELLY_CAPACITY - 3);
   });
 
   it('spendBelly refuses when insufficient', () => {
-    const date = new Date('2026-05-10T12:00:00Z');
-    spendBelly(BELLY_CAPACITY, date); // exhaust
-    const r = spendBelly(1, date);
+    spendBelly(BELLY_CAPACITY, 0); // exhaust
+    const r = spendBelly(1, 0);
     expect(r.ok).toBe(false);
     expect(r.remaining).toBe(0);
   });
 
-  it('different days have independent belly meters', () => {
-    const d1 = new Date('2026-05-10T12:00:00Z');
-    const d2 = new Date('2026-05-11T12:00:00Z');
-    spendBelly(10, d1);
-    expect(loadBelly(d1)).toBe(BELLY_CAPACITY - 10);
-    expect(loadBelly(d2)).toBe(BELLY_CAPACITY); // independent
+  it('different encounters have independent belly meters', () => {
+    spendBelly(10, 5);
+    expect(loadBelly(5)).toBe(BELLY_CAPACITY - 10);
+    expect(loadBelly(6)).toBe(BELLY_CAPACITY); // independent
   });
 });

@@ -26,6 +26,29 @@ export interface MatchResult {
   violations: string[];
 }
 
+export interface AxisBreakdown {
+  axis: keyof FoodProperties;
+  actual: number;
+  target: number;
+  /** max(0, |actual-target| - 1) — same per-axis term as computeMatchPct */
+  cost: number;
+  /** true when within ±1 of target (cost === 0). */
+  matched: boolean;
+}
+
+/**
+ * Per-axis breakdown of why the player got their score. Used by the
+ * result panel to surface cause→effect (PLAN_v7 T1.1).
+ */
+export function computeMatchBreakdown(actual: FoodProperties, target: FoodProperties): AxisBreakdown[] {
+  return AXES.map((axis) => {
+    const a = actual[axis];
+    const t = target[axis];
+    const cost = Math.max(0, Math.abs(a - t) - 1);
+    return { axis, actual: a, target: t, cost, matched: cost === 0 };
+  });
+}
+
 /**
  * Tolerant L1 distance: each axis contributes max(0, |actual - target| - 1)
  * so being within ±1 of the target is "perfect" for that axis. Max distance

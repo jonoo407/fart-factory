@@ -49,11 +49,10 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function utcDaySeed(d: Date): number {
-  const yyyy = d.getUTCFullYear();
-  const mm = d.getUTCMonth() + 1;
-  const dd = d.getUTCDate();
-  return yyyy * 10_000 + mm * 100 + dd;
+import { currentEncounterIdx, encounterSeed } from './run-state';
+
+function shopSeed(idx: number): number {
+  return encounterSeed(idx) ^ 0xa1b2c3d4; // decorrelate from audience seed
 }
 
 function pickK<T>(arr: T[], k: number, rng: () => number): T[] {
@@ -70,8 +69,9 @@ function pickK<T>(arr: T[], k: number, rng: () => number): T[] {
 
 // ---------- daily roll ----------
 
-export function getShopOffers(d: Date = new Date()): ShopOffer[] {
-  const seed = utcDaySeed(d);
+export function getShopOffers(_d: Date = new Date(), idx?: number): ShopOffer[] {
+  const i = idx ?? currentEncounterIdx();
+  const seed = shopSeed(i);
   const rng = mulberry32(seed);
   const unlocked = new Set(loadPantry());
 

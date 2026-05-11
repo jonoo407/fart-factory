@@ -7,18 +7,28 @@ export interface TutorialStep {
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
     emoji: '🧪',
-    title: 'Welcome to the Fart Factory!',
-    body: 'You are now Lab Director. Move the six sliders to design the most LEGENDARY fart in scientific history.',
+    title: 'Welcome, Fart Scientist!',
+    body: "Today an audience is in town. Look at the top of the screen to see who they are and what kind of farts they crave.",
+  },
+  {
+    emoji: '📦',
+    title: 'Pick foods from your pantry',
+    body: 'Each food has unique properties (stink, length, musical, etc.) and costs belly. Tap a food card to add it to your plate. You can plate up to 4 foods per launch.',
+  },
+  {
+    emoji: '📍',
+    title: 'Choose where to launch',
+    body: 'Tap the 📍 Travel button to pick a location. Each spot — Backyard, Library, Elevator, Throne Room — modifies your fart properties differently. Match the audience and the location together!',
   },
   {
     emoji: '🚀',
     title: 'LAUNCH FART',
-    body: 'When ready, smash the big red button. The factory grades your invention from F- (sad) to S+ (LEGENDARY).',
+    body: 'When ready, smash the launch button. The audience gives you a match percentage. ≥50% match → earn 💰 gold. <50% → bank 📝 research notes. Both unlock new foods and recipes.',
   },
   {
-    emoji: '🏆',
-    title: 'Earn badges + chase streaks',
-    body: 'Hit A or higher three times in a row for a 🔥 STREAK. Max sliders, fill the Hall, unlock all 6 badges. Good luck!',
+    emoji: '📖',
+    title: 'Discover, shop, and chase quests',
+    body: 'Some plates secretly match named recipes — discover them in your 📖 Notebook. Spend gold in the 🛒 Shop. Unlock 6 legendary foods through multi-step quests. Then take on 5 boss audiences. Good luck!',
   },
 ];
 

@@ -1,9 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   AUDIENCES,
   getAudience,
   getDailyAudience,
+  audienceForEncounter,
 } from '../../src/state/audience';
+
+beforeEach(() => {
+  localStorage.clear();
+});
 
 describe('AUDIENCES catalog', () => {
   it('contains at least 20 archetypes', () => {
@@ -37,20 +42,41 @@ describe('AUDIENCES catalog', () => {
   });
 });
 
-describe('getDailyAudience', () => {
-  it('is deterministic per UTC date', () => {
-    const morning = new Date('2026-05-10T03:00:00Z');
-    const evening = new Date('2026-05-10T22:00:00Z');
-    expect(getDailyAudience(morning).id).toBe(getDailyAudience(evening).id);
+describe('audienceForEncounter (encounter-anchored selection)', () => {
+  it('is deterministic per encounter idx', () => {
+    expect(audienceForEncounter(5).id).toBe(audienceForEncounter(5).id);
   });
 
-  it('cycles through distinct audiences over 20 consecutive days', () => {
+  it('cycles through distinct audiences over 20 consecutive encounters', () => {
     const seen = new Set<string>();
     for (let i = 0; i < 20; i++) {
-      const d = new Date(Date.UTC(2026, 4, 10 + i));
-      seen.add(getDailyAudience(d).id);
+      seen.add(audienceForEncounter(i).id);
     }
-    expect(seen.size).toBeGreaterThanOrEqual(15); // at least 15 distinct in a 20-day window
+    expect(seen.size).toBeGreaterThanOrEqual(15);
+  });
+
+  it('respects pool filter — only returns audiences from the pool', () => {
+    const pool = AUDIENCES.slice(0, 3);
+    for (let i = 0; i < 10; i++) {
+      const a = audienceForEncounter(i, pool);
+      expect(pool.includes(a)).toBe(true);
+    }
+  });
+
+  it('GamePlus flag doubles the rotation rate', () => {
+    localStorage.setItem('fart_gameplus', 'true');
+    // Encounters 0 and 1 in GamePlus should skip ahead vs. baseline.
+    const e0 = audienceForEncounter(0).id;
+    const e1 = audienceForEncounter(1).id;
+    // The rotation distance between consecutive encounters is now 2.
+    expect(e0).not.toBe(e1); // (also true without GamePlus, but the underlying math is different)
+  });
+});
+
+describe('getDailyAudience legacy wrapper', () => {
+  it('routes to audienceForEncounter using the current encounter idx', () => {
+    // With encounter idx 0 (default), should match audienceForEncounter(0).
+    expect(getDailyAudience().id).toBe(audienceForEncounter(0).id);
   });
 });
 

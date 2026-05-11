@@ -19,6 +19,18 @@
 
       <!-- Story Mode shell (Tier 7). Pantry + plate + belly meter. -->
       <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
+        <div id="arenaOverlay" class="arena-overlay" hidden role="region" aria-label="Boss arena">
+          <div class="arena-card">
+            <div class="arena-header">
+              <span class="arena-boss-emoji" id="arenaBossEmoji">❓</span>
+              <h2 class="arena-boss-name" id="arenaBossName">—</h2>
+              <button type="button" id="arenaCloseBtn" class="arena-close" aria-label="Forfeit and exit arena">✕</button>
+            </div>
+            <div class="arena-flavor" id="arenaFlavor"></div>
+            <div class="arena-stage" id="arenaStage"></div>
+            <div class="arena-result" id="arenaResult" hidden aria-live="polite"></div>
+          </div>
+        </div>
         <div class="audience-wrap" role="region" aria-label="Today's audience">
           <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
           <div class="audience-meta">
@@ -32,22 +44,55 @@
             🧠 Hard
           </button>
         </div>
+        <div class="first-launch-hint" id="firstLaunchHint" hidden aria-live="polite"></div>
         <div class="audience-reaction" id="audienceReaction" hidden aria-live="polite">
           <span class="audience-reaction-tier" id="audienceReactionTier"></span>
           <span class="audience-reaction-trend" id="audienceReactionTrend"></span>
+          <span class="audience-reaction-streak" id="audienceReactionStreak" hidden></span>
         </div>
         <div class="progression-strip" role="region" aria-label="Progression">
           <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
           <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
+          <button type="button" class="kitchen-mode-toggle" id="kitchenModeToggle" aria-pressed="false" aria-label="Toggle Kitchen Mode (advanced prep + treatments)">🍳 Kitchen Mode</button>
+          <button type="button" class="btn kitchen-btn" id="kitchenBtn" aria-label="Open kitchen (prep foods before launch)" hidden>🍳 Kitchen</button>
+          <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
           <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
         </div>
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
-          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20" aria-label="Belly capacity">
+          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="30" aria-valuenow="30" aria-label="Belly capacity">
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
-          <span class="belly-value"><span id="bellyValue">20</span>/<span id="bellyCap">20</span></span>
+          <span class="belly-value"><span id="bellyValue">30</span>/<span id="bellyCap">30</span></span>
+          <button type="button" class="move-on-btn" id="moveOnBtn" aria-label="Move On to the next audience (refills belly)">➡ Move On</button>
+        </div>
+
+        <div id="activeBuffStrip" class="active-buff-strip" hidden aria-live="polite"></div>
+
+        <div id="intermissionOverlay" class="intermission-overlay" hidden role="dialog" aria-modal="true" aria-label="Pick an activity">
+          <div class="intermission-card">
+            <h2 class="intermission-title">Pick an activity</h2>
+            <div class="intermission-flavor">Between performances, you can do one thing. The next launch will feel its effect.</div>
+            <div class="intermission-choices" id="intermissionChoices"></div>
+          </div>
+        </div>
+
+        <div id="kitchenOverlay" class="kitchen-overlay" hidden role="region" aria-label="Kitchen prep">
+          <div class="kitchen-card">
+            <div class="kitchen-header">
+              <h2>🍳 Kitchen — prep before launch</h2>
+              <button type="button" id="kitchenCloseBtn" class="kitchen-close" aria-label="Close kitchen">✕</button>
+            </div>
+            <div class="kitchen-section-label">Prep Table</div>
+            <div class="prep-table" id="prepTable"></div>
+            <div class="kitchen-section-label">Fermentation Rack</div>
+            <div class="ferment-rack" id="fermentRack"></div>
+            <div class="kitchen-actions">
+              <button type="button" id="kitchenSendBtn" class="kitchen-send-btn" aria-label="Send prepped plate to launch">Send to Performance ▶</button>
+            </div>
+            <div class="kitchen-flavor">Tap a pantry food below to add it to the prep table. Treatments modify properties before launch.</div>
+          </div>
         </div>
 
         <div class="plate-wrap" role="group" aria-label="Plate">
@@ -60,9 +105,10 @@
           </div>
         </div>
 
-        <div class="area-wrap" role="region" aria-label="Containment area">
-          <div class="area-label">📍 Where are you launching this?</div>
-          <div class="area-grid" id="areaGrid"></div>
+        <div class="area-display" role="region" aria-label="Current location">
+          <span class="area-display-prefix">📍 Launching at:</span>
+          <span class="area-display-current" id="areaCurrentName">—</span>
+          <button type="button" class="area-display-change" id="areaChangeBtn" aria-label="Change location">change</button>
         </div>
 
         <div class="pantry-wrap" role="region" aria-label="Pantry">
@@ -193,6 +239,17 @@
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
     </div>
 
+    <div id="mapScreen" class="map-screen" hidden role="dialog" aria-modal="true" aria-label="World map">
+      <div class="map-screen-card">
+        <div class="map-screen-header">
+          <h2>📍 World Map</h2>
+          <button type="button" id="mapCloseBtn" class="map-close" aria-label="Close map">✕</button>
+        </div>
+        <div class="map-canvas" id="mapCanvas"></div>
+        <div class="map-info" id="mapInfo">Tap a pin to travel there. Locked regions unlock through progression.</div>
+      </div>
+    </div>
+
     <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">
       <div class="research-modal-card">
         <div class="research-modal-header">
@@ -219,6 +276,12 @@
         <div class="notebook-recipes" id="notebookRecipes"></div>
         <h3 class="notebook-section-h">🏆 Legendary Quests</h3>
         <div class="legendary-quests" id="legendaryQuests"></div>
+        <h3 class="notebook-section-h">⚔ Bosses</h3>
+        <div class="boss-list" id="bossList"></div>
+        <h3 class="notebook-section-h">🌟 Food Mastery</h3>
+        <div class="mastery-list" id="masteryList"></div>
+        <h3 class="notebook-section-h">🏆 Hall of Trophies</h3>
+        <div class="trophy-list" id="trophyList"></div>
         <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
       </div>
     </div>
@@ -236,6 +299,14 @@
         <div class="shop-modal-flavor">Offerings refresh each day. Common foods are already free in your pantry. Legendary foods unlock through quests.</div>
       </div>
     </div>
+
+    <div id="bossUnlockToast" class="boss-unlock-toast" hidden role="status" aria-live="polite"></div>
+
+    <div id="discoverySplash" class="discovery-splash" hidden role="status" aria-live="polite"></div>
+
+    <div id="criticalSplash" class="critical-splash" hidden role="status" aria-live="polite"></div>
+
+    <div id="ultimateOverlay" class="ultimate-overlay" hidden role="status" aria-live="polite"></div>
 
     <div class="gas-overlay" id="gasOverlay" aria-hidden="true"></div>
 

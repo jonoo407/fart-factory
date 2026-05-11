@@ -13,6 +13,11 @@ import { FOODS, getFood } from '../state/food';
 import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
 import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
+import { renderBossList } from './boss-arena';
+import { loadFoodMastery, masteryLevel, masteryLabel } from '../scoring/food-mastery';
+import { loadTrophies } from '../state/trophies';
+import { getBoss } from '../state/bosses';
+import { loadGamePlusUnlocked } from '../state/boss-progress';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -23,7 +28,11 @@ function renderNotebookCounter(): void {
   const counter = $('notebookCounter');
   if (counter) counter.textContent = `${discovered}/${total}`;
   const progress = $('notebookProgressText');
-  if (progress) progress.textContent = `${discovered} / ${total} discovered`;
+  if (progress) {
+    // P12: GamePlus badge.
+    const badge = loadGamePlusUnlocked() ? ' 🌌 New Game+' : '';
+    progress.textContent = `${discovered} / ${total} discovered${badge}`;
+  }
 }
 
 function rarityClass(rarity: Recipe['rarity']): string {
@@ -167,10 +176,62 @@ function renderLegendaryQuests(): void {
   });
 }
 
+function renderMasteryList(): void {
+  const grid = $('masteryList');
+  if (!grid) return;
+  const unlocked = new Set(loadPantry());
+  const rows = FOODS.filter((f) => unlocked.has(f.id))
+    .map((f) => {
+      const uses = loadFoodMastery(f.id);
+      const lvl = masteryLevel(uses);
+      const lvlText = masteryLabel(lvl);
+      // Progress to next level: thresholds 0, 10, 25, 50, 100
+      const thresholds = [0, 10, 25, 50, 100];
+      let next = 100;
+      for (const t of thresholds) {
+        if (uses < t) { next = t; break; }
+      }
+      const prev = thresholds[thresholds.indexOf(next) - 1] ?? 0;
+      const pctToNext = next > prev ? Math.min(100, ((uses - prev) / (next - prev)) * 100) : 100;
+      return `<div class="mastery-row rarity-${f.rarity}">
+        <span class="mastery-emoji">${f.emoji}</span>
+        <span class="mastery-name">${f.name}</span>
+        <span class="mastery-level">${lvlText}</span>
+        <span class="mastery-uses">${uses} use${uses === 1 ? '' : 's'}</span>
+        <div class="mastery-bar"><div class="mastery-bar-fill" style="width:${pctToNext}%"></div></div>
+      </div>`;
+    })
+    .join('');
+  grid.innerHTML = rows || '<div class="mastery-empty">No food mastery yet. Use foods in launches to level them up.</div>';
+}
+
+function renderTrophyList(): void {
+  const grid = $('trophyList');
+  if (!grid) return;
+  const trophies = loadTrophies();
+  if (trophies.length === 0) {
+    grid.innerHTML = '<div class="trophy-empty">No trophies yet. Defeat a boss to earn one.</div>';
+    return;
+  }
+  grid.innerHTML = trophies.slice().reverse().map((t) => {
+    const boss = getBoss(t.bossId);
+    const dateStr = new Date(t.defeatedAt).toLocaleDateString();
+    return `<div class="trophy-row">
+      <span class="trophy-emoji">${boss?.emoji ?? '🏆'}</span>
+      <span class="trophy-name">${boss?.name ?? t.bossId}</span>
+      <span class="trophy-pct">${t.matchPct}%</span>
+      <span class="trophy-date">${dateStr}</span>
+    </div>`;
+  }).join('');
+}
+
 export function openNotebook(): void {
   renderNotebookCounter();
   renderRecipes();
   renderLegendaryQuests();
+  renderBossList();
+  renderMasteryList();
+  renderTrophyList();
   $('notebookModal')?.removeAttribute('hidden');
 }
 

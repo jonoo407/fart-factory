@@ -69,4 +69,11 @@ export const SEEDS: readonly Seed[] = [
   // ====== Phase K legendary fanfare seeds (item 63) ======
   { id: 'legendary-fanfare', name: 'Legendary Fanfare', mood: 'enthralled', duration_seconds: 2.6, prompt: 'a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly' },
   { id: 'quest-claimed',     name: 'Quest Claimed',     mood: 'triumphant', duration_seconds: 1.8, prompt: 'a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly' },
+
+  // ====== PLAN_v5 P8 boss entrance seeds (5 themed cues) ======
+  { id: 'boss-entrance-granny',   name: 'Granny Entrance',   mood: 'comedic',     duration_seconds: 2.0, prompt: 'a warm cozy kazoo + accordion flourish, grandmotherly arrival, family-friendly cartoon' },
+  { id: 'boss-entrance-royal',    name: 'Royal Entrance',    mood: 'enthralled',  duration_seconds: 2.4, prompt: 'a regal short brass fanfare with trumpets and timpani, royal court arrival, family-friendly' },
+  { id: 'boss-entrance-haunted',  name: 'Haunted Entrance',  mood: 'eerie',       duration_seconds: 2.2, prompt: 'a low spooky cartoon organ chord with subtle ghost whoosh, haunted mansion door creak, family-friendly Halloween' },
+  { id: 'boss-entrance-volcano',  name: 'Volcano Entrance',  mood: 'triumphant',  duration_seconds: 2.4, prompt: 'a deep rumbling timpani roll with sharp metallic clang, volcanic ritual gong, family-friendly' },
+  { id: 'boss-entrance-cosmic',   name: 'Cosmic Entrance',   mood: 'surprised',   duration_seconds: 2.6, prompt: 'an otherworldly synth pad rising sweep with bell shimmer, alien council gathering, family-friendly sci-fi' },
 ];
