@@ -218,6 +218,18 @@ export function submitArenaLaunch(launch: BossLaunchInput): void {
 function handleVictory(): void {
   if (!currentBoss) return;
   const reward = dispatchBossReward(currentBoss);
+  // T3.2: record this win as a Trophy.
+  const lastResult = currentState?.results[currentState.results.length - 1];
+  const matchPct = lastResult?.audienceResults[0]?.pct ?? 0;
+  const plateUsed = lastResult?.ingredientIds ?? [];
+  void import('../state/trophies').then(({ addTrophy }) => {
+    addTrophy({
+      bossId: currentBoss!.id,
+      defeatedAt: new Date().toISOString(),
+      plateUsed,
+      matchPct,
+    });
+  });
   // P3: victory fanfare SFX (silent until operator runs sfx:generate).
   void playEventSfx(reward.firstWin ? LEGENDARY_FANFARE_SFX : QUEST_CLAIMED_SFX, 8);
   // PLAN_v5 Phase 5: roll the next boss slot (boss outcome → re-pace).
@@ -242,7 +254,11 @@ function handleDefeat(): void {
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
-  r.innerHTML = `<div class="arena-defeat">😔 ${currentBoss.name} is unsatisfied. Cool off for a few performances, then try again.</div>`;
+  // T3.3: per-boss snark line on loss.
+  void import('../state/boss-snark').then(({ snarkForBossLoss }) => {
+    const snark = snarkForBossLoss(currentBoss!.id, Date.now() & 0xff);
+    r.innerHTML = `<div class="arena-defeat">😔 ${snark}<br><small style="opacity:0.7">(Cool off for 3 performances, then try again.)</small></div>`;
+  });
 }
 
 export function wireArena(): void {

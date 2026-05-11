@@ -354,6 +354,25 @@ function showKitchenUnlockToast(): void {
   if (kb) kb.removeAttribute('hidden');
 }
 
+function showUltimateOverlay(count: number): void {
+  const overlay = document.getElementById('ultimateOverlay');
+  if (!overlay) return;
+  overlay.innerHTML = `<div class="ultimate-card">
+    <div class="ultimate-banner">⚡ ULTIMATE LAUNCH ⚡</div>
+    <div class="ultimate-emoji">💨</div>
+    <div class="ultimate-count">×${count} LEGENDARY FOODS ON THE PLATE</div>
+    <div class="ultimate-bonus">+10 💰  +5 📝</div>
+  </div>`;
+  overlay.removeAttribute('hidden');
+  overlay.classList.remove('ultimate-overlay-show');
+  void overlay.offsetWidth;
+  overlay.classList.add('ultimate-overlay-show');
+  setTimeout(() => {
+    overlay.setAttribute('hidden', '');
+    overlay.classList.remove('ultimate-overlay-show');
+  }, 2500);
+}
+
 function showLootDropSplash(food: { id: string; name: string; emoji: string; rarity: string }): void {
   const splash = document.getElementById('discoverySplash');
   if (!splash) return;
@@ -751,13 +770,18 @@ function onStoryLaunch(): void {
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.
-  const hasLegendary = ids.some((id) => {
-    const f = getFood(id);
-    return f && f.rarity === 'legendary';
-  });
+  const legendaryCount = ids.filter((id) => getFood(id)?.rarity === 'legendary').length;
+  const hasLegendary = legendaryCount >= 1;
   if (hasLegendary) {
     flashLegendaryFanfare();
     void playEventSfx(LEGENDARY_FANFARE_SFX, 7);
+  }
+  // T3.1: ULTIMATE LAUNCH — ≥2 legendary foods triggers a full cinematic.
+  if (legendaryCount >= 2 && ingredientCount > 0) {
+    showUltimateOverlay(legendaryCount);
+    // Ultimate bonus: +10 gold + +5 notes.
+    addGold(10);
+    addResearchNotes(5);
   }
 
   commitBellySpend();

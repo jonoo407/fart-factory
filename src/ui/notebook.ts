@@ -15,6 +15,8 @@ import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
 import { renderBossList } from './boss-arena';
 import { loadFoodMastery, masteryLevel, masteryLabel } from '../scoring/food-mastery';
+import { loadTrophies } from '../state/trophies';
+import { getBoss } from '../state/bosses';
 import { loadGamePlusUnlocked } from '../state/boss-progress';
 
 function $(id: string): HTMLElement | null {
@@ -203,12 +205,33 @@ function renderMasteryList(): void {
   grid.innerHTML = rows || '<div class="mastery-empty">No food mastery yet. Use foods in launches to level them up.</div>';
 }
 
+function renderTrophyList(): void {
+  const grid = $('trophyList');
+  if (!grid) return;
+  const trophies = loadTrophies();
+  if (trophies.length === 0) {
+    grid.innerHTML = '<div class="trophy-empty">No trophies yet. Defeat a boss to earn one.</div>';
+    return;
+  }
+  grid.innerHTML = trophies.slice().reverse().map((t) => {
+    const boss = getBoss(t.bossId);
+    const dateStr = new Date(t.defeatedAt).toLocaleDateString();
+    return `<div class="trophy-row">
+      <span class="trophy-emoji">${boss?.emoji ?? '🏆'}</span>
+      <span class="trophy-name">${boss?.name ?? t.bossId}</span>
+      <span class="trophy-pct">${t.matchPct}%</span>
+      <span class="trophy-date">${dateStr}</span>
+    </div>`;
+  }).join('');
+}
+
 export function openNotebook(): void {
   renderNotebookCounter();
   renderRecipes();
   renderLegendaryQuests();
   renderBossList();
   renderMasteryList();
+  renderTrophyList();
   $('notebookModal')?.removeAttribute('hidden');
 }
 
