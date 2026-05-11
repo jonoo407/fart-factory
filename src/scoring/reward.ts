@@ -25,12 +25,12 @@ export function goldForMatch(pct: number): number {
 }
 
 /**
- * @param pct       match%
- * @param locationId optional — if launching at a Hot Spot in GamePlus,
- *                  applies the multiplier.
+ * @param pct        match%
+ * @param locationId Hot Spot GamePlus multiplier when matching.
+ * @param extraMult  additional multiplier (e.g., Watch Comedy buff).
  */
-export function awardGoldForLaunch(pct: number, locationId?: string): number {
+export function awardGoldForLaunch(pct: number, locationId?: string, extraMult = 1): number {
   const base = goldForMatch(pct);
-  const mult = locationId ? hotSpotGoldMultiplier(locationId) : 1;
-  return addGold(base * mult);
+  const hotMult = locationId ? hotSpotGoldMultiplier(locationId) : 1;
+  return addGold(Math.floor(base * hotMult * extraMult));
 }

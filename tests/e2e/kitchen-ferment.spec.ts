@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-async function loadStory(page: import('@playwright/test').Page, opts: { rack?: Array<{foodId: string; startedAt: string}>; ferments?: number } = {}) {
+async function loadStory(page: import('@playwright/test').Page, opts: { rack?: Array<{foodId: string; startedAt: string; startedAtIdx?: number}>; ferments?: number } = {}) {
   await page.goto('/');
   await page.evaluate((p) => {
     localStorage.setItem('fart_onboarding_seen', 'true');
@@ -37,17 +37,24 @@ test('Clicking Send to Rack removes the prep slot AND adds to ferment rack', asy
   await expect(page.locator('.ferment-slot-waiting').first()).toBeVisible();
 });
 
-test('Yesterday-seeded ferment slot shows Ready + Claim button', async ({ page }) => {
-  const yesterday = new Date(Date.now() - 86_400_000);
-  await loadStory(page, { rack: [{ foodId: 'cheese', startedAt: yesterday.toISOString() }] });
+test('Ferment slot placed at idx 0 shows Ready + Claim at idx 1', async ({ page }) => {
+  // Seed rack with a slot stamped at idx 0; advance encounter counter to 1.
+  await loadStory(page, {
+    rack: [{ foodId: 'cheese', startedAt: new Date().toISOString(), startedAtIdx: 0 }],
+  });
+  await page.evaluate(() => localStorage.setItem('fart_encounter_idx', '1'));
+  await page.reload();
   await page.click('#kitchenBtn');
   await expect(page.locator('.ferment-slot-ready').first()).toBeVisible();
   await expect(page.locator('.ferment-claim-btn').first()).toBeVisible();
 });
 
 test('Clicking Claim removes the slot and increments the ferment-claims counter (Phase V item 98)', async ({ page }) => {
-  const yesterday = new Date(Date.now() - 86_400_000);
-  await loadStory(page, { rack: [{ foodId: 'cheese', startedAt: yesterday.toISOString() }] });
+  await loadStory(page, {
+    rack: [{ foodId: 'cheese', startedAt: new Date().toISOString(), startedAtIdx: 0 }],
+  });
+  await page.evaluate(() => localStorage.setItem('fart_encounter_idx', '1'));
+  await page.reload();
   await page.click('#kitchenBtn');
   await page.locator('.ferment-claim-btn').first().click();
   // Rack slot disappears (now empty placeholder).

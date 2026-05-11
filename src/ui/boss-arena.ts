@@ -220,6 +220,8 @@ function handleVictory(): void {
   const reward = dispatchBossReward(currentBoss);
   // P3: victory fanfare SFX (silent until operator runs sfx:generate).
   void playEventSfx(reward.firstWin ? LEGENDARY_FANFARE_SFX : QUEST_CLAIMED_SFX, 8);
+  // PLAN_v5 Phase 5: roll the next boss slot (boss outcome → re-pace).
+  void import('../state/boss-cadence').then(({ rollNextBossSlot }) => rollNextBossSlot());
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
@@ -232,10 +234,15 @@ function handleVictory(): void {
 
 function handleDefeat(): void {
   if (!currentBoss) return;
+  // PLAN_v5 Phase 5: cooldown the boss for 3 encounters, reroll slot.
+  void import('../state/boss-cadence').then(({ setBossCooldown, rollNextBossSlot }) => {
+    setBossCooldown(currentBoss!.id, 3);
+    rollNextBossSlot();
+  });
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
-  r.innerHTML = `<div class="arena-defeat">😔 ${currentBoss.name} is unsatisfied. Try again tomorrow.</div>`;
+  r.innerHTML = `<div class="arena-defeat">😔 ${currentBoss.name} is unsatisfied. Cool off for a few performances, then try again.</div>`;
 }
 
 export function wireArena(): void {

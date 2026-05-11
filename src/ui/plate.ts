@@ -32,7 +32,7 @@ import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from 
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
-import { attemptRestRefill, REST_NOTES_COST } from '../scoring/rest';
+import { applyActiveBuffs, consumeBuffs, goldMultiplierFromBuffs, isEasyModeForceFromBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -222,38 +222,50 @@ export function renderBellyMeter(): void {
   if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
   if (value) value.textContent = String(r);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
-  // Rest button: show when belly is below ~33% AND player has enough notes.
-  const restBtn = $('restBtn');
-  if (restBtn) {
-    const lowBelly = r < BELLY_CAPACITY / 3;
-    const canAfford = loadResearchNotes() >= REST_NOTES_COST;
-    if (lowBelly) {
-      restBtn.removeAttribute('hidden');
-      restBtn.setAttribute('aria-disabled', canAfford ? 'false' : 'true');
-      restBtn.textContent = canAfford
-        ? `💤 Rest (-${REST_NOTES_COST}📝)`
-        : `💤 Rest (need ${REST_NOTES_COST}📝)`;
-    } else {
-      restBtn.setAttribute('hidden', '');
-    }
-  }
 }
 
-function wireRestButton(): void {
-  const btn = $('restBtn');
+/** Wire the Move On button: opens intermission, then advances the encounter. */
+function wireMoveOnButton(): void {
+  const btn = $('moveOnBtn');
   if (!btn) return;
   btn.addEventListener('click', () => {
-    if (btn.getAttribute('aria-disabled') === 'true') return;
-    const result = attemptRestRefill();
-    if (result.ok) {
-      renderBellyMeter();
-      renderProgression();
-    } else {
-      btn.classList.remove('rest-btn-refused');
-      void btn.offsetWidth;
-      btn.classList.add('rest-btn-refused');
-      setTimeout(() => btn.classList.remove('rest-btn-refused'), 600);
+    // Lazy-import to avoid static circular dep.
+    import('./intermission').then(({ openIntermission }) => {
+      openIntermission(() => {
+        // After the intermission resolves: re-render everything that
+        // depends on encounter idx (audience, hot-spot, belly meter, etc.).
+        clearPlate();
+        clearPlateTreatments();
+        renderAudiencePortrait();
+        renderAreaDisplay();
+        renderActiveBuffStrip();
+        renderPlate();
+        renderBellyMeter();
+        renderProgression();
+        renderPantryGrid();
+        renderFirstLaunchHint();
+        // Hide any leftover result/reaction strip.
+        $('storyResult')?.setAttribute('hidden', '');
+        $('audienceReaction')?.setAttribute('hidden', '');
+        $('discoverySplash')?.setAttribute('hidden', '');
+      });
+    });
+  });
+}
+
+/** Render a "current buff" strip showing the player which buff applies to next launch. */
+function renderActiveBuffStrip(): void {
+  const strip = $('activeBuffStrip');
+  if (!strip) return;
+  // Lazy-import buffs (also avoids circular)
+  import('../scoring/buffs').then(({ loadActiveBuffs }) => {
+    const buffs = loadActiveBuffs();
+    if (buffs.length === 0) {
+      strip.setAttribute('hidden', '');
+      return;
     }
+    strip.removeAttribute('hidden');
+    strip.innerHTML = '✨ Next launch: ' + buffs.map((b) => `<span class="active-buff-chip">${b.emoji} ${b.name}</span>`).join(' ');
   });
 }
 
@@ -604,7 +616,10 @@ function onStoryLaunch(): void {
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
-  const propsAfterArea = applyAreaModifiers(resolved.props, area);
+  // PLAN_v5 Phase 6: apply active buffs BEFORE area modifiers, so the
+  // buff deltas are propagated through the area multipliers naturally.
+  const propsWithBuffs = applyActiveBuffs(resolved.props);
+  const propsAfterArea = applyAreaModifiers(propsWithBuffs, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -631,7 +646,12 @@ function onStoryLaunch(): void {
   }
 
   const aud = currentAudience();
-  const match = evaluateMatch(propsAfterArea, ids, aud.cravings, aud.restrictions);
+  // PLAN_v5 Phase 6: Long Shower buff cancels one of the audience's
+  // restrictions for this launch (the first one in the list).
+  const restrictions = aud.restrictions && cancelOneRestrictionFromBuffs()
+    ? aud.restrictions.slice(1)
+    : aud.restrictions;
+  const match = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
@@ -653,17 +673,20 @@ function onStoryLaunch(): void {
   commitBellySpend();
 
   if (ingredientCount > 0) {
-    awardGoldForLaunch(match.pct, areaId);
+    awardGoldForLaunch(match.pct, areaId, goldMultiplierFromBuffs());
     awardResearchForLaunch(match.pct);
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
-    if (loadHardMode()) bumpBestHard(match.pct);
+    // Hard Mode tracking — but Meditation buff forces Easy Mode for this launch.
+    if (loadHardMode() && !isEasyModeForceFromBuffs()) bumpBestHard(match.pct);
     incrementLaunchCount(); // P7: count for first-launch hint visibility
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
       showKitchenUnlockToast();
     }
+    // PLAN_v5 Phase 6: buffs consumed after the launch they applied to.
+    consumeBuffs();
   }
 
   clearPlate();
@@ -671,6 +694,7 @@ function onStoryLaunch(): void {
   renderPlate();
   renderBellyMeter();
   renderProgression();
+  renderActiveBuffStrip();
   renderNotebookCounter();
   // P6: discovery splash — only on FIRST discovery of a recipe.
   if (discovery && discovery.freshlyDiscovered) {
@@ -710,11 +734,12 @@ export function initStoryPantry(): void {
   wireStoryLaunchButton();
   wireStoryHardModeButton();
   wireAreaChangeButton();
-  wireRestButton();
+  wireMoveOnButton();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();
   renderProgression();
+  renderActiveBuffStrip();
   renderFirstLaunchHint(); // P7: show hint on initial load for new players
 }
 

@@ -64,7 +64,17 @@
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
           <span class="belly-value"><span id="bellyValue">30</span>/<span id="bellyCap">30</span></span>
-          <button type="button" class="rest-btn" id="restBtn" hidden aria-label="Rest: spend 10 research notes to refill belly">💤 Rest</button>
+          <button type="button" class="move-on-btn" id="moveOnBtn" aria-label="Move On to the next audience (refills belly)">➡ Move On</button>
+        </div>
+
+        <div id="activeBuffStrip" class="active-buff-strip" hidden aria-live="polite"></div>
+
+        <div id="intermissionOverlay" class="intermission-overlay" hidden role="dialog" aria-modal="true" aria-label="Pick an activity">
+          <div class="intermission-card">
+            <h2 class="intermission-title">Pick an activity</h2>
+            <div class="intermission-flavor">Between performances, you can do one thing. The next launch will feel its effect.</div>
+            <div class="intermission-choices" id="intermissionChoices"></div>
+          </div>
         </div>
 
         <div id="kitchenOverlay" class="kitchen-overlay" hidden role="region" aria-label="Kitchen prep">

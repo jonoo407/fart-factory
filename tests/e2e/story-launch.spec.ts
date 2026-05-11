@@ -36,17 +36,17 @@ test('Story Launch clears the plate and deducts belly persistently', async ({ pa
   await loadStoryMode(page);
   await page.locator('[data-food="beans"]').click();   // -2
   await page.locator('[data-food="cheese"]').click();  // -2
-  await page.locator('[data-food="onion"]').click();   // -2 → 14 remaining
-  await expect(page.locator('#bellyValue')).toHaveText('14');
+  await page.locator('[data-food="onion"]').click();   // -2 → 24 remaining (30-6)
+  await expect(page.locator('#bellyValue')).toHaveText('24');
   await page.click('#storyLaunchBtn');
-  // Plate cleared, belly persisted at 14
+  // Plate cleared, belly persisted at 24
   await expect(page.locator('#plateSlot1.plate-slot-filled')).toHaveCount(0);
-  await expect(page.locator('#bellyValue')).toHaveText('14');
-  // Reload — belly stays at 14 since we already committed.
+  await expect(page.locator('#bellyValue')).toHaveText('24');
+  // Reload — belly stays at 24 since we already committed (encounter-anchored).
   await page.reload();
   await page.evaluate(() => localStorage.setItem('fart_onboarding_seen', 'true'));
   await page.reload();
-  await expect(page.locator('#bellyValue')).toHaveText('14');
+  await expect(page.locator('#bellyValue')).toHaveText('24');
 });
 
 test('AudioContext exists after Story Launch (no crash)', async ({ page }) => {

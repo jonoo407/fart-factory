@@ -21,8 +21,8 @@ test('Story Mode renders pantry grid + plate + belly meter', async ({ page }) =>
   await expect(page.locator('#storyShell')).toBeVisible();
   await expect(page.locator('#pantryGrid')).toBeVisible();
   await expect(page.locator('#plate')).toBeVisible();
-  await expect(page.locator('#bellyValue')).toHaveText('20');
-  await expect(page.locator('#bellyCap')).toHaveText('20');
+  await expect(page.locator('#bellyValue')).toHaveText('30');
+  await expect(page.locator('#bellyCap')).toHaveText('30');
 });
 
 test('pantry grid shows starter common foods (clickable)', async ({ page }) => {
@@ -39,16 +39,16 @@ test('tapping a food card adds it to the first empty plate slot + drops belly', 
   // Beans costs 2 belly per food.ts
   await page.locator('[data-food="beans"]').click();
   await expect(page.locator('#plateSlot1.plate-slot-filled')).toBeVisible();
-  await expect(page.locator('#bellyValue')).toHaveText('18'); // 20 - 2
+  await expect(page.locator('#bellyValue')).toHaveText('28'); // 30 - 2
 });
 
 test('tapping a filled plate slot returns the food to pantry + refunds belly', async ({ page }) => {
   await loadStoryMode(page);
   await page.locator('[data-food="cheese"]').click();
-  await expect(page.locator('#bellyValue')).toHaveText('18');
+  await expect(page.locator('#bellyValue')).toHaveText('28'); // 30 - 2
   await page.locator('#plateSlot1').click();
   await expect(page.locator('#plateSlot1')).not.toHaveClass(/plate-slot-filled/);
-  await expect(page.locator('#bellyValue')).toHaveText('20');
+  await expect(page.locator('#bellyValue')).toHaveText('30');
 });
 
 test('cannot add a food when belly is insufficient', async ({ page }) => {
