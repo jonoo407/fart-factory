@@ -8,8 +8,79 @@
   </head>
   <body>
     <div class="container">
-      <h1>💨 The Fart Factory 💨</h1>
+      <div class="header-row">
+        <h1>💨 The Fart Factory 💨</h1>
+        <button type="button" id="modeBtn" class="mode-btn"
+                aria-label="Switch game mode" aria-pressed="false">
+          🍴 Story
+        </button>
+      </div>
       <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
+
+      <!-- Story Mode shell (Tier 7). Pantry + plate + belly meter. -->
+      <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
+        <div class="audience-wrap" role="region" aria-label="Today's audience">
+          <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
+          <div class="audience-meta">
+            <div class="audience-name" id="audienceName">—</div>
+            <div class="audience-flavor" id="audienceFlavor">—</div>
+            <div class="audience-cravings" id="audienceCravings">—</div>
+            <div class="audience-restrictions" id="audienceRestrictions"></div>
+          </div>
+          <button type="button" class="hard-mode-btn" id="storyHardModeBtn"
+                  aria-pressed="false" aria-label="Toggle Hard Mode (hide cravings)">
+            🧠 Hard
+          </button>
+        </div>
+        <div class="audience-reaction" id="audienceReaction" hidden aria-live="polite">
+          <span class="audience-reaction-tier" id="audienceReactionTier"></span>
+          <span class="audience-reaction-trend" id="audienceReactionTrend"></span>
+        </div>
+        <div class="progression-strip" role="region" aria-label="Progression">
+          <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
+          <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
+          <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
+          <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
+        </div>
+        <div class="belly-meter-wrap">
+          <span class="belly-label">🍽️ Belly:</span>
+          <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="20" aria-label="Belly capacity">
+            <div class="belly-fill" id="bellyFill" style="width:100%"></div>
+          </div>
+          <span class="belly-value"><span id="bellyValue">20</span>/<span id="bellyCap">20</span></span>
+        </div>
+
+        <div class="plate-wrap" role="group" aria-label="Plate">
+          <div class="plate-label">🍴 Plate (tap a slot to remove):</div>
+          <div class="plate" id="plate">
+            <button type="button" class="plate-slot" id="plateSlot1" data-slot="0" aria-label="Plate slot 1 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot2" data-slot="1" aria-label="Plate slot 2 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot3" data-slot="2" aria-label="Plate slot 3 (empty)">＋</button>
+            <button type="button" class="plate-slot" id="plateSlot4" data-slot="3" aria-label="Plate slot 4 (empty)">＋</button>
+          </div>
+        </div>
+
+        <div class="area-wrap" role="region" aria-label="Containment area">
+          <div class="area-label">📍 Where are you launching this?</div>
+          <div class="area-grid" id="areaGrid"></div>
+        </div>
+
+        <div class="pantry-wrap" role="region" aria-label="Pantry">
+          <div class="pantry-label">📦 Pantry (tap to add to plate):</div>
+          <div class="pantry-grid" id="pantryGrid"></div>
+        </div>
+
+        <div class="story-launch-wrap">
+          <button type="button" class="btn launch" id="storyLaunchBtn" aria-label="Launch the fart with this recipe">🚀 LAUNCH FART</button>
+        </div>
+
+        <div class="story-result" id="storyResult" hidden aria-live="polite">
+          <div class="story-result-row">
+            <span id="storyResultTitle">—</span>
+          </div>
+          <div class="story-result-effects" id="storyResultEffects"></div>
+        </div>
+      </div>
 
       <div id="challengeCard" class="challenge" role="region" aria-label="Today's challenge">
         <div class="challenge-row">
@@ -120,6 +191,50 @@
       </div>
 
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+    </div>
+
+    <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">
+      <div class="research-modal-card">
+        <div class="research-modal-header">
+          <h2>📝 Research Lab</h2>
+          <button type="button" id="researchCloseBtn" class="research-close" aria-label="Close research panel">✕</button>
+        </div>
+        <div class="research-modal-balance" aria-live="polite">
+          📝 You have <span id="researchBalance">0</span> research notes
+        </div>
+        <div class="research-offers" id="researchOffers"></div>
+        <div class="research-modal-flavor">Research notes accumulate from failed launches (match% &lt; 50). Spend them to unlock foods the daily shop doesn't offer.</div>
+      </div>
+    </div>
+
+    <div id="notebookModal" class="notebook-modal" hidden role="dialog" aria-modal="true" aria-label="Lab notebook">
+      <div class="notebook-modal-card">
+        <div class="notebook-modal-header">
+          <h2>📖 Lab Notebook</h2>
+          <button type="button" id="notebookCloseBtn" class="notebook-close" aria-label="Close notebook">✕</button>
+        </div>
+        <div class="notebook-modal-progress" aria-live="polite">
+          <span id="notebookProgressText">0 / 0 discovered</span>
+        </div>
+        <div class="notebook-recipes" id="notebookRecipes"></div>
+        <h3 class="notebook-section-h">🏆 Legendary Quests</h3>
+        <div class="legendary-quests" id="legendaryQuests"></div>
+        <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
+      </div>
+    </div>
+
+    <div id="shopModal" class="shop-modal" hidden role="dialog" aria-modal="true" aria-label="Pantry shop">
+      <div class="shop-modal-card">
+        <div class="shop-modal-header">
+          <h2>🛒 Pantry Shop</h2>
+          <button type="button" id="shopCloseBtn" class="shop-close" aria-label="Close shop">✕</button>
+        </div>
+        <div class="shop-modal-balance" aria-live="polite">
+          💰 You have <span id="shopBalance">0</span> gold
+        </div>
+        <div class="shop-offers" id="shopOffers"></div>
+        <div class="shop-modal-flavor">Offerings refresh each day. Common foods are already free in your pantry. Legendary foods unlock through quests.</div>
+      </div>
     </div>
 
     <div class="gas-overlay" id="gasOverlay" aria-hidden="true"></div>

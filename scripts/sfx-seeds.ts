@@ -14,7 +14,9 @@ export type Mood =
   | 'embarrassed'
   | 'sneaky'
   | 'surprised'
-  | 'exhausted';
+  | 'exhausted'
+  | 'enthralled' // Phase K: applause, fanfare, legendary cues
+  | 'eerie';     // Phase K: haunted-mansion moans, alien gasps
 
 export interface Seed {
   id: string;
@@ -49,4 +51,22 @@ export const SEEDS: readonly Seed[] = [
   // --- specialty ---
   { id: 'silent-killer', name: 'Silent Killer',    mood: 'sneaky',      duration_seconds: 0.8, prompt: 'a soft barely-audible whoosh of a silent fart, sneaky cartoon stealth' },
   { id: 'symphony',      name: 'Symphony',         mood: 'triumphant',  duration_seconds: 1.8, prompt: 'a melodic harmonized cartoon fart that sounds almost musical, with rising arpeggio, comedic' },
+
+  // ====== Phase K audience-reaction seeds (item 61) ======
+  { id: 'granny-cackle',         name: "Granny's Cackle",        mood: 'comedic',    duration_seconds: 1.8, prompt: 'an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style' },
+  { id: 'royal-court-applause',  name: 'Royal Court Applause',   mood: 'enthralled', duration_seconds: 2.4, prompt: 'a dignified royal-court polite applause, refined hand-clapping with brief approving murmur, family-friendly' },
+  { id: 'frat-howl',             name: 'Frat House Howl',        mood: 'triumphant', duration_seconds: 1.6, prompt: 'a small group of college friends cheering and hollering enthusiastically, comedic celebration, family-friendly tone' },
+  { id: 'haunted-mansion-moan',  name: 'Haunted Mansion Moan',   mood: 'eerie',      duration_seconds: 2.0, prompt: 'a low spooky cartoon ghostly moan and woooo, kid-friendly Halloween, gentle eerie' },
+  { id: 'alien-tourists-gasp',   name: 'Alien Tourists Gasp',    mood: 'surprised',  duration_seconds: 1.4, prompt: 'small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly' },
+  { id: 'toddler-giggle',        name: 'Toddler Giggle',         mood: 'comedic',    duration_seconds: 1.5, prompt: 'a small toddler giggling and laughing with delight, gentle and warm, family-friendly' },
+
+  // ====== Phase K food-eating seeds (item 62) ======
+  { id: 'food-munch',  name: 'Food Munch',   mood: 'comedic',  duration_seconds: 0.6, prompt: 'a quick comedic cartoon chewing crunch, brief munching foley, family-friendly' },
+  { id: 'food-crunch', name: 'Food Crunch',  mood: 'comedic',  duration_seconds: 0.5, prompt: 'a sharp crispy food crunch like biting an apple, comedic foley, brief' },
+  { id: 'food-slurp',  name: 'Food Slurp',   mood: 'comedic',  duration_seconds: 0.7, prompt: 'a wet cartoon slurp like noodles, quick foley, comedic' },
+  { id: 'food-gulp',   name: 'Food Gulp',    mood: 'comedic',  duration_seconds: 0.5, prompt: 'a comedic cartoon swallowing gulp, brief foley, family-friendly' },
+
+  // ====== Phase K legendary fanfare seeds (item 63) ======
+  { id: 'legendary-fanfare', name: 'Legendary Fanfare', mood: 'enthralled', duration_seconds: 2.6, prompt: 'a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly' },
+  { id: 'quest-claimed',     name: 'Quest Claimed',     mood: 'triumphant', duration_seconds: 1.8, prompt: 'a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly' },
 ];

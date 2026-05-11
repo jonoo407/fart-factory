@@ -1,4 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
+import { useSandboxMode } from './_legacy-setup';
+
+useSandboxMode();
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 
