@@ -29,6 +29,8 @@ import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
 import { playEventSfx, playEventSfxOneOf, FOOD_EATING_SFX, AUDIENCE_REACTION_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
+import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
+import { setKitchenMode } from './kitchen';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -277,6 +279,25 @@ function applyAreaModifiers(props: FoodProperties, area: Area): FoodProperties {
 }
 
 // ----- Audience portrait + area picker -----
+
+function showKitchenUnlockToast(): void {
+  const toast = document.getElementById('bossUnlockToast');
+  if (!toast) return;
+  toast.textContent = '🍳 Kitchen Mode unlocked! Roast, chill, and ferment your foods for advanced launches.';
+  toast.removeAttribute('hidden');
+  toast.classList.remove('boss-unlock-toast-enter');
+  void toast.offsetWidth;
+  toast.classList.add('boss-unlock-toast-enter');
+  setTimeout(() => toast.setAttribute('hidden', ''), 5000);
+  // Also reveal the Kitchen Mode toggle visual state.
+  const t = document.getElementById('kitchenModeToggle');
+  if (t) {
+    t.setAttribute('aria-pressed', 'true');
+    t.classList.add('kitchen-mode-toggle-on');
+  }
+  const kb = document.getElementById('kitchenBtn');
+  if (kb) kb.removeAttribute('hidden');
+}
 
 function showDiscoverySplash(recipeId: string): void {
   const splash = document.getElementById('discoverySplash');
@@ -597,6 +618,11 @@ function onStoryLaunch(): void {
     bumpBestMatchOverall(match.pct);
     if (loadHardMode()) bumpBestHard(match.pct);
     incrementLaunchCount(); // P7: count for first-launch hint visibility
+    recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
+    if (shouldAutoUnlockKitchen()) {
+      setKitchenMode(true);
+      showKitchenUnlockToast();
+    }
   }
 
   clearPlate();
