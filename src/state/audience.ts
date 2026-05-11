@@ -65,9 +65,10 @@ function dayOfYear(d: Date): number {
   return Math.floor(ms / 86_400_000);
 }
 
-export function getDailyAudience(d: Date = new Date()): Audience {
-  const idx = dayOfYear(d) % AUDIENCES.length;
-  return AUDIENCES[idx]!;
+export function getDailyAudience(d: Date = new Date(), pool?: readonly Audience[]): Audience {
+  const arr = pool && pool.length > 0 ? pool : AUDIENCES;
+  const idx = dayOfYear(d) % arr.length;
+  return arr[idx]!;
 }
 
 export function getAudience(id: string): Audience | undefined {

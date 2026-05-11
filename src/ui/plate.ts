@@ -11,7 +11,6 @@ import {
   spendBelly,
   BELLY_CAPACITY,
   loadLastArea,
-  setLastArea,
   loadLastMatch,
   setLastMatch,
   loadGold,
@@ -30,6 +29,7 @@ import { renderNotebookCounter } from './notebook';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
+import { audiencePoolForLocation } from '../state/location-progress';
 import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
@@ -277,7 +277,7 @@ function flashLegendaryFanfare(): void {
 }
 
 export function renderAudiencePortrait(): void {
-  const aud = getDailyAudience();
+  const aud = currentAudience();
   const hardMode = loadHardMode();
   const emojiEl = $('audiencePortraitEmoji');
   const nameEl = $('audienceName');
@@ -397,25 +397,23 @@ function wireStoryHardModeButton(): void {
   });
 }
 
-function renderAreaGrid(): void {
-  const grid = $('areaGrid');
-  if (!grid) return;
-  const selectedId = loadLastArea();
-  grid.innerHTML = AREAS.map((a) => {
-    const selected = a.id === selectedId;
-    return `<button type="button" class="area-card${selected ? ' area-card-selected' : ''}" data-area="${a.id}" aria-pressed="${selected}" aria-label="${a.name}: ${a.flavor}">
-      <span class="area-emoji">${a.emoji}</span>
-      <span class="area-name">${a.name}</span>
-    </button>`;
-  }).join('');
-  grid.querySelectorAll<HTMLElement>('.area-card').forEach((el) => {
-    const id = el.getAttribute('data-area');
-    if (!id) return;
-    el.addEventListener('click', () => {
-      setLastArea(id);
-      renderAreaGrid();
-    });
-  });
+function renderAreaDisplay(): void {
+  const el = $('areaCurrentName');
+  if (!el) return;
+  const cur = getArea(loadLastArea()) ?? AREAS[0]!;
+  el.textContent = `${cur.emoji} ${cur.name}`;
+  el.setAttribute('data-area', cur.id);
+}
+
+/**
+ * Audience for today + current location. Replaces bare `getDailyAudience()`
+ * calls so the audience pool respects region-locked locations (Phase Q
+ * item 83 + Phase S item 88).
+ */
+function currentAudience(): ReturnType<typeof getDailyAudience> {
+  const area = getArea(loadLastArea()) ?? AREAS[0]!;
+  const pool = audiencePoolForLocation(area);
+  return getDailyAudience(new Date(), pool);
 }
 
 function matchEmoji(pct: number): string {
@@ -433,7 +431,7 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
   const effects = $('storyResultEffects');
   if (!wrap || !title || !effects) return;
   const hardMode = loadHardMode();
-  const aud = getDailyAudience();
+  const aud = currentAudience();
   if (plateLen === 0) {
     wrap.removeAttribute('hidden');
     title.innerHTML = '🌬️ A whisper. (Empty plate — the audience waits.)';
@@ -507,7 +505,7 @@ function onStoryLaunch(): void {
     return;
   }
 
-  const aud = getDailyAudience();
+  const aud = currentAudience();
   const match = evaluateMatch(propsAfterArea, ids, aud.cravings, aud.restrictions);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
@@ -554,12 +552,26 @@ function wireStoryLaunchButton(): void {
   $('storyLaunchBtn')?.addEventListener('click', onStoryLaunch);
 }
 
+function wireAreaChangeButton(): void {
+  // The 'change' link next to the current-area display opens the map.
+  // We dispatch a click on #travelBtn to reuse the map UI.
+  $('areaChangeBtn')?.addEventListener('click', () => {
+    $('travelBtn')?.click();
+  });
+  // Listen for map's location-changed event to refresh the display.
+  window.addEventListener('fart:location-changed', () => {
+    renderAreaDisplay();
+    renderAudiencePortrait();
+  });
+}
+
 export function initStoryPantry(): void {
   renderAudiencePortrait();
-  renderAreaGrid();
+  renderAreaDisplay();
   wirePlateSlots();
   wireStoryLaunchButton();
   wireStoryHardModeButton();
+  wireAreaChangeButton();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();

@@ -43,7 +43,9 @@ test('Full v3 gameplay flow — fresh save → launch → notebook → shop → 
 
   // 1. Audience + area + pantry visible.
   await expect(page.locator('#audienceName')).not.toHaveText('—');
-  await expect(page.locator('.area-card')).toHaveCount(6);
+  // PLAN_v4 Phase S: area-grid replaced by the world-map Travel button.
+  await expect(page.locator('#travelBtn')).toBeVisible();
+  await expect(page.locator('#areaCurrentName')).toBeVisible();
   await expect(page.locator('.food-card-clickable').first()).toBeVisible();
 
   // 2. Plate two foods.

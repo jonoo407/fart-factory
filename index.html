@@ -51,6 +51,7 @@
         <div class="progression-strip" role="region" aria-label="Progression">
           <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
           <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
+          <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
           <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
         </div>
@@ -72,9 +73,10 @@
           </div>
         </div>
 
-        <div class="area-wrap" role="region" aria-label="Containment area">
-          <div class="area-label">📍 Where are you launching this?</div>
-          <div class="area-grid" id="areaGrid"></div>
+        <div class="area-display" role="region" aria-label="Current location">
+          <span class="area-display-prefix">📍 Launching at:</span>
+          <span class="area-display-current" id="areaCurrentName">—</span>
+          <button type="button" class="area-display-change" id="areaChangeBtn" aria-label="Change location">change</button>
         </div>
 
         <div class="pantry-wrap" role="region" aria-label="Pantry">
@@ -203,6 +205,17 @@
       </div>
 
       <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+    </div>
+
+    <div id="mapScreen" class="map-screen" hidden role="dialog" aria-modal="true" aria-label="World map">
+      <div class="map-screen-card">
+        <div class="map-screen-header">
+          <h2>📍 World Map</h2>
+          <button type="button" id="mapCloseBtn" class="map-close" aria-label="Close map">✕</button>
+        </div>
+        <div class="map-canvas" id="mapCanvas"></div>
+        <div class="map-info" id="mapInfo">Tap a pin to travel there. Locked regions unlock through progression.</div>
+      </div>
     </div>
 
     <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">

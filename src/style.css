@@ -1378,6 +1378,184 @@ footer {
     opacity: 0;
   }
 }
+/* --- Area display (current location summary) --- */
+.area-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 0.95em;
+  color: #e6f0ff;
+}
+.area-display-prefix { opacity: 0.7; }
+.area-display-current { font-weight: bold; color: #ffe79a; }
+.area-display-change {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  color: #aaffe2;
+  font-size: 0.82em;
+  padding: 2px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: auto;
+}
+.area-display-change:hover { background: rgba(255, 255, 255, 0.08); border-style: solid; }
+
+/* --- Travel button --- */
+.travel-btn {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #14b8a6, #0d6964);
+  border: 2px solid #5eead4;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+.travel-btn:hover { filter: brightness(1.1); }
+.progression-strip .notebook-btn, .progression-strip .shop-btn { margin-left: 0; }
+
+/* --- Map screen --- */
+.map-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 16px;
+}
+.map-screen[hidden] { display: none; }
+.map-screen-card {
+  background: linear-gradient(135deg, #1a2a4a, #0a1530);
+  border: 3px solid #5eead4;
+  border-radius: 14px;
+  padding: 16px;
+  max-width: 720px;
+  width: 100%;
+  max-height: 92vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #fff;
+  box-shadow: 0 0 40px rgba(94, 234, 212, 0.35);
+}
+.map-screen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.map-screen-header h2 {
+  margin: 0;
+  color: #5eead4;
+  font-size: 1.3em;
+}
+.map-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
+.map-close:hover { background: rgba(255, 255, 255, 0.2); }
+.map-canvas {
+  position: relative;
+  width: 100%;
+  height: min(480px, 60vh);
+  background:
+    radial-gradient(ellipse at 20% 70%, rgba(34, 197, 94, 0.2), transparent 40%),
+    radial-gradient(ellipse at 50% 30%, rgba(168, 85, 247, 0.18), transparent 40%),
+    radial-gradient(ellipse at 80% 60%, rgba(245, 158, 11, 0.18), transparent 40%),
+    radial-gradient(ellipse at 90% 20%, rgba(94, 234, 212, 0.2), transparent 40%),
+    linear-gradient(135deg, #0a2540, #042020);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.map-info {
+  font-size: 0.85em;
+  opacity: 0.7;
+  font-style: italic;
+  text-align: center;
+}
+
+/* --- Map pins --- */
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.65);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  color: #fff;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.map-pin:hover { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 16px rgba(255, 255, 255, 0.4); }
+.map-pin:focus-visible { outline: 3px solid #ffeb3b; }
+.map-pin-emoji { font-size: 1.4em; line-height: 1; }
+.map-pin-name { font-size: 0.65em; line-height: 1.1; white-space: nowrap; }
+.map-pin-lock {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  padding: 2px 4px;
+  font-size: 0.7em;
+}
+.map-pin[data-locked='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+.map-pin[data-locked='true']:hover { transform: translate(-50%, -50%); box-shadow: none; }
+.map-pin-hot {
+  animation: map-pin-pulse 2s ease-in-out infinite;
+  border-color: #f59e0b;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.55);
+}
+@keyframes map-pin-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.55); }
+  50%      { box-shadow: 0 0 22px rgba(245, 158, 11, 0.95); }
+}
+.map-pin-current {
+  border-color: #5eead4;
+  box-shadow: 0 0 12px rgba(94, 234, 212, 0.55);
+}
+.map-pin-hometown   { background: rgba(40, 30, 10, 0.7); }
+.map-pin-city       { background: rgba(20, 30, 50, 0.7); }
+.map-pin-wilderness { background: rgba(15, 40, 25, 0.7); }
+.map-pin-royal      { background: rgba(40, 30, 60, 0.7); }
+.map-pin-cosmic     { background: rgba(60, 20, 80, 0.7); }
+
+.map-region-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  font-weight: bold;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* --- Region-themed Story shell tint when location is selected --- */
+body[data-region='royal'] .audience-wrap   { border-color: #f59e0b; }
+body[data-region='cosmic'] .audience-wrap  { border-color: #a855f7; }
+body[data-region='wilderness'] .audience-wrap { border-color: #22c55e; }
+body[data-region='city'] .audience-wrap    { border-color: #3b82f6; }
+
 /* --- Boss unlock toast --- */
 .boss-unlock-toast {
   position: fixed;
