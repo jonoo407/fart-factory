@@ -25,17 +25,14 @@ test.describe('Onboarding tutorial', () => {
     await freshLoad(page);
     const overlay = page.locator('.onboarding');
     await expect(overlay).toBeVisible();
-    // step 1 → step 2
-    await page.click('#onboardingNext');
-    await expect(overlay.locator('.onboarding-step-indicator')).toContainText(
-      /2/,
-    );
-    // step 2 → step 3
-    await page.click('#onboardingNext');
-    await expect(overlay.locator('.onboarding-step-indicator')).toContainText(
-      /3/,
-    );
-    // step 3 → close
+    // Tutorial has 5 steps after PLAN_v5 P2 rewrite.
+    for (let i = 2; i <= 5; i++) {
+      await page.click('#onboardingNext');
+      await expect(overlay.locator('.onboarding-step-indicator')).toContainText(
+        new RegExp(`${i}`),
+      );
+    }
+    // step 5 → close
     await page.click('#onboardingNext');
     await expect(overlay).toBeHidden();
   });

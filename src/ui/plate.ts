@@ -619,7 +619,7 @@ function onStoryLaunch(): void {
   commitBellySpend();
 
   if (ingredientCount > 0) {
-    awardGoldForLaunch(match.pct);
+    awardGoldForLaunch(match.pct, areaId);
     awardResearchForLaunch(match.pct);
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);

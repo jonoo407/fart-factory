@@ -67,7 +67,20 @@ function dayOfYear(d: Date): number {
 
 export function getDailyAudience(d: Date = new Date(), pool?: readonly Audience[]): Audience {
   const arr = pool && pool.length > 0 ? pool : AUDIENCES;
-  const idx = dayOfYear(d) % arr.length;
+  // P12: GamePlus splits the UTC day at noon — twice the audience rotation rate.
+  // The check is done via a dynamic read of localStorage (boss-progress.ts) to
+  // keep audience.ts free of UI/state dependencies.
+  let gamePlus = false;
+  try {
+    const raw = localStorage.getItem('fart_gameplus');
+    gamePlus = raw !== null && JSON.parse(raw) === true;
+  } catch {
+    gamePlus = false;
+  }
+  const base = dayOfYear(d);
+  const idx = gamePlus
+    ? (base * 2 + (d.getUTCHours() < 12 ? 0 : 1)) % arr.length
+    : base % arr.length;
   return arr[idx]!;
 }
 

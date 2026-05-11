@@ -14,6 +14,7 @@ import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, render
 import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
 import { renderBossList } from './boss-arena';
+import { loadGamePlusUnlocked } from '../state/boss-progress';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -24,7 +25,11 @@ function renderNotebookCounter(): void {
   const counter = $('notebookCounter');
   if (counter) counter.textContent = `${discovered}/${total}`;
   const progress = $('notebookProgressText');
-  if (progress) progress.textContent = `${discovered} / ${total} discovered`;
+  if (progress) {
+    // P12: GamePlus badge.
+    const badge = loadGamePlusUnlocked() ? ' 🌌 New Game+' : '';
+    progress.textContent = `${discovered} / ${total} discovered${badge}`;
+  }
 }
 
 function rarityClass(rarity: Recipe['rarity']): string {
