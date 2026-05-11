@@ -97,6 +97,7 @@
 
         <div class="plate-wrap" role="group" aria-label="Plate">
           <div class="plate-label">🍴 Plate (tap a slot to remove):</div>
+          <div id="platePreview" class="plate-preview" hidden aria-live="polite"></div>
           <div class="plate" id="plate">
             <button type="button" class="plate-slot" id="plateSlot1" data-slot="0" aria-label="Plate slot 1 (empty)">＋</button>
             <button type="button" class="plate-slot" id="plateSlot2" data-slot="1" aria-label="Plate slot 2 (empty)">＋</button>
@@ -114,6 +115,7 @@
         <div class="pantry-wrap" role="region" aria-label="Pantry">
           <div class="pantry-label">📦 Pantry (tap to add to plate):</div>
           <div class="pantry-grid" id="pantryGrid"></div>
+          <button type="button" id="pantryShowLockedBtn" class="pantry-toggle" aria-pressed="false">🔒 Show locked teasers</button>
         </div>
 
         <div class="story-launch-wrap">
@@ -124,6 +126,7 @@
           <div class="story-result-row">
             <span id="storyResultTitle">—</span>
           </div>
+          <div id="fartProfile" hidden></div>
           <div class="story-result-effects" id="storyResultEffects"></div>
         </div>
       </div>
@@ -278,8 +281,8 @@
         <div class="legendary-quests" id="legendaryQuests"></div>
         <h3 class="notebook-section-h">⚔ Bosses</h3>
         <div class="boss-list" id="bossList"></div>
-        <h3 class="notebook-section-h">🌟 Food Mastery</h3>
-        <div class="mastery-list" id="masteryList"></div>
+        <h3 class="notebook-section-h">📚 Field Guide</h3>
+        <div class="field-guide" id="fieldGuide"></div>
         <h3 class="notebook-section-h">🏆 Hall of Trophies</h3>
         <div class="trophy-list" id="trophyList"></div>
         <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
@@ -305,6 +308,8 @@
     <div id="discoverySplash" class="discovery-splash" hidden role="status" aria-live="polite"></div>
 
     <div id="criticalSplash" class="critical-splash" hidden role="status" aria-live="polite"></div>
+
+    <div id="axisDiscoverySplash" class="axis-discovery-splash" hidden role="status" aria-live="polite"></div>
 
     <div id="ultimateOverlay" class="ultimate-overlay" hidden role="status" aria-live="polite"></div>
 

@@ -2506,6 +2506,290 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   color: #fee2e2;
 }
 
+/* === V8 T1.c — Fart Profile Card === */
+#fartProfile[hidden] { display: none; }
+.fart-profile-card {
+  margin: 8px 0 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(168, 85, 247, 0.12));
+  border: 2px solid rgba(168, 85, 247, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.fart-profile-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(168, 85, 247, 0.4);
+}
+.fart-profile-rocket { font-size: 1.6em; line-height: 1; }
+.fart-profile-eyebrow {
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #c4b5fd;
+  text-transform: uppercase;
+}
+.fart-profile-name {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #fbbf24;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  flex: 1 1 100%;
+}
+.fart-profile-bars { display: grid; gap: 6px; }
+.fart-profile-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 28px;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95em;
+}
+.fart-profile-axis-label {
+  text-transform: capitalize;
+  color: #e9d5ff;
+  font-weight: 600;
+}
+.fart-profile-bar {
+  position: relative;
+  display: block;
+  height: 14px;
+  border-radius: 7px;
+  background: rgba(15, 23, 42, 0.6);
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.fart-profile-bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #a855f7);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fart-profile-value {
+  font-weight: 700;
+  color: #fde68a;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* === V8 T3 — Fart Profile pulse-on-playback === */
+.fart-profile-card.fart-profile-pulsing .fart-profile-bar-fill {
+  animation: fart-profile-pulse 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: left center;
+}
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(1) .fart-profile-bar-fill { animation-delay: 0ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(2) .fart-profile-bar-fill { animation-delay: 100ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(3) .fart-profile-bar-fill { animation-delay: 200ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(4) .fart-profile-bar-fill { animation-delay: 300ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(5) .fart-profile-bar-fill { animation-delay: 400ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(6) .fart-profile-bar-fill { animation-delay: 500ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row:nth-child(7) .fart-profile-bar-fill { animation-delay: 600ms; }
+.fart-profile-card.fart-profile-pulsing .fart-profile-row .fart-profile-value {
+  animation: fart-profile-value-bump 1.4s ease-out;
+}
+@keyframes fart-profile-pulse {
+  0%   { filter: brightness(1.0) saturate(1.0); transform: scaleY(1); }
+  35%  { filter: brightness(1.9) saturate(1.5); transform: scaleY(1.5); }
+  100% { filter: brightness(1.0) saturate(1.0); transform: scaleY(1); }
+}
+@keyframes fart-profile-value-bump {
+  0%, 100% { transform: scale(1); color: #fde68a; }
+  30%      { transform: scale(1.35); color: #fff; }
+}
+
+/* === V8 T5 — Pantry show-locked toggle === */
+.pantry-toggle {
+  display: block;
+  margin: 8px auto 0;
+  padding: 6px 14px;
+  font-size: 0.85em;
+  font-weight: 600;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.pantry-toggle:hover {
+  background: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #e0f2fe;
+}
+.pantry-toggle[hidden] { display: none; }
+
+/* === V8 T4 — Field Guide entries === */
+.field-guide { display: grid; gap: 10px; }
+.field-guide-entry {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  display: grid;
+  gap: 8px;
+}
+.field-guide-entry[data-band="mystery"] {
+  opacity: 0.7;
+  border-style: dashed;
+}
+.field-guide-entry[data-band="master"] {
+  border-color: rgba(245, 158, 11, 0.6);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.07), rgba(168, 85, 247, 0.07));
+}
+.field-guide-entry-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.field-guide-entry-emoji { font-size: 1.4em; line-height: 1; }
+.field-guide-entry-name {
+  font-weight: 700;
+  color: #f1f5f9;
+  flex: 1;
+}
+.field-guide-entry-band {
+  font-size: 0.78em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #c4b5fd;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.18);
+}
+.field-guide-entry-uses {
+  font-size: 0.78em;
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+.field-guide-entry-bars { display: grid; gap: 4px; }
+.field-guide-entry-text {
+  font-size: 0.85em;
+  font-style: italic;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+.field-guide-locked {
+  text-align: center;
+  font-size: 0.85em;
+  color: #94a3b8;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+}
+
+/* === V8 T2 — Plate Preview ("🔮 PREDICTION") === */
+.plate-preview[hidden] { display: none; }
+.plate-preview-card {
+  margin: 6px 0 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 2px dashed rgba(148, 163, 184, 0.5);
+}
+.plate-preview-card.plate-preview-confident {
+  border-style: solid;
+  border-color: rgba(56, 189, 248, 0.55);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(34, 197, 94, 0.08));
+}
+.plate-preview-card.plate-preview-uncertain {
+  border-style: dashed;
+  border-color: rgba(250, 204, 21, 0.55);
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.08), rgba(168, 85, 247, 0.08));
+}
+.plate-preview-card.plate-preview-uncertain .fart-profile-bar-fill {
+  background: repeating-linear-gradient(
+    45deg,
+    #facc15,
+    #facc15 6px,
+    #a16207 6px,
+    #a16207 12px
+  );
+  opacity: 0.75;
+}
+.plate-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.3);
+}
+.plate-preview-icon { font-size: 1.3em; }
+.plate-preview-label {
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #cbd5e1;
+}
+.plate-preview-uncertain .plate-preview-label { color: #fde68a; }
+.plate-preview-bars { display: grid; gap: 5px; }
+
+/* === V8 T1.b — Axis discovery splash === */
+.axis-discovery-splash {
+  position: fixed;
+  top: 8vh;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 270;
+  pointer-events: none;
+}
+.axis-discovery-splash[hidden] { display: none; }
+.axis-discovery-card {
+  max-width: 90vw;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6d28d9, #db2777);
+  border: 3px solid #fde68a;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(109, 40, 217, 0.6);
+  opacity: 0;
+  transform: scale(0.6) translateY(-30px);
+  transition: opacity 0.35s, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.axis-discovery-show .axis-discovery-card {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+.axis-discovery-label {
+  font-size: 0.95em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  color: #fde68a;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+.axis-discovery-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 10px;
+  margin-bottom: 6px;
+}
+.axis-discovery-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 1.1em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.axis-discovery-hint {
+  font-size: 0.78em;
+  opacity: 0.82;
+  font-style: italic;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation: none !important;

@@ -38,6 +38,25 @@ function safeSave<T>(key: string, value: T): void {
   }
 }
 
+// ----- V8 T5 — Pantry locked-collapse toggle -----
+//
+// The launch-screen pantry hides locked food teasers by default so the
+// player only sees what they actually own. A "🔒 Show locked teasers"
+// toggle flips this flag, which persists across sessions.
+
+const KEY_PANTRY_SHOW_LOCKED = 'fart_pantry_show_locked';
+
+export function loadPantryShowLocked(): boolean {
+  return safeLoad<boolean>(
+    KEY_PANTRY_SHOW_LOCKED,
+    false,
+    (v): v is boolean => typeof v === 'boolean',
+  );
+}
+export function setPantryShowLocked(show: boolean): void {
+  safeSave(KEY_PANTRY_SHOW_LOCKED, show);
+}
+
 // ----- Pantry (unlocked food ids) -----
 
 function defaultPantry(): string[] {

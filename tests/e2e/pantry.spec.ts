@@ -65,12 +65,23 @@ test('cannot add a food when belly is insufficient', async ({ page }) => {
   await expect(page.locator('#plateSlot1.plate-slot-filled')).toBeVisible();
 });
 
-test('locked tier foods are visible as teasers but not clickable', async ({ page }) => {
+test('V8 T5 — locked teasers are HIDDEN by default; toggle reveals them', async ({ page }) => {
   await loadStoryMode(page);
-  // Uncommon kimchi should be in the pantry as a locked teaser.
+  // Default state: locked teasers are not in the pantry grid.
   const kimchi = page.locator('[data-food="kimchi"]');
+  await expect(kimchi).toHaveCount(0);
+  // Toggle button is visible and shows the locked count in its label.
+  const toggle = page.locator('#pantryShowLockedBtn');
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toContainText(/Show locked teasers/i);
+  // Click → locked teasers now render with the locked class, non-clickable.
+  await toggle.click();
   await expect(kimchi).toBeVisible();
   await expect(kimchi).toHaveClass(/food-card-locked/);
-  // Locked teasers are rendered as <div>, not <button> — not focusable / clickable.
   await expect(kimchi).not.toHaveClass(/food-card-clickable/);
+  // Toggle label flips.
+  await expect(toggle).toContainText(/Hide locked teasers/i);
+  // Click again → hidden again.
+  await toggle.click();
+  await expect(kimchi).toHaveCount(0);
 });

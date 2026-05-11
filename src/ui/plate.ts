@@ -5,8 +5,11 @@
  */
 
 import { FOODS, type Food, getFood, type FoodProperties } from '../state/food';
+import { buildPantryGridHtml } from './pantry-grid';
 import {
   loadPantry,
+  loadPantryShowLocked,
+  setPantryShowLocked,
   loadBelly,
   spendBelly,
   BELLY_CAPACITY,
@@ -28,7 +31,7 @@ import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus, tierLabel 
 import { awardGoldForLaunch } from '../scoring/reward';
 import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak, streakGoldMultiplier } from '../scoring/streak';
-import { recordFoodUse, applyMasteryBonuses } from '../scoring/food-mastery';
+import { recordFoodUse, applyMasteryBonuses, loadFoodMastery, masteryLevel } from '../scoring/food-mastery';
 import { unlockFood } from '../state/persistence';
 import { encounterSeed, currentEncounterIdx } from '../state/run-state';
 import { detectHiddenCombo } from '../scoring/hidden-combos';
@@ -43,6 +46,9 @@ import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
 import { applyActiveBuffs, consumeBuffs, goldMultiplierFromBuffs, isEasyModeForceFromBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
+import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
+import { renderPlatePreviewHtml } from './plate-preview';
+import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -119,44 +125,26 @@ function rarityClassFor(food: Food): string {
   return `rarity-${food.rarity}`;
 }
 
-function buildFoodCard(food: Food, opts: { locked?: boolean; clickable?: boolean }): string {
-  const lockedClass = opts.locked ? 'food-card-locked' : '';
-  const clickableClass = opts.clickable ? 'food-card-clickable' : '';
-  const aria = opts.locked
-    ? `aria-label="Locked: ${food.name} (${food.rarity})" disabled`
-    : `aria-label="Add ${food.name} (costs ${food.bellyCost} belly)"`;
-  const emoji = opts.locked ? '❓' : food.emoji;
-  const name = opts.locked ? '???' : food.name;
-  const cost = opts.locked ? '?' : String(food.bellyCost);
-  const tag = opts.clickable ? 'button' : 'div';
-  const type = tag === 'button' ? 'type="button"' : '';
-  return `<${tag} ${type} class="food-card ${rarityClassFor(food)} ${lockedClass} ${clickableClass}" data-food="${food.id}" ${aria}>
-    <span class="food-emoji">${emoji}</span>
-    <span class="food-name">${name}</span>
-    <span class="food-cost">🍽️ ${cost}</span>
-  </${tag}>`;
-}
-
 export function renderPantryGrid(): void {
   const grid = $('pantryGrid');
   if (!grid) return;
   const unlocked = new Set(loadPantry());
-  // Sort by rarity (common first), then alphabetical. Locked teasers at the end.
-  const sorted = [...FOODS].sort((a, b) => {
-    const rarityOrder: Record<string, number> = {
-      common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4,
-    };
-    const ru = unlocked.has(a.id) ? 0 : 1;
-    const rb = unlocked.has(b.id) ? 0 : 1;
-    if (ru !== rb) return ru - rb;
-    const ar = rarityOrder[a.rarity] ?? 99;
-    const br = rarityOrder[b.rarity] ?? 99;
-    if (ar !== br) return ar - br;
-    return a.name.localeCompare(b.name);
-  });
-  grid.innerHTML = sorted
-    .map((f) => buildFoodCard(f, { locked: !unlocked.has(f.id), clickable: unlocked.has(f.id) }))
-    .join('');
+  const showLocked = loadPantryShowLocked();
+  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked);
+  grid.innerHTML = html;
+  // V8 T5 — toggle button reflects the current state and the locked count.
+  const toggle = $('pantryShowLockedBtn') as HTMLButtonElement | null;
+  if (toggle) {
+    if (lockedCount === 0) {
+      toggle.setAttribute('hidden', '');
+    } else {
+      toggle.removeAttribute('hidden');
+      toggle.textContent = showLocked
+        ? '🔓 Hide locked teasers'
+        : `🔒 Show locked teasers (+${lockedCount})`;
+      toggle.setAttribute('aria-pressed', String(showLocked));
+    }
+  }
   // Wire clicks.
   grid.querySelectorAll<HTMLElement>('.food-card-clickable').forEach((el) => {
     const id = el.getAttribute('data-food');
@@ -222,6 +210,35 @@ export function renderPlate(): void {
       slot.setAttribute('aria-label', `Plate slot ${i + 1} (empty)`);
     }
   }
+  renderPlatePreview();
+}
+
+/**
+ * V8 T2 — render the 🔮 PREDICTION card above the plate. Naive property
+ * sum (no synergies/treatments — those reveal at launch). Marks
+ * UNCERTAIN whenever any plate food is below Apprentice mastery.
+ */
+function renderPlatePreview(): void {
+  const el = $('platePreview');
+  if (!el) return;
+  const ids = plateIngredientIds();
+  if (ids.length === 0) {
+    el.setAttribute('hidden', '');
+    el.innerHTML = '';
+    return;
+  }
+  const sum: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
+  let anyUnmastered = false;
+  for (const id of ids) {
+    const food = getFood(id);
+    if (!food) continue;
+    if (masteryLevel(loadFoodMastery(id)) === 'novice') anyUnmastered = true;
+    for (const a of Object.keys(sum) as Array<keyof FoodProperties>) {
+      sum[a] = Math.min(5, sum[a] + food.properties[a]);
+    }
+  }
+  el.innerHTML = renderPlatePreviewHtml(sum, loadDiscoveredAxes(), anyUnmastered);
+  el.removeAttribute('hidden');
 }
 
 export function renderBellyMeter(): void {
@@ -429,6 +446,31 @@ function showCriticalSplash(tier: CriticalTier): void {
     splash.setAttribute('hidden', '');
     splash.classList.remove('critical-splash-show');
   }, 1800);
+}
+
+function showAxisDiscoverySplash(axes: readonly AxisName[]): void {
+  if (axes.length === 0) return;
+  const splash = document.getElementById('axisDiscoverySplash');
+  if (!splash) return;
+  const chips = axes.map((a) => (
+    `<span class="axis-discovery-chip">${axisEmoji(a)} <strong>${a.toUpperCase()}</strong></span>`
+  )).join('');
+  const heading = axes.length === 1
+    ? '✨ NEW DIMENSION DISCOVERED ✨'
+    : '✨ NEW DIMENSIONS DISCOVERED ✨';
+  splash.innerHTML = `<div class="axis-discovery-card">
+    <div class="axis-discovery-label">${heading}</div>
+    <div class="axis-discovery-list">${chips}</div>
+    <div class="axis-discovery-hint">You'll see these on every fart from now on.</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('axis-discovery-show');
+  void splash.offsetWidth;
+  splash.classList.add('axis-discovery-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('axis-discovery-show');
+  }, 3000);
 }
 
 function showDiscoverySplash(recipeId: string): void {
@@ -685,10 +727,11 @@ function renderBreakdown(breakdown: AxisBreakdown[]): string {
   }).join('');
 }
 
-function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null, breakdown?: AxisBreakdown[]): void {
+function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null, breakdown?: AxisBreakdown[], fartProps?: FoodProperties): void {
   const wrap = $('storyResult');
   const title = $('storyResultTitle');
   const effects = $('storyResultEffects');
+  const profile = $('fartProfile');
   if (!wrap || !title || !effects) return;
   const hardMode = loadHardMode();
   const aud = currentAudience();
@@ -696,7 +739,19 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
     wrap.removeAttribute('hidden');
     title.innerHTML = '🌬️ A whisper. (Empty plate — the audience waits.)';
     effects.innerHTML = '';
+    if (profile) {
+      profile.innerHTML = '';
+      profile.setAttribute('hidden', '');
+    }
     return;
+  }
+  // V8 T1.c: the Fart Profile is THE primary "you made this" surface. Render
+  // it before any match copy so the player sees their own fart first, even
+  // in Hard Mode (the audience target stays hidden — the player's own fart
+  // belongs to the player).
+  if (profile && fartProps) {
+    profile.innerHTML = renderFartProfileHtml(fartProps, loadDiscoveredAxes());
+    profile.removeAttribute('hidden');
   }
   const discoveryLine = (() => {
     if (!discovery) return '';
@@ -867,6 +922,13 @@ function onStoryLaunch(): void {
     if (tier === 'perfect' || tier === 'great' || tier === 'disaster') {
       showCriticalSplash(tier);
     }
+    // V8 T1.b: axis-discovery splash (Scheme 1) — fires the FIRST time a
+    // hidden axis registers ≥1 in the player's own fart. Idempotent: if
+    // nothing new was discovered this launch, the splash is a no-op.
+    const axisDisco = discoverAxesFromFart(propsAfterArea);
+    if (axisDisco.added.length > 0) {
+      showAxisDiscoverySplash(axisDisco.added);
+    }
     // PLAN_v5 Phase 6: buffs consumed after the launch they applied to.
     consumeBuffs();
   }
@@ -882,7 +944,11 @@ function onStoryLaunch(): void {
   if (discovery && discovery.freshlyDiscovered) {
     showDiscoverySplash(discovery.recipeId);
   }
-  renderStoryResult(recipe, match, area, ingredientCount, discovery, breakdown);
+  renderStoryResult(recipe, match, area, ingredientCount, discovery, breakdown, propsAfterArea);
+  // V8 T3 — pulse the Fart Profile bars in step with the audio playback.
+  if (ingredientCount > 0) {
+    pulseFartProfile($('fartProfile'));
+  }
   renderFirstLaunchHint(); // P7: re-render in case it should now hide
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
@@ -894,6 +960,14 @@ function onStoryLaunch(): void {
 
 function wireStoryLaunchButton(): void {
   $('storyLaunchBtn')?.addEventListener('click', onStoryLaunch);
+}
+
+/** V8 T5 — wire the "Show locked teasers" toggle. */
+function wirePantryShowLockedToggle(): void {
+  $('pantryShowLockedBtn')?.addEventListener('click', () => {
+    setPantryShowLocked(!loadPantryShowLocked());
+    renderPantryGrid();
+  });
 }
 
 function wireAreaChangeButton(): void {
@@ -917,6 +991,7 @@ export function initStoryPantry(): void {
   wireStoryHardModeButton();
   wireAreaChangeButton();
   wireMoveOnButton();
+  wirePantryShowLockedToggle();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();
