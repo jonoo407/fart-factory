@@ -31,6 +31,8 @@ import { loadStreak, recordLaunchForStreak, streakGoldMultiplier } from '../scor
 import { recordFoodUse, applyMasteryBonuses } from '../scoring/food-mastery';
 import { unlockFood } from '../state/persistence';
 import { encounterSeed, currentEncounterIdx } from '../state/run-state';
+import { detectHiddenCombo } from '../scoring/hidden-combos';
+import { rollUnicornEncounter, UNICORN_AUDIENCE } from '../state/unicorn-encounter';
 import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
@@ -354,6 +356,26 @@ function showKitchenUnlockToast(): void {
   if (kb) kb.removeAttribute('hidden');
 }
 
+function showHiddenComboSplash(combo: { name: string; emoji: string; flavor: string; bonusGold: number; bonusNotes: number }): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-legendary">
+    <div class="discovery-splash-banner">🎁 HIDDEN COMBO! 🎁</div>
+    <div class="discovery-splash-emoji">${combo.emoji}</div>
+    <div class="discovery-splash-name">${combo.name}</div>
+    <div class="discovery-splash-desc">${combo.flavor}</div>
+    <div class="discovery-splash-hint">${combo.bonusGold > 0 ? `+${combo.bonusGold}💰 ` : ''}${combo.bonusNotes > 0 ? `+${combo.bonusNotes}📝` : ''}</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('discovery-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('discovery-splash-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('discovery-splash-show');
+  }, 3500);
+}
+
 function showUltimateOverlay(count: number): void {
   const overlay = document.getElementById('ultimateOverlay');
   if (!overlay) return;
@@ -621,6 +643,11 @@ function renderAreaDisplay(): void {
  * item 83 + Phase S item 88).
  */
 function currentAudience(): ReturnType<typeof getDailyAudience> {
+  // T4.2: 4% chance per encounter that the Mystery Unicorn appears
+  // instead. Deterministic per encounter idx so reloads see the same.
+  const idx = currentEncounterIdx();
+  const unicornSeed = encounterSeed(idx) ^ 0xc0ffee;
+  if (rollUnicornEncounter(unicornSeed)) return UNICORN_AUDIENCE;
   const area = getArea(loadLastArea()) ?? AREAS[0]!;
   const pool = audiencePoolForLocation(area);
   return getDailyAudience(new Date(), pool);
@@ -759,7 +786,12 @@ function onStoryLaunch(): void {
   const restrictions = aud.restrictions && cancelOneRestrictionFromBuffs()
     ? aud.restrictions.slice(1)
     : aud.restrictions;
-  const match = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
+  // T4.1: hidden plate combos detect BEFORE scoring.
+  const hiddenCombo = ingredientCount > 0 ? detectHiddenCombo(ids) : null;
+  const baseMatch = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
+  const match = hiddenCombo?.guaranteedPerfect
+    ? { pct: 100, violations: [] }
+    : baseMatch;
   const breakdown = computeMatchBreakdown(propsAfterArea, aud.cravings);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
@@ -803,15 +835,23 @@ function onStoryLaunch(): void {
     if (notesBonus > 0) addResearchNotes(notesBonus);
     // T2.3: record food uses for mastery
     recordFoodUse(ids);
-    // T2.1: roll loot drop on PERFECT (chance scales with legendary on plate)
-    if (tier === 'perfect') {
+    // T2.1: roll loot drop on PERFECT (chance scales with legendary on plate).
+    // T4.1: hidden combos can FORCE a drop (chance=1) and/or boost bonuses.
+    const forceDrop = hiddenCombo?.guaranteedDrop ?? false;
+    if (tier === 'perfect' || forceDrop) {
       const seed = encounterSeed(currentEncounterIdx()) ^ Date.now();
-      const chance = dropChanceForLaunch(tier, hasLegendary);
+      const chance = forceDrop ? 1 : dropChanceForLaunch(tier, hasLegendary);
       const drop = rollLootDrop(chance, seed);
       if (drop) {
         unlockFood(drop.id);
         showLootDropSplash(drop);
       }
+    }
+    // T4.1: apply hidden-combo bonus rewards + splash.
+    if (hiddenCombo) {
+      if (hiddenCombo.bonusGold > 0) addGold(hiddenCombo.bonusGold);
+      if (hiddenCombo.bonusNotes > 0) addResearchNotes(hiddenCombo.bonusNotes);
+      showHiddenComboSplash(hiddenCombo);
     }
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
