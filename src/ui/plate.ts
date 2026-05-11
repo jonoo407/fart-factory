@@ -27,6 +27,7 @@ import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
+import { isKitchenOpen, tryAddToPrep } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
@@ -144,6 +145,11 @@ export function renderPantryGrid(): void {
     const id = el.getAttribute('data-food');
     if (!id) return;
     el.addEventListener('click', () => {
+      // Phase U item 95 — if Kitchen is open, route to the prep table.
+      if (isKitchenOpen()) {
+        tryAddToPrep(id);
+        return;
+      }
       const result = addFoodToPlate(id);
       if (result.ok) {
         renderPlate();

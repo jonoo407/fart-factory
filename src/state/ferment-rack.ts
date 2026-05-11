@@ -89,6 +89,31 @@ export function claimFerment(slotIdx: number, today: Date = new Date()): ClaimRe
   return { ok: true, originalFoodId: slot.foodId };
 }
 
+// ----- Cumulative claim counter (Phase V item 98) -----
+
+const KEY_CLAIMS = 'fart_ferment_claims';
+
+export function loadFermentClaims(): number {
+  try {
+    const raw = localStorage.getItem(KEY_CLAIMS);
+    if (!raw) return 0;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 0 ? n : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function incrementFermentClaims(): number {
+  const next = loadFermentClaims() + 1;
+  try {
+    localStorage.setItem(KEY_CLAIMS, String(next));
+  } catch {
+    // ignore
+  }
+  return next;
+}
+
 /**
  * Remove ferments older than FERMENT_TTL_DAYS. Returns the count removed.
  */

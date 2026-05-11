@@ -51,6 +51,8 @@
         <div class="progression-strip" role="region" aria-label="Progression">
           <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
           <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
+          <button type="button" class="kitchen-mode-toggle" id="kitchenModeToggle" aria-pressed="false" aria-label="Toggle Kitchen Mode (advanced prep + treatments)">🍳 Kitchen Mode</button>
+          <button type="button" class="btn kitchen-btn" id="kitchenBtn" aria-label="Open kitchen (prep foods before launch)" hidden>🍳 Kitchen</button>
           <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
           <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
@@ -61,6 +63,23 @@
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
           <span class="belly-value"><span id="bellyValue">20</span>/<span id="bellyCap">20</span></span>
+        </div>
+
+        <div id="kitchenOverlay" class="kitchen-overlay" hidden role="region" aria-label="Kitchen prep">
+          <div class="kitchen-card">
+            <div class="kitchen-header">
+              <h2>🍳 Kitchen — prep before launch</h2>
+              <button type="button" id="kitchenCloseBtn" class="kitchen-close" aria-label="Close kitchen">✕</button>
+            </div>
+            <div class="kitchen-section-label">Prep Table</div>
+            <div class="prep-table" id="prepTable"></div>
+            <div class="kitchen-section-label">Fermentation Rack</div>
+            <div class="ferment-rack" id="fermentRack"></div>
+            <div class="kitchen-actions">
+              <button type="button" id="kitchenSendBtn" class="kitchen-send-btn" aria-label="Send prepped plate to launch">Send to Performance ▶</button>
+            </div>
+            <div class="kitchen-flavor">Tap a pantry food below to add it to the prep table. Treatments modify properties before launch.</div>
+          </div>
         </div>
 
         <div class="plate-wrap" role="group" aria-label="Plate">

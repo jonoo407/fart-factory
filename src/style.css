@@ -1401,6 +1401,211 @@ footer {
 }
 .area-display-change:hover { background: rgba(255, 255, 255, 0.08); border-style: solid; }
 
+/* --- Kitchen Mode toggle (in progression strip) --- */
+.kitchen-mode-toggle {
+  background: rgba(40, 20, 10, 0.4);
+  border: 1px dashed rgba(253, 186, 116, 0.5);
+  color: #fdba74;
+  font-size: 0.78em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.kitchen-mode-toggle-on {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.5), rgba(194, 65, 12, 0.5));
+  border-style: solid;
+  border-color: #f97316;
+  color: #fff;
+}
+
+/* --- Kitchen button + overlay --- */
+.kitchen-btn {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #f97316, #c2410c);
+  border: 2px solid #fdba74;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+.kitchen-btn:hover { filter: brightness(1.1); }
+.kitchen-overlay {
+  margin-bottom: 14px;
+  border-radius: 12px;
+}
+.kitchen-overlay[hidden] { display: none; }
+.kitchen-card {
+  background: linear-gradient(135deg, #2a1a10, #1a0a05);
+  border: 3px solid #f97316;
+  border-radius: 14px;
+  padding: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  color: #fff;
+  box-shadow: 0 0 40px rgba(249, 115, 22, 0.4);
+}
+.kitchen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.kitchen-header h2 {
+  margin: 0;
+  color: #fdba74;
+  font-size: 1.3em;
+}
+.kitchen-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+}
+.kitchen-section-label {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fdba74;
+  margin: 12px 0 6px;
+  font-weight: bold;
+}
+.prep-table {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.prep-slot {
+  border: 2px dashed rgba(253, 186, 116, 0.4);
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  position: relative;
+}
+.prep-slot-filled {
+  border-style: solid;
+  border-color: rgba(253, 186, 116, 0.7);
+}
+.prep-slot-filled .food-emoji { font-size: 1.8em; line-height: 1; }
+.prep-slot-filled .food-name { font-size: 0.78em; }
+.prep-slot-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 0.7em;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.prep-slot-remove:hover { background: rgba(248, 113, 113, 0.5); }
+.prep-treatment-select {
+  font-size: 0.78em;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  font-family: inherit;
+  margin-top: 2px;
+}
+.prep-empty { font-size: 0.82em; opacity: 0.5; }
+.prep-send-to-rack-btn {
+  margin-top: 4px;
+  background: linear-gradient(135deg, #5eead4, #0d9488);
+  border: 1px solid #99f6e4;
+  color: #042525;
+  font-weight: bold;
+  font-size: 0.72em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.prep-send-to-rack-btn:hover { filter: brightness(1.1); }
+.prep-send-refused { animation: shop-refuse 0.6s ease-out; }
+
+.ferment-rack {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.ferment-slot {
+  border: 2px solid rgba(94, 234, 212, 0.4);
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(0, 30, 25, 0.4);
+}
+.ferment-slot-waiting { opacity: 0.7; }
+.ferment-slot-ready {
+  border-color: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+}
+.ferment-slot-empty {
+  border-style: dashed;
+  opacity: 0.5;
+}
+.ferment-slot .food-emoji { font-size: 1.5em; }
+.ferment-slot .food-name { font-size: 0.7em; }
+.ferment-status { font-size: 0.7em; opacity: 0.85; }
+.ferment-claim-btn {
+  margin-top: 4px;
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  border: 1px solid #4ade80;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.75em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.ferment-empty { font-size: 0.75em; opacity: 0.5; }
+
+.kitchen-actions {
+  margin-top: 14px;
+  text-align: center;
+}
+.kitchen-send-btn {
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  border: 2px solid #4ade80;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1em;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.kitchen-send-btn:hover { filter: brightness(1.1); }
+.kitchen-flavor {
+  font-size: 0.82em;
+  opacity: 0.65;
+  text-align: center;
+  font-style: italic;
+  margin-top: 10px;
+}
+
 /* --- Travel button --- */
 .travel-btn {
   margin-left: auto;
