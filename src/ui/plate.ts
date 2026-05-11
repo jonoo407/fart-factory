@@ -27,6 +27,7 @@ import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
 import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
+import { isArenaActive, submitArenaLaunch } from './boss-arena';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { loadHardMode, setHardMode, audienceReaction } from '../state/challenge';
@@ -482,6 +483,30 @@ function onStoryLaunch(): void {
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
   const propsAfterArea = applyAreaModifiers(recipe.props, area);
+
+  // Boss arena fork: if an arena is active, route the launch there.
+  // Audio + visual still fire (we want full feedback). The arena handles
+  // the scoring + win/lose state.
+  if (isArenaActive()) {
+    const [aL, aW, aV, aS, aT, aM] = recipeToSliderInputs(propsAfterArea);
+    triggerHaptic(HAPTICS.launch);
+    playFart(aL, aW, aV, aS, aT, aM);
+    spawnGas(aS, aV);
+    commitBellySpend();
+    // Read declared target (Boss 5 only) from the arena's select.
+    const targetSelect = document.getElementById('arenaTargetSelect') as HTMLSelectElement | null;
+    const targetIdx = targetSelect ? parseInt(targetSelect.value, 10) : null;
+    submitArenaLaunch({
+      ingredientIds: ids,
+      propsAfterArea,
+      targetAudienceIdx: targetIdx !== null && !Number.isNaN(targetIdx) ? targetIdx : null,
+    });
+    clearPlate();
+    renderPlate();
+    renderBellyMeter();
+    return;
+  }
+
   const aud = getDailyAudience();
   const match = evaluateMatch(propsAfterArea, ids, aud.cravings, aud.restrictions);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;

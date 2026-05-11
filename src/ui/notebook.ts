@@ -13,6 +13,7 @@ import { FOODS, getFood } from '../state/food';
 import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
 import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
+import { renderBossList } from './boss-arena';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -171,6 +172,7 @@ export function openNotebook(): void {
   renderNotebookCounter();
   renderRecipes();
   renderLegendaryQuests();
+  renderBossList();
   $('notebookModal')?.removeAttribute('hidden');
 }
 

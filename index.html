@@ -19,6 +19,18 @@
 
       <!-- Story Mode shell (Tier 7). Pantry + plate + belly meter. -->
       <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
+        <div id="arenaOverlay" class="arena-overlay" hidden role="region" aria-label="Boss arena">
+          <div class="arena-card">
+            <div class="arena-header">
+              <span class="arena-boss-emoji" id="arenaBossEmoji">❓</span>
+              <h2 class="arena-boss-name" id="arenaBossName">—</h2>
+              <button type="button" id="arenaCloseBtn" class="arena-close" aria-label="Forfeit and exit arena">✕</button>
+            </div>
+            <div class="arena-flavor" id="arenaFlavor"></div>
+            <div class="arena-stage" id="arenaStage"></div>
+            <div class="arena-result" id="arenaResult" hidden aria-live="polite"></div>
+          </div>
+        </div>
         <div class="audience-wrap" role="region" aria-label="Today's audience">
           <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
           <div class="audience-meta">
@@ -219,6 +231,8 @@
         <div class="notebook-recipes" id="notebookRecipes"></div>
         <h3 class="notebook-section-h">🏆 Legendary Quests</h3>
         <div class="legendary-quests" id="legendaryQuests"></div>
+        <h3 class="notebook-section-h">⚔ Bosses</h3>
+        <div class="boss-list" id="bossList"></div>
         <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
       </div>
     </div>
