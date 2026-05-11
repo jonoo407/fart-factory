@@ -61,26 +61,52 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
     expect(isBossWon(boss, s)).toBe(true);
   });
 
-  it('Boss 2 (Royal Court / escalation) — same audience over 3 rounds wins if restrictions met', () => {
+  it('Boss 2 (Royal Court / escalation) — winnable with the right strategy (P4 regression)', () => {
     const boss = BOSSES.find((b) => b.id === 'royal-court-escalation')!;
     let s = createBossRunState(boss);
-    // Royal Court cravings have stink=1 (low). The round-3 restriction
-    // min-stink:3 directly conflicts. So the boss is INTENTIONALLY hard:
-    // you need to please their craving (low stink) AND the restriction
-    // (high stink). With the v3 tolerant L1 scoring this is impossible.
-    // Smoke this by asserting the run COMPLETES without crashing —
-    // balance pass is documenting the intentional difficulty.
+    // Strategy: stay close to Royal Court's cravings (wet:0, dry:3, stink:1,
+    // loud:1, musical:5, length:4, temp:2). Round 1: 1-food plate. Round 2:
+    // 2 foods (satisfy min-foods:2). Round 3: 3 foods, NO dairy (satisfy
+    // min-foods:3 + no-dairy).
+    //
+    // The fart_props passed here are illustrative — what matters is that
+    // the SHAPE is close to cravings AND restrictions are satisfied.
+    // Round 1 — single dry/musical plate.
+    s = evaluateBossRound(boss, s, {
+      ingredientIds: ['asparagus'],
+      propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
+      targetAudienceIdx: null,
+    });
+    // Round 2 — 2 foods, still close.
+    s = evaluateBossRound(boss, s, {
+      ingredientIds: ['asparagus', 'cheese'],
+      propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
+      targetAudienceIdx: null,
+    });
+    // Round 3 — 3 foods, NO dairy (so cheese must be replaced).
+    s = evaluateBossRound(boss, s, {
+      ingredientIds: ['asparagus', 'kombucha', 'beans'],
+      propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
+      targetAudienceIdx: null,
+    });
+    expect(s.results.length).toBe(3);
+    // All 3 rounds must have passed (≥50% match with restrictions met).
+    expect(isBossWon(boss, s)).toBe(true);
+  });
+
+  it('Boss 2 fails when player violates the no-dairy restriction in round 3', () => {
+    const boss = BOSSES.find((b) => b.id === 'royal-court-escalation')!;
+    let s = createBossRunState(boss);
+    // Same approach but uses cheese in round 3 — violates no-dairy.
     for (let i = 0; i < 3; i++) {
       s = evaluateBossRound(boss, s, {
-        ingredientIds: ['cheese', 'beans', 'pickle'],
-        propsAfterArea: { wet: 0, dry: 3, stink: 3, loud: 1, musical: 5, length: 4, temp: 2 },
+        ingredientIds: ['asparagus', 'cheese', 'beans'],
+        propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
         targetAudienceIdx: null,
       });
     }
-    expect(s.results.length).toBe(3);
-    // Document the intentional hardcore difficulty: this boss is hard
-    // because the escalation conflicts with the audience profile. The
-    // player will need to use treatments (Phase C) to bridge the gap.
+    // Round 3 fails because of no-dairy violation (-25% per violation).
+    expect(s.results[2]!.audienceResults[0]!.violations).toContain('no-dairy');
   });
 
   it('Boss 3 (Three Ghosts / prioritization) — 2 perfect launches at distinct audiences wins', () => {

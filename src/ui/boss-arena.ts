@@ -129,22 +129,22 @@ function renderArenaStage(): void {
 
   const roundsLine = `<div class="arena-rounds">Launches remaining: <strong>${state.roundsRemaining}</strong></div>`;
 
-  // Skill-specific subtitle.
+  // Skill-specific subtitle (P4: per-boss hint for difficulty).
   let skillSubtitle = '';
   switch (boss.skillKind) {
     case 'intersection':
-      skillSubtitle = 'One launch. Match ≥50% against ALL audiences.'; break;
+      skillSubtitle = 'One launch. Match ≥50% against ALL audiences. Find the intersection of their cravings.'; break;
     case 'escalation':
-      skillSubtitle = `Round ${state.results.length + 1} of ${boss.rounds}. Restrictions tighten each round.`; break;
+      skillSubtitle = `Round ${state.results.length + 1} of ${boss.rounds}. Restrictions tighten: R2 needs ≥2 foods. R3 needs ≥3 foods AND no dairy. 💡 Stay close to the audience's cravings.`; break;
     case 'prioritization':
-      skillSubtitle = `2 launches total. Please any 2 of the 3 audiences.`; break;
+      skillSubtitle = `2 launches total. Please any 2 of the 3 audiences. 💡 Pick the two whose cravings overlap most.`; break;
     case 'deduction':
       skillSubtitle = state.results.length === 0
-        ? 'Cravings HIDDEN. First launch is a probe — read the reaction tier.'
-        : 'Inferring from the probe. Hit ≥60% to win.';
+        ? 'Cravings HIDDEN. First launch is a probe — read the reaction tier carefully.'
+        : 'Inferring from the probe. Hit ≥60% to win. 💡 If the probe got 😍 you were close — try similar.';
       break;
     case 'resource-allocation':
-      skillSubtitle = 'Declare a target before each launch. Need ≥3/4 votes.'; break;
+      skillSubtitle = 'Declare a target before each launch. Need ≥3/4 votes. 💡 Cook for the easiest audience first — save hard ones for last.'; break;
   }
 
   // For resource-allocation, also show a target-selector.

@@ -65,11 +65,19 @@ function audById(id: string): Audience {
 }
 
 // Escalation tier adds restrictions algorithmically each round (Boss 2).
-// Round 1: base. Round 2: + 'min-foods:2'. Round 3: + 'min-stink:3'.
+// Round 1: base. Round 2: + 'min-foods:2'. Round 3: + 'min-foods:3' AND
+// 'no-dairy' — forces the player to use a 3-food no-cheese plate, which
+// is the meaningful escalation Royal Court tests (their stink-1 / musical-5
+// craving is already hard to satisfy with a 3-food plate; banning dairy
+// removes the easy "two cheese" path). Previously this used 'min-stink:3'
+// which directly conflicted with Royal Court's stink-1 craving — the
+// boss was mathematically unwinnable. Per CRITIC_v4_REVIEW.md / PLAN_v5
+// P4, restrictions must compose with the underlying cravings, not fight
+// them.
 function escalationRestrictionsForRound(round: number): string[] {
   if (round <= 1) return [];
   if (round === 2) return ['min-foods:2'];
-  return ['min-foods:2', 'min-stink:3'];
+  return ['min-foods:3', 'no-dairy'];
 }
 
 export function createBossRunState(boss: Boss): BossRunState {
