@@ -29,6 +29,7 @@ import { getRecipe } from '../state/recipes';
 import { renderNotebookCounter } from './notebook';
 import { playEventSfx, playEventSfxOneOf, FOOD_EATING_SFX, AUDIENCE_REACTION_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
+import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
@@ -382,14 +383,20 @@ export function renderAudiencePortrait(): void {
   }
 }
 
-function tierLabel(tier: ReturnType<typeof audienceReaction>['tier']): string {
+function tierEmoji(tier: ReturnType<typeof audienceReaction>['tier']): string {
   switch (tier) {
-    case 'loved':     return '😍 The audience LOVES it!';
-    case 'liked':     return '🙂 They liked that.';
-    case 'meh':       return '😐 Mixed reactions.';
-    case 'disliked':  return '🤢 Several covered their nose.';
-    case 'evacuated': return '💀 The room is clearing out.';
+    case 'loved':     return '😍';
+    case 'liked':     return '🙂';
+    case 'meh':       return '😐';
+    case 'disliked':  return '🤢';
+    case 'evacuated': return '💀';
   }
+}
+
+function tierLabel(tier: ReturnType<typeof audienceReaction>['tier']): string {
+  // Per-audience flavor text + tier emoji (P10).
+  const aud = currentAudience();
+  return `${tierEmoji(tier)} ${reactionTextForAudience(aud, tier)}`;
 }
 
 function trendLabel(trend: ReturnType<typeof audienceReaction>['trend']): string {
