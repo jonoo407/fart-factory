@@ -277,6 +277,28 @@ function applyAreaModifiers(props: FoodProperties, area: Area): FoodProperties {
 
 // ----- Audience portrait + area picker -----
 
+function showDiscoverySplash(recipeId: string): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  const recipe = getRecipe(recipeId);
+  if (!recipe) return;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-${recipe.rarity}">
+    <div class="discovery-splash-banner">✨ NEW RECIPE DISCOVERED ✨</div>
+    <div class="discovery-splash-emoji">${recipe.emoji}</div>
+    <div class="discovery-splash-name">${recipe.name}</div>
+    ${recipe.description ? `<div class="discovery-splash-desc">${recipe.description}</div>` : ''}
+    <div class="discovery-splash-hint">📖 Saved to your Lab Notebook</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('discovery-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('discovery-splash-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('discovery-splash-show');
+  }, 3200);
+}
+
 function flashLegendaryFanfare(): void {
   const wrap = document.querySelector<HTMLElement>('.audience-wrap');
   if (!wrap) return;
@@ -559,6 +581,10 @@ function onStoryLaunch(): void {
   renderBellyMeter();
   renderProgression();
   renderNotebookCounter();
+  // P6: discovery splash — only on FIRST discovery of a recipe.
+  if (discovery && discovery.freshlyDiscovered) {
+    showDiscoverySplash(discovery.recipeId);
+  }
   renderStoryResult(recipe, match, area, ingredientCount, discovery);
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
