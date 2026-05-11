@@ -27,6 +27,14 @@ import { dispatchBossReward } from '../scoring/boss-reward';
 import { renderPantryGrid, renderProgression } from './plate';
 import { playEventSfx, QUEST_CLAIMED_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 
+const BOSS_ENTRANCE_SFX: Record<string, string> = {
+  'granny-family-reunion':    'boss-entrance-granny',
+  'royal-court-escalation':   'boss-entrance-royal',
+  'haunted-three-ghosts':     'boss-entrance-haunted',
+  'volcano-cult-ritual':      'boss-entrance-volcano',
+  'cosmic-council-judgment':  'boss-entrance-cosmic',
+};
+
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
 }
@@ -91,6 +99,9 @@ export function openArena(bossId: string): void {
   overlay.classList.remove('arena-entering');
   void overlay.offsetWidth;
   overlay.classList.add('arena-entering');
+  // P8: per-boss entrance SFX (silent until operator regenerates audio).
+  const sfxId = BOSS_ENTRANCE_SFX[boss.id];
+  if (sfxId) void playEventSfx(sfxId, 8);
   renderArenaStage();
 }
 

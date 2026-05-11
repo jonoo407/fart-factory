@@ -62,4 +62,13 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
     expect(ids.has('legendary-fanfare')).toBe(true);
     expect(ids.has('quest-claimed')).toBe(true);
   });
+
+  it('includes 5 per-boss entrance SFX seeds (PLAN_v5 P8)', () => {
+    const ids = new Set(SEEDS.map((s) => s.id));
+    expect(ids.has('boss-entrance-granny')).toBe(true);
+    expect(ids.has('boss-entrance-royal')).toBe(true);
+    expect(ids.has('boss-entrance-haunted')).toBe(true);
+    expect(ids.has('boss-entrance-volcano')).toBe(true);
+    expect(ids.has('boss-entrance-cosmic')).toBe(true);
+  });
 });
