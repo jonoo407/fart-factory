@@ -1415,6 +1415,51 @@ footer {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* --- Feature intro (per-system mini-explainer) --- */
+.feature-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 305;
+  background: rgba(10, 5, 30, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: onboardingFade 0.25s ease-out;
+}
+.feature-intro-card {
+  background: linear-gradient(160deg, #2a1050, #1a0a3e);
+  color: #fff;
+  border: 3px solid #fde047;
+  border-radius: 18px;
+  padding: 22px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 32px rgba(253, 224, 71, 0.4);
+}
+.feature-intro-emoji { font-size: 3.4em; line-height: 1; margin-bottom: 6px; }
+.feature-intro-title {
+  font-size: 1.35em;
+  margin-bottom: 10px;
+  color: #fde68a;
+  text-shadow: 0 0 10px rgba(253, 224, 71, 0.6);
+}
+.feature-intro-body { font-size: 1em; line-height: 1.45; margin-bottom: 16px; }
+.feature-intro-close {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  border: 2px solid #fde047;
+  color: #1f1300;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  min-width: 130px;
+}
+.feature-intro-close:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
+
 /* --- Area display (current location summary) --- */
 .area-display {
   display: flex;

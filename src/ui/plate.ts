@@ -51,6 +51,7 @@ import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
 import { playPerfectCinematic } from './perfect-cinematic';
+import { showFeatureIntro } from './feature-intro';
 import { recordLaunchEvent } from '../state/daily-quest';
 import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
@@ -878,6 +879,14 @@ async function onStoryLaunch(): Promise<void> {
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
       showKitchenUnlockToast();
+      // PR3: first time the kitchen unlocks, queue an explainer modal.
+      showFeatureIntro({
+        id: 'kitchen',
+        emoji: '🍳',
+        title: 'Kitchen Mode unlocked!',
+        body: 'Tap 🍳 Kitchen Mode to switch into prep view. There you can apply treatments (roast / chill / blend / ferment) to your plate before launching — each treatment shifts properties (e.g. roast adds dry + temp, ferment adds wet + stink). Send the prepped plate to perform.',
+        cta: 'Let me cook',
+      });
     }
     // T1.2: critical-tier visual splash.
     if (tier === 'perfect' || tier === 'great' || tier === 'disaster') {

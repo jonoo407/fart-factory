@@ -306,6 +306,16 @@ export function maybeShowBossUnlockToast(): void {
     if (loadBossUnlockToastSeen(b.id)) continue;
     markBossUnlockToastSeen(b.id);
     showToast(`🏆 ${b.emoji} ${b.name} is ready to fight! Check the Notebook.`);
+    // PR3: first-ever boss unlock → explain how bosses work.
+    void import('./feature-intro').then(({ showFeatureIntro }) => {
+      showFeatureIntro({
+        id: 'boss',
+        emoji: '⚔',
+        title: 'Bosses unlocked',
+        body: "Bosses are special audiences with a fixed number of rounds and a unique puzzle each (intersection, escalation, prioritization, deduction, resource-allocation). Win on the first try and you'll unlock that boss's legendary food. Lose and you'll cool off 3 encounters — but you'll learn one of their cravings.",
+        cta: 'Bring it',
+      });
+    });
     return; // one toast per launch
   }
 }
