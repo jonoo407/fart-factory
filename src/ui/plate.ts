@@ -51,6 +51,8 @@ import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
 import { playPerfectCinematic } from './perfect-cinematic';
+import { recordLaunchEvent } from '../state/daily-quest';
+import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -863,6 +865,14 @@ async function onStoryLaunch(): Promise<void> {
     }
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
+    // PR2: feed today's daily quest with this launch.
+    recordLaunchEvent({
+      matchPct: match.pct,
+      ids,
+      hadTreatment: treatments.length > 0,
+      recipeDiscovered: Boolean(discovery?.freshlyDiscovered),
+    });
+    renderDailyQuest();
     incrementLaunchCount(); // P7: count for first-launch hint visibility
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {

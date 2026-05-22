@@ -229,6 +229,11 @@ export function submitArenaLaunch(launch: BossLaunchInput): void {
 function handleVictory(): void {
   if (!currentBoss) return;
   const reward = dispatchBossReward(currentBoss);
+  // PR2: feed today's daily quest.
+  void import('../state/daily-quest').then(({ recordBossWinEvent }) => {
+    recordBossWinEvent();
+    void import('./daily-quest').then(({ renderDailyQuest }) => renderDailyQuest());
+  });
   // T3.2: record this win as a Trophy.
   const lastResult = currentState?.results[currentState.results.length - 1];
   const matchPct = lastResult?.audienceResults[0]?.pct ?? 0;

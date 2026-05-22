@@ -13,6 +13,7 @@ import { wireResearch } from './ui/research';
 import { wireArena } from './ui/boss-arena';
 import { wireMap } from './ui/map-screen';
 import { wireKitchen } from './ui/kitchen';
+import { wireDailyQuest } from './ui/daily-quest';
 import { showOnboarding } from './ui/onboarding';
 
 function $(id: string): HTMLElement | null {
@@ -58,6 +59,7 @@ function init(): void {
   wireArena();
   wireMap();
   wireKitchen();
+  wireDailyQuest();
   showOnboarding();
 
   const w = window as unknown as {

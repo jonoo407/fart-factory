@@ -342,6 +342,81 @@ body {
 .shop-btn:hover { filter: brightness(1.1); }
 .shop-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* --- Daily quest strip (PR2) --- */
+.daily-quest-strip {
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(40, 20, 70, 0.45);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.18);
+}
+.daily-quest-header {
+  font-weight: bold;
+  color: #ffd97a;
+  font-size: 0.95em;
+  margin-bottom: 6px;
+}
+.daily-quest-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.daily-quest-step {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9em;
+  color: #e6f0ff;
+}
+.daily-quest-step-done { color: #4ade80; text-decoration: line-through; opacity: 0.8; }
+.daily-quest-check { font-size: 1.1em; line-height: 1; }
+.daily-quest-progress { font-size: 0.85em; color: #fde68a; }
+.daily-quest-action {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+.daily-quest-claim {
+  padding: 8px 12px;
+  background: rgba(74, 222, 128, 0.18);
+  border: 2px solid #4ade80;
+  border-radius: 10px;
+  color: #d1fae5;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+}
+.daily-quest-claim:disabled,
+.daily-quest-claim[aria-disabled='true'] {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+.daily-quest-claim-ready {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  border-color: #fde047;
+  color: #1f1300;
+  animation: daily-quest-pulse 1.8s ease-in-out infinite;
+}
+.daily-quest-pending {
+  font-size: 0.85em;
+  color: #cbd5e1;
+  font-style: italic;
+}
+@keyframes daily-quest-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(253, 224, 71, 0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-quest-claim-ready { animation: none; }
+}
+
 /* --- Belly meter --- */
 .belly-meter-wrap {
   display: flex;
