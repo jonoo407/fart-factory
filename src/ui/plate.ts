@@ -130,7 +130,7 @@ export function renderPantryGrid(): void {
   if (!grid) return;
   const unlocked = new Set(loadPantry());
   const showLocked = loadPantryShowLocked();
-  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked);
+  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked, loadFoodMastery);
   grid.innerHTML = html;
   // V8 T5 — toggle button reflects the current state and the locked count.
   const toggle = $('pantryShowLockedBtn') as HTMLButtonElement | null;

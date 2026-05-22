@@ -542,6 +542,31 @@ body {
   cursor: default;
   min-height: 90px;
   justify-content: center;
+  position: relative;
+}
+.mastery-chip {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.7em;
+  line-height: 1;
+  letter-spacing: -1px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.mastery-chip-master,
+.mastery-chip-legendary {
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7));
+}
+.mastery-chip-legendary {
+  animation: mastery-chip-pulse 2.4s ease-in-out infinite;
+}
+@keyframes mastery-chip-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mastery-chip-legendary { animation: none; }
 }
 .food-card-clickable { cursor: pointer; }
 .food-card-clickable:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 2px; }
