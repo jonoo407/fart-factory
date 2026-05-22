@@ -22,6 +22,7 @@ import {
   bumpBestMatchOverall,
   addGold,
   addResearchNotes,
+  markHiddenComboFound,
 } from '../state/persistence';
 import type { RecipeResult } from '../scoring/fart-recipe';
 import { resolveLaunchProps } from '../scoring/launch-resolver';
@@ -784,7 +785,15 @@ function onStoryLaunch(): void {
     ? aud.restrictions.slice(1)
     : aud.restrictions;
   // T4.1: hidden plate combos detect BEFORE scoring.
-  const hiddenCombo = ingredientCount > 0 ? detectHiddenCombo(ids) : null;
+  const priorStreak = loadStreak();
+  const hiddenCombo = ingredientCount > 0
+    ? detectHiddenCombo(ids, {
+        audienceId: aud.id,
+        areaId,
+        getMasteryUses: loadFoodMastery,
+        streak: priorStreak,
+      })
+    : null;
   const baseMatch = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
   const match = hiddenCombo?.guaranteedPerfect
     ? { pct: 100, violations: [] }
@@ -844,10 +853,11 @@ function onStoryLaunch(): void {
         showLootDropSplash(drop);
       }
     }
-    // T4.1: apply hidden-combo bonus rewards + splash.
+    // T4.1: apply hidden-combo bonus rewards + splash. Persist discovery.
     if (hiddenCombo) {
       if (hiddenCombo.bonusGold > 0) addGold(hiddenCombo.bonusGold);
       if (hiddenCombo.bonusNotes > 0) addResearchNotes(hiddenCombo.bonusNotes);
+      markHiddenComboFound(hiddenCombo.id);
       showHiddenComboSplash(hiddenCombo);
     }
     bumpBestMatch(aud.id, match.pct);

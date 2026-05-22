@@ -2429,6 +2429,24 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 .pantry-toggle[hidden] { display: none; }
 
 /* === V8 T4 — Field Guide entries === */
+.hidden-combos { display: grid; gap: 6px; }
+.hidden-combo {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  row-gap: 2px;
+  column-gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 2px solid rgba(148, 163, 184, 0.25);
+}
+.hidden-combo-locked { opacity: 0.5; filter: grayscale(0.5); }
+.hidden-combo-found { border-color: rgba(255, 215, 0, 0.55); background: rgba(255, 215, 0, 0.08); }
+.hidden-combo-emoji { grid-row: 1 / span 2; font-size: 1.6em; line-height: 1; text-align: center; }
+.hidden-combo-name { font-weight: bold; font-size: 0.95em; color: #ffe6b3; }
+.hidden-combo-hint { font-size: 0.85em; color: #cbd5e1; font-style: italic; }
+
 .field-guide { display: grid; gap: 10px; }
 .field-guide-entry {
   padding: 10px 12px;

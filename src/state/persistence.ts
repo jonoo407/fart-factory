@@ -14,6 +14,7 @@ const KEY_NOTES = 'fart_research';       // number — research notes balance
 const KEY_RECIPES = 'fart_recipes_seen'; // string[] — discovered recipe ids
 const KEY_LAST_AREA = 'fart_area';       // current area id
 const KEY_LAST_MATCH = 'fart_last_match'; // number — last launch match% for trend
+const KEY_HIDDEN_COMBOS = 'fart_hidden_combos_found'; // string[] — discovered hidden combo ids
 
 function safeLoad<T>(key: string, fallback: T, validate: (v: unknown) => v is T): T {
   try {
@@ -123,6 +124,24 @@ export function markRecipeDiscovered(id: string): { added: boolean; list: string
   if (cur.includes(id)) return { added: false, list: cur };
   const next = [...cur, id];
   safeSave(KEY_RECIPES, next);
+  return { added: true, list: next };
+}
+
+// ----- Discovered hidden combos (PR4) -----
+
+export function loadHiddenCombosFound(): string[] {
+  return safeLoad<string[]>(
+    KEY_HIDDEN_COMBOS,
+    [],
+    (v): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string'),
+  );
+}
+
+export function markHiddenComboFound(id: string): { added: boolean; list: string[] } {
+  const cur = loadHiddenCombosFound();
+  if (cur.includes(id)) return { added: false, list: cur };
+  const next = [...cur, id];
+  safeSave(KEY_HIDDEN_COMBOS, next);
   return { added: true, list: next };
 }
 

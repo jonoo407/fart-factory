@@ -8,7 +8,8 @@
  */
 
 import { RECIPES, getRecipe, type Recipe } from '../state/recipes';
-import { loadDiscoveredRecipes, loadPantry } from '../state/persistence';
+import { loadDiscoveredRecipes, loadPantry, loadHiddenCombosFound } from '../state/persistence';
+import { HIDDEN_COMBO_CATALOG } from '../scoring/hidden-combos';
 import { FOODS, getFood } from '../state/food';
 import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
 import { recipeProgress } from '../scoring/discovery';
@@ -205,6 +206,27 @@ function renderFieldGuide(): void {
   grid.innerHTML = unlockedEntries + lockedFoot;
 }
 
+function renderHiddenCombos(): void {
+  const grid = $('hiddenCombosList');
+  if (!grid) return;
+  const found = new Set(loadHiddenCombosFound());
+  grid.innerHTML = HIDDEN_COMBO_CATALOG.map((c) => {
+    const isFound = found.has(c.id);
+    if (isFound) {
+      return `<div class="hidden-combo hidden-combo-found" data-combo="${c.id}">
+        <span class="hidden-combo-emoji">${c.emoji}</span>
+        <span class="hidden-combo-name">${c.name}</span>
+        <span class="hidden-combo-hint">${c.hint}</span>
+      </div>`;
+    }
+    return `<div class="hidden-combo hidden-combo-locked" data-combo="${c.id}">
+      <span class="hidden-combo-emoji">❓</span>
+      <span class="hidden-combo-name">???</span>
+      <span class="hidden-combo-hint">${c.hint}</span>
+    </div>`;
+  }).join('');
+}
+
 function renderTrophyList(): void {
   const grid = $('trophyList');
   if (!grid) return;
@@ -231,6 +253,7 @@ export function openNotebook(): void {
   renderLegendaryQuests();
   renderBossList();
   renderFieldGuide();
+  renderHiddenCombos();
   renderLegendaryCodex();
   renderTrophyList();
   $('notebookModal')?.removeAttribute('hidden');
