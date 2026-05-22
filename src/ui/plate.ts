@@ -50,6 +50,7 @@ import { applyLegendaryProps } from '../scoring/legendary-buffs';
 import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
+import { playPerfectCinematic } from './perfect-cinematic';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
@@ -735,7 +736,7 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
   }
 }
 
-function onStoryLaunch(): void {
+async function onStoryLaunch(): Promise<void> {
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
   // P1: resolve launch through prep-aware path. If treatments are
@@ -872,6 +873,11 @@ function onStoryLaunch(): void {
     if (tier === 'perfect' || tier === 'great' || tier === 'disaster') {
       showCriticalSplash(tier);
     }
+    // PR6: PERFECT cinematic — pause input ~1.2s, fire confetti + sting
+    // before the result panel renders. Reduced-motion users skip the hold.
+    if (tier === 'perfect') {
+      await playPerfectCinematic();
+    }
     // V8 T1.b: axis-discovery splash (Scheme 1) — fires the FIRST time a
     // hidden axis registers ≥1 in the player's own fart. Idempotent: if
     // nothing new was discovered this launch, the splash is a no-op.
@@ -909,7 +915,9 @@ function onStoryLaunch(): void {
 }
 
 function wireStoryLaunchButton(): void {
-  $('storyLaunchBtn')?.addEventListener('click', onStoryLaunch);
+  $('storyLaunchBtn')?.addEventListener('click', () => {
+    void onStoryLaunch();
+  });
 }
 
 /** V8 T5 — wire the "Show locked teasers" toggle. */

@@ -1245,6 +1245,34 @@ h1 {
   50% { transform: scale(2); opacity: 0.6; }
   100% { transform: scale(3) translateY(-100px); opacity: 0; }
 }
+
+/* PR6 — PERFECT cinematic confetti. Spawned into .gas-overlay. */
+.confetti-piece {
+  position: absolute;
+  top: -8vh;
+  left: var(--cx, 50vw);
+  font-size: 1.6em;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.55, 0.4, 1);
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+}
+@keyframes confetti-fall {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  100% {
+    transform:
+      translate(var(--cdx, 0vw), 110vh)
+      rotate(var(--crot, 360deg));
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { display: none; }
+}
 footer {
   text-align: center;
   padding: 20px;
