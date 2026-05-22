@@ -12,11 +12,8 @@ const KEY_PANTRY = 'fart_pantry';        // string[] — unlocked food ids
 const KEY_GOLD = 'fart_gold';            // number — current gold balance
 const KEY_NOTES = 'fart_research';       // number — research notes balance
 const KEY_RECIPES = 'fart_recipes_seen'; // string[] — discovered recipe ids
-const KEY_MODE = 'fart_mode';            // 'story' | 'sandbox'
 const KEY_LAST_AREA = 'fart_area';       // current area id
 const KEY_LAST_MATCH = 'fart_last_match'; // number — last launch match% for trend
-
-export type Mode = 'story' | 'sandbox';
 
 function safeLoad<T>(key: string, fallback: T, validate: (v: unknown) => v is T): T {
   try {
@@ -127,22 +124,6 @@ export function markRecipeDiscovered(id: string): { added: boolean; list: string
   const next = [...cur, id];
   safeSave(KEY_RECIPES, next);
   return { added: true, list: next };
-}
-
-// ----- Mode (story / sandbox) -----
-
-export function loadMode(): Mode {
-  // Tier 7 Phase M: default flipped to 'story'. The food game IS the
-  // headline product; Sandbox remains accessible via the 🍴 toggle in
-  // the header for players who prefer the original slider experience.
-  return safeLoad<Mode>(
-    KEY_MODE,
-    'story',
-    (v): v is Mode => v === 'story' || v === 'sandbox',
-  );
-}
-export function setMode(m: Mode): void {
-  safeSave(KEY_MODE, m);
 }
 
 // ----- Last-selected area + last-match (for trend) -----

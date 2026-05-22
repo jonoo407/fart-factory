@@ -12,34 +12,7 @@ body {
   overflow-x: hidden;
 }
 .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.mode-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 0.95em;
-  font-weight: bold;
-  cursor: pointer;
-  min-height: 44px;
-  min-width: 44px;
-  transition: background 0.15s, border-color 0.15s;
-}
-.mode-btn[aria-pressed='true'] {
-  background: rgba(255, 217, 122, 0.25);
-  border-color: rgba(255, 217, 122, 0.7);
-  color: #ffd97a;
-}
-.mode-btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
 
-/* Story Mode shell — visible only when body[data-mode="story"]. */
 .story-shell {
   background: rgba(20, 40, 80, 0.5);
   border: 2px solid #aaccff;
@@ -1185,15 +1158,6 @@ body {
   100% { transform: scale(1); }
 }
 
-/* Sandbox-only elements hidden in Story Mode (legacy slider chrome). */
-body[data-mode='story'] .challenge,
-body[data-mode='story'] .lab,
-body[data-mode='story'] .buttons,
-body[data-mode='story'] .reactions,
-body[data-mode='story'] .commentary,
-body[data-mode='story'] .results {
-  display: none !important;
-}
 h1 {
   text-align: center;
   font-size: 2.2em;
@@ -1201,149 +1165,6 @@ h1 {
   text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
 }
 .subtitle { text-align: center; font-size: 0.95em; color: #aaffaa; margin-bottom: 15px; }
-.lab {
-  background: rgba(0, 50, 0, 0.3);
-  border: 2px solid #00ff00;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
-}
-.challenge {
-  background: rgba(40, 20, 70, 0.5);
-  border: 2px solid #ffaa00;
-  border-radius: 15px;
-  padding: 12px 14px;
-  margin: 10px 0;
-  box-shadow: 0 0 12px rgba(255, 170, 0, 0.2);
-}
-.challenge-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.challenge-emoji {
-  font-size: 2.2em;
-  line-height: 1;
-  flex: 0 0 auto;
-}
-.challenge-text { flex: 1 1 auto; }
-.challenge-label {
-  font-size: 0.95em;
-  color: #ffd97a;
-  font-weight: bold;
-}
-.challenge-name { color: #fff; }
-.challenge-hint {
-  font-size: 0.9em;
-  color: #ffe6b3;
-  margin-top: 2px;
-  font-style: italic;
-}
-.challenge-match {
-  text-align: center;
-  margin-top: 10px;
-  padding: 6px 10px;
-  background: rgba(255, 170, 0, 0.15);
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.05em;
-  color: #ffd97a;
-}
-.challenge-match-emoji { font-size: 1.2em; }
-.challenge-best {
-  text-align: center;
-  margin-top: 6px;
-  font-size: 0.95em;
-  color: #ffe6b3;
-  opacity: 0.9;
-}
-.audience {
-  text-align: center;
-  margin-top: 8px;
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.05em;
-  color: #fff;
-}
-.audience-trend {
-  font-size: 0.9em;
-  font-weight: normal;
-  opacity: 0.85;
-}
-/* Reactive variety per V27: high-match celebratory pulse on the
- * challenge card. Tier 1 (≥90%): warm gold pulse. Tier 2 (=100%):
- * brighter flash + stronger pulse. transform/opacity-only — V7-safe. */
-.challenge.match-tier-1 { animation: challengePulse1 900ms ease-out; }
-.challenge.match-tier-2 { animation: challengePulse2 1200ms ease-out; }
-@keyframes challengePulse1 {
-  0%   { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-  40%  { transform: scale(1.03); box-shadow: 0 0 28px rgba(255, 215, 0, 0.6); }
-  100% { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-}
-@keyframes challengePulse2 {
-  0%   { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-  20%  { transform: scale(1.07); box-shadow: 0 0 50px rgba(255, 230, 90, 0.95); }
-  60%  { transform: scale(0.98); box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); }
-  100% { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-}
-.slider-group { margin: 8px 0; }
-.slider-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95em;
-  margin-bottom: 3px;
-}
-.slider-label .emoji-range { color: #aaffcc; font-size: 0.85em; }
-.slider-label .hint {
-  font-size: 1em;
-  min-width: 1.6em;
-  text-align: center;
-  display: inline-block;
-}
-.slider-label .hint[data-dir='ok'] { color: #ffd97a; }
-.slider-label .hint[data-intensity='3'] { font-size: 0.95em; }
-input[type=range] {
-  width: 100%;
-  /*
-   * V3 / WCAG 2.2 SC 2.5.8: 44px minimum target height. Was 30px which
-   * failed the touch-target spec on mobile (375×667). The thumb is
-   * already 44×44 but the track itself must also be tappable.
-   */
-  height: 44px;
-  -webkit-appearance: none;
-  background: linear-gradient(90deg, #004400, #00ff00, #ffff00, #ff0000);
-  background-clip: content-box;
-  padding: 7px 0;
-  border-radius: 12px;
-  outline: none;
-  touch-action: manipulation;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid #00ff00;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00ff00;
-}
-input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4px; }
-.val {
-  display: inline-block;
-  background: #00ff00;
-  color: #000;
-  border-radius: 8px;
-  padding: 2px 10px;
-  font-weight: bold;
-  font-size: 0.95em;
-  min-width: 30px;
-  text-align: center;
-}
-.buttons { display: flex; gap: 10px; margin: 15px 0; }
 .btn {
   flex: 1;
   padding: 18px;
@@ -1358,33 +1179,12 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
 }
 .btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
 .btn:active { transform: scale(0.95); }
-/*
- * Launch button wind-up / pop / settle motion (Disney 12 — Anticipation,
- * Squash & Stretch, Follow-Through). 80ms windup (squash down), 200ms pop
- * (stretch up + bright glow), 320ms settle (overshoot bounce back to rest).
- * Total ~600ms. transform/opacity-only to stay GPU-composited (V7).
- */
-.launch.firing { animation: launchWindupPopSettle 600ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
-@keyframes launchWindupPopSettle {
-  0%   { transform: scale(1); }
-  13%  { transform: scaleX(1.05) scaleY(0.85); } /* squash (windup, ~80ms) */
-  20%  { transform: scaleX(1.05) scaleY(0.85); }
-  45%  { transform: scaleX(0.92) scaleY(1.18); box-shadow: 0 4px 35px rgba(255, 220, 100, 0.95); } /* stretch + glow pop (~200ms) */
-  70%  { transform: scale(1.06); }
-  85%  { transform: scale(0.97); } /* slight overshoot bounce */
-  100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); }
-}
 .launch {
   background: linear-gradient(135deg, #ff0000, #ff6600);
   color: #fff;
   font-size: 1.4em;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-.random {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
 }
 .mute {
   flex: 0 0 auto;
@@ -1397,52 +1197,6 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
 .mute[aria-pressed='true'] {
   background: rgba(255, 100, 100, 0.25);
   color: #ffaaaa;
-}
-.results {
-  background: rgba(50, 0, 50, 0.4);
-  border: 2px solid #ff00ff;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-  display: none;
-}
-.results h2 { text-align: center; margin-bottom: 10px; color: #ff88ff; }
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(255, 0, 255, 0.2);
-  font-size: 0.95em;
-}
-.score-row:last-child { border: none; }
-.grade {
-  text-align: center;
-  font-size: 3em;
-  margin: 10px 0;
-  text-shadow: 0 0 20px currentColor;
-}
-.commentary {
-  text-align: center;
-  font-style: italic;
-  color: #ffff88;
-  font-size: 1.05em;
-  margin: 10px 0;
-  min-height: 50px;
-  line-height: 1.4;
-}
-.reactions {
-  display: flex;
-  justify-content: space-around;
-  font-size: 2em;
-  margin: 10px 0;
-  min-height: 50px;
-}
-.reaction { transition: transform 0.3s; display: inline-block; }
-.reaction.active { animation: react 0.5s ease; }
-@keyframes react {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.5) rotate(15deg); }
-  100% { transform: scale(1); }
 }
 .gas-overlay {
   position: fixed;
@@ -1466,40 +1220,6 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
   50% { transform: scale(2); opacity: 0.6; }
   100% { transform: scale(3) translateY(-100px); opacity: 0; }
 }
-.hall {
-  background: rgba(80, 50, 0, 0.3);
-  border: 2px solid #ffaa00;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-}
-.hall h2 { text-align: center; color: #ffcc00; margin-bottom: 10px; }
-.hall-entry {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  background: rgba(255, 170, 0, 0.1);
-  border-radius: 8px;
-  margin: 3px 0;
-  font-size: 0.95em;
-}
-.hall-empty { text-align: center; color: #ffcc88; font-style: italic; }
-.stink-meter {
-  height: 18px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #88ff88, #ffff00, #ff8800, #ff0000, #880088);
-  margin: 5px 0;
-  position: relative;
-}
-.stink-fill {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 0 8px 8px 0;
-  transition: width 0.5s;
-}
 footer {
   text-align: center;
   padding: 20px;
@@ -1509,19 +1229,6 @@ footer {
    * matches .ach-desc parity. Was 0.85em (~13.6px) below floor.
    */
   font-size: 0.9em;
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-.sparkle {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-  filter: drop-shadow(0 0 6px #ffeb3b);
-  animation: sparkleBurst 1.8s ease-out forwards;
-  will-change: transform, opacity;
 }
 .onboarding {
   position: fixed;
@@ -1579,74 +1286,6 @@ footer {
 @keyframes onboardingFade {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-.combo-banner {
-  text-align: center;
-  margin: 8px 0;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, #ff5722, #ff9800, #ffc107);
-  color: #1a0a2e;
-  font-weight: bold;
-  font-size: 1.1em;
-  border-radius: 12px;
-  box-shadow: 0 0 18px rgba(255, 152, 0, 0.6);
-  animation: comboPulse 1.4s ease-in-out infinite;
-}
-.combo-banner[hidden] { display: none !important; }
-@keyframes comboPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-.achievement-host {
-  position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: min(420px, calc(100vw - 20px));
-  pointer-events: none;
-}
-.achievement-toast {
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95));
-  color: #221100;
-  border: 2px solid #ffaa00;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-family: inherit;
-  font-weight: bold;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  animation: toastIn 0.35s ease-out, toastOut 0.4s ease-in 3.6s forwards;
-}
-.ach-emoji { font-size: 2em; line-height: 1; }
-.ach-name { font-size: 1em; }
-.ach-desc { font-size: 0.9em; font-weight: normal; opacity: 0.9; }
-@keyframes toastIn {
-  from { transform: translateY(-30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-@keyframes toastOut {
-  to { transform: translateY(-20px); opacity: 0; }
-}
-@keyframes sparkleBurst {
-  0% {
-    transform: translate(0, 0) scale(0.3) rotate(0deg);
-    opacity: 0;
-  }
-  10% { opacity: 1; }
-  100% {
-    transform:
-      translate(var(--dx, 0px), var(--dy, -150px))
-      scale(1.4)
-      rotate(360deg);
-    opacity: 0;
-  }
 }
 /* --- Area display (current location summary) --- */
 .area-display {

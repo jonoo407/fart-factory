@@ -9,8 +9,6 @@ import {
   addResearchNotes,
   loadDiscoveredRecipes,
   markRecipeDiscovered,
-  loadMode,
-  setMode,
   loadLastArea,
   setLastArea,
   loadLastMatch,
@@ -94,22 +92,6 @@ describe('Discovered recipes', () => {
     expect(a.list).toContain('swamp-beast');
     const b = markRecipeDiscovered('swamp-beast');
     expect(b.added).toBe(false);
-  });
-});
-
-describe('Mode toggle', () => {
-  it('defaults to story (Phase M flip — food game is the headline)', () => {
-    expect(loadMode()).toBe('story');
-  });
-  it('round-trips story and sandbox', () => {
-    setMode('story');
-    expect(loadMode()).toBe('story');
-    setMode('sandbox');
-    expect(loadMode()).toBe('sandbox');
-  });
-  it('returns default on corrupt value', () => {
-    localStorage.setItem('fart_mode', '"weird"');
-    expect(loadMode()).toBe('story');
   });
 });
 

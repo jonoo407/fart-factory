@@ -54,7 +54,7 @@ import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments 
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
-import { audienceReaction } from '../state/challenge';
+import { audienceReaction } from '../scoring/audience-reactions';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';

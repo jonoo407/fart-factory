@@ -8,17 +8,10 @@
   </head>
   <body>
     <div class="container">
-      <div class="header-row">
-        <h1>💨 The Fart Factory 💨</h1>
-        <button type="button" id="modeBtn" class="mode-btn"
-                aria-label="Switch game mode" aria-pressed="false">
-          🍴 Story
-        </button>
-      </div>
+      <h1>💨 The Fart Factory 💨</h1>
       <p class="subtitle">Welcome, Fart Scientist. Your lab awaits.</p>
 
-      <!-- Story Mode shell (Tier 7). Pantry + plate + belly meter. -->
-      <div id="storyShell" class="story-shell" hidden role="region" aria-label="Story Mode">
+      <div id="storyShell" class="story-shell" role="region" aria-label="Story Mode">
         <div id="arenaOverlay" class="arena-overlay" hidden role="region" aria-label="Boss arena">
           <div class="arena-card">
             <div class="arena-header">
@@ -54,6 +47,7 @@
           <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
           <button type="button" class="btn notebook-btn" id="notebookBtn" aria-label="Open lab notebook">📖 Notebook <span id="notebookCounter">0/0</span></button>
           <button type="button" class="btn shop-btn" id="shopBtn" aria-label="Open pantry shop">🛒 Shop</button>
+          <button type="button" class="btn mute" id="muteBtn" aria-pressed="false" aria-label="Mute audio">🔊</button>
         </div>
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
@@ -127,111 +121,7 @@
         </div>
       </div>
 
-      <div id="challengeCard" class="challenge" role="region" aria-label="Today's challenge">
-        <div class="challenge-row">
-          <span class="challenge-emoji" id="challengeEmoji">🎯</span>
-          <div class="challenge-text">
-            <div class="challenge-label">🎯 Today's Challenge:
-              <span class="challenge-name" id="challengeName">—</span>
-            </div>
-            <div class="challenge-hint" id="challengeHint">—</div>
-          </div>
-        </div>
-        <div class="audience" id="audience" hidden aria-live="polite">
-          <span class="audience-tier" id="audienceTier"></span>
-          <span class="audience-trend" id="audienceTrend"></span>
-        </div>
-        <div class="challenge-match" id="challengeMatch" aria-live="polite" hidden>
-          Match: <span id="challengeMatchPct">—</span>%
-          <span class="challenge-match-emoji" id="challengeMatchEmoji"></span>
-        </div>
-        <div class="challenge-best" id="challengeBest" aria-live="off">
-          🏆 Best today: <span id="challengeBestPct">0</span>%
-        </div>
-      </div>
-
-      <div class="lab" role="group" aria-label="Fart parameters">
-        <div class="slider-group">
-          <label class="slider-label" for="s1">
-            <span>⏱️ Length <span class="val" id="v1" aria-live="off">5</span></span>
-            <span class="hint" id="hint1" aria-live="polite"></span>
-            <span class="emoji-range">Quick Toot → Never-Ending</span>
-          </label>
-          <input type="range" id="s1" min="1" max="10" value="5" aria-label="Length, 1 to 10" />
-        </div>
-        <div class="slider-group">
-          <label class="slider-label" for="s2">
-            <span>💧 Wetness <span class="val" id="v2" aria-live="off">5</span></span>
-            <span class="hint" id="hint2" aria-live="polite"></span>
-            <span class="emoji-range">Bone Dry → Swamp Mode</span>
-          </label>
-          <input type="range" id="s2" min="1" max="10" value="5" aria-label="Wetness, 1 to 10" />
-        </div>
-        <div class="slider-group">
-          <label class="slider-label" for="s3">
-            <span>🔊 Volume <span class="val" id="v3" aria-live="off">5</span></span>
-            <span class="hint" id="hint3" aria-live="polite"></span>
-            <span class="emoji-range">Silent → Car Alarm</span>
-          </label>
-          <input type="range" id="s3" min="1" max="10" value="5" aria-label="Volume, 1 to 10" />
-        </div>
-        <div class="slider-group">
-          <label class="slider-label" for="s4">
-            <span>🦨 Stinkiness <span class="val" id="v4" aria-live="off">5</span></span>
-            <span class="hint" id="hint4" aria-live="polite"></span>
-            <span class="emoji-range">Fresh Breeze → Biohazard</span>
-          </label>
-          <input type="range" id="s4" min="1" max="10" value="5" aria-label="Stinkiness, 1 to 10" />
-        </div>
-        <div class="slider-group">
-          <label class="slider-label" for="s5">
-            <span>🌡️ Temperature <span class="val" id="v5" aria-live="off">5</span></span>
-            <span class="hint" id="hint5" aria-live="polite"></span>
-            <span class="emoji-range">Ice Cold → Volcanic</span>
-          </label>
-          <input type="range" id="s5" min="1" max="10" value="5" aria-label="Temperature, 1 to 10" />
-        </div>
-        <div class="slider-group">
-          <label class="slider-label" for="s6">
-            <span>🎵 Musical Quality <span class="val" id="v6" aria-live="off">5</span></span>
-            <span class="hint" id="hint6" aria-live="polite"></span>
-            <span class="emoji-range">Monotone → Full Symphony</span>
-          </label>
-          <input type="range" id="s6" min="1" max="10" value="5" aria-label="Musical quality, 1 to 10" />
-        </div>
-      </div>
-
-      <div class="buttons">
-        <button class="btn launch" id="launchBtn">🚀 LAUNCH FART</button>
-        <button class="btn random" id="randomBtn">🎲 Random</button>
-        <button class="btn mute" id="muteBtn" type="button" aria-pressed="false" aria-label="Mute audio">🔊</button>
-      </div>
-
-      <div id="comboBanner" class="combo-banner" hidden role="status" aria-live="polite"></div>
-      <div class="reactions" id="reactions" aria-hidden="true"></div>
-      <div class="commentary" id="commentary" aria-live="polite"></div>
-
-      <div class="results" id="results">
-        <h2>📊 Fart Report Card</h2>
-        <div class="score-row"><span>💪 Impressiveness</span><span id="sc1">—</span></div>
-        <div class="score-row"><span>🦨 Stinkiness</span><span id="sc2">—</span></div>
-        <div class="stink-meter" aria-hidden="true">
-          <div class="stink-fill" id="stinkFill" style="width:100%"></div>
-        </div>
-        <div class="score-row"><span>🎵 Sound Quality</span><span id="sc3">—</span></div>
-        <div class="score-row"><span>⏱️ Duration</span><span id="sc4">—</span></div>
-        <div class="grade" id="grade">—</div>
-        <div style="text-align:center;font-size:.95em;color:#ffaaff" id="gradeDesc"></div>
-      </div>
-
-      <div class="hall">
-        <h2>🏆 Hall of Shame 🏆</h2>
-        <div id="hallList">
-          <div class="hall-empty">No legendary farts yet... Launch one!</div>
-        </div>
-      </div>
-
-      <footer>The Fart Factory v2.0 — A Serious Scientific Institution 🧪</footer>
+      <footer>The Fart Factory — A Serious Scientific Institution 🧪</footer>
     </div>
 
     <div id="mapScreen" class="map-screen" hidden role="dialog" aria-modal="true" aria-label="World map">
