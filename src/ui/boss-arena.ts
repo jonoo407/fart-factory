@@ -15,6 +15,7 @@ import {
   loadBossUnlockToastSeen,
   markBossUnlockToastSeen,
 } from '../state/boss-progress';
+import { loadBossLossCount, revealedCravingsForBoss } from '../state/boss-hints';
 import {
   createBossRunState,
   evaluateBossRound,
@@ -59,11 +60,21 @@ export function renderBossList(): void {
       ? `<span class="boss-card-subtitle">Act ${b.act} · ${b.skillKind}</span>`
       : `<span class="boss-card-subtitle boss-card-locked-hint">${b.unlockReq.description}</span>`;
     const defeatedBadge = isDefeated ? '<span class="boss-card-defeated">✓ Defeated</span>' : '';
+    // PR7 — shame strip + revealed cravings from prior losses.
+    const lossCount = loadBossLossCount(b.id);
+    const shame = lossCount > 0
+      ? `<span class="boss-card-shame">💀 Bested you ${lossCount}×</span>`
+      : '';
+    const revealed = revealedCravingsForBoss(b.id);
+    const revealedHtml = revealed.length > 0
+      ? `<ul class="boss-card-cravings">${revealed.map((c) => `<li>📖 craves <strong>${c}</strong></li>`).join('')}</ul>`
+      : '';
     return `<div class="boss-card${isDefeated ? ' boss-card-won' : ''}" data-boss="${b.id}">
       <span class="boss-card-emoji">${b.emoji}</span>
       <div class="boss-card-meta">
-        <div class="boss-card-name">${b.name} ${defeatedBadge}</div>
+        <div class="boss-card-name">${b.name} ${defeatedBadge}${shame}</div>
         ${subtitle}
+        ${revealedHtml}
       </div>
       <button type="button" class="boss-fight-btn" data-boss="${b.id}" aria-disabled="${ariaDisabled}" aria-label="${unlocked ? 'Fight' : 'Locked'} ${b.name}">${buttonText}</button>
     </div>`;
@@ -218,6 +229,11 @@ export function submitArenaLaunch(launch: BossLaunchInput): void {
 function handleVictory(): void {
   if (!currentBoss) return;
   const reward = dispatchBossReward(currentBoss);
+  // PR2: feed today's daily quest.
+  void import('../state/daily-quest').then(({ recordBossWinEvent }) => {
+    recordBossWinEvent();
+    void import('./daily-quest').then(({ renderDailyQuest }) => renderDailyQuest());
+  });
   // T3.2: record this win as a Trophy.
   const lastResult = currentState?.results[currentState.results.length - 1];
   const matchPct = lastResult?.audienceResults[0]?.pct ?? 0;
@@ -246,18 +262,33 @@ function handleVictory(): void {
 
 function handleDefeat(): void {
   if (!currentBoss) return;
+  const bossId = currentBoss.id;
   // PLAN_v5 Phase 5: cooldown the boss for 3 encounters, reroll slot.
   void import('../state/boss-cadence').then(({ setBossCooldown, rollNextBossSlot }) => {
-    setBossCooldown(currentBoss!.id, 3);
+    setBossCooldown(bossId, 3);
     rollNextBossSlot();
   });
+  // PR7: record loss + (first time only) reveal one boss craving as a hint.
+  let revealedCraving: string | null = null;
+  void import('../state/boss-hints').then(({ recordFirstLoss }) => {
+    revealedCraving = recordFirstLoss(bossId);
+    renderDefeatPanel(bossId, revealedCraving);
+  });
+  // Fire the snark while the dynamic-import resolves so the panel
+  // always shows something — re-rendered with the hint if recorded.
+  renderDefeatPanel(bossId, null);
+}
+
+function renderDefeatPanel(bossId: string, revealedCraving: string | null): void {
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
-  // T3.3: per-boss snark line on loss.
   void import('../state/boss-snark').then(({ snarkForBossLoss }) => {
-    const snark = snarkForBossLoss(currentBoss!.id, Date.now() & 0xff);
-    r.innerHTML = `<div class="arena-defeat">😔 ${snark}<br><small style="opacity:0.7">(Cool off for 3 performances, then try again.)</small></div>`;
+    const snark = snarkForBossLoss(bossId, Date.now() & 0xff);
+    const hintHtml = revealedCraving
+      ? `<div class="arena-defeat-hint">📖 You learned this boss craves: <strong>${revealedCraving}</strong></div>`
+      : '';
+    r.innerHTML = `<div class="arena-defeat">😔 ${snark}<br><small style="opacity:0.7">(Cool off for 3 performances, then try again.)</small></div>${hintHtml}`;
   });
 }
 
@@ -275,6 +306,16 @@ export function maybeShowBossUnlockToast(): void {
     if (loadBossUnlockToastSeen(b.id)) continue;
     markBossUnlockToastSeen(b.id);
     showToast(`🏆 ${b.emoji} ${b.name} is ready to fight! Check the Notebook.`);
+    // PR3: first-ever boss unlock → explain how bosses work.
+    void import('./feature-intro').then(({ showFeatureIntro }) => {
+      showFeatureIntro({
+        id: 'boss',
+        emoji: '⚔',
+        title: 'Bosses unlocked',
+        body: "Bosses are special audiences with a fixed number of rounds and a unique puzzle each (intersection, escalation, prioritization, deduction, resource-allocation). Win on the first try and you'll unlock that boss's legendary food. Lose and you'll cool off 3 encounters — but you'll learn one of their cravings.",
+        cta: 'Bring it',
+      });
+    });
     return; // one toast per launch
   }
 }

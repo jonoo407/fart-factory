@@ -11,8 +11,8 @@ beforeEach(() => {
 });
 
 describe('TUTORIAL_STEPS', () => {
-  it('has at least 3 steps with title + body', () => {
-    expect(TUTORIAL_STEPS.length).toBeGreaterThanOrEqual(3);
+  it('has a thin opener of 2 steps with title + body (PR3 trim)', () => {
+    expect(TUTORIAL_STEPS.length).toBe(2);
     for (const s of TUTORIAL_STEPS) {
       expect(s.title.length).toBeGreaterThan(0);
       expect(s.body.length).toBeGreaterThan(0);

@@ -11,6 +11,26 @@ import type { Audience } from '../state/audience';
 
 type Tier = 'loved' | 'liked' | 'meh' | 'disliked' | 'evacuated';
 
+export interface AudienceReaction {
+  tier: Tier;
+  trend: 'warmer' | 'colder' | 'first' | 'same';
+}
+
+export function audienceReaction(matchPct: number, priorMatchPct: number | null): AudienceReaction {
+  let tier: Tier;
+  if (matchPct >= 90) tier = 'loved';
+  else if (matchPct >= 70) tier = 'liked';
+  else if (matchPct >= 50) tier = 'meh';
+  else if (matchPct >= 30) tier = 'disliked';
+  else tier = 'evacuated';
+  let trend: AudienceReaction['trend'];
+  if (priorMatchPct === null) trend = 'first';
+  else if (matchPct > priorMatchPct) trend = 'warmer';
+  else if (matchPct < priorMatchPct) trend = 'colder';
+  else trend = 'same';
+  return { tier, trend };
+}
+
 const REACTIONS: Record<string, Record<Tier, string>> = {
   'granny-edna': {
     loved:     'Granny Edna chuckles warmly. "Oh dear, that takes me back."',

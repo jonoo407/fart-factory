@@ -4,7 +4,11 @@ import {
   loadPantryShowLocked,
   setPantryShowLocked,
 } from '../../src/state/persistence';
-import { buildPantryGridHtml } from '../../src/ui/pantry-grid';
+import {
+  buildFoodCard,
+  buildPantryGridHtml,
+  masteryChip,
+} from '../../src/ui/pantry-grid';
 
 const STARTER_IDS = new Set(FOODS.filter((f) => f.startsUnlocked).map((f) => f.id));
 
@@ -82,5 +86,55 @@ describe('buildPantryGridHtml (V8 T5)', () => {
     const { html, lockedCount } = buildPantryGridHtml(FOODS, allIds, false);
     expect(lockedCount).toBe(0);
     expect(html).not.toMatch(/food-card-locked/);
+  });
+});
+
+describe('mastery chip on food card', () => {
+  it('returns null below apprentice (novice tier)', () => {
+    expect(masteryChip('novice')).toBeNull();
+  });
+  it('returns chip for apprentice/adept/master/legendary', () => {
+    expect(masteryChip('apprentice')).toEqual({ emoji: '⭐', label: 'Apprentice' });
+    expect(masteryChip('adept')).toEqual({ emoji: '⭐⭐', label: 'Adept' });
+    expect(masteryChip('master')).toEqual({ emoji: '⭐⭐⭐', label: 'Master' });
+    expect(masteryChip('legendary')).toEqual({ emoji: '👑', label: 'Legendary' });
+  });
+  it('buildFoodCard renders no chip below 10 uses', () => {
+    const food = FOODS[0]!;
+    const html = buildFoodCard(food, { clickable: true, masteryUses: 5 });
+    expect(html).not.toContain('mastery-chip');
+  });
+  it('buildFoodCard renders apprentice chip at 10 uses', () => {
+    const food = FOODS[0]!;
+    const html = buildFoodCard(food, { clickable: true, masteryUses: 10 });
+    expect(html).toContain('mastery-chip-apprentice');
+    expect(html).toContain('⭐');
+  });
+  it('buildFoodCard renders master chip at 50 uses', () => {
+    const food = FOODS[0]!;
+    const html = buildFoodCard(food, { clickable: true, masteryUses: 50 });
+    expect(html).toContain('mastery-chip-master');
+  });
+  it('buildFoodCard renders legendary chip at 100 uses', () => {
+    const food = FOODS[0]!;
+    const html = buildFoodCard(food, { clickable: true, masteryUses: 200 });
+    expect(html).toContain('mastery-chip-legendary');
+    expect(html).toContain('👑');
+  });
+  it('buildFoodCard does not render chip on locked card even with uses', () => {
+    const food = FOODS[0]!;
+    const html = buildFoodCard(food, { locked: true, masteryUses: 50 });
+    expect(html).not.toContain('mastery-chip');
+  });
+  it('buildPantryGridHtml uses the supplied mastery getter', () => {
+    const starterIds = new Set(FOODS.filter((f) => f.startsUnlocked).map((f) => f.id));
+    const firstUnlockedId = [...starterIds][0]!;
+    const { html } = buildPantryGridHtml(
+      FOODS,
+      starterIds,
+      false,
+      (id) => (id === firstUnlockedId ? 30 : 0),
+    );
+    expect(html).toContain('mastery-chip-adept');
   });
 });

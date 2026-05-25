@@ -8,27 +8,12 @@ export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
     emoji: '🧪',
     title: 'Welcome, Fart Scientist!',
-    body: "Today an audience is in town. Look at the top of the screen to see who they are and what kind of farts they crave.",
-  },
-  {
-    emoji: '📦',
-    title: 'Pick foods from your pantry',
-    body: 'Each food has unique properties (stink, length, musical, etc.) and costs belly. Tap a food card to add it to your plate. You can plate up to 4 foods per launch.',
-  },
-  {
-    emoji: '📍',
-    title: 'Choose where to launch',
-    body: 'Tap the 📍 Travel button to pick a location. Each spot — Backyard, Library, Elevator, Throne Room — modifies your fart properties differently. Match the audience and the location together!',
+    body: "Today an audience is in town. Tap foods from your pantry to plate them, then smash 🚀 LAUNCH FART. The audience scores your match; ≥50% earns 💰 gold, less earns 📝 research notes — both unlock more.",
   },
   {
     emoji: '🚀',
-    title: 'LAUNCH FART',
-    body: 'When ready, smash the launch button. The audience gives you a match percentage. ≥50% match → earn 💰 gold. <50% → bank 📝 research notes. Both unlock new foods and recipes.',
-  },
-  {
-    emoji: '📖',
-    title: 'Discover, shop, and chase quests',
-    body: 'Some plates secretly match named recipes — discover them in your 📖 Notebook. Spend gold in the 🛒 Shop. Unlock 6 legendary foods through multi-step quests. Then take on 5 boss audiences. Good luck!',
+    title: "You'll learn more as you play",
+    body: "Each new system (Kitchen, Bosses, Daily Quest) gets a quick intro the first time it appears. For now: plate, launch, see what happens. Good luck!",
   },
 ];
 

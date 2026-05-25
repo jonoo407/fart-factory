@@ -12,34 +12,7 @@ body {
   overflow-x: hidden;
 }
 .container { max-width: 500px; margin: 0 auto; padding: 10px; }
-.header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.mode-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-family: inherit;
-  font-size: 0.95em;
-  font-weight: bold;
-  cursor: pointer;
-  min-height: 44px;
-  min-width: 44px;
-  transition: background 0.15s, border-color 0.15s;
-}
-.mode-btn[aria-pressed='true'] {
-  background: rgba(255, 217, 122, 0.25);
-  border-color: rgba(255, 217, 122, 0.7);
-  color: #ffd97a;
-}
-.mode-btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
 
-/* Story Mode shell — visible only when body[data-mode="story"]. */
 .story-shell {
   background: rgba(20, 40, 80, 0.5);
   border: 2px solid #aaccff;
@@ -369,6 +342,81 @@ body {
 .shop-btn:hover { filter: brightness(1.1); }
 .shop-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* --- Daily quest strip (PR2) --- */
+.daily-quest-strip {
+  margin: 10px 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(40, 20, 70, 0.45);
+  border: 2px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.18);
+}
+.daily-quest-header {
+  font-weight: bold;
+  color: #ffd97a;
+  font-size: 0.95em;
+  margin-bottom: 6px;
+}
+.daily-quest-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.daily-quest-step {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9em;
+  color: #e6f0ff;
+}
+.daily-quest-step-done { color: #4ade80; text-decoration: line-through; opacity: 0.8; }
+.daily-quest-check { font-size: 1.1em; line-height: 1; }
+.daily-quest-progress { font-size: 0.85em; color: #fde68a; }
+.daily-quest-action {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+.daily-quest-claim {
+  padding: 8px 12px;
+  background: rgba(74, 222, 128, 0.18);
+  border: 2px solid #4ade80;
+  border-radius: 10px;
+  color: #d1fae5;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+}
+.daily-quest-claim:disabled,
+.daily-quest-claim[aria-disabled='true'] {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #cbd5e1;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+.daily-quest-claim-ready {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  border-color: #fde047;
+  color: #1f1300;
+  animation: daily-quest-pulse 1.8s ease-in-out infinite;
+}
+.daily-quest-pending {
+  font-size: 0.85em;
+  color: #cbd5e1;
+  font-style: italic;
+}
+@keyframes daily-quest-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); box-shadow: 0 0 14px rgba(253, 224, 71, 0.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-quest-claim-ready { animation: none; }
+}
+
 /* --- Belly meter --- */
 .belly-meter-wrap {
   display: flex;
@@ -569,6 +617,31 @@ body {
   cursor: default;
   min-height: 90px;
   justify-content: center;
+  position: relative;
+}
+.mastery-chip {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 0.7em;
+  line-height: 1;
+  letter-spacing: -1px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.mastery-chip-master,
+.mastery-chip-legendary {
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.7));
+}
+.mastery-chip-legendary {
+  animation: mastery-chip-pulse 2.4s ease-in-out infinite;
+}
+@keyframes mastery-chip-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mastery-chip-legendary { animation: none; }
 }
 .food-card-clickable { cursor: pointer; }
 .food-card-clickable:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 2px; }
@@ -1185,15 +1258,6 @@ body {
   100% { transform: scale(1); }
 }
 
-/* Sandbox-only elements hidden in Story Mode (legacy slider chrome). */
-body[data-mode='story'] .challenge,
-body[data-mode='story'] .lab,
-body[data-mode='story'] .buttons,
-body[data-mode='story'] .reactions,
-body[data-mode='story'] .commentary,
-body[data-mode='story'] .results {
-  display: none !important;
-}
 h1 {
   text-align: center;
   font-size: 2.2em;
@@ -1201,149 +1265,6 @@ h1 {
   text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
 }
 .subtitle { text-align: center; font-size: 0.95em; color: #aaffaa; margin-bottom: 15px; }
-.lab {
-  background: rgba(0, 50, 0, 0.3);
-  border: 2px solid #00ff00;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
-}
-.challenge {
-  background: rgba(40, 20, 70, 0.5);
-  border: 2px solid #ffaa00;
-  border-radius: 15px;
-  padding: 12px 14px;
-  margin: 10px 0;
-  box-shadow: 0 0 12px rgba(255, 170, 0, 0.2);
-}
-.challenge-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.challenge-emoji {
-  font-size: 2.2em;
-  line-height: 1;
-  flex: 0 0 auto;
-}
-.challenge-text { flex: 1 1 auto; }
-.challenge-label {
-  font-size: 0.95em;
-  color: #ffd97a;
-  font-weight: bold;
-}
-.challenge-name { color: #fff; }
-.challenge-hint {
-  font-size: 0.9em;
-  color: #ffe6b3;
-  margin-top: 2px;
-  font-style: italic;
-}
-.challenge-match {
-  text-align: center;
-  margin-top: 10px;
-  padding: 6px 10px;
-  background: rgba(255, 170, 0, 0.15);
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.05em;
-  color: #ffd97a;
-}
-.challenge-match-emoji { font-size: 1.2em; }
-.challenge-best {
-  text-align: center;
-  margin-top: 6px;
-  font-size: 0.95em;
-  color: #ffe6b3;
-  opacity: 0.9;
-}
-.audience {
-  text-align: center;
-  margin-top: 8px;
-  padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.05em;
-  color: #fff;
-}
-.audience-trend {
-  font-size: 0.9em;
-  font-weight: normal;
-  opacity: 0.85;
-}
-/* Reactive variety per V27: high-match celebratory pulse on the
- * challenge card. Tier 1 (≥90%): warm gold pulse. Tier 2 (=100%):
- * brighter flash + stronger pulse. transform/opacity-only — V7-safe. */
-.challenge.match-tier-1 { animation: challengePulse1 900ms ease-out; }
-.challenge.match-tier-2 { animation: challengePulse2 1200ms ease-out; }
-@keyframes challengePulse1 {
-  0%   { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-  40%  { transform: scale(1.03); box-shadow: 0 0 28px rgba(255, 215, 0, 0.6); }
-  100% { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-}
-@keyframes challengePulse2 {
-  0%   { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-  20%  { transform: scale(1.07); box-shadow: 0 0 50px rgba(255, 230, 90, 0.95); }
-  60%  { transform: scale(0.98); box-shadow: 0 0 30px rgba(255, 215, 0, 0.7); }
-  100% { transform: scale(1);   box-shadow: 0 0 12px rgba(255, 170, 0, 0.2); }
-}
-.slider-group { margin: 8px 0; }
-.slider-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.95em;
-  margin-bottom: 3px;
-}
-.slider-label .emoji-range { color: #aaffcc; font-size: 0.85em; }
-.slider-label .hint {
-  font-size: 1em;
-  min-width: 1.6em;
-  text-align: center;
-  display: inline-block;
-}
-.slider-label .hint[data-dir='ok'] { color: #ffd97a; }
-.slider-label .hint[data-intensity='3'] { font-size: 0.95em; }
-input[type=range] {
-  width: 100%;
-  /*
-   * V3 / WCAG 2.2 SC 2.5.8: 44px minimum target height. Was 30px which
-   * failed the touch-target spec on mobile (375×667). The thumb is
-   * already 44×44 but the track itself must also be tappable.
-   */
-  height: 44px;
-  -webkit-appearance: none;
-  background: linear-gradient(90deg, #004400, #00ff00, #ffff00, #ff0000);
-  background-clip: content-box;
-  padding: 7px 0;
-  border-radius: 12px;
-  outline: none;
-  touch-action: manipulation;
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: #fff;
-  border: 3px solid #00ff00;
-  cursor: pointer;
-  box-shadow: 0 0 10px #00ff00;
-}
-input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4px; }
-.val {
-  display: inline-block;
-  background: #00ff00;
-  color: #000;
-  border-radius: 8px;
-  padding: 2px 10px;
-  font-weight: bold;
-  font-size: 0.95em;
-  min-width: 30px;
-  text-align: center;
-}
-.buttons { display: flex; gap: 10px; margin: 15px 0; }
 .btn {
   flex: 1;
   padding: 18px;
@@ -1358,33 +1279,12 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
 }
 .btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
 .btn:active { transform: scale(0.95); }
-/*
- * Launch button wind-up / pop / settle motion (Disney 12 — Anticipation,
- * Squash & Stretch, Follow-Through). 80ms windup (squash down), 200ms pop
- * (stretch up + bright glow), 320ms settle (overshoot bounce back to rest).
- * Total ~600ms. transform/opacity-only to stay GPU-composited (V7).
- */
-.launch.firing { animation: launchWindupPopSettle 600ms cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
-@keyframes launchWindupPopSettle {
-  0%   { transform: scale(1); }
-  13%  { transform: scaleX(1.05) scaleY(0.85); } /* squash (windup, ~80ms) */
-  20%  { transform: scaleX(1.05) scaleY(0.85); }
-  45%  { transform: scaleX(0.92) scaleY(1.18); box-shadow: 0 4px 35px rgba(255, 220, 100, 0.95); } /* stretch + glow pop (~200ms) */
-  70%  { transform: scale(1.06); }
-  85%  { transform: scale(0.97); } /* slight overshoot bounce */
-  100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4); }
-}
 .launch {
   background: linear-gradient(135deg, #ff0000, #ff6600);
   color: #fff;
   font-size: 1.4em;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
-}
-.random {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
 }
 .mute {
   flex: 0 0 auto;
@@ -1397,52 +1297,6 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
 .mute[aria-pressed='true'] {
   background: rgba(255, 100, 100, 0.25);
   color: #ffaaaa;
-}
-.results {
-  background: rgba(50, 0, 50, 0.4);
-  border: 2px solid #ff00ff;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-  display: none;
-}
-.results h2 { text-align: center; margin-bottom: 10px; color: #ff88ff; }
-.score-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid rgba(255, 0, 255, 0.2);
-  font-size: 0.95em;
-}
-.score-row:last-child { border: none; }
-.grade {
-  text-align: center;
-  font-size: 3em;
-  margin: 10px 0;
-  text-shadow: 0 0 20px currentColor;
-}
-.commentary {
-  text-align: center;
-  font-style: italic;
-  color: #ffff88;
-  font-size: 1.05em;
-  margin: 10px 0;
-  min-height: 50px;
-  line-height: 1.4;
-}
-.reactions {
-  display: flex;
-  justify-content: space-around;
-  font-size: 2em;
-  margin: 10px 0;
-  min-height: 50px;
-}
-.reaction { transition: transform 0.3s; display: inline-block; }
-.reaction.active { animation: react 0.5s ease; }
-@keyframes react {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.5) rotate(15deg); }
-  100% { transform: scale(1); }
 }
 .gas-overlay {
   position: fixed;
@@ -1466,39 +1320,33 @@ input[type=range]:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 4p
   50% { transform: scale(2); opacity: 0.6; }
   100% { transform: scale(3) translateY(-100px); opacity: 0; }
 }
-.hall {
-  background: rgba(80, 50, 0, 0.3);
-  border: 2px solid #ffaa00;
-  border-radius: 15px;
-  padding: 15px;
-  margin: 10px 0;
-}
-.hall h2 { text-align: center; color: #ffcc00; margin-bottom: 10px; }
-.hall-entry {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px;
-  background: rgba(255, 170, 0, 0.1);
-  border-radius: 8px;
-  margin: 3px 0;
-  font-size: 0.95em;
-}
-.hall-empty { text-align: center; color: #ffcc88; font-style: italic; }
-.stink-meter {
-  height: 18px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #88ff88, #ffff00, #ff8800, #ff0000, #880088);
-  margin: 5px 0;
-  position: relative;
-}
-.stink-fill {
+
+/* PR6 — PERFECT cinematic confetti. Spawned into .gas-overlay. */
+.confetti-piece {
   position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 0 8px 8px 0;
-  transition: width 0.5s;
+  top: -8vh;
+  left: var(--cx, 50vw);
+  font-size: 1.6em;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.25, 0.55, 0.4, 1);
+  animation-fill-mode: forwards;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+}
+@keyframes confetti-fall {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  100% {
+    transform:
+      translate(var(--cdx, 0vw), 110vh)
+      rotate(var(--crot, 360deg));
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { display: none; }
 }
 footer {
   text-align: center;
@@ -1509,19 +1357,6 @@ footer {
    * matches .ach-desc parity. Was 0.85em (~13.6px) below floor.
    */
   font-size: 0.9em;
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-.sparkle {
-  position: absolute;
-  pointer-events: none;
-  user-select: none;
-  filter: drop-shadow(0 0 6px #ffeb3b);
-  animation: sparkleBurst 1.8s ease-out forwards;
-  will-change: transform, opacity;
 }
 .onboarding {
   position: fixed;
@@ -1580,74 +1415,51 @@ footer {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.combo-banner {
-  text-align: center;
-  margin: 8px 0;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, #ff5722, #ff9800, #ffc107);
-  color: #1a0a2e;
-  font-weight: bold;
-  font-size: 1.1em;
-  border-radius: 12px;
-  box-shadow: 0 0 18px rgba(255, 152, 0, 0.6);
-  animation: comboPulse 1.4s ease-in-out infinite;
-}
-.combo-banner[hidden] { display: none !important; }
-@keyframes comboPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-.achievement-host {
+
+/* --- Feature intro (per-system mini-explainer) --- */
+.feature-intro {
   position: fixed;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: min(420px, calc(100vw - 20px));
-  pointer-events: none;
-}
-.achievement-toast {
-  pointer-events: none;
+  inset: 0;
+  z-index: 305;
+  background: rgba(10, 5, 30, 0.78);
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95));
-  color: #221100;
-  border: 2px solid #ffaa00;
-  border-radius: 12px;
-  padding: 10px 14px;
+  justify-content: center;
+  padding: 20px;
+  animation: onboardingFade 0.25s ease-out;
+}
+.feature-intro-card {
+  background: linear-gradient(160deg, #2a1050, #1a0a3e);
+  color: #fff;
+  border: 3px solid #fde047;
+  border-radius: 18px;
+  padding: 22px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 0 32px rgba(253, 224, 71, 0.4);
+}
+.feature-intro-emoji { font-size: 3.4em; line-height: 1; margin-bottom: 6px; }
+.feature-intro-title {
+  font-size: 1.35em;
+  margin-bottom: 10px;
+  color: #fde68a;
+  text-shadow: 0 0 10px rgba(253, 224, 71, 0.6);
+}
+.feature-intro-body { font-size: 1em; line-height: 1.45; margin-bottom: 16px; }
+.feature-intro-close {
+  background: linear-gradient(135deg, #facc15, #f59e0b);
+  border: 2px solid #fde047;
+  color: #1f1300;
   font-family: inherit;
   font-weight: bold;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  animation: toastIn 0.35s ease-out, toastOut 0.4s ease-in 3.6s forwards;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  min-width: 130px;
 }
-.ach-emoji { font-size: 2em; line-height: 1; }
-.ach-name { font-size: 1em; }
-.ach-desc { font-size: 0.9em; font-weight: normal; opacity: 0.9; }
-@keyframes toastIn {
-  from { transform: translateY(-30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-@keyframes toastOut {
-  to { transform: translateY(-20px); opacity: 0; }
-}
-@keyframes sparkleBurst {
-  0% {
-    transform: translate(0, 0) scale(0.3) rotate(0deg);
-    opacity: 0;
-  }
-  10% { opacity: 1; }
-  100% {
-    transform:
-      translate(var(--dx, 0px), var(--dy, -150px))
-      scale(1.4)
-      rotate(360deg);
-    opacity: 0;
-  }
-}
+.feature-intro-close:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
+
 /* --- Area display (current location summary) --- */
 .area-display {
   display: flex;
@@ -2320,6 +2132,21 @@ body[data-region='city'] .audience-wrap    { border-color: #3b82f6; }
   font-size: 0.75em;
   color: #4ade80;
 }
+.boss-card-shame {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.75em;
+  color: #f87171;
+  font-weight: normal;
+}
+.boss-card-cravings {
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+  font-size: 0.8em;
+  color: #fde68a;
+}
+.boss-card-cravings li { padding: 1px 0; }
 .boss-fight-btn {
   background: linear-gradient(135deg, #a855f7, #6b21a8);
   border: 2px solid #d8b4fe;
@@ -2480,6 +2307,15 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   padding: 12px;
   border-radius: 10px;
   color: #fee2e2;
+}
+.arena-defeat-hint {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(253, 230, 138, 0.15);
+  border: 2px solid #fde68a;
+  color: #fef3c7;
+  font-size: 0.95em;
 }
 
 /* === V8 T1.c — Fart Profile Card === */
@@ -2765,6 +2601,24 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 .pantry-toggle[hidden] { display: none; }
 
 /* === V8 T4 — Field Guide entries === */
+.hidden-combos { display: grid; gap: 6px; }
+.hidden-combo {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  row-gap: 2px;
+  column-gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 2px solid rgba(148, 163, 184, 0.25);
+}
+.hidden-combo-locked { opacity: 0.5; filter: grayscale(0.5); }
+.hidden-combo-found { border-color: rgba(255, 215, 0, 0.55); background: rgba(255, 215, 0, 0.08); }
+.hidden-combo-emoji { grid-row: 1 / span 2; font-size: 1.6em; line-height: 1; text-align: center; }
+.hidden-combo-name { font-weight: bold; font-size: 0.95em; color: #ffe6b3; }
+.hidden-combo-hint { font-size: 0.85em; color: #cbd5e1; font-style: italic; }
+
 .field-guide { display: grid; gap: 10px; }
 .field-guide-entry {
   padding: 10px 12px;

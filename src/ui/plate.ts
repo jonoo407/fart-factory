@@ -22,6 +22,7 @@ import {
   bumpBestMatchOverall,
   addGold,
   addResearchNotes,
+  markHiddenComboFound,
 } from '../state/persistence';
 import type { RecipeResult } from '../scoring/fart-recipe';
 import { resolveLaunchProps } from '../scoring/launch-resolver';
@@ -49,12 +50,16 @@ import { applyLegendaryProps } from '../scoring/legendary-buffs';
 import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
+import { playPerfectCinematic } from './perfect-cinematic';
+import { showFeatureIntro } from './feature-intro';
+import { recordLaunchEvent } from '../state/daily-quest';
+import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
 import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
-import { audienceReaction } from '../state/challenge';
+import { audienceReaction } from '../scoring/audience-reactions';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
@@ -130,7 +135,7 @@ export function renderPantryGrid(): void {
   if (!grid) return;
   const unlocked = new Set(loadPantry());
   const showLocked = loadPantryShowLocked();
-  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked);
+  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked, loadFoodMastery);
   grid.innerHTML = html;
   // V8 T5 — toggle button reflects the current state and the locked count.
   const toggle = $('pantryShowLockedBtn') as HTMLButtonElement | null;
@@ -734,7 +739,7 @@ function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen
   }
 }
 
-function onStoryLaunch(): void {
+async function onStoryLaunch(): Promise<void> {
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
   // P1: resolve launch through prep-aware path. If treatments are
@@ -784,7 +789,15 @@ function onStoryLaunch(): void {
     ? aud.restrictions.slice(1)
     : aud.restrictions;
   // T4.1: hidden plate combos detect BEFORE scoring.
-  const hiddenCombo = ingredientCount > 0 ? detectHiddenCombo(ids) : null;
+  const priorStreak = loadStreak();
+  const hiddenCombo = ingredientCount > 0
+    ? detectHiddenCombo(ids, {
+        audienceId: aud.id,
+        areaId,
+        getMasteryUses: loadFoodMastery,
+        streak: priorStreak,
+      })
+    : null;
   const baseMatch = evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions);
   const match = hiddenCombo?.guaranteedPerfect
     ? { pct: 100, violations: [] }
@@ -844,23 +857,45 @@ function onStoryLaunch(): void {
         showLootDropSplash(drop);
       }
     }
-    // T4.1: apply hidden-combo bonus rewards + splash.
+    // T4.1: apply hidden-combo bonus rewards + splash. Persist discovery.
     if (hiddenCombo) {
       if (hiddenCombo.bonusGold > 0) addGold(hiddenCombo.bonusGold);
       if (hiddenCombo.bonusNotes > 0) addResearchNotes(hiddenCombo.bonusNotes);
+      markHiddenComboFound(hiddenCombo.id);
       showHiddenComboSplash(hiddenCombo);
     }
     bumpBestMatch(aud.id, match.pct);
     bumpBestMatchOverall(match.pct);
+    // PR2: feed today's daily quest with this launch.
+    recordLaunchEvent({
+      matchPct: match.pct,
+      ids,
+      hadTreatment: treatments.length > 0,
+      recipeDiscovered: Boolean(discovery?.freshlyDiscovered),
+    });
+    renderDailyQuest();
     incrementLaunchCount(); // P7: count for first-launch hint visibility
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
       showKitchenUnlockToast();
+      // PR3: first time the kitchen unlocks, queue an explainer modal.
+      showFeatureIntro({
+        id: 'kitchen',
+        emoji: '🍳',
+        title: 'Kitchen Mode unlocked!',
+        body: 'Tap 🍳 Kitchen Mode to switch into prep view. There you can apply treatments (roast / chill / blend / ferment) to your plate before launching — each treatment shifts properties (e.g. roast adds dry + temp, ferment adds wet + stink). Send the prepped plate to perform.',
+        cta: 'Let me cook',
+      });
     }
     // T1.2: critical-tier visual splash.
     if (tier === 'perfect' || tier === 'great' || tier === 'disaster') {
       showCriticalSplash(tier);
+    }
+    // PR6: PERFECT cinematic — pause input ~1.2s, fire confetti + sting
+    // before the result panel renders. Reduced-motion users skip the hold.
+    if (tier === 'perfect') {
+      await playPerfectCinematic();
     }
     // V8 T1.b: axis-discovery splash (Scheme 1) — fires the FIRST time a
     // hidden axis registers ≥1 in the player's own fart. Idempotent: if
@@ -899,7 +934,9 @@ function onStoryLaunch(): void {
 }
 
 function wireStoryLaunchButton(): void {
-  $('storyLaunchBtn')?.addEventListener('click', onStoryLaunch);
+  $('storyLaunchBtn')?.addEventListener('click', () => {
+    void onStoryLaunch();
+  });
 }
 
 /** V8 T5 — wire the "Show locked teasers" toggle. */
