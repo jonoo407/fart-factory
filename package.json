@@ -1,7 +1,7 @@
 {
   "name": "fart-factory",
   "private": true,
-  "version": "2.0.0-overhaul",
+  "version": "9.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

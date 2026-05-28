@@ -95,7 +95,7 @@ test('Launch routes to arena: victory unlocks reward food (Boss 1 — intersecti
   // Plate a mild plate that should pass all 3 family-style audiences.
   // Granny/Baby Shower/Kindergarten all want gentle, musical, short. Cheese
   // is mild, low-stink, low-loud — close to the intersection.
-  await page.locator('[data-food="cheese"]').click();
+  await page.locator('.food-card-clickable[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
 
   // Either victory or defeat result panel visible. We don't assert outcome
