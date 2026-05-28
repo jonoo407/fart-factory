@@ -1,22 +1,26 @@
 /**
- * Per-UTC-day 3-step quest for Story Mode. Per PR2.
+ * Per-UTC-day 3-step quest for Story Mode. Per PR2 (+ deadlock guard).
  *
  * Story has a rotating audience but no "today's puzzle." This module
- * picks 3 steps from a small pool, seeded by the UTC date so every
- * player on the same day gets the same quest. Progress + claim state
- * persist per date key.
+ * picks up to 3 steps from a small pool, seeded by the UTC date. Steps
+ * the player cannot currently complete (boss not unlocked, no legendary
+ * owned, kitchen mode not on, all recipes discovered) are filtered out
+ * before the pick — no impossible quests for the day.
  *
- * Step kinds (v1 keeps the pool small — expand later when fatigue is
- * observed):
- *   - launch-ge-75:   land N launches at ≥75% match
- *   - plate-rare:     plate a rare+ food in any launch
- *   - use-treatment:  use any kitchen treatment on a launch
- *   - beat-any-boss:  win 1 boss
- *   - discover-recipe:discover N new recipes today
- *   - plate-legendary:plate a legendary food
+ * Step kinds:
+ *   - launch-ge-75:    land N launches at ≥75% match — always eligible
+ *   - plate-rare:      plate a rare+ food — always eligible
+ *   - use-treatment:   use any kitchen treatment — gated on kitchen mode
+ *   - beat-any-boss:   win 1 boss — gated on ≥1 unlocked boss
+ *   - discover-recipe: discover a new recipe — gated on ≥1 undiscovered
+ *   - plate-legendary: plate a legendary food — gated on ≥1 owned
  */
 
-import { getFood } from './food';
+import { getFood, FOODS } from './food';
+import { loadPantry, loadDiscoveredRecipes } from './persistence';
+import { RECIPES } from './recipes';
+import { BOSSES } from './bosses';
+import { isBossUnlocked } from './boss-progress';
 
 export type DailyQuestStepKind =
   | 'launch-ge-75'
@@ -44,15 +48,47 @@ export interface ClaimReward {
   notes: number;
 }
 
+/**
+ * What the player can actually accomplish today. Each step's predicate
+ * reads a single flag. Undefined flags default to "eligible" so tests
+ * that don't care about gating get the full pool.
+ */
+export interface QuestEligibility {
+  /** ≥1 boss is currently unlocked (defeated bosses still count). */
+  bossAvailable?: boolean;
+  /** ≥1 legendary food is in the player's pantry. */
+  legendaryOwned?: boolean;
+  /** ≥1 recipe in RECIPES is not yet discovered. */
+  undiscoveredRecipeExists?: boolean;
+  /** Kitchen Mode is currently enabled. */
+  kitchenAvailable?: boolean;
+}
+
 const CLAIM_REWARD: ClaimReward = { gold: 25, notes: 10 };
 
-const STEP_TEMPLATES: ReadonlyArray<{ kind: DailyQuestStepKind; target: number; label: string }> = [
-  { kind: 'launch-ge-75',     target: 3, label: 'Land 3 launches at ≥75% match' },
-  { kind: 'plate-rare',       target: 1, label: 'Plate a rare-or-better food' },
-  { kind: 'use-treatment',    target: 1, label: 'Use any Kitchen treatment' },
-  { kind: 'beat-any-boss',    target: 1, label: 'Defeat any boss' },
-  { kind: 'discover-recipe',  target: 1, label: 'Discover a new recipe' },
-  { kind: 'plate-legendary',  target: 1, label: 'Plate a legendary food' },
+interface StepTemplate {
+  kind: DailyQuestStepKind;
+  target: number;
+  label: string;
+  /** Eligibility predicate. Undefined flag → eligible by default. */
+  isEligible: (e: QuestEligibility) => boolean;
+}
+
+const STEP_TEMPLATES: ReadonlyArray<StepTemplate> = [
+  // Always eligible — every player can attempt these.
+  { kind: 'launch-ge-75',    target: 3, label: 'Land 3 launches at ≥75% match',
+    isEligible: () => true },
+  { kind: 'plate-rare',      target: 1, label: 'Plate a rare-or-better food',
+    isEligible: () => true },
+  { kind: 'discover-recipe', target: 1, label: 'Discover a new recipe',
+    isEligible: (e) => e.undiscoveredRecipeExists ?? true },
+  // Gated — these need a specific game-state milestone to be achievable today.
+  { kind: 'use-treatment',   target: 1, label: 'Use any Kitchen treatment',
+    isEligible: (e) => e.kitchenAvailable ?? true },
+  { kind: 'beat-any-boss',   target: 1, label: 'Defeat any boss',
+    isEligible: (e) => e.bossAvailable ?? true },
+  { kind: 'plate-legendary', target: 1, label: 'Plate a legendary food',
+    isEligible: (e) => e.legendaryOwned ?? true },
 ];
 
 export function dateKey(d: Date = new Date()): string {
@@ -86,10 +122,17 @@ function seedFromDateKey(key: string): number {
   return h >>> 0;
 }
 
-/** Pick 3 distinct step kinds for the given date. */
-export function pickDailySteps(key: string): DailyQuestStep[] {
+/**
+ * Pick up to 3 distinct eligible step kinds for the given date.
+ * If fewer than 3 step kinds are eligible the quest is shorter.
+ * launch-ge-75 is always eligible, so the quest is never empty.
+ */
+export function pickDailySteps(
+  key: string,
+  eligibility: QuestEligibility = {},
+): DailyQuestStep[] {
   const rand = mulberry32(seedFromDateKey(key));
-  const pool = [...STEP_TEMPLATES];
+  const pool = STEP_TEMPLATES.filter((t) => t.isEligible(eligibility));
   const out: DailyQuestStep[] = [];
   while (out.length < 3 && pool.length > 0) {
     const idx = Math.floor(rand() * pool.length);
@@ -98,6 +141,32 @@ export function pickDailySteps(key: string): DailyQuestStep[] {
     pool.splice(idx, 1);
   }
   return out;
+}
+
+const KITCHEN_MODE_KEY = 'fart_kitchen_mode';
+
+/**
+ * Compute eligibility from the current save state. Side-effectful via
+ * localStorage reads; pure relative to its inputs (no mutation).
+ */
+export function computeQuestEligibility(): QuestEligibility {
+  const pantry = new Set(loadPantry());
+  const discovered = new Set(loadDiscoveredRecipes());
+  const legendaryOwned = FOODS.some((f) => pantry.has(f.id) && f.rarity === 'legendary');
+  const undiscoveredRecipeExists = RECIPES.some((r) => !discovered.has(r.id));
+  const bossAvailable = BOSSES.some((b) => isBossUnlocked(b));
+  let kitchenAvailable = false;
+  try {
+    kitchenAvailable = localStorage.getItem(KITCHEN_MODE_KEY) === 'true';
+  } catch {
+    kitchenAvailable = false;
+  }
+  return {
+    bossAvailable,
+    legendaryOwned,
+    undiscoveredRecipeExists,
+    kitchenAvailable,
+  };
 }
 
 function isValidQuest(v: unknown): v is DailyQuest {
@@ -127,7 +196,11 @@ export function getDailyQuest(d: Date = new Date()): DailyQuest {
   } catch {
     // ignore
   }
-  const quest: DailyQuest = { dateKey: key, steps: pickDailySteps(key), claimed: false };
+  const quest: DailyQuest = {
+    dateKey: key,
+    steps: pickDailySteps(key, computeQuestEligibility()),
+    claimed: false,
+  };
   saveDailyQuest(quest);
   return quest;
 }
