@@ -14,7 +14,6 @@ import {
   spendBelly,
   BELLY_CAPACITY,
   loadLastArea,
-  loadLastMatch,
   setLastMatch,
   loadGold,
   loadResearchNotes,
@@ -24,10 +23,9 @@ import {
   addResearchNotes,
   markHiddenComboFound,
 } from '../state/persistence';
-import type { RecipeResult } from '../scoring/fart-recipe';
 import { resolveLaunchProps } from '../scoring/launch-resolver';
-import { evaluateMatch, computeMatchBreakdown, type MatchResult, type AxisBreakdown } from '../scoring/match';
-import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus, tierLabel as criticalLabel, type CriticalTier } from '../scoring/critical-tier';
+import { evaluateMatch, computeMatchBreakdown } from '../scoring/match';
+import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForLaunch } from '../scoring/reward';
 import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak, streakGoldMultiplier } from '../scoring/streak';
@@ -37,21 +35,30 @@ import { encounterSeed, currentEncounterIdx } from '../state/run-state';
 import { detectHiddenCombo } from '../scoring/hidden-combos';
 import { rollUnicornEncounter, UNICORN_AUDIENCE } from '../state/unicorn-encounter';
 import { awardResearchForLaunch } from '../scoring/research';
-import { discoverFromPlate, type DiscoveryResult } from '../scoring/discovery';
-import { getRecipe } from '../state/recipes';
+import { discoverFromPlate } from '../scoring/discovery';
 import { renderNotebookCounter } from './notebook';
-import { playEventSfx, playEventSfxOneOf, FOOD_EATING_SFX, AUDIENCE_REACTION_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
+import { playEventSfxOneOf, FOOD_EATING_SFX, LEGENDARY_FANFARE_SFX, playEventSfx } from '../audio/event-sfx';
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
-import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
 import { applyActiveBuffs, consumeBuffs, goldMultiplierFromBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
 import { applyLegendaryProps } from '../scoring/legendary-buffs';
-import { renderFartProfileHtml, pulseFartProfile } from './fart-profile';
+import { pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
-import { discoverAxesFromFart, loadDiscoveredAxes, type AxisName } from '../state/axis-discovery';
+import { discoverAxesFromFart, loadDiscoveredAxes } from '../state/axis-discovery';
 import { playPerfectCinematic } from './perfect-cinematic';
 import { showFeatureIntro } from './feature-intro';
+import {
+  showKitchenUnlockToast,
+  showHiddenComboSplash,
+  showUltimateOverlay,
+  showLootDropSplash,
+  showCriticalSplash,
+  showAxisDiscoverySplash,
+  showDiscoverySplash,
+  flashLegendaryFanfare,
+} from './splashes';
+import { renderAudienceReaction, renderStoryResult } from './result-panel';
 import { recordLaunchEvent } from '../state/daily-quest';
 import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
@@ -59,7 +66,6 @@ import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments 
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
-import { audienceReaction } from '../scoring/audience-reactions';
 import { playFart } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
@@ -359,156 +365,6 @@ function applyAreaModifiers(props: FoodProperties, area: Area): FoodProperties {
 
 // ----- Audience portrait + area picker -----
 
-function showKitchenUnlockToast(): void {
-  const toast = document.getElementById('bossUnlockToast');
-  if (!toast) return;
-  toast.textContent = '🍳 Kitchen Mode unlocked! Roast, chill, and ferment your foods for advanced launches.';
-  toast.removeAttribute('hidden');
-  toast.classList.remove('boss-unlock-toast-enter');
-  void toast.offsetWidth;
-  toast.classList.add('boss-unlock-toast-enter');
-  setTimeout(() => toast.setAttribute('hidden', ''), 5000);
-  // Also reveal the Kitchen Mode toggle visual state.
-  const t = document.getElementById('kitchenModeToggle');
-  if (t) {
-    t.setAttribute('aria-pressed', 'true');
-    t.classList.add('kitchen-mode-toggle-on');
-  }
-  const kb = document.getElementById('kitchenBtn');
-  if (kb) kb.removeAttribute('hidden');
-}
-
-function showHiddenComboSplash(combo: { name: string; emoji: string; flavor: string; bonusGold: number; bonusNotes: number }): void {
-  const splash = document.getElementById('discoverySplash');
-  if (!splash) return;
-  splash.innerHTML = `<div class="discovery-splash-card rarity-legendary">
-    <div class="discovery-splash-banner">🎁 HIDDEN COMBO! 🎁</div>
-    <div class="discovery-splash-emoji">${combo.emoji}</div>
-    <div class="discovery-splash-name">${combo.name}</div>
-    <div class="discovery-splash-desc">${combo.flavor}</div>
-    <div class="discovery-splash-hint">${combo.bonusGold > 0 ? `+${combo.bonusGold}💰 ` : ''}${combo.bonusNotes > 0 ? `+${combo.bonusNotes}📝` : ''}</div>
-  </div>`;
-  splash.removeAttribute('hidden');
-  splash.classList.remove('discovery-splash-show');
-  void splash.offsetWidth;
-  splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3500);
-}
-
-function showUltimateOverlay(count: number): void {
-  const overlay = document.getElementById('ultimateOverlay');
-  if (!overlay) return;
-  overlay.innerHTML = `<div class="ultimate-card">
-    <div class="ultimate-banner">⚡ ULTIMATE LAUNCH ⚡</div>
-    <div class="ultimate-emoji">💨</div>
-    <div class="ultimate-count">×${count} LEGENDARY FOODS ON THE PLATE</div>
-    <div class="ultimate-bonus">+10 💰  +5 📝</div>
-  </div>`;
-  overlay.removeAttribute('hidden');
-  overlay.classList.remove('ultimate-overlay-show');
-  void overlay.offsetWidth;
-  overlay.classList.add('ultimate-overlay-show');
-  setTimeout(() => {
-    overlay.setAttribute('hidden', '');
-    overlay.classList.remove('ultimate-overlay-show');
-  }, 2500);
-}
-
-function showLootDropSplash(food: { id: string; name: string; emoji: string; rarity: string }): void {
-  const splash = document.getElementById('discoverySplash');
-  if (!splash) return;
-  splash.innerHTML = `<div class="discovery-splash-card rarity-${food.rarity}">
-    <div class="discovery-splash-banner">✨ LOOT DROP ✨</div>
-    <div class="discovery-splash-emoji">${food.emoji}</div>
-    <div class="discovery-splash-name">${food.name}</div>
-    <div class="discovery-splash-desc">The audience handed you a snack!</div>
-    <div class="discovery-splash-hint">📦 Added to your pantry</div>
-  </div>`;
-  splash.removeAttribute('hidden');
-  splash.classList.remove('discovery-splash-show');
-  void splash.offsetWidth;
-  splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3200);
-}
-
-function showCriticalSplash(tier: CriticalTier): void {
-  const splash = document.getElementById('criticalSplash');
-  if (!splash) return;
-  splash.innerHTML = `<div class="critical-splash-card critical-${tier}">
-    <div class="critical-splash-label">${criticalLabel(tier)}</div>
-  </div>`;
-  splash.removeAttribute('hidden');
-  splash.classList.remove('critical-splash-show');
-  void splash.offsetWidth;
-  splash.classList.add('critical-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('critical-splash-show');
-  }, 1800);
-}
-
-function showAxisDiscoverySplash(axes: readonly AxisName[]): void {
-  if (axes.length === 0) return;
-  const splash = document.getElementById('axisDiscoverySplash');
-  if (!splash) return;
-  const chips = axes.map((a) => (
-    `<span class="axis-discovery-chip">${axisEmoji(a)} <strong>${a.toUpperCase()}</strong></span>`
-  )).join('');
-  const heading = axes.length === 1
-    ? '✨ NEW DIMENSION DISCOVERED ✨'
-    : '✨ NEW DIMENSIONS DISCOVERED ✨';
-  splash.innerHTML = `<div class="axis-discovery-card">
-    <div class="axis-discovery-label">${heading}</div>
-    <div class="axis-discovery-list">${chips}</div>
-    <div class="axis-discovery-hint">You'll see these on every fart from now on.</div>
-  </div>`;
-  splash.removeAttribute('hidden');
-  splash.classList.remove('axis-discovery-show');
-  void splash.offsetWidth;
-  splash.classList.add('axis-discovery-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('axis-discovery-show');
-  }, 3000);
-}
-
-function showDiscoverySplash(recipeId: string): void {
-  const splash = document.getElementById('discoverySplash');
-  if (!splash) return;
-  const recipe = getRecipe(recipeId);
-  if (!recipe) return;
-  splash.innerHTML = `<div class="discovery-splash-card rarity-${recipe.rarity}">
-    <div class="discovery-splash-banner">✨ NEW RECIPE DISCOVERED ✨</div>
-    <div class="discovery-splash-emoji">${recipe.emoji}</div>
-    <div class="discovery-splash-name">${recipe.name}</div>
-    ${recipe.description ? `<div class="discovery-splash-desc">${recipe.description}</div>` : ''}
-    <div class="discovery-splash-hint">📖 Saved to your Lab Notebook</div>
-  </div>`;
-  splash.removeAttribute('hidden');
-  splash.classList.remove('discovery-splash-show');
-  void splash.offsetWidth;
-  splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3200);
-}
-
-function flashLegendaryFanfare(): void {
-  const wrap = document.querySelector<HTMLElement>('.audience-wrap');
-  if (!wrap) return;
-  wrap.classList.remove('audience-wrap-legendary');
-  void wrap.offsetWidth;
-  wrap.classList.add('audience-wrap-legendary');
-  setTimeout(() => wrap.classList.remove('audience-wrap-legendary'), 1600);
-}
-
 export function renderAudiencePortrait(): void {
   const aud = currentAudience();
   const emojiEl = $('audiencePortraitEmoji');
@@ -530,82 +386,6 @@ export function renderAudiencePortrait(): void {
   if (restrictionsEl) restrictionsEl.textContent = '';
 }
 
-function tierEmoji(tier: ReturnType<typeof audienceReaction>['tier']): string {
-  switch (tier) {
-    case 'loved':     return '😍';
-    case 'liked':     return '🙂';
-    case 'meh':       return '😐';
-    case 'disliked':  return '🤢';
-    case 'evacuated': return '💀';
-  }
-}
-
-function tierLabel(tier: ReturnType<typeof audienceReaction>['tier']): string {
-  // Per-audience flavor text + tier emoji (P10).
-  const aud = currentAudience();
-  return `${tierEmoji(tier)} ${reactionTextForAudience(aud, tier)}`;
-}
-
-function trendLabel(trend: ReturnType<typeof audienceReaction>['trend']): string {
-  switch (trend) {
-    case 'first':  return '';
-    case 'warmer': return ' 🔥 warmer';
-    case 'colder': return ' ❄️ colder';
-    case 'same':   return ' ➡️ same';
-  }
-}
-
-function applyReactionFace(tier: ReturnType<typeof audienceReaction>['tier']): void {
-  const emojiEl = $('audiencePortraitEmoji');
-  if (!emojiEl) return;
-  // Strip any prior reaction class.
-  emojiEl.classList.remove(
-    'audience-portrait-loved',
-    'audience-portrait-liked',
-    'audience-portrait-meh',
-    'audience-portrait-disliked',
-    'audience-portrait-evacuated',
-  );
-  emojiEl.classList.add(`audience-portrait-${tier}`);
-  // Also swap the emoji for an emotion glyph so the reaction is legible.
-  const emojiMap: Record<typeof tier, string> = {
-    loved:    '😍',
-    liked:    '🙂',
-    meh:      '😐',
-    disliked: '🤢',
-    evacuated:'💀',
-  };
-  emojiEl.textContent = emojiMap[tier];
-}
-
-function renderAudienceReaction(pct: number): void {
-  const wrap = $('audienceReaction');
-  const tierEl = $('audienceReactionTier');
-  const trendEl = $('audienceReactionTrend');
-  const r = audienceReaction(pct, loadLastMatch());
-  if (wrap) wrap.removeAttribute('hidden');
-  if (tierEl) tierEl.textContent = tierLabel(r.tier);
-  if (trendEl) trendEl.textContent = trendLabel(r.trend);
-  applyReactionFace(r.tier);
-  // T2.2: streak counter visible in the reaction strip.
-  const streakEl = $('audienceReactionStreak');
-  if (streakEl) {
-    const s = loadStreak();
-    if (s >= 2) {
-      streakEl.removeAttribute('hidden');
-      streakEl.textContent = s >= 10 ? `🌟 LEGENDARY STREAK ×${s}` : s >= 5 ? `🔥🔥 Streak ×${s}` : `🔥 Streak ×${s}`;
-    } else {
-      streakEl.setAttribute('hidden', '');
-    }
-  }
-  // P3: tier-specific audience SFX (silent until operator runs sfx:generate).
-  const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
-  if (reactionSfx) void playEventSfx(reactionSfx, 5);
-  // T1.3: emoji particles per tier
-  void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
-    spawnReactionParticles(r.tier);
-  });
-}
 
 
 /** P7: first-launch hint banner — render before #audienceReaction. */
@@ -654,90 +434,6 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
   return getDailyAudience(new Date(), pool);
 }
 
-function matchEmoji(pct: number): string {
-  if (pct >= 90) return '🎯💥';
-  if (pct >= 70) return '🔥';
-  if (pct >= 50) return '👍';
-  if (pct >= 30) return '🤏';
-  if (pct >= 10) return '😬';
-  return '💀';
-}
-
-function axisEmoji(axis: AxisBreakdown['axis']): string {
-  switch (axis) {
-    case 'wet': return '💧';
-    case 'dry': return '🌵';
-    case 'stink': return '🦨';
-    case 'loud': return '🔊';
-    case 'musical': return '🎵';
-    case 'length': return '⏱';
-    case 'temp': return '🌡';
-  }
-}
-
-function renderBreakdown(breakdown: AxisBreakdown[]): string {
-  // Sort: mismatched axes (cost > 0) first, descending cost, then matched ones.
-  const sorted = [...breakdown].sort((a, b) => b.cost - a.cost);
-  return sorted.map((row) => {
-    if (row.matched) {
-      return `<div class="breakdown-row breakdown-matched">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} ✓</div>`;
-    }
-    return `<div class="breakdown-row breakdown-miss">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} <span class="breakdown-cost">-${row.cost}</span></div>`;
-  }).join('');
-}
-
-function renderStoryResult(r: RecipeResult, m: MatchResult, area: Area, plateLen: number, discovery: DiscoveryResult | null, breakdown?: AxisBreakdown[], fartProps?: FoodProperties): void {
-  const wrap = $('storyResult');
-  const title = $('storyResultTitle');
-  const effects = $('storyResultEffects');
-  const profile = $('fartProfile');
-  if (!wrap || !title || !effects) return;
-  const aud = currentAudience();
-  if (plateLen === 0) {
-    wrap.removeAttribute('hidden');
-    title.innerHTML = '🌬️ A whisper. (Empty plate — the audience waits.)';
-    effects.innerHTML = '';
-    if (profile) {
-      profile.innerHTML = '';
-      profile.setAttribute('hidden', '');
-    }
-    return;
-  }
-  // V8 T1.c: the Fart Profile is THE primary "you made this" surface. Render
-  // it before any match copy so the player sees their own fart first, even
-  // in Hard Mode (the audience target stays hidden — the player's own fart
-  // belongs to the player).
-  if (profile && fartProps) {
-    profile.innerHTML = renderFartProfileHtml(fartProps, loadDiscoveredAxes());
-    profile.removeAttribute('hidden');
-  }
-  const discoveryLine = (() => {
-    if (!discovery) return '';
-    const recipe = getRecipe(discovery.recipeId);
-    if (!recipe) return '';
-    if (discovery.freshlyDiscovered) {
-      return `<div class="story-result-discovery story-result-discovery-new">✨ NEW RECIPE: ${recipe.emoji} <strong>${recipe.name}</strong> — added to your lab notebook!</div>`;
-    }
-    return `<div class="story-result-discovery">📖 Recipe: ${recipe.emoji} ${recipe.name}</div>`;
-  })();
-  {
-    wrap.removeAttribute('hidden');
-    title.innerHTML = `${matchEmoji(m.pct)} <strong>${m.pct}%</strong> match for ${aud.emoji} ${aud.name} <span style="opacity:0.7">@ ${area.emoji} ${area.name}</span>`;
-    const lines: string[] = [];
-    if (discoveryLine) lines.push(discoveryLine);
-    for (const v of m.violations) lines.push(`🚫 Restriction violated: ${v} (-25%)`);
-    for (const s of r.triggeredSynergies) lines.push(`✨ Synergy: ${s}`);
-    for (const c of r.triggeredConflicts) lines.push(`⚡ Conflict: ${c}`);
-    const linesHtml = lines.length
-      ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
-      : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
-    // T1.1: per-axis breakdown (cause-effect)
-    const breakdownHtml = breakdown
-      ? `<details class="breakdown-details" open><summary>📊 Match breakdown — why ${m.pct}%?</summary><div class="breakdown-grid">${renderBreakdown(breakdown)}</div></details>`
-      : '';
-    effects.innerHTML = linesHtml + breakdownHtml;
-  }
-}
 
 async function onStoryLaunch(): Promise<void> {
   const ids = plateIngredientIds();
@@ -919,7 +615,7 @@ async function onStoryLaunch(): Promise<void> {
   if (discovery && discovery.freshlyDiscovered) {
     showDiscoverySplash(discovery.recipeId);
   }
-  renderStoryResult(recipe, match, area, ingredientCount, discovery, breakdown, propsAfterArea);
+  renderStoryResult(recipe, match, area, ingredientCount, discovery, aud, breakdown, propsAfterArea);
   // V8 T3 — pulse the Fart Profile bars in step with the audio playback.
   if (ingredientCount > 0) {
     pulseFartProfile($('fartProfile'));
@@ -928,7 +624,7 @@ async function onStoryLaunch(): Promise<void> {
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
   if (ingredientCount > 0) {
-    renderAudienceReaction(match.pct);
+    renderAudienceReaction(match.pct, aud);
     setLastMatch(match.pct);
   }
 }
