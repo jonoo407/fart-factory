@@ -15,6 +15,8 @@ import { wireMap } from './ui/map-screen';
 import { wireKitchen } from './ui/kitchen';
 import { wireDailyQuest } from './ui/daily-quest';
 import { showOnboarding } from './ui/onboarding';
+import { playPerfectCinematic } from './ui/perfect-cinematic';
+import { showFeatureIntro, type FeatureIntroOptions } from './ui/feature-intro';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -65,9 +67,13 @@ function init(): void {
   const w = window as unknown as {
     __audioCtxState?: () => string;
     __lastFartSchedule?: () => unknown;
+    __playPerfectCinematic?: () => Promise<void>;
+    __showFeatureIntro?: (opts: FeatureIntroOptions) => void;
   };
   w.__audioCtxState = () => getAudioContext()?.state ?? 'none';
   w.__lastFartSchedule = () => getLastFartSchedule();
+  w.__playPerfectCinematic = () => playPerfectCinematic();
+  w.__showFeatureIntro = (opts) => showFeatureIntro(opts);
 }
 
 if (document.readyState === 'loading') {

@@ -11,6 +11,7 @@ import {
   type DailyQuest,
 } from '../state/daily-quest';
 import { addGold, addResearchNotes } from '../state/persistence';
+import { renderProgression } from './plate';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -58,8 +59,8 @@ function onClaim(): void {
   addGold(r.gold);
   addResearchNotes(r.notes);
   renderDailyQuest();
-  // Dispatch a custom event so other UI (progression strip) can refresh.
-  document.dispatchEvent(new CustomEvent('daily-quest-claimed', { detail: r }));
+  // Refresh the progression strip so the new gold + notes totals show.
+  renderProgression();
 }
 
 export function wireDailyQuest(): void {
