@@ -173,6 +173,15 @@
         <h3 class="notebook-section-h">🏆 Hall of Trophies</h3>
         <div class="trophy-list" id="trophyList"></div>
         <div class="notebook-modal-flavor">Tap a discovered recipe's 🍴 Cook button to auto-fill your plate.</div>
+        <div class="save-io-section">
+          <h3 class="notebook-section-h">💾 Save</h3>
+          <div class="save-io-actions">
+            <button type="button" id="saveExportBtn" class="save-io-btn" aria-label="Download your save file">⬇ Export save</button>
+            <button type="button" id="saveImportBtn" class="save-io-btn" aria-label="Load a save file from your device">⬆ Import save</button>
+            <input type="file" id="saveImportInput" accept="application/json,.json" hidden />
+          </div>
+          <div id="saveIoStatus" class="save-io-status" aria-live="polite"></div>
+        </div>
       </div>
     </div>
 

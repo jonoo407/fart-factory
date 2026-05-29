@@ -1119,6 +1119,41 @@ body {
   font-style: italic;
 }
 
+/* --- Save export / import (notebook footer) --- */
+.save-io-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(148, 163, 184, 0.35);
+}
+.save-io-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.save-io-btn {
+  background: rgba(148, 163, 184, 0.18);
+  color: #e2e8f0;
+  border: 2px solid rgba(148, 163, 184, 0.45);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: bold;
+  cursor: pointer;
+  min-height: 44px;
+}
+.save-io-btn:hover { filter: brightness(1.1); }
+.save-io-btn:focus-visible { outline: 3px solid #ffeb3b; outline-offset: 3px; }
+.save-io-status {
+  text-align: center;
+  margin-top: 8px;
+  font-size: 0.88em;
+  min-height: 1.2em;
+}
+.save-io-status[data-kind="ok"]  { color: #4ade80; }
+.save-io-status[data-kind="err"] { color: #f87171; }
+
 /* --- Legendary quest section in notebook --- */
 .notebook-section-h {
   margin: 14px 0 6px;

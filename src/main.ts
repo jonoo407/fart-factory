@@ -14,6 +14,7 @@ import { wireArena } from './ui/boss-arena';
 import { wireMap } from './ui/map-screen';
 import { wireKitchen } from './ui/kitchen';
 import { wireDailyQuest } from './ui/daily-quest';
+import { wireSaveIo } from './ui/save-io';
 import { showOnboarding } from './ui/onboarding';
 import { playPerfectCinematic } from './ui/perfect-cinematic';
 import { showFeatureIntro, type FeatureIntroOptions } from './ui/feature-intro';
@@ -62,6 +63,7 @@ function init(): void {
   wireMap();
   wireKitchen();
   wireDailyQuest();
+  wireSaveIo();
   showOnboarding();
 
   const w = window as unknown as {
