@@ -263,28 +263,21 @@ function handleVictory(): void {
 function handleDefeat(): void {
   if (!currentBoss) return;
   const bossId = currentBoss.id;
-  // PLAN_v5 Phase 5: cooldown the boss for 3 encounters, reroll slot.
-  void import('../state/boss-cadence').then(({ setBossCooldown, rollNextBossSlot }) => {
-    setBossCooldown(bossId, 3);
-    rollNextBossSlot();
-  });
-  // PR7: record loss + (first time only) reveal one boss craving as a hint.
-  let revealedCraving: string | null = null;
-  void import('../state/boss-hints').then(({ recordFirstLoss }) => {
-    revealedCraving = recordFirstLoss(bossId);
-    renderDefeatPanel(bossId, revealedCraving);
-  });
-  // Fire the snark while the dynamic-import resolves so the panel
-  // always shows something — re-rendered with the hint if recorded.
-  renderDefeatPanel(bossId, null);
-}
-
-function renderDefeatPanel(bossId: string, revealedCraving: string | null): void {
-  const r = $('arenaResult');
-  if (!r) return;
-  r.removeAttribute('hidden');
-  void import('../state/boss-snark').then(({ snarkForBossLoss }) => {
-    const snark = snarkForBossLoss(bossId, Date.now() & 0xff);
+  // Resolve every dynamic import together so the defeat panel renders ONCE
+  // with the snark + (optional) revealed craving. Previously the panel
+  // rendered snark-only first, then re-rendered with the hint — visible flicker.
+  void Promise.all([
+    import('../state/boss-cadence'),
+    import('../state/boss-hints'),
+    import('../state/boss-snark'),
+  ]).then(([cadence, hints, snarkMod]) => {
+    cadence.setBossCooldown(bossId, 3);
+    cadence.rollNextBossSlot();
+    const revealedCraving = hints.recordFirstLoss(bossId);
+    const snark = snarkMod.snarkForBossLoss(bossId, Date.now() & 0xff);
+    const r = $('arenaResult');
+    if (!r) return;
+    r.removeAttribute('hidden');
     const hintHtml = revealedCraving
       ? `<div class="arena-defeat-hint">📖 You learned this boss craves: <strong>${revealedCraving}</strong></div>`
       : '';
