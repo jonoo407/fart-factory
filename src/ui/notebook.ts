@@ -10,6 +10,8 @@
 import { RECIPES, getRecipe, type Recipe } from '../state/recipes';
 import { loadDiscoveredRecipes, loadPantry, loadHiddenCombosFound } from '../state/persistence';
 import { HIDDEN_COMBO_CATALOG } from '../scoring/hidden-combos';
+import { loadConquests } from '../state/conquests';
+import { AUDIENCES } from '../state/audience';
 import { FOODS, getFood } from '../state/food';
 import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
 import { recipeProgress } from '../scoring/discovery';
@@ -227,6 +229,36 @@ function renderHiddenCombos(): void {
   }).join('');
 }
 
+function renderConquests(): void {
+  const grid = $('conquestList');
+  if (!grid) return;
+  const conquests = loadConquests();
+  const totalAudiences = AUDIENCES.length;
+  if (conquests.length === 0) {
+    grid.innerHTML = `<div class="conquest-empty">No conquests yet. Land an 85%+ match to wow an audience.</div>
+      <div class="conquest-progress">0 / ${totalAudiences} audiences wowed</div>`;
+    return;
+  }
+  const rows = conquests
+    .slice()
+    .sort((a, b) => b.bestPct - a.bestPct)
+    .map((c) => {
+      const aud = AUDIENCES.find((a) => a.id === c.audienceId);
+      const name = aud?.name ?? c.audienceId;
+      const emoji = aud?.emoji ?? '🎉';
+      const dateStr = new Date(c.wowedAt).toLocaleDateString();
+      return `<div class="conquest-row">
+        <span class="conquest-emoji">${emoji}</span>
+        <span class="conquest-name">${name}</span>
+        <span class="conquest-pct">${c.bestPct}%</span>
+        <span class="conquest-count">${c.timesWowed > 1 ? `×${c.timesWowed}` : ''}</span>
+        <span class="conquest-date">${dateStr}</span>
+      </div>`;
+    })
+    .join('');
+  grid.innerHTML = rows + `<div class="conquest-progress">${conquests.length} / ${totalAudiences} audiences wowed</div>`;
+}
+
 function renderTrophyList(): void {
   const grid = $('trophyList');
   if (!grid) return;
@@ -255,6 +287,7 @@ export function openNotebook(): void {
   renderFieldGuide();
   renderHiddenCombos();
   renderLegendaryCodex();
+  renderConquests();
   renderTrophyList();
   $('notebookModal')?.removeAttribute('hidden');
 }

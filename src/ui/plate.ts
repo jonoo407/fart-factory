@@ -59,6 +59,17 @@ import {
   flashLegendaryFanfare,
 } from './splashes';
 import { renderAudienceReaction, renderStoryResult } from './result-panel';
+import {
+  diminishingMultiplier,
+  recordLaunch as recordEncounterLaunch,
+  upcomingLaunchIdx,
+  isWowed,
+  clearEncounterProgress,
+  WOW_BONUS_GOLD,
+  ENCORE_BONUS_GOLD,
+} from '../state/encounter-progress';
+import { recordConquest } from '../state/conquests';
+import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
 import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
@@ -262,11 +273,56 @@ export function renderBellyMeter(): void {
   if (cap) cap.textContent = String(BELLY_CAPACITY);
 }
 
+/** PR9: repaint the Move On button to advertise the encore bonus once
+ *  the current audience is wowed.
+ */
+export function paintMoveOnButton(wowed: boolean): void {
+  const btn = $('moveOnBtn');
+  if (!btn) return;
+  if (wowed) {
+    btn.textContent = `➡ Move On — Encore +${ENCORE_BONUS_GOLD}💰`;
+    btn.classList.add('move-on-encore');
+    btn.setAttribute('aria-label', `Move On to the next audience (claims ${ENCORE_BONUS_GOLD} gold encore bonus)`);
+  } else {
+    btn.textContent = '➡ Move On';
+    btn.classList.remove('move-on-encore');
+    btn.setAttribute('aria-label', 'Move On to the next audience (refills belly)');
+  }
+}
+
+/** PR9: Wow splash — fires the first time the current encounter crosses 85%. */
+function showWowSplash(aud: Audience, pct: number): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-legendary">
+    <div class="discovery-splash-banner">🎉 YOU WOWED THEM! 🎉</div>
+    <div class="discovery-splash-emoji">${aud.emoji}</div>
+    <div class="discovery-splash-name">${aud.name} — ${pct}% match</div>
+    <div class="discovery-splash-desc">+${WOW_BONUS_GOLD}💰 wow bonus. Move On to claim the encore.</div>
+    <div class="discovery-splash-hint">🏆 Added to your Conquests</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('discovery-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('discovery-splash-show');
+  setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('discovery-splash-show');
+  }, 3500);
+}
+
 /** Wire the Move On button: opens intermission, then advances the encounter. */
 function wireMoveOnButton(): void {
   const btn = $('moveOnBtn');
   if (!btn) return;
   btn.addEventListener('click', () => {
+    // PR9: claim encore bonus if currently wowed.
+    const aud = currentAudience();
+    if (isWowed(aud.id, currentEncounterIdx())) {
+      addGold(ENCORE_BONUS_GOLD);
+    }
+    clearEncounterProgress();
+    paintMoveOnButton(false);
     // Lazy-import to avoid static circular dep.
     import('./intermission').then(({ openIntermission }) => {
       openIntermission(() => {
@@ -379,7 +435,10 @@ export function renderAudiencePortrait(): void {
     emojiEl.textContent = aud.emoji;
     emojiEl.className = `audience-portrait audience-portrait-idle audience-portrait-tier-${aud.difficultyTier}`;
   }
-  if (nameEl) nameEl.textContent = aud.name;
+  if (nameEl) {
+    nameEl.textContent = aud.name;
+    nameEl.setAttribute('data-audience-id', aud.id);
+  }
   if (flavorEl) flavorEl.textContent = aud.description;
   // Hide legacy cravings/restrictions DOM (T6 — exposition is gone).
   if (cravingsEl) cravingsEl.textContent = '';
@@ -528,12 +587,30 @@ async function onStoryLaunch(): Promise<void> {
   const tier = classifyCriticalTier(match);
 
   if (ingredientCount > 0) {
+    // PR9: diminishing-returns multiplier for repeat launches at the
+    // same audience. Read upcoming launch idx BEFORE recording so the
+    // first launch lands at 1.0×.
+    const launchN = upcomingLaunchIdx(aud.id, currentEncounterIdx());
+    const diminMult = diminishingMultiplier(launchN);
     // T2.2: streak multiplier + buff multiplier combine for total gold mult.
     const newStreak = recordLaunchForStreak(match.pct);
     const streakMult = streakGoldMultiplier(newStreak);
     const buffMult = goldMultiplierFromBuffs();
-    awardGoldForLaunch(match.pct, areaId, streakMult * buffMult);
+    awardGoldForLaunch(match.pct, areaId, streakMult * buffMult * diminMult);
     awardResearchForLaunch(match.pct);
+    // PR9: record this launch against the encounter. justWowed iff we
+    // crossed the threshold for the first time this encounter.
+    const { justWowed, progress: encounterProg } = recordEncounterLaunch(
+      aud.id,
+      currentEncounterIdx(),
+      match.pct,
+    );
+    if (justWowed) {
+      addGold(WOW_BONUS_GOLD);
+      recordConquest(aud.id, match.pct);
+      showWowSplash(aud, match.pct);
+    }
+    paintMoveOnButton(encounterProg.wowed);
     // T1.2: critical bonus — PERFECT/GREAT add gold; DISASTER adds consolation notes.
     const goldBonus = criticalGoldBonus(tier);
     const notesBonus = criticalNotesBonus(tier);
@@ -670,6 +747,9 @@ export function initStoryPantry(): void {
   renderProgression();
   renderActiveBuffStrip();
   renderFirstLaunchHint(); // P7: show hint on initial load for new players
+  // PR9: restore the Move On button's wowed state on reload.
+  const aud0 = currentAudience();
+  paintMoveOnButton(isWowed(aud0.id, currentEncounterIdx()));
 }
 
 // Test-only reset hook.
