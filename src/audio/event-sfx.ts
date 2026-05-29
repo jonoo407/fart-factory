@@ -60,3 +60,32 @@ export const AUDIENCE_REACTION_SFX = {
 } as const;
 export const LEGENDARY_FANFARE_SFX = 'legendary-fanfare';
 export const QUEST_CLAIMED_SFX = 'quest-claimed';
+
+// ---------- Per-audience audio (signatures + voice lines) ----------
+//
+// Convention: signature id is `sig-${audienceId}`; voice id is
+// `voice-${audienceId}-${tier}` (tiers: loved | evacuated). Both helpers
+// resolve to silent no-ops via playSample when the id isn't in the
+// manifest — so the runtime ships safely even before assets are generated.
+
+export type AudienceVoiceTier = 'loved' | 'evacuated';
+
+export function audienceSignatureSfxId(audienceId: string): string {
+  return `sig-${audienceId}`;
+}
+
+export function audienceVoiceSfxId(audienceId: string, tier: AudienceVoiceTier): string {
+  return `voice-${audienceId}-${tier}`;
+}
+
+export async function playAudienceSignature(audienceId: string, volume = 6): Promise<void> {
+  await playEventSfx(audienceSignatureSfxId(audienceId), volume);
+}
+
+export async function playAudienceVoice(
+  audienceId: string,
+  tier: AudienceVoiceTier,
+  volume = 7,
+): Promise<void> {
+  await playEventSfx(audienceVoiceSfxId(audienceId, tier), volume);
+}
