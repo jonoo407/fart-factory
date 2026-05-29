@@ -20,21 +20,22 @@
 
 import { getAudioContext } from './procedural';
 import { loadManifest, playSample } from './sample-player';
-import { loadMuted } from './mute';
+import { channelVolume, isChannelAudible } from './audio-settings';
 
 /**
  * Fire a one-shot SFX by id at slight reduced volume (these are
  * contextual cues, not the headline fart sound — they shouldn't crowd
- * the procedural payload).
+ * the procedural payload). Gated on the 'sfx' channel volume.
  */
 export async function playEventSfx(id: string, volumeSlider = 5): Promise<void> {
-  if (loadMuted()) return;
+  if (!isChannelAudible('sfx')) return;
   const ctx = getAudioContext();
   if (!ctx) return; // Pre-launch — no context yet; cue silently lost.
   const manifest = await loadManifest();
   if (!manifest) return;
-  // playSample returns 0 silently if id isn't in manifest.
-  await playSample(ctx, manifest, id, 0, volumeSlider);
+  // Scale the per-call volume slider by the channel volume (0-100 → 0-1).
+  const scaled = volumeSlider * (channelVolume('sfx') / 100);
+  await playSample(ctx, manifest, id, 0, scaled);
 }
 
 /**
@@ -42,7 +43,7 @@ export async function playEventSfx(id: string, volumeSlider = 5): Promise<void> 
  * variety). Returns silently if none match the manifest.
  */
 export async function playEventSfxOneOf(ids: readonly string[], volumeSlider = 5): Promise<void> {
-  if (loadMuted()) return;
+  if (!isChannelAudible('sfx')) return;
   if (ids.length === 0) return;
   const picked = ids[Math.floor(Math.random() * ids.length)]!;
   await playEventSfx(picked, volumeSlider);

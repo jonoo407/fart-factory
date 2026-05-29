@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { loadMuted } from './mute';
+import { loadMuted } from './audio-settings';
 
 /**
  * Sample-bank player that complements the procedural synth in

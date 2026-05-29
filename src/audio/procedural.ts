@@ -1,4 +1,4 @@
-import { loadMuted } from './mute';
+import { isChannelAudible } from './audio-settings';
 import {
   loadManifest,
   pickSampleId,
@@ -101,7 +101,7 @@ export function playFart(
   temp: number,
   musical: number,
 ): number {
-  if (loadMuted()) return 0;
+  if (!isChannelAudible('farts')) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
 
@@ -236,7 +236,7 @@ export function playFart(
  * everything is silent. Subject to visibilitychange suspend.
  */
 export function playCelebrationSting(): number {
-  if (loadMuted()) return 0;
+  if (!isChannelAudible('sfx')) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
   const now = ctx.currentTime;

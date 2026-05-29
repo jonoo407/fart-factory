@@ -5,7 +5,8 @@ import {
   getAudioContext,
   getLastFartSchedule,
 } from './audio/procedural';
-import { loadMuted, setMuted } from './audio/mute';
+import { loadMuted } from './audio/audio-settings';
+import { wireAudioPopover } from './ui/audio-popover';
 import { initStoryPantry } from './ui/plate';
 import { wireShop } from './ui/shop';
 import { wireNotebook } from './ui/notebook';
@@ -19,29 +20,6 @@ import { showOnboarding } from './ui/onboarding';
 import { playPerfectCinematic } from './ui/perfect-cinematic';
 import { showFeatureIntro, type FeatureIntroOptions } from './ui/feature-intro';
 
-function $(id: string): HTMLElement | null {
-  return document.getElementById(id);
-}
-
-function paintMuteBtn(btn: HTMLButtonElement, muted: boolean): void {
-  btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
-  btn.textContent = muted ? '🔇' : '🔊';
-  btn.setAttribute('aria-label', muted ? 'Unmute audio' : 'Mute audio');
-}
-
-function wireMuteButton(): void {
-  const btn = $('muteBtn') as HTMLButtonElement | null;
-  if (!btn) return;
-  paintMuteBtn(btn, loadMuted());
-  btn.addEventListener('click', () => {
-    const next = !loadMuted();
-    setMuted(next);
-    paintMuteBtn(btn, next);
-    if (next) suspendAudio();
-    else resumeAudio();
-  });
-}
-
 function wireVisibilityChange(): void {
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -53,7 +31,7 @@ function wireVisibilityChange(): void {
 }
 
 function init(): void {
-  wireMuteButton();
+  wireAudioPopover();
   wireVisibilityChange();
   initStoryPantry();
   wireShop();
