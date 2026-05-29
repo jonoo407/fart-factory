@@ -15,6 +15,7 @@
     "lint": "eslint src/ tests/",
     "mutation": "stryker run",
     "lighthouse": "lighthouse http://localhost:5173/fart-factory/ --form-factor=mobile --only-categories=performance,accessibility --chrome-flags=\"--headless=new\" --output=json --output-path=.session/lighthouse.json --quiet",
+    "lighthouse:check": "tsx scripts/check-lighthouse.ts",
     "sfx:generate": "tsx scripts/generate-sfx.ts"
   },
   "devDependencies": {

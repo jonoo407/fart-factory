@@ -1,0 +1,10 @@
+{
+  "_comment": "Lighthouse mobile-form-factor baseline. Update via `npm run lighthouse:baseline`. CI / local checks via `npm run lighthouse:check` flag regressions > 5 points on either category.",
+  "scores": {
+    "performance": 55,
+    "accessibility": 100
+  },
+  "regressionTolerance": 5,
+  "generatedAt": "2026-05-29",
+  "notes": "Performance is limited by the procedural audio init + ~60-card pantry render on first paint. Targets for next iteration: lazy-init audio (no AudioContext until first launch), virtualize the pantry grid."
+}
