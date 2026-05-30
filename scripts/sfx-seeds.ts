@@ -27,6 +27,23 @@ export type Mood =
   | 'eerie'
   | 'voice';
 
+/**
+ * What role a sound plays in the game. This is the single source of truth the
+ * runtime filters on: the Launch picker (pickSampleId) only ever selects
+ * `fart` samples, so audience reactions / signatures / voice lines / food /
+ * boss cues are never substituted for the headline fart. The other categories
+ * are fired explicitly by event-sfx at their own moments.
+ */
+export type SfxCategory =
+  | 'fart'
+  | 'reaction'
+  | 'food'
+  | 'event'
+  | 'boss'
+  | 'utility'
+  | 'signature'
+  | 'voice';
+
 export interface SfxSeed {
   kind: 'sfx';
   id: string;
@@ -34,6 +51,7 @@ export interface SfxSeed {
   prompt: string;
   duration_seconds: number;
   mood: Mood;
+  category: SfxCategory;
 }
 
 export interface TtsSeed {
@@ -44,12 +62,23 @@ export interface TtsSeed {
   voice_id: string;
   /** Mood is informational for TTS — stored in manifest, doesn't change the request. */
   mood: Mood;
+  category: 'voice';
 }
 
 export type Seed = SfxSeed | TtsSeed;
 
+/**
+ * Tag a group of SFX specs with a shared category. Keeps `category` attached to
+ * the whole group (it can't drift per-line) and keeps the seed literals tidy.
+ */
+type SfxSpec = Omit<SfxSeed, 'category'>;
+function withCat(specs: SfxSpec[], category: SfxCategory): SfxSeed[] {
+  return specs.map((s) => ({ ...s, category }));
+}
+
 // ====== Phase 1: legacy SFX library (procedural fart cues + reactions) ======
-const LEGACY_SFX: SfxSeed[] = [
+// Headline fart samples — the ONLY group the Launch picker draws from.
+const FART_SFX: SfxSeed[] = withCat([
   // --- short pops ---
   { kind: 'sfx', id: 'mouse-squeak',  name: 'Mouse Squeak',     mood: 'sneaky',      duration_seconds: 0.6, prompt: 'tiny squeaky mouse-like fart, brief high-pitched cartoon raspberry, comedic' },
   { kind: 'sfx', id: 'champagne-pop', name: 'Champagne Pop',    mood: 'surprised',   duration_seconds: 0.6, prompt: 'a brief sharp pop like a small champagne cork, bright high-frequency burst' },
@@ -72,7 +101,10 @@ const LEGACY_SFX: SfxSeed[] = [
   { kind: 'sfx', id: 'silent-killer', name: 'Silent Killer',    mood: 'sneaky',      duration_seconds: 0.8, prompt: 'a soft barely-audible whoosh of a silent fart, sneaky cartoon stealth' },
   { kind: 'sfx', id: 'symphony',      name: 'Symphony',         mood: 'triumphant',  duration_seconds: 1.8, prompt: 'a melodic harmonized cartoon fart that sounds almost musical, with rising arpeggio, comedic' },
 
-  // ====== Phase K audience-reaction seeds (item 61) ======
+], 'fart');
+
+// ====== Phase K audience-reaction seeds (item 61) ======
+const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'granny-cackle',         name: "Granny's Cackle",        mood: 'comedic',    duration_seconds: 1.8, prompt: 'an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style' },
   { kind: 'sfx', id: 'royal-court-applause',  name: 'Royal Court Applause',   mood: 'enthralled', duration_seconds: 2.4, prompt: 'a dignified royal-court polite applause, refined hand-clapping with brief approving murmur, family-friendly' },
   { kind: 'sfx', id: 'frat-howl',             name: 'Frat House Howl',        mood: 'triumphant', duration_seconds: 1.6, prompt: 'a small group of college friends cheering and hollering enthusiastically, comedic celebration, family-friendly tone' },
@@ -80,29 +112,38 @@ const LEGACY_SFX: SfxSeed[] = [
   { kind: 'sfx', id: 'alien-tourists-gasp',   name: 'Alien Tourists Gasp',    mood: 'surprised',  duration_seconds: 1.4, prompt: 'small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly' },
   { kind: 'sfx', id: 'toddler-giggle',        name: 'Toddler Giggle',         mood: 'comedic',    duration_seconds: 1.5, prompt: 'a small toddler giggling and laughing with delight, gentle and warm, family-friendly' },
 
-  // ====== Phase K food-eating seeds (item 62) ======
+], 'reaction');
+
+// ====== Phase K food-eating seeds (item 62) ======
+const FOOD_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'food-munch',  name: 'Food Munch',   mood: 'comedic',  duration_seconds: 0.6, prompt: 'a quick comedic cartoon chewing crunch, brief munching foley, family-friendly' },
   { kind: 'sfx', id: 'food-crunch', name: 'Food Crunch',  mood: 'comedic',  duration_seconds: 0.5, prompt: 'a sharp crispy food crunch like biting an apple, comedic foley, brief' },
   { kind: 'sfx', id: 'food-slurp',  name: 'Food Slurp',   mood: 'comedic',  duration_seconds: 0.7, prompt: 'a wet cartoon slurp like noodles, quick foley, comedic' },
   { kind: 'sfx', id: 'food-gulp',   name: 'Food Gulp',    mood: 'comedic',  duration_seconds: 0.5, prompt: 'a comedic cartoon swallowing gulp, brief foley, family-friendly' },
 
-  // ====== Phase K legendary fanfare seeds (item 63) ======
+], 'food');
+
+// ====== Phase K legendary fanfare seeds (item 63) ======
+const EVENT_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'legendary-fanfare', name: 'Legendary Fanfare', mood: 'enthralled', duration_seconds: 2.6, prompt: 'a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly' },
   { kind: 'sfx', id: 'quest-claimed',     name: 'Quest Claimed',     mood: 'triumphant', duration_seconds: 1.8, prompt: 'a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly' },
 
-  // ====== PLAN_v5 P8 boss entrance seeds (5 themed cues) ======
+], 'event');
+
+// ====== PLAN_v5 P8 boss entrance seeds (5 themed cues) ======
+const BOSS_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'boss-entrance-granny',   name: 'Granny Entrance',   mood: 'comedic',     duration_seconds: 2.0, prompt: 'a warm cozy kazoo + accordion flourish, grandmotherly arrival, family-friendly cartoon' },
   { kind: 'sfx', id: 'boss-entrance-royal',    name: 'Royal Entrance',    mood: 'enthralled',  duration_seconds: 2.4, prompt: 'a regal short brass fanfare with trumpets and timpani, royal court arrival, family-friendly' },
   { kind: 'sfx', id: 'boss-entrance-haunted',  name: 'Haunted Entrance',  mood: 'eerie',       duration_seconds: 2.2, prompt: 'a low spooky cartoon organ chord with subtle ghost whoosh, haunted mansion door creak, family-friendly Halloween' },
   { kind: 'sfx', id: 'boss-entrance-volcano',  name: 'Volcano Entrance',  mood: 'triumphant',  duration_seconds: 2.4, prompt: 'a deep rumbling timpani roll with sharp metallic clang, volcanic ritual gong, family-friendly' },
   { kind: 'sfx', id: 'boss-entrance-cosmic',   name: 'Cosmic Entrance',   mood: 'surprised',   duration_seconds: 2.6, prompt: 'an otherworldly synth pad rising sweep with bell shimmer, alien council gathering, family-friendly sci-fi' },
-];
+], 'boss');
 
 // ====== Phase 2 (new): utility SFX for interaction polish ======
-const UTILITY_SFX: SfxSeed[] = [
+const UTILITY_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'plate-pluck', name: 'Plate Pluck', mood: 'comedic',     duration_seconds: 0.6, prompt: 'a soft cartoon mouth pop or finger pluck, brief light comedic foley, family-friendly' },
   { kind: 'sfx', id: 'drumroll',    name: 'Drum Roll',   mood: 'triumphant',  duration_seconds: 1.6, prompt: 'a brief snare drum roll building into a soft crescendo, theatrical anticipation, family-friendly' },
-];
+], 'utility');
 
 // ====== Phase 3 (new): per-audience signature SFX (20) ======
 //
@@ -110,7 +151,7 @@ const UTILITY_SFX: SfxSeed[] = [
 // when the audience-of-the-day rotates AND when the player taps the
 // audience portrait. Each is concretely audible — not silence, not a vague
 // drone. Family-friendly.
-const AUDIENCE_SIGNATURES: SfxSeed[] = [
+const AUDIENCE_SIGNATURES: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'sig-granny-edna',      name: 'Signature: Granny Edna',       mood: 'comedic',    duration_seconds: 1.6, prompt: 'cozy knitting needle clicks with a faint warm grandmother chuckle, gentle and inviting, family-friendly cartoon foley' },
   { kind: 'sfx', id: 'sig-royal-court',      name: 'Signature: Royal Court',       mood: 'enthralled', duration_seconds: 1.6, prompt: 'a brief regal trumpet flourish announcing court arrival, two short fanfare notes, family-friendly' },
   { kind: 'sfx', id: 'sig-frat-bros',        name: 'Signature: Frat Bros',         mood: 'triumphant', duration_seconds: 1.6, prompt: 'a small group of frat bros whooping with brief party cheer and a cup tap, family-friendly tone' },
@@ -131,7 +172,7 @@ const AUDIENCE_SIGNATURES: SfxSeed[] = [
   { kind: 'sfx', id: 'sig-punk-show',        name: 'Signature: Punk Show',         mood: 'triumphant', duration_seconds: 1.6, prompt: 'a brief power-chord guitar riff with a crash cymbal hit, punk-rock energy, family-friendly cartoon' },
   { kind: 'sfx', id: 'sig-silent-monks',     name: 'Signature: Silent Monks',      mood: 'enthralled', duration_seconds: 1.6, prompt: 'a single soft meditation bowl ringing slowly fading, contemplative, family-friendly' },
   { kind: 'sfx', id: 'sig-mystery-guest',    name: 'Signature: Mystery Guest',     mood: 'eerie',      duration_seconds: 1.6, prompt: 'a low mysterious synth swell with a distant indistinct whisper, family-friendly intrigue' },
-];
+], 'signature');
 
 // ====== Phase 4 (new): TTS voice lines (40 — loved + evacuated × 20) ======
 //
@@ -193,6 +234,7 @@ function buildVoiceSeeds(): TtsSeed[] {
         text,
         voice_id: cast.voice_id,
         mood: 'voice',
+        category: 'voice',
       });
     }
   }
@@ -202,7 +244,11 @@ function buildVoiceSeeds(): TtsSeed[] {
 const VOICE_SEEDS = buildVoiceSeeds();
 
 export const SEEDS: readonly Seed[] = [
-  ...LEGACY_SFX,
+  ...FART_SFX,
+  ...REACTION_SFX,
+  ...FOOD_SFX,
+  ...EVENT_SFX,
+  ...BOSS_SFX,
   ...UTILITY_SFX,
   ...AUDIENCE_SIGNATURES,
   ...VOICE_SEEDS,

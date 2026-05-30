@@ -22,6 +22,13 @@ export interface ManifestEntry {
   file: string;
   bytes: number;
   checksum: string;
+  /**
+   * Role of the sound. The Launch picker (pickSampleId) only selects `fart`
+   * entries. Optional for resilience to legacy manifests that predate the
+   * field — a missing category is treated as non-fart, so the launcher falls
+   * back to procedural synthesis rather than blurting a reaction/voice clip.
+   */
+  category?: string;
   proceduralFallback?: boolean;
 }
 
@@ -85,12 +92,18 @@ export interface SliderConfig {
  */
 export function pickSampleId(cfg: SliderConfig, manifest: Manifest): string | null {
   const targetBucket = bucketForLength(cfg.length);
+  // The Launch sound must ALWAYS be a fart. The manifest also holds audience
+  // reactions, per-audience signatures, voice lines, food + boss cues — those
+  // are fired explicitly by event-sfx, never as the headline launch hit. Without
+  // this guard, a long Launch could pick a 6-second spoken voice line as "the
+  // fart" and the player heard the audience but no fart.
+  const isFart = (e: ManifestEntry): boolean => e.category === 'fart' && !e.proceduralFallback;
   const candidates = manifest.entries.filter(
-    (e) => !e.proceduralFallback && bucketOf(e.durationMs) === targetBucket && e.id !== lastSelectedId,
+    (e) => isFart(e) && bucketOf(e.durationMs) === targetBucket && e.id !== lastSelectedId,
   );
   if (!candidates.length) {
-    // Fall back to ANY non-fallback entry (shuffle-bag exhausted in bucket).
-    const any = manifest.entries.filter((e) => !e.proceduralFallback && e.id !== lastSelectedId);
+    // Fall back to ANY fart entry (shuffle-bag exhausted in this duration bucket).
+    const any = manifest.entries.filter((e) => isFart(e) && e.id !== lastSelectedId);
     if (!any.length) return null;
     const pick = any[Math.floor(Math.random() * any.length)]!;
     lastSelectedId = pick.id;

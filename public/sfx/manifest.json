@@ -1,6 +1,6 @@
 {
   "version": "v2",
-  "generatedAt": "2026-05-30T12:47:44.651Z",
+  "generatedAt": "2026-05-30T17:42:51.562Z",
   "entries": [
     {
       "id": "mouse-squeak",
@@ -11,7 +11,8 @@
       "file": "mouse-squeak.mp3",
       "checksum": "309977c9ce22",
       "kind": "sfx",
-      "bytes": 10493
+      "bytes": 10493,
+      "category": "fart"
     },
     {
       "id": "champagne-pop",
@@ -22,7 +23,8 @@
       "file": "champagne-pop.mp3",
       "checksum": "01ac7cb3d22e",
       "kind": "sfx",
-      "bytes": 10493
+      "bytes": 10493,
+      "category": "fart"
     },
     {
       "id": "tiny-toot",
@@ -33,7 +35,8 @@
       "file": "tiny-toot.mp3",
       "checksum": "40f931c944c2",
       "kind": "sfx",
-      "bytes": 8821
+      "bytes": 8821,
+      "category": "fart"
     },
     {
       "id": "wet-flapper",
@@ -44,7 +47,8 @@
       "file": "wet-flapper.mp3",
       "checksum": "f2a88bc99f23",
       "kind": "sfx",
-      "bytes": 20106
+      "bytes": 20106,
+      "category": "fart"
     },
     {
       "id": "dry-trumpet",
@@ -55,7 +59,8 @@
       "file": "dry-trumpet.mp3",
       "checksum": "cb877cb99e35",
       "kind": "sfx",
-      "bytes": 23031
+      "bytes": 23031,
+      "category": "fart"
     },
     {
       "id": "kazoo-honk",
@@ -66,7 +71,8 @@
       "file": "kazoo-honk.mp3",
       "checksum": "8a50c584c274",
       "kind": "sfx",
-      "bytes": 18434
+      "bytes": 18434,
+      "category": "fart"
     },
     {
       "id": "duck-quack",
@@ -77,7 +83,8 @@
       "file": "duck-quack.mp3",
       "checksum": "e66986cb8078",
       "kind": "sfx",
-      "bytes": 17180
+      "bytes": 17180,
+      "category": "fart"
     },
     {
       "id": "sad-trombone",
@@ -88,7 +95,8 @@
       "file": "sad-trombone.mp3",
       "checksum": "20addfe1f443",
       "kind": "sfx",
-      "bytes": 24703
+      "bytes": 24703,
+      "category": "fart"
     },
     {
       "id": "thunder-roll",
@@ -99,7 +107,8 @@
       "file": "thunder-roll.mp3",
       "checksum": "7fcbc4e9084c",
       "kind": "sfx",
-      "bytes": 39332
+      "bytes": 39332,
+      "category": "fart"
     },
     {
       "id": "never-ending",
@@ -110,7 +119,8 @@
       "file": "never-ending.mp3",
       "checksum": "08b670f486a0",
       "kind": "sfx",
-      "bytes": 45183
+      "bytes": 45183,
+      "category": "fart"
     },
     {
       "id": "machine-gun",
@@ -121,7 +131,8 @@
       "file": "machine-gun.mp3",
       "checksum": "32ea8f271b7f",
       "kind": "sfx",
-      "bytes": 33062
+      "bytes": 33062,
+      "category": "fart"
     },
     {
       "id": "volcano",
@@ -132,7 +143,8 @@
       "file": "volcano.mp3",
       "checksum": "053a9df9f8fa",
       "kind": "sfx",
-      "bytes": 41839
+      "bytes": 41839,
+      "category": "fart"
     },
     {
       "id": "silent-killer",
@@ -143,7 +155,8 @@
       "file": "silent-killer.mp3",
       "checksum": "05c57c7fd427",
       "kind": "sfx",
-      "bytes": 13836
+      "bytes": 13836,
+      "category": "fart"
     },
     {
       "id": "symphony",
@@ -154,7 +167,8 @@
       "file": "symphony.mp3",
       "checksum": "730c8e987e16",
       "kind": "sfx",
-      "bytes": 29301
+      "bytes": 29301,
+      "category": "fart"
     },
     {
       "id": "granny-cackle",
@@ -165,7 +179,8 @@
       "file": "granny-cackle.mp3",
       "checksum": "76cd1991ae1c",
       "kind": "sfx",
-      "bytes": 29301
+      "bytes": 29301,
+      "category": "reaction"
     },
     {
       "id": "royal-court-applause",
@@ -176,7 +191,8 @@
       "file": "royal-court-applause.mp3",
       "checksum": "1a7de23421f0",
       "kind": "sfx",
-      "bytes": 39332
+      "bytes": 39332,
+      "category": "reaction"
     },
     {
       "id": "frat-howl",
@@ -187,7 +203,8 @@
       "file": "frat-howl.mp3",
       "checksum": "1ce75cc1526c",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "reaction"
     },
     {
       "id": "haunted-mansion-moan",
@@ -198,7 +215,8 @@
       "file": "haunted-mansion-moan.mp3",
       "checksum": "ca842b3a072b",
       "kind": "sfx",
-      "bytes": 33062
+      "bytes": 33062,
+      "category": "reaction"
     },
     {
       "id": "alien-tourists-gasp",
@@ -209,7 +227,8 @@
       "file": "alien-tourists-gasp.mp3",
       "checksum": "59cfb3ebd9a2",
       "kind": "sfx",
-      "bytes": 23031
+      "bytes": 23031,
+      "category": "reaction"
     },
     {
       "id": "toddler-giggle",
@@ -220,7 +239,8 @@
       "file": "toddler-giggle.mp3",
       "checksum": "5d7f47c1bddb",
       "kind": "sfx",
-      "bytes": 24703
+      "bytes": 24703,
+      "category": "reaction"
     },
     {
       "id": "food-munch",
@@ -231,7 +251,8 @@
       "file": "food-munch.mp3",
       "checksum": "6e90456ee04e",
       "kind": "sfx",
-      "bytes": 10493
+      "bytes": 10493,
+      "category": "food"
     },
     {
       "id": "food-crunch",
@@ -242,7 +263,8 @@
       "file": "food-crunch.mp3",
       "checksum": "f030d5fb7ee9",
       "kind": "sfx",
-      "bytes": 8821
+      "bytes": 8821,
+      "category": "food"
     },
     {
       "id": "food-slurp",
@@ -253,7 +275,8 @@
       "file": "food-slurp.mp3",
       "checksum": "81418e54fb34",
       "kind": "sfx",
-      "bytes": 12164
+      "bytes": 12164,
+      "category": "food"
     },
     {
       "id": "food-gulp",
@@ -264,7 +287,8 @@
       "file": "food-gulp.mp3",
       "checksum": "b0f0927ec9b3",
       "kind": "sfx",
-      "bytes": 8821
+      "bytes": 8821,
+      "category": "food"
     },
     {
       "id": "legendary-fanfare",
@@ -275,7 +299,8 @@
       "file": "legendary-fanfare.mp3",
       "checksum": "42e82f93b2dc",
       "kind": "sfx",
-      "bytes": 41839
+      "bytes": 41839,
+      "category": "event"
     },
     {
       "id": "quest-claimed",
@@ -286,7 +311,8 @@
       "file": "quest-claimed.mp3",
       "checksum": "e0ef71c8d85b",
       "kind": "sfx",
-      "bytes": 29301
+      "bytes": 29301,
+      "category": "event"
     },
     {
       "id": "boss-entrance-granny",
@@ -297,7 +323,8 @@
       "file": "boss-entrance-granny.mp3",
       "checksum": "9390bdd38824",
       "kind": "sfx",
-      "bytes": 33062
+      "bytes": 33062,
+      "category": "boss"
     },
     {
       "id": "boss-entrance-royal",
@@ -308,7 +335,8 @@
       "file": "boss-entrance-royal.mp3",
       "checksum": "010ccf2c50e7",
       "kind": "sfx",
-      "bytes": 39332
+      "bytes": 39332,
+      "category": "boss"
     },
     {
       "id": "boss-entrance-haunted",
@@ -319,7 +347,8 @@
       "file": "boss-entrance-haunted.mp3",
       "checksum": "27cc4db0547f",
       "kind": "sfx",
-      "bytes": 36406
+      "bytes": 36406,
+      "category": "boss"
     },
     {
       "id": "boss-entrance-volcano",
@@ -330,7 +359,8 @@
       "file": "boss-entrance-volcano.mp3",
       "checksum": "4799f253cbd7",
       "kind": "sfx",
-      "bytes": 39332
+      "bytes": 39332,
+      "category": "boss"
     },
     {
       "id": "boss-entrance-cosmic",
@@ -341,7 +371,8 @@
       "file": "boss-entrance-cosmic.mp3",
       "checksum": "53a46b95cd9d",
       "kind": "sfx",
-      "bytes": 41839
+      "bytes": 41839,
+      "category": "boss"
     },
     {
       "id": "plate-pluck",
@@ -352,7 +383,8 @@
       "file": "plate-pluck.mp3",
       "checksum": "1fafcd066e13",
       "kind": "sfx",
-      "bytes": 10493
+      "bytes": 10493,
+      "category": "utility"
     },
     {
       "id": "drumroll",
@@ -363,7 +395,8 @@
       "file": "drumroll.mp3",
       "checksum": "812d1022d56e",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "utility"
     },
     {
       "id": "sig-granny-edna",
@@ -374,7 +407,8 @@
       "file": "sig-granny-edna.mp3",
       "checksum": "1b397157205a",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-royal-court",
@@ -385,7 +419,8 @@
       "file": "sig-royal-court.mp3",
       "checksum": "3360cd5fa367",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-frat-bros",
@@ -396,7 +431,8 @@
       "file": "sig-frat-bros.mp3",
       "checksum": "69ea5907d613",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-haunted-mansion",
@@ -407,7 +443,8 @@
       "file": "sig-haunted-mansion.mp3",
       "checksum": "c0f07982905b",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-alien-tourists",
@@ -418,7 +455,8 @@
       "file": "sig-alien-tourists.mp3",
       "checksum": "66cac49746c6",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-toddler-bday",
@@ -429,7 +467,8 @@
       "file": "sig-toddler-bday.mp3",
       "checksum": "b79aa1ef5717",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-goth-teens",
@@ -440,7 +479,8 @@
       "file": "sig-goth-teens.mp3",
       "checksum": "17124aa63670",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-kindergarten",
@@ -451,7 +491,8 @@
       "file": "sig-kindergarten.mp3",
       "checksum": "85acb0b8cef4",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-skunk-society",
@@ -462,7 +503,8 @@
       "file": "sig-skunk-society.mp3",
       "checksum": "fc8a78552d73",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-opera-house",
@@ -473,7 +515,8 @@
       "file": "sig-opera-house.mp3",
       "checksum": "39a23cf16fb8",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-wrestling-fans",
@@ -484,7 +527,8 @@
       "file": "sig-wrestling-fans.mp3",
       "checksum": "e4fc3114b60f",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-librarians",
@@ -495,7 +539,8 @@
       "file": "sig-librarians.mp3",
       "checksum": "8711a9a20f1f",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-volcano-cult",
@@ -506,7 +551,8 @@
       "file": "sig-volcano-cult.mp3",
       "checksum": "07358fde9f7f",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-pet-rescue",
@@ -517,7 +563,8 @@
       "file": "sig-pet-rescue.mp3",
       "checksum": "953b59460e47",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-astronauts",
@@ -528,7 +575,8 @@
       "file": "sig-astronauts.mp3",
       "checksum": "21b27444b0b1",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-food-critics",
@@ -539,7 +587,8 @@
       "file": "sig-food-critics.mp3",
       "checksum": "4c4b1f6e14ee",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-baby-shower",
@@ -550,7 +599,8 @@
       "file": "sig-baby-shower.mp3",
       "checksum": "15c34dd7312d",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-punk-show",
@@ -561,7 +611,8 @@
       "file": "sig-punk-show.mp3",
       "checksum": "6d63b9d20ab1",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-silent-monks",
@@ -572,7 +623,8 @@
       "file": "sig-silent-monks.mp3",
       "checksum": "9f604c1417ee",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "sig-mystery-guest",
@@ -583,7 +635,8 @@
       "file": "sig-mystery-guest.mp3",
       "checksum": "63f5ee0eee0a",
       "kind": "sfx",
-      "bytes": 26793
+      "bytes": 26793,
+      "category": "signature"
     },
     {
       "id": "voice-granny-edna-loved",
@@ -595,7 +648,8 @@
       "checksum": "42132963ac5f",
       "kind": "tts",
       "voiceId": "9BWtsMINqrJLrRacOk9x",
-      "bytes": 61902
+      "bytes": 61902,
+      "category": "voice"
     },
     {
       "id": "voice-granny-edna-evacuated",
@@ -607,7 +661,8 @@
       "checksum": "2150c733e871",
       "kind": "tts",
       "voiceId": "9BWtsMINqrJLrRacOk9x",
-      "bytes": 47273
+      "bytes": 47273,
+      "category": "voice"
     },
     {
       "id": "voice-toddler-bday-loved",
@@ -619,7 +674,8 @@
       "checksum": "6fd89fb48bd0",
       "kind": "tts",
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
-      "bytes": 44765
+      "bytes": 44765,
+      "category": "voice"
     },
     {
       "id": "voice-toddler-bday-evacuated",
@@ -631,7 +687,8 @@
       "checksum": "32754335c6ce",
       "kind": "tts",
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
-      "bytes": 52288
+      "bytes": 52288,
+      "category": "voice"
     },
     {
       "id": "voice-baby-shower-loved",
@@ -643,7 +700,8 @@
       "checksum": "26e55a726944",
       "kind": "tts",
       "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 62737
+      "bytes": 62737,
+      "category": "voice"
     },
     {
       "id": "voice-baby-shower-evacuated",
@@ -655,7 +713,8 @@
       "checksum": "dda1db83d32e",
       "kind": "tts",
       "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 49363
+      "bytes": 49363,
+      "category": "voice"
     },
     {
       "id": "voice-kindergarten-loved",
@@ -667,7 +726,8 @@
       "checksum": "54582eef7f99",
       "kind": "tts",
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
-      "bytes": 75276
+      "bytes": 75276,
+      "category": "voice"
     },
     {
       "id": "voice-kindergarten-evacuated",
@@ -679,7 +739,8 @@
       "checksum": "966b6d1bb283",
       "kind": "tts",
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
-      "bytes": 44347
+      "bytes": 44347,
+      "category": "voice"
     },
     {
       "id": "voice-pet-rescue-loved",
@@ -691,7 +752,8 @@
       "checksum": "f1e0d5fef359",
       "kind": "tts",
       "voiceId": "FGY2WhTYpPnrIDTdsKH5",
-      "bytes": 69425
+      "bytes": 69425,
+      "category": "voice"
     },
     {
       "id": "voice-pet-rescue-evacuated",
@@ -703,7 +765,8 @@
       "checksum": "731fa77ce67b",
       "kind": "tts",
       "voiceId": "FGY2WhTYpPnrIDTdsKH5",
-      "bytes": 38078
+      "bytes": 38078,
+      "category": "voice"
     },
     {
       "id": "voice-frat-bros-loved",
@@ -715,7 +778,8 @@
       "checksum": "467a29b57611",
       "kind": "tts",
       "voiceId": "IKne3meq5aSn9XLyUdCD",
-      "bytes": 67753
+      "bytes": 67753,
+      "category": "voice"
     },
     {
       "id": "voice-frat-bros-evacuated",
@@ -727,7 +791,8 @@
       "checksum": "9d171f13a440",
       "kind": "tts",
       "voiceId": "IKne3meq5aSn9XLyUdCD",
-      "bytes": 57722
+      "bytes": 57722,
+      "category": "voice"
     },
     {
       "id": "voice-goth-teens-loved",
@@ -739,7 +804,8 @@
       "checksum": "bc256e3368c6",
       "kind": "tts",
       "voiceId": "cgSgspJ2msm6clMCkdW9",
-      "bytes": 67335
+      "bytes": 67335,
+      "category": "voice"
     },
     {
       "id": "voice-goth-teens-evacuated",
@@ -751,7 +817,8 @@
       "checksum": "8155d703abc8",
       "kind": "tts",
       "voiceId": "cgSgspJ2msm6clMCkdW9",
-      "bytes": 59812
+      "bytes": 59812,
+      "category": "voice"
     },
     {
       "id": "voice-alien-tourists-loved",
@@ -763,7 +830,8 @@
       "checksum": "fbfa2d3af7a6",
       "kind": "tts",
       "voiceId": "XB0fDUnXU5powFXDhCwa",
-      "bytes": 56050
+      "bytes": 56050,
+      "category": "voice"
     },
     {
       "id": "voice-alien-tourists-evacuated",
@@ -775,7 +843,8 @@
       "checksum": "833d02711ab9",
       "kind": "tts",
       "voiceId": "XB0fDUnXU5powFXDhCwa",
-      "bytes": 42675
+      "bytes": 42675,
+      "category": "voice"
     },
     {
       "id": "voice-wrestling-fans-loved",
@@ -787,7 +856,8 @@
       "checksum": "15e50aa0853c",
       "kind": "tts",
       "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 70261
+      "bytes": 70261,
+      "category": "voice"
     },
     {
       "id": "voice-wrestling-fans-evacuated",
@@ -799,7 +869,8 @@
       "checksum": "2dd3c3b3cd6a",
       "kind": "tts",
       "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 53960
+      "bytes": 53960,
+      "category": "voice"
     },
     {
       "id": "voice-punk-show-loved",
@@ -811,7 +882,8 @@
       "checksum": "0eb1432d9ce6",
       "kind": "tts",
       "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 50199
+      "bytes": 50199,
+      "category": "voice"
     },
     {
       "id": "voice-punk-show-evacuated",
@@ -823,7 +895,8 @@
       "checksum": "464624bf1b46",
       "kind": "tts",
       "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 48527
+      "bytes": 48527,
+      "category": "voice"
     },
     {
       "id": "voice-skunk-society-loved",
@@ -835,7 +908,8 @@
       "checksum": "9c97d83713db",
       "kind": "tts",
       "voiceId": "nPczCjzI2devNBz1zQrb",
-      "bytes": 54378
+      "bytes": 54378,
+      "category": "voice"
     },
     {
       "id": "voice-skunk-society-evacuated",
@@ -847,7 +921,8 @@
       "checksum": "127b45d4a144",
       "kind": "tts",
       "voiceId": "nPczCjzI2devNBz1zQrb",
-      "bytes": 46437
+      "bytes": 46437,
+      "category": "voice"
     },
     {
       "id": "voice-food-critics-loved",
@@ -859,7 +934,8 @@
       "checksum": "7fb26426c1cc",
       "kind": "tts",
       "voiceId": "SAz9YHcvj6GT2YYXdXww",
-      "bytes": 61902
+      "bytes": 61902,
+      "category": "voice"
     },
     {
       "id": "voice-food-critics-evacuated",
@@ -871,7 +947,8 @@
       "checksum": "de74e0fc3e12",
       "kind": "tts",
       "voiceId": "SAz9YHcvj6GT2YYXdXww",
-      "bytes": 48527
+      "bytes": 48527,
+      "category": "voice"
     },
     {
       "id": "voice-volcano-cult-loved",
@@ -883,7 +960,8 @@
       "checksum": "f2db7cec514d",
       "kind": "tts",
       "voiceId": "iP95p4xoKVk53GoZ742B",
-      "bytes": 56050
+      "bytes": 56050,
+      "category": "voice"
     },
     {
       "id": "voice-volcano-cult-evacuated",
@@ -895,7 +973,8 @@
       "checksum": "bd5c76d69d2a",
       "kind": "tts",
       "voiceId": "iP95p4xoKVk53GoZ742B",
-      "bytes": 47691
+      "bytes": 47691,
+      "category": "voice"
     },
     {
       "id": "voice-haunted-mansion-loved",
@@ -907,7 +986,8 @@
       "checksum": "d712631c128f",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 51453
+      "bytes": 51453,
+      "category": "voice"
     },
     {
       "id": "voice-haunted-mansion-evacuated",
@@ -919,7 +999,8 @@
       "checksum": "7b243515656f",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 44347
+      "bytes": 44347,
+      "category": "voice"
     },
     {
       "id": "voice-librarians-loved",
@@ -931,7 +1012,8 @@
       "checksum": "ce9bc3c03be4",
       "kind": "tts",
       "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 66499
+      "bytes": 66499,
+      "category": "voice"
     },
     {
       "id": "voice-librarians-evacuated",
@@ -943,7 +1025,8 @@
       "checksum": "cfb785c8f38a",
       "kind": "tts",
       "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 44347
+      "bytes": 44347,
+      "category": "voice"
     },
     {
       "id": "voice-royal-court-loved",
@@ -955,7 +1038,8 @@
       "checksum": "60f9cbfb3703",
       "kind": "tts",
       "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
-      "bytes": 77784
+      "bytes": 77784,
+      "category": "voice"
     },
     {
       "id": "voice-royal-court-evacuated",
@@ -967,7 +1051,8 @@
       "checksum": "2e9eaf163549",
       "kind": "tts",
       "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
-      "bytes": 58140
+      "bytes": 58140,
+      "category": "voice"
     },
     {
       "id": "voice-opera-house-loved",
@@ -979,7 +1064,8 @@
       "checksum": "36323534015d",
       "kind": "tts",
       "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 53124
+      "bytes": 53124,
+      "category": "voice"
     },
     {
       "id": "voice-opera-house-evacuated",
@@ -991,7 +1077,8 @@
       "checksum": "5f3be6b347f0",
       "kind": "tts",
       "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 51453
+      "bytes": 51453,
+      "category": "voice"
     },
     {
       "id": "voice-astronauts-loved",
@@ -1003,7 +1090,8 @@
       "checksum": "2d7586ca85f9",
       "kind": "tts",
       "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
-      "bytes": 65663
+      "bytes": 65663,
+      "category": "voice"
     },
     {
       "id": "voice-astronauts-evacuated",
@@ -1015,7 +1103,8 @@
       "checksum": "fc933c8ab183",
       "kind": "tts",
       "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
-      "bytes": 53124
+      "bytes": 53124,
+      "category": "voice"
     },
     {
       "id": "voice-silent-monks-loved",
@@ -1027,7 +1116,8 @@
       "checksum": "59f7ce900b3f",
       "kind": "tts",
       "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 47273
+      "bytes": 47273,
+      "category": "voice"
     },
     {
       "id": "voice-silent-monks-evacuated",
@@ -1039,7 +1129,8 @@
       "checksum": "ecef11051aaa",
       "kind": "tts",
       "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 54378
+      "bytes": 54378,
+      "category": "voice"
     },
     {
       "id": "voice-mystery-guest-loved",
@@ -1051,7 +1142,8 @@
       "checksum": "98ab61c17c66",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 76112
+      "bytes": 76112,
+      "category": "voice"
     },
     {
       "id": "voice-mystery-guest-evacuated",
@@ -1063,7 +1155,8 @@
       "checksum": "7aa2142609c7",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 38914
+      "bytes": 38914,
+      "category": "voice"
     }
   ]
 }

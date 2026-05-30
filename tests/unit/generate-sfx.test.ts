@@ -15,6 +15,7 @@ function makeSfxSeeds(ids: string[]): Seed[] {
     mood: 'comedic',
     duration_seconds: 1,
     prompt: `prompt for ${id}`,
+    category: 'fart',
   }));
 }
 

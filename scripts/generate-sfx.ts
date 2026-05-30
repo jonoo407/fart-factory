@@ -27,7 +27,7 @@ import { writeFile, mkdir, readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { SEEDS, type Seed } from './sfx-seeds';
+import { SEEDS, type Seed, type SfxCategory } from './sfx-seeds';
 
 const SFX_ENDPOINT = 'https://api.elevenlabs.io/v1/sound-generation';
 const TTS_MODEL_ID = 'eleven_multilingual_v2';
@@ -56,6 +56,9 @@ export interface ManifestEntry {
   file: string;
   bytes: number;
   checksum: string;
+  /** Role of the sound (fart / reaction / voice / …). The runtime Launch picker
+   *  only selects `fart` entries — see src/audio/sample-player.ts. */
+  category?: SfxCategory;
   /** Set on TTS entries — the ElevenLabs voice id used. */
   voiceId?: string;
   /** Marker so the runtime knows whether to expect SFX vs TTS semantics. */
@@ -172,11 +175,13 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
       const file = `${seed.id}.mp3`;
       const filePath = resolve(outDir, file);
 
-      // Cache hit?
+      // Cache hit? Reuse the audio, but back-fill metadata that isn't part of
+      // the checksum (e.g. `category`) from the current seed so an existing
+      // manifest picks up new fields without burning an API call to regenerate.
       const prior = existingById.get(seed.id);
       if (prior && prior.checksum === checksum && existsSync(filePath)) {
         console.log(`cache hit:  ${seed.id} (${prior.bytes} bytes)`);
-        entries.push(prior);
+        entries.push({ ...prior, category: seed.category });
         continue;
       }
 
@@ -200,6 +205,7 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
         mood: seed.mood,
         file,
         checksum,
+        category: seed.category,
         kind: seed.kind,
         ...(seed.kind === 'tts' ? { voiceId: seed.voice_id } : {}),
       };
