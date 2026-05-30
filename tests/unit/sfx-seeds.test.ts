@@ -1,9 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { SEEDS } from '../../scripts/sfx-seeds';
+import { SEEDS, VOICE_CAST, VOICE_TIERS, voiceSeedId } from '../../scripts/sfx-seeds';
+import { AUDIENCES } from '../../src/state/audience';
+import { REACTIONS } from '../../src/scoring/audience-reactions';
+
+const SFX_SEEDS = SEEDS.filter((s): s is Extract<typeof s, { kind: 'sfx' }> => s.kind === 'sfx');
+const TTS_SEEDS = SEEDS.filter((s): s is Extract<typeof s, { kind: 'tts' }> => s.kind === 'tts');
 
 describe('SFX seeds catalog (Phase K — Library Richness)', () => {
   it('has ≥20 named effects (A28 Library Richness gate)', () => {
-    expect(SEEDS.length).toBeGreaterThanOrEqual(20);
+    expect(SFX_SEEDS.length).toBeGreaterThanOrEqual(20);
   });
 
   it('every seed has unique id', () => {
@@ -11,18 +16,26 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('every seed has a non-empty prompt and a positive duration', () => {
-    for (const s of SEEDS) {
+  it('every SFX seed has a non-empty prompt and a positive duration', () => {
+    for (const s of SFX_SEEDS) {
       expect(s.prompt.length).toBeGreaterThan(0);
       expect(s.duration_seconds).toBeGreaterThan(0);
       expect(s.name.length).toBeGreaterThan(0);
     }
   });
 
-  it('covers all 3 duration buckets (short ≤0.5s, medium 0.5-1.5s, long >1.5s)', () => {
-    const short = SEEDS.filter((s) => s.duration_seconds <= 0.5);
-    const medium = SEEDS.filter((s) => s.duration_seconds > 0.5 && s.duration_seconds <= 1.5);
-    const long = SEEDS.filter((s) => s.duration_seconds > 1.5);
+  it('every TTS seed has non-empty text + a voice_id + a name', () => {
+    for (const s of TTS_SEEDS) {
+      expect(s.text.length).toBeGreaterThan(0);
+      expect(s.voice_id.length).toBeGreaterThan(0);
+      expect(s.name.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('covers all 3 SFX duration buckets (short ≤0.5s, medium 0.5-1.5s, long >1.5s)', () => {
+    const short = SFX_SEEDS.filter((s) => s.duration_seconds <= 0.5);
+    const medium = SFX_SEEDS.filter((s) => s.duration_seconds > 0.5 && s.duration_seconds <= 1.5);
+    const long = SFX_SEEDS.filter((s) => s.duration_seconds > 1.5);
     expect(short.length).toBeGreaterThanOrEqual(1);
     expect(medium.length).toBeGreaterThanOrEqual(1);
     expect(long.length).toBeGreaterThanOrEqual(1);
@@ -35,7 +48,6 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
 
   it('includes the new Phase K audience-reaction seeds', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
-    // At least these 6 audience-reaction seeds from PLAN.md Phase K item 61.
     const required = [
       'granny-cackle',
       'royal-court-applause',
@@ -44,17 +56,13 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
       'alien-tourists-gasp',
       'toddler-giggle',
     ];
-    for (const r of required) {
-      expect(ids.has(r)).toBe(true);
-    }
+    for (const r of required) expect(ids.has(r)).toBe(true);
   });
 
   it('includes food-eating SFX seeds (Phase K item 62)', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
     const required = ['food-munch', 'food-crunch', 'food-slurp', 'food-gulp'];
-    for (const r of required) {
-      expect(ids.has(r)).toBe(true);
-    }
+    for (const r of required) expect(ids.has(r)).toBe(true);
   });
 
   it('includes legendary-fanfare SFX seeds (Phase K item 63)', () => {
@@ -65,10 +73,66 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
 
   it('includes 5 per-boss entrance SFX seeds (PLAN_v5 P8)', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
-    expect(ids.has('boss-entrance-granny')).toBe(true);
-    expect(ids.has('boss-entrance-royal')).toBe(true);
-    expect(ids.has('boss-entrance-haunted')).toBe(true);
-    expect(ids.has('boss-entrance-volcano')).toBe(true);
-    expect(ids.has('boss-entrance-cosmic')).toBe(true);
+    for (const id of [
+      'boss-entrance-granny',
+      'boss-entrance-royal',
+      'boss-entrance-haunted',
+      'boss-entrance-volcano',
+      'boss-entrance-cosmic',
+    ]) {
+      expect(ids.has(id)).toBe(true);
+    }
+  });
+});
+
+describe('audience signature SFX (Phase 3)', () => {
+  it('every audience has a signature SFX seed (sig-<audId>)', () => {
+    const ids = new Set(SEEDS.map((s) => s.id));
+    for (const aud of AUDIENCES) {
+      expect(ids.has(`sig-${aud.id}`)).toBe(true);
+    }
+  });
+});
+
+describe('audience voice TTS (Phase 4)', () => {
+  it('every audience has a voice cast mapping with a non-empty voice_id', () => {
+    for (const aud of AUDIENCES) {
+      const cast = VOICE_CAST[aud.id];
+      expect(cast).toBeDefined();
+      expect(cast!.voice_id.length).toBeGreaterThan(8);
+    }
+  });
+
+  it('every audience has loved+evacuated TTS seeds', () => {
+    const byId = new Map(TTS_SEEDS.map((s) => [s.id, s]));
+    for (const aud of AUDIENCES) {
+      for (const tier of VOICE_TIERS) {
+        const seed = byId.get(voiceSeedId(aud.id, tier));
+        expect(seed).toBeDefined();
+      }
+    }
+  });
+
+  it("every TTS seed's text matches REACTIONS[audId][tier] verbatim", () => {
+    for (const seed of TTS_SEEDS) {
+      // Parse the id pattern: voice-<audId>-<tier>
+      const match = seed.id.match(/^voice-(.+)-(loved|evacuated)$/);
+      expect(match).not.toBeNull();
+      const [, audId, tier] = match!;
+      const expected = REACTIONS[audId!]?.[tier as 'loved' | 'evacuated'];
+      expect(seed.text).toBe(expected);
+    }
+  });
+
+  it('includes 20 audiences × 2 tiers = 40 voice clips', () => {
+    expect(TTS_SEEDS.length).toBe(AUDIENCES.length * VOICE_TIERS.length);
+  });
+});
+
+describe('utility SFX (Phase 2)', () => {
+  it('includes plate-pluck + drumroll', () => {
+    const ids = new Set(SEEDS.map((s) => s.id));
+    expect(ids.has('plate-pluck')).toBe(true);
+    expect(ids.has('drumroll')).toBe(true);
   });
 });

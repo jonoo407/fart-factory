@@ -37,7 +37,14 @@ import { rollUnicornEncounter, UNICORN_AUDIENCE } from '../state/unicorn-encount
 import { awardResearchForLaunch } from '../scoring/research';
 import { discoverFromPlate } from '../scoring/discovery';
 import { renderNotebookCounter } from './notebook';
-import { playEventSfxOneOf, FOOD_EATING_SFX, LEGENDARY_FANFARE_SFX, playEventSfx } from '../audio/event-sfx';
+import {
+  playEventSfxOneOf,
+  FOOD_EATING_SFX,
+  LEGENDARY_FANFARE_SFX,
+  playEventSfx,
+  playAudienceSignature,
+  playAudienceVoice,
+} from '../audio/event-sfx';
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
@@ -316,6 +323,8 @@ function wireMoveOnButton(): void {
   const btn = $('moveOnBtn');
   if (!btn) return;
   btn.addEventListener('click', () => {
+    // PR10 — drumroll cue announces the transition.
+    void playEventSfx('drumroll', 5);
     // PR9: claim encore bonus if currently wowed.
     const aud = currentAudience();
     if (isWowed(aud.id, currentEncounterIdx())) {
@@ -342,6 +351,9 @@ function wireMoveOnButton(): void {
         $('storyResult')?.setAttribute('hidden', '');
         $('audienceReaction')?.setAttribute('hidden', '');
         $('discoverySplash')?.setAttribute('hidden', '');
+        // PR10 — the next audience announces itself with its signature cue.
+        const nextAud = currentAudience();
+        void playAudienceSignature(nextAud.id);
       });
     });
   });
@@ -376,6 +388,8 @@ export function wirePlateSlots(): void {
     if (!slot) continue;
     slot.addEventListener('click', () => {
       if (removeFoodFromPlate(i)) {
+        // PR10 — soft "pluck" SFX when a food is removed.
+        void playEventSfx('plate-pluck', 3);
         renderPlate();
         renderBellyMeter();
       }
@@ -733,6 +747,119 @@ function wireAreaChangeButton(): void {
   });
 }
 
+/**
+ * PR10 — Audience portrait tap (signature SFX + micro-reaction) and
+ * long-press (voice preview). Wired once in initStoryPantry.
+ */
+const LONG_PRESS_MS = 600;
+function wireAudiencePortraitInteraction(): void {
+  const emojiEl = $('audiencePortraitEmoji');
+  if (!emojiEl) return;
+  emojiEl.setAttribute('role', 'button');
+  emojiEl.setAttribute('aria-label', 'Tap to greet the audience; hold to hear them speak');
+  emojiEl.setAttribute('tabindex', '0');
+  emojiEl.style.cursor = 'pointer';
+
+  let pressTimer: ReturnType<typeof setTimeout> | null = null;
+  let longPressFired = false;
+
+  const onPress = (): void => {
+    longPressFired = false;
+    if (pressTimer) clearTimeout(pressTimer);
+    pressTimer = setTimeout(() => {
+      longPressFired = true;
+      const aud = currentAudience();
+      void playAudienceVoice(aud.id, 'loved');
+    }, LONG_PRESS_MS);
+  };
+
+  const onRelease = (): void => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+    if (longPressFired) return; // long-press already played voice
+    const aud = currentAudience();
+    void playAudienceSignature(aud.id);
+    // Brief wobble for visible feedback (reuse the loved-tier portrait keyframe).
+    emojiEl.classList.remove('audience-portrait-loved');
+    void (emojiEl as HTMLElement).offsetWidth;
+    emojiEl.classList.add('audience-portrait-loved');
+    setTimeout(() => emojiEl.classList.remove('audience-portrait-loved'), 1200);
+    // Small particle burst — reuse the existing reaction-particles system.
+    void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
+      spawnReactionParticles('liked');
+    });
+    // First-tap discoverability hint for the long-press.
+    void import('./feature-intro').then(({ showFeatureIntro }) => {
+      showFeatureIntro({
+        id: 'portrait_voice',
+        emoji: '🎤',
+        title: 'Tip: hold the audience',
+        body: 'Press and hold the audience portrait to hear them speak a line in their own voice.',
+        cta: 'Got it',
+      });
+    });
+  };
+
+  const onCancel = (): void => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      pressTimer = null;
+    }
+  };
+
+  emojiEl.addEventListener('pointerdown', onPress);
+  emojiEl.addEventListener('pointerup', onRelease);
+  emojiEl.addEventListener('pointerleave', onCancel);
+  emojiEl.addEventListener('pointercancel', onCancel);
+  emojiEl.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      onRelease();
+    }
+  });
+}
+
+/**
+ * PR10 — Belly meter tap = mini-fart easter egg. Plays a tiny low-volume
+ * fart without spending belly. After every 10 taps, a one-line toast.
+ */
+function wireBellyMeterTap(): void {
+  const track = document.querySelector<HTMLElement>('.belly-track');
+  if (!track) return;
+  // Don't override role="meter" / aria-label — those describe the value
+  // display, which remains the primary semantic. The tap is an easter egg
+  // layered on top; cursor change is enough hint for sighted players.
+  track.style.cursor = 'pointer';
+  track.addEventListener('click', () => {
+    playFart(2, 1, 2, 1, 5, 1);
+    triggerHaptic(HAPTICS.launch);
+    let taps = 0;
+    try {
+      const stored = localStorage.getItem('fart_belly_taps');
+      if (stored) taps = parseInt(stored, 10) || 0;
+    } catch { /* ignore */ }
+    taps += 1;
+    try { localStorage.setItem('fart_belly_taps', String(taps)); } catch { /* ignore */ }
+    if (taps % 10 === 0) {
+      const splash = document.getElementById('discoverySplash');
+      if (splash) {
+        splash.innerHTML = `<div class="discovery-splash-card rarity-common">
+          <div class="discovery-splash-banner">🫃 ${taps} belly pokes</div>
+          <div class="discovery-splash-desc">Stop poking my belly.</div>
+        </div>`;
+        splash.removeAttribute('hidden');
+        splash.classList.add('discovery-splash-show');
+        setTimeout(() => {
+          splash.setAttribute('hidden', '');
+          splash.classList.remove('discovery-splash-show');
+        }, 2200);
+      }
+    }
+  });
+}
+
 export function initStoryPantry(): void {
   renderAudiencePortrait();
   renderAreaDisplay();
@@ -741,6 +868,8 @@ export function initStoryPantry(): void {
   wireAreaChangeButton();
   wireMoveOnButton();
   wirePantryShowLockedToggle();
+  wireAudiencePortraitInteraction();
+  wireBellyMeterTap();
   renderPantryGrid();
   renderPlate();
   renderBellyMeter();

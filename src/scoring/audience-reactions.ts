@@ -182,6 +182,11 @@ const FALLBACK_TIERS: Record<Tier, string> = {
   evacuated: '💀 The room is clearing out.',
 };
 
+// Exported for the SFX-seed generator so it can fetch the exact lines
+// to voice (single source of truth — never re-typed in seeds).
+export { REACTIONS };
+export type { Tier };
+
 export function reactionTextForAudience(aud: Audience, tier: Tier): string {
   const perAudience = REACTIONS[aud.id];
   if (perAudience && perAudience[tier]) return perAudience[tier];

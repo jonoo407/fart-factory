@@ -12,7 +12,7 @@ import { audienceReaction } from '../scoring/audience-reactions';
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { loadLastMatch } from '../state/persistence';
 import { loadStreak } from '../scoring/streak';
-import { playEventSfx, AUDIENCE_REACTION_SFX } from '../audio/event-sfx';
+import { playEventSfx, AUDIENCE_REACTION_SFX, playAudienceVoice } from '../audio/event-sfx';
 import { loadDiscoveredAxes } from '../state/axis-discovery';
 import { getRecipe } from '../state/recipes';
 import { renderFartProfileHtml } from './fart-profile';
@@ -99,6 +99,15 @@ export function renderAudienceReaction(pct: number, audience: Audience): void {
   void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
     spawnReactionParticles(r.tier);
   });
+  // PR10 — voiced reaction line. Only loved + evacuated are voiced today.
+  // Scheduled ~800ms after the generic tier cue so the audience VOICE lands
+  // as a punchline rather than overlapping the applause/moan.
+  if (r.tier === 'loved' || r.tier === 'evacuated') {
+    const tier = r.tier;
+    setTimeout(() => {
+      void playAudienceVoice(audience.id, tier);
+    }, 800);
+  }
 }
 
 function matchEmoji(pct: number): string {
