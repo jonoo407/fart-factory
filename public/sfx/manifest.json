@@ -1,6 +1,6 @@
 {
-  "version": "v1",
-  "generatedAt": "2026-05-10T17:41:33.397Z",
+  "version": "v2",
+  "generatedAt": "2026-05-30T12:47:44.651Z",
   "entries": [
     {
       "id": "mouse-squeak",
@@ -9,8 +9,9 @@
       "durationMs": 600,
       "mood": "sneaky",
       "file": "mouse-squeak.mp3",
-      "bytes": 10493,
-      "checksum": "72cebd3d211d"
+      "checksum": "309977c9ce22",
+      "kind": "sfx",
+      "bytes": 10493
     },
     {
       "id": "champagne-pop",
@@ -19,8 +20,9 @@
       "durationMs": 600,
       "mood": "surprised",
       "file": "champagne-pop.mp3",
-      "bytes": 10493,
-      "checksum": "6f2b54a28e69"
+      "checksum": "01ac7cb3d22e",
+      "kind": "sfx",
+      "bytes": 10493
     },
     {
       "id": "tiny-toot",
@@ -29,8 +31,9 @@
       "durationMs": 500,
       "mood": "embarrassed",
       "file": "tiny-toot.mp3",
-      "bytes": 8821,
-      "checksum": "c29736d6480f"
+      "checksum": "40f931c944c2",
+      "kind": "sfx",
+      "bytes": 8821
     },
     {
       "id": "wet-flapper",
@@ -39,8 +42,9 @@
       "durationMs": 1200,
       "mood": "comedic",
       "file": "wet-flapper.mp3",
-      "bytes": 20106,
-      "checksum": "824298b26200"
+      "checksum": "f2a88bc99f23",
+      "kind": "sfx",
+      "bytes": 20106
     },
     {
       "id": "dry-trumpet",
@@ -49,8 +53,9 @@
       "durationMs": 1400,
       "mood": "triumphant",
       "file": "dry-trumpet.mp3",
-      "bytes": 23031,
-      "checksum": "cd9a6c292286"
+      "checksum": "cb877cb99e35",
+      "kind": "sfx",
+      "bytes": 23031
     },
     {
       "id": "kazoo-honk",
@@ -59,8 +64,9 @@
       "durationMs": 1100,
       "mood": "comedic",
       "file": "kazoo-honk.mp3",
-      "bytes": 18434,
-      "checksum": "9d8656886f04"
+      "checksum": "8a50c584c274",
+      "kind": "sfx",
+      "bytes": 18434
     },
     {
       "id": "duck-quack",
@@ -69,8 +75,9 @@
       "durationMs": 1000,
       "mood": "surprised",
       "file": "duck-quack.mp3",
-      "bytes": 17180,
-      "checksum": "c00811de4fda"
+      "checksum": "e66986cb8078",
+      "kind": "sfx",
+      "bytes": 17180
     },
     {
       "id": "sad-trombone",
@@ -79,8 +86,9 @@
       "durationMs": 1500,
       "mood": "embarrassed",
       "file": "sad-trombone.mp3",
-      "bytes": 24703,
-      "checksum": "a6616554e469"
+      "checksum": "20addfe1f443",
+      "kind": "sfx",
+      "bytes": 24703
     },
     {
       "id": "thunder-roll",
@@ -89,8 +97,9 @@
       "durationMs": 2400,
       "mood": "triumphant",
       "file": "thunder-roll.mp3",
-      "bytes": 39332,
-      "checksum": "3e8463641f40"
+      "checksum": "7fcbc4e9084c",
+      "kind": "sfx",
+      "bytes": 39332
     },
     {
       "id": "never-ending",
@@ -99,8 +108,9 @@
       "durationMs": 2800,
       "mood": "exhausted",
       "file": "never-ending.mp3",
-      "bytes": 45183,
-      "checksum": "ad1d62a47329"
+      "checksum": "08b670f486a0",
+      "kind": "sfx",
+      "bytes": 45183
     },
     {
       "id": "machine-gun",
@@ -109,8 +119,9 @@
       "durationMs": 2000,
       "mood": "comedic",
       "file": "machine-gun.mp3",
-      "bytes": 33062,
-      "checksum": "34f959d0963d"
+      "checksum": "32ea8f271b7f",
+      "kind": "sfx",
+      "bytes": 33062
     },
     {
       "id": "volcano",
@@ -119,8 +130,9 @@
       "durationMs": 2600,
       "mood": "triumphant",
       "file": "volcano.mp3",
-      "bytes": 41839,
-      "checksum": "bd073d3ab0bf"
+      "checksum": "053a9df9f8fa",
+      "kind": "sfx",
+      "bytes": 41839
     },
     {
       "id": "silent-killer",
@@ -129,8 +141,9 @@
       "durationMs": 800,
       "mood": "sneaky",
       "file": "silent-killer.mp3",
-      "bytes": 13836,
-      "checksum": "c9ac1ea2719b"
+      "checksum": "05c57c7fd427",
+      "kind": "sfx",
+      "bytes": 13836
     },
     {
       "id": "symphony",
@@ -139,8 +152,918 @@
       "durationMs": 1800,
       "mood": "triumphant",
       "file": "symphony.mp3",
-      "bytes": 29301,
-      "checksum": "b3d33793ba94"
+      "checksum": "730c8e987e16",
+      "kind": "sfx",
+      "bytes": 29301
+    },
+    {
+      "id": "granny-cackle",
+      "name": "Granny's Cackle",
+      "prompt": "an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style",
+      "durationMs": 1800,
+      "mood": "comedic",
+      "file": "granny-cackle.mp3",
+      "checksum": "76cd1991ae1c",
+      "kind": "sfx",
+      "bytes": 29301
+    },
+    {
+      "id": "royal-court-applause",
+      "name": "Royal Court Applause",
+      "prompt": "a dignified royal-court polite applause, refined hand-clapping with brief approving murmur, family-friendly",
+      "durationMs": 2400,
+      "mood": "enthralled",
+      "file": "royal-court-applause.mp3",
+      "checksum": "1a7de23421f0",
+      "kind": "sfx",
+      "bytes": 39332
+    },
+    {
+      "id": "frat-howl",
+      "name": "Frat House Howl",
+      "prompt": "a small group of college friends cheering and hollering enthusiastically, comedic celebration, family-friendly tone",
+      "durationMs": 1600,
+      "mood": "triumphant",
+      "file": "frat-howl.mp3",
+      "checksum": "1ce75cc1526c",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "haunted-mansion-moan",
+      "name": "Haunted Mansion Moan",
+      "prompt": "a low spooky cartoon ghostly moan and woooo, kid-friendly Halloween, gentle eerie",
+      "durationMs": 2000,
+      "mood": "eerie",
+      "file": "haunted-mansion-moan.mp3",
+      "checksum": "ca842b3a072b",
+      "kind": "sfx",
+      "bytes": 33062
+    },
+    {
+      "id": "alien-tourists-gasp",
+      "name": "Alien Tourists Gasp",
+      "prompt": "small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly",
+      "durationMs": 1400,
+      "mood": "surprised",
+      "file": "alien-tourists-gasp.mp3",
+      "checksum": "59cfb3ebd9a2",
+      "kind": "sfx",
+      "bytes": 23031
+    },
+    {
+      "id": "toddler-giggle",
+      "name": "Toddler Giggle",
+      "prompt": "a small toddler giggling and laughing with delight, gentle and warm, family-friendly",
+      "durationMs": 1500,
+      "mood": "comedic",
+      "file": "toddler-giggle.mp3",
+      "checksum": "5d7f47c1bddb",
+      "kind": "sfx",
+      "bytes": 24703
+    },
+    {
+      "id": "food-munch",
+      "name": "Food Munch",
+      "prompt": "a quick comedic cartoon chewing crunch, brief munching foley, family-friendly",
+      "durationMs": 600,
+      "mood": "comedic",
+      "file": "food-munch.mp3",
+      "checksum": "6e90456ee04e",
+      "kind": "sfx",
+      "bytes": 10493
+    },
+    {
+      "id": "food-crunch",
+      "name": "Food Crunch",
+      "prompt": "a sharp crispy food crunch like biting an apple, comedic foley, brief",
+      "durationMs": 500,
+      "mood": "comedic",
+      "file": "food-crunch.mp3",
+      "checksum": "f030d5fb7ee9",
+      "kind": "sfx",
+      "bytes": 8821
+    },
+    {
+      "id": "food-slurp",
+      "name": "Food Slurp",
+      "prompt": "a wet cartoon slurp like noodles, quick foley, comedic",
+      "durationMs": 700,
+      "mood": "comedic",
+      "file": "food-slurp.mp3",
+      "checksum": "81418e54fb34",
+      "kind": "sfx",
+      "bytes": 12164
+    },
+    {
+      "id": "food-gulp",
+      "name": "Food Gulp",
+      "prompt": "a comedic cartoon swallowing gulp, brief foley, family-friendly",
+      "durationMs": 500,
+      "mood": "comedic",
+      "file": "food-gulp.mp3",
+      "checksum": "b0f0927ec9b3",
+      "kind": "sfx",
+      "bytes": 8821
+    },
+    {
+      "id": "legendary-fanfare",
+      "name": "Legendary Fanfare",
+      "prompt": "a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly",
+      "durationMs": 2600,
+      "mood": "enthralled",
+      "file": "legendary-fanfare.mp3",
+      "checksum": "42e82f93b2dc",
+      "kind": "sfx",
+      "bytes": 41839
+    },
+    {
+      "id": "quest-claimed",
+      "name": "Quest Claimed",
+      "prompt": "a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly",
+      "durationMs": 1800,
+      "mood": "triumphant",
+      "file": "quest-claimed.mp3",
+      "checksum": "e0ef71c8d85b",
+      "kind": "sfx",
+      "bytes": 29301
+    },
+    {
+      "id": "boss-entrance-granny",
+      "name": "Granny Entrance",
+      "prompt": "a warm cozy kazoo + accordion flourish, grandmotherly arrival, family-friendly cartoon",
+      "durationMs": 2000,
+      "mood": "comedic",
+      "file": "boss-entrance-granny.mp3",
+      "checksum": "9390bdd38824",
+      "kind": "sfx",
+      "bytes": 33062
+    },
+    {
+      "id": "boss-entrance-royal",
+      "name": "Royal Entrance",
+      "prompt": "a regal short brass fanfare with trumpets and timpani, royal court arrival, family-friendly",
+      "durationMs": 2400,
+      "mood": "enthralled",
+      "file": "boss-entrance-royal.mp3",
+      "checksum": "010ccf2c50e7",
+      "kind": "sfx",
+      "bytes": 39332
+    },
+    {
+      "id": "boss-entrance-haunted",
+      "name": "Haunted Entrance",
+      "prompt": "a low spooky cartoon organ chord with subtle ghost whoosh, haunted mansion door creak, family-friendly Halloween",
+      "durationMs": 2200,
+      "mood": "eerie",
+      "file": "boss-entrance-haunted.mp3",
+      "checksum": "27cc4db0547f",
+      "kind": "sfx",
+      "bytes": 36406
+    },
+    {
+      "id": "boss-entrance-volcano",
+      "name": "Volcano Entrance",
+      "prompt": "a deep rumbling timpani roll with sharp metallic clang, volcanic ritual gong, family-friendly",
+      "durationMs": 2400,
+      "mood": "triumphant",
+      "file": "boss-entrance-volcano.mp3",
+      "checksum": "4799f253cbd7",
+      "kind": "sfx",
+      "bytes": 39332
+    },
+    {
+      "id": "boss-entrance-cosmic",
+      "name": "Cosmic Entrance",
+      "prompt": "an otherworldly synth pad rising sweep with bell shimmer, alien council gathering, family-friendly sci-fi",
+      "durationMs": 2600,
+      "mood": "surprised",
+      "file": "boss-entrance-cosmic.mp3",
+      "checksum": "53a46b95cd9d",
+      "kind": "sfx",
+      "bytes": 41839
+    },
+    {
+      "id": "plate-pluck",
+      "name": "Plate Pluck",
+      "prompt": "a soft cartoon mouth pop or finger pluck, brief light comedic foley, family-friendly",
+      "durationMs": 600,
+      "mood": "comedic",
+      "file": "plate-pluck.mp3",
+      "checksum": "1fafcd066e13",
+      "kind": "sfx",
+      "bytes": 10493
+    },
+    {
+      "id": "drumroll",
+      "name": "Drum Roll",
+      "prompt": "a brief snare drum roll building into a soft crescendo, theatrical anticipation, family-friendly",
+      "durationMs": 1600,
+      "mood": "triumphant",
+      "file": "drumroll.mp3",
+      "checksum": "812d1022d56e",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-granny-edna",
+      "name": "Signature: Granny Edna",
+      "prompt": "cozy knitting needle clicks with a faint warm grandmother chuckle, gentle and inviting, family-friendly cartoon foley",
+      "durationMs": 1600,
+      "mood": "comedic",
+      "file": "sig-granny-edna.mp3",
+      "checksum": "1b397157205a",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-royal-court",
+      "name": "Signature: Royal Court",
+      "prompt": "a brief regal trumpet flourish announcing court arrival, two short fanfare notes, family-friendly",
+      "durationMs": 1600,
+      "mood": "enthralled",
+      "file": "sig-royal-court.mp3",
+      "checksum": "3360cd5fa367",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-frat-bros",
+      "name": "Signature: Frat Bros",
+      "prompt": "a small group of frat bros whooping with brief party cheer and a cup tap, family-friendly tone",
+      "durationMs": 1600,
+      "mood": "triumphant",
+      "file": "sig-frat-bros.mp3",
+      "checksum": "69ea5907d613",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-haunted-mansion",
+      "name": "Signature: Haunted Mansion",
+      "prompt": "a slow creaking wooden door with a faint spooky cartoon woooo, gentle Halloween, family-friendly",
+      "durationMs": 1600,
+      "mood": "eerie",
+      "file": "sig-haunted-mansion.mp3",
+      "checksum": "c0f07982905b",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-alien-tourists",
+      "name": "Signature: Alien Tourists",
+      "prompt": "a UFO landing whoosh with bright synth chirps and curious alien beeps, family-friendly sci-fi cartoon",
+      "durationMs": 1600,
+      "mood": "surprised",
+      "file": "sig-alien-tourists.mp3",
+      "checksum": "66cac49746c6",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-toddler-bday",
+      "name": "Signature: Toddler Birthday",
+      "prompt": "a toy party-blower kazoo with toddler giggles and a tiny clap, joyful, family-friendly",
+      "durationMs": 1600,
+      "mood": "comedic",
+      "file": "sig-toddler-bday.mp3",
+      "checksum": "b79aa1ef5717",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-goth-teens",
+      "name": "Signature: Goth Teens",
+      "prompt": "a single dark synth pad chord with a teen sigh, moody but family-friendly cartoon",
+      "durationMs": 1600,
+      "mood": "embarrassed",
+      "file": "sig-goth-teens.mp3",
+      "checksum": "17124aa63670",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-kindergarten",
+      "name": "Signature: Kindergarten",
+      "prompt": "a small group of kindergartners shouting yay with a recess bell ring, family-friendly",
+      "durationMs": 1600,
+      "mood": "comedic",
+      "file": "sig-kindergarten.mp3",
+      "checksum": "85acb0b8cef4",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-skunk-society",
+      "name": "Signature: Skunk Society",
+      "prompt": "a soft sniffing sound followed by a brief approving murmur from a small animal-society gathering, family-friendly",
+      "durationMs": 1600,
+      "mood": "sneaky",
+      "file": "sig-skunk-society.mp3",
+      "checksum": "fc8a78552d73",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-opera-house",
+      "name": "Signature: Opera House",
+      "prompt": "an operatic soprano warm-up trill on a single note with concert-hall reverb, family-friendly",
+      "durationMs": 1600,
+      "mood": "enthralled",
+      "file": "sig-opera-house.mp3",
+      "checksum": "39a23cf16fb8",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-wrestling-fans",
+      "name": "Signature: Wrestling Fans",
+      "prompt": "a big stadium crowd cheer with a brief ring-bell ding, sports broadcaster energy, family-friendly",
+      "durationMs": 1600,
+      "mood": "triumphant",
+      "file": "sig-wrestling-fans.mp3",
+      "checksum": "e4fc3114b60f",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-librarians",
+      "name": "Signature: Librarians",
+      "prompt": "a single sharp shush followed by the soft rustle of turning paper pages, family-friendly",
+      "durationMs": 1600,
+      "mood": "sneaky",
+      "file": "sig-librarians.mp3",
+      "checksum": "8711a9a20f1f",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-volcano-cult",
+      "name": "Signature: Volcano Cult",
+      "prompt": "a low ritual gong followed by distant low chanting, family-friendly cartoon mystic tone",
+      "durationMs": 1600,
+      "mood": "eerie",
+      "file": "sig-volcano-cult.mp3",
+      "checksum": "07358fde9f7f",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-pet-rescue",
+      "name": "Signature: Pet Rescue",
+      "prompt": "a friendly dog bark with a soft cat meow and gentle paws-on-floor patter, warm and family-friendly",
+      "durationMs": 1600,
+      "mood": "comedic",
+      "file": "sig-pet-rescue.mp3",
+      "checksum": "953b59460e47",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-astronauts",
+      "name": "Signature: Astronauts",
+      "prompt": "a brief radio static crackle with mission-control beep, cold sterile sci-fi, family-friendly",
+      "durationMs": 1600,
+      "mood": "surprised",
+      "file": "sig-astronauts.mp3",
+      "checksum": "21b27444b0b1",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-food-critics",
+      "name": "Signature: Food Critics",
+      "prompt": "a delicate silver spoon tapping a porcelain teacup followed by a polite refined cough, family-friendly",
+      "durationMs": 1600,
+      "mood": "embarrassed",
+      "file": "sig-food-critics.mp3",
+      "checksum": "4c4b1f6e14ee",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-baby-shower",
+      "name": "Signature: Baby Shower",
+      "prompt": "a gentle rattle shake and a soft baby coo with paper-wrap rustle, warm, family-friendly",
+      "durationMs": 1600,
+      "mood": "comedic",
+      "file": "sig-baby-shower.mp3",
+      "checksum": "15c34dd7312d",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-punk-show",
+      "name": "Signature: Punk Show",
+      "prompt": "a brief power-chord guitar riff with a crash cymbal hit, punk-rock energy, family-friendly cartoon",
+      "durationMs": 1600,
+      "mood": "triumphant",
+      "file": "sig-punk-show.mp3",
+      "checksum": "6d63b9d20ab1",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-silent-monks",
+      "name": "Signature: Silent Monks",
+      "prompt": "a single soft meditation bowl ringing slowly fading, contemplative, family-friendly",
+      "durationMs": 1600,
+      "mood": "enthralled",
+      "file": "sig-silent-monks.mp3",
+      "checksum": "9f604c1417ee",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "sig-mystery-guest",
+      "name": "Signature: Mystery Guest",
+      "prompt": "a low mysterious synth swell with a distant indistinct whisper, family-friendly intrigue",
+      "durationMs": 1600,
+      "mood": "eerie",
+      "file": "sig-mystery-guest.mp3",
+      "checksum": "63f5ee0eee0a",
+      "kind": "sfx",
+      "bytes": 26793
+    },
+    {
+      "id": "voice-granny-edna-loved",
+      "name": "Voice: Granny Edna — loved",
+      "prompt": "Granny Edna chuckles warmly. \"Oh dear, that takes me back.\"",
+      "durationMs": 4917,
+      "mood": "voice",
+      "file": "voice-granny-edna-loved.mp3",
+      "checksum": "42132963ac5f",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 61902
+    },
+    {
+      "id": "voice-granny-edna-evacuated",
+      "name": "Voice: Granny Edna — evacuated",
+      "prompt": "Granny Edna marches out muttering about manners.",
+      "durationMs": 4000,
+      "mood": "voice",
+      "file": "voice-granny-edna-evacuated.mp3",
+      "checksum": "2150c733e871",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 47273
+    },
+    {
+      "id": "voice-toddler-bday-loved",
+      "name": "Voice: Toddler Birthday Party — loved",
+      "prompt": "The toddlers SHRIEK with laughter and demand cake.",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-toddler-bday-loved.mp3",
+      "checksum": "6fd89fb48bd0",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 44765
+    },
+    {
+      "id": "voice-toddler-bday-evacuated",
+      "name": "Voice: Toddler Birthday Party — evacuated",
+      "prompt": "Parents whisk their toddlers away, glaring at you.",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-toddler-bday-evacuated.mp3",
+      "checksum": "32754335c6ce",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 52288
+    },
+    {
+      "id": "voice-baby-shower-loved",
+      "name": "Voice: Baby Shower — loved",
+      "prompt": "The Baby Shower goes silent, then erupts in genteel applause.",
+      "durationMs": 5083,
+      "mood": "voice",
+      "file": "voice-baby-shower-loved.mp3",
+      "checksum": "26e55a726944",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 62737
+    },
+    {
+      "id": "voice-baby-shower-evacuated",
+      "name": "Voice: Baby Shower — evacuated",
+      "prompt": "The Baby Shower relocates to \"somewhere more peaceful.\"",
+      "durationMs": 4583,
+      "mood": "voice",
+      "file": "voice-baby-shower-evacuated.mp3",
+      "checksum": "dda1db83d32e",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 49363
+    },
+    {
+      "id": "voice-kindergarten-loved",
+      "name": "Voice: Kindergarten Class — loved",
+      "prompt": "The kindergartners erupt in giggles. A spontaneous dance breaks out.",
+      "durationMs": 5667,
+      "mood": "voice",
+      "file": "voice-kindergarten-loved.mp3",
+      "checksum": "54582eef7f99",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 75276
+    },
+    {
+      "id": "voice-kindergarten-evacuated",
+      "name": "Voice: Kindergarten Class — evacuated",
+      "prompt": "The teacher leads the kindergartners away muttering.",
+      "durationMs": 4333,
+      "mood": "voice",
+      "file": "voice-kindergarten-evacuated.mp3",
+      "checksum": "966b6d1bb283",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 44347
+    },
+    {
+      "id": "voice-pet-rescue-loved",
+      "name": "Voice: Pet Rescue Volunteers — loved",
+      "prompt": "The dogs wag tails. The volunteers smile. Net donations spike.",
+      "durationMs": 5167,
+      "mood": "voice",
+      "file": "voice-pet-rescue-loved.mp3",
+      "checksum": "f1e0d5fef359",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 69425
+    },
+    {
+      "id": "voice-pet-rescue-evacuated",
+      "name": "Voice: Pet Rescue Volunteers — evacuated",
+      "prompt": "The pets are removed for their own safety.",
+      "durationMs": 3500,
+      "mood": "voice",
+      "file": "voice-pet-rescue-evacuated.mp3",
+      "checksum": "731fa77ce67b",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 38078
+    },
+    {
+      "id": "voice-frat-bros-loved",
+      "name": "Voice: The Frat Bros — loved",
+      "prompt": "THE FRAT BROS HOLLER. BEER GETS SPILLED. SOMEONE YELLS 'LEGEND!'",
+      "durationMs": 5333,
+      "mood": "voice",
+      "file": "voice-frat-bros-loved.mp3",
+      "checksum": "467a29b57611",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 67753
+    },
+    {
+      "id": "voice-frat-bros-evacuated",
+      "name": "Voice: The Frat Bros — evacuated",
+      "prompt": "The Frat Bros stagger to the parking lot, swearing off you forever.",
+      "durationMs": 5583,
+      "mood": "voice",
+      "file": "voice-frat-bros-evacuated.mp3",
+      "checksum": "9d171f13a440",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 57722
+    },
+    {
+      "id": "voice-goth-teens-loved",
+      "name": "Voice: Goth Teens — loved",
+      "prompt": "The Goth Teens nod slowly, almost smiling. \"Sick.\"",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-goth-teens-loved.mp3",
+      "checksum": "bc256e3368c6",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 67335
+    },
+    {
+      "id": "voice-goth-teens-evacuated",
+      "name": "Voice: Goth Teens — evacuated",
+      "prompt": "The Goth Teens vanish into the shadows, more disappointed than ever.",
+      "durationMs": 5667,
+      "mood": "voice",
+      "file": "voice-goth-teens-evacuated.mp3",
+      "checksum": "8155d703abc8",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 59812
+    },
+    {
+      "id": "voice-alien-tourists-loved",
+      "name": "Voice: Alien Tourists — loved",
+      "prompt": "The Alien Tourists emit synchronized chirps of delight.",
+      "durationMs": 4583,
+      "mood": "voice",
+      "file": "voice-alien-tourists-loved.mp3",
+      "checksum": "fbfa2d3af7a6",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 56050
+    },
+    {
+      "id": "voice-alien-tourists-evacuated",
+      "name": "Voice: Alien Tourists — evacuated",
+      "prompt": "The Alien Tourists beam back to their ship.",
+      "durationMs": 3583,
+      "mood": "voice",
+      "file": "voice-alien-tourists-evacuated.mp3",
+      "checksum": "833d02711ab9",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 42675
+    },
+    {
+      "id": "voice-wrestling-fans-loved",
+      "name": "Voice: Wrestling Fans — loved",
+      "prompt": "THE WRESTLING FANS GO ABSOLUTELY UNHINGED. CHANTS START.",
+      "durationMs": 4667,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-loved.mp3",
+      "checksum": "15e50aa0853c",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 70261
+    },
+    {
+      "id": "voice-wrestling-fans-evacuated",
+      "name": "Voice: Wrestling Fans — evacuated",
+      "prompt": "The Wrestling Fans riot. They were going to anyway.",
+      "durationMs": 4250,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-evacuated.mp3",
+      "checksum": "2dd3c3b3cd6a",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 53960
+    },
+    {
+      "id": "voice-punk-show-loved",
+      "name": "Voice: Punk Rock Show — loved",
+      "prompt": "The Punk Show MOSHES. Someone yells \"ENCORE!\"",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-punk-show-loved.mp3",
+      "checksum": "0eb1432d9ce6",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 50199
+    },
+    {
+      "id": "voice-punk-show-evacuated",
+      "name": "Voice: Punk Rock Show — evacuated",
+      "prompt": "The Punk Show storms the stage and gets ejected.",
+      "durationMs": 4000,
+      "mood": "voice",
+      "file": "voice-punk-show-evacuated.mp3",
+      "checksum": "464624bf1b46",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 48527
+    },
+    {
+      "id": "voice-skunk-society-loved",
+      "name": "Voice: The Skunk Society — loved",
+      "prompt": "The Skunk Society spritzes appreciation in your direction.",
+      "durationMs": 4833,
+      "mood": "voice",
+      "file": "voice-skunk-society-loved.mp3",
+      "checksum": "9c97d83713db",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 54378
+    },
+    {
+      "id": "voice-skunk-society-evacuated",
+      "name": "Voice: The Skunk Society — evacuated",
+      "prompt": "The Skunk Society leaves AND ASKS FOR A RAINCHECK.",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-skunk-society-evacuated.mp3",
+      "checksum": "127b45d4a144",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 46437
+    },
+    {
+      "id": "voice-food-critics-loved",
+      "name": "Voice: Food Critics — loved",
+      "prompt": "The Food Critics write glowing reviews. Three stars confirmed.",
+      "durationMs": 5167,
+      "mood": "voice",
+      "file": "voice-food-critics-loved.mp3",
+      "checksum": "7fb26426c1cc",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 61902
+    },
+    {
+      "id": "voice-food-critics-evacuated",
+      "name": "Voice: Food Critics — evacuated",
+      "prompt": "The Food Critics storm out, tweeting threads of fury.",
+      "durationMs": 4417,
+      "mood": "voice",
+      "file": "voice-food-critics-evacuated.mp3",
+      "checksum": "de74e0fc3e12",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 48527
+    },
+    {
+      "id": "voice-volcano-cult-loved",
+      "name": "Voice: The Volcano Cult — loved",
+      "prompt": "The Volcano Cult chants your name. THE MAGMA GOD IS PLEASED.",
+      "durationMs": 5000,
+      "mood": "voice",
+      "file": "voice-volcano-cult-loved.mp3",
+      "checksum": "f2db7cec514d",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 56050
+    },
+    {
+      "id": "voice-volcano-cult-evacuated",
+      "name": "Voice: The Volcano Cult — evacuated",
+      "prompt": "The Volcano Cult retreats to the caldera, plotting.",
+      "durationMs": 4250,
+      "mood": "voice",
+      "file": "voice-volcano-cult-evacuated.mp3",
+      "checksum": "bd5c76d69d2a",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 47691
+    },
+    {
+      "id": "voice-haunted-mansion-loved",
+      "name": "Voice: The Haunted Mansion — loved",
+      "prompt": "Spectral wails of approval echo through the halls.",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-loved.mp3",
+      "checksum": "d712631c128f",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 51453
+    },
+    {
+      "id": "voice-haunted-mansion-evacuated",
+      "name": "Voice: The Haunted Mansion — evacuated",
+      "prompt": "Even the ghosts pack up and haunt elsewhere.",
+      "durationMs": 3667,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-evacuated.mp3",
+      "checksum": "7b243515656f",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 44347
+    },
+    {
+      "id": "voice-librarians-loved",
+      "name": "Voice: Librarians — loved",
+      "prompt": "The Librarians give the rarest of compliments: a quiet \"well done.\"",
+      "durationMs": 5583,
+      "mood": "voice",
+      "file": "voice-librarians-loved.mp3",
+      "checksum": "ce9bc3c03be4",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 66499
+    },
+    {
+      "id": "voice-librarians-evacuated",
+      "name": "Voice: Librarians — evacuated",
+      "prompt": "The Librarians file a formal complaint and leave.",
+      "durationMs": 4083,
+      "mood": "voice",
+      "file": "voice-librarians-evacuated.mp3",
+      "checksum": "cfb785c8f38a",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 44347
+    },
+    {
+      "id": "voice-royal-court-loved",
+      "name": "Voice: The Royal Court — loved",
+      "prompt": "The Royal Court erupts in dignified applause. A knighthood is whispered of.",
+      "durationMs": 6250,
+      "mood": "voice",
+      "file": "voice-royal-court-loved.mp3",
+      "checksum": "60f9cbfb3703",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 77784
+    },
+    {
+      "id": "voice-royal-court-evacuated",
+      "name": "Voice: The Royal Court — evacuated",
+      "prompt": "The Royal Court flees the hall, demanding the architect.",
+      "durationMs": 4667,
+      "mood": "voice",
+      "file": "voice-royal-court-evacuated.mp3",
+      "checksum": "2e9eaf163549",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 58140
+    },
+    {
+      "id": "voice-opera-house-loved",
+      "name": "Voice: The Opera House — loved",
+      "prompt": "The Opera House gives a standing ovation. Tears glisten.",
+      "durationMs": 4667,
+      "mood": "voice",
+      "file": "voice-opera-house-loved.mp3",
+      "checksum": "36323534015d",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 53124
+    },
+    {
+      "id": "voice-opera-house-evacuated",
+      "name": "Voice: The Opera House — evacuated",
+      "prompt": "The Opera House files out, demanding a refund and a duel.",
+      "durationMs": 4750,
+      "mood": "voice",
+      "file": "voice-opera-house-evacuated.mp3",
+      "checksum": "5f3be6b347f0",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 51453
+    },
+    {
+      "id": "voice-astronauts-loved",
+      "name": "Voice: Astronauts — loved",
+      "prompt": "The Astronauts radio back: \"ZERO-G OBSERVATION, IMPRESSIVE.\"",
+      "durationMs": 5000,
+      "mood": "voice",
+      "file": "voice-astronauts-loved.mp3",
+      "checksum": "2d7586ca85f9",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 65663
+    },
+    {
+      "id": "voice-astronauts-evacuated",
+      "name": "Voice: Astronauts — evacuated",
+      "prompt": "The Astronauts initiate emergency cabin recycling.",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-astronauts-evacuated.mp3",
+      "checksum": "fc933c8ab183",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 53124
+    },
+    {
+      "id": "voice-silent-monks-loved",
+      "name": "Voice: Silent Monks — loved",
+      "prompt": "The Silent Monks meditate more deeply. A subtle nod.",
+      "durationMs": 4333,
+      "mood": "voice",
+      "file": "voice-silent-monks-loved.mp3",
+      "checksum": "59f7ce900b3f",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 47273
+    },
+    {
+      "id": "voice-silent-monks-evacuated",
+      "name": "Voice: Silent Monks — evacuated",
+      "prompt": "The Silent Monks silently file out, leaving a trail of regret.",
+      "durationMs": 5167,
+      "mood": "voice",
+      "file": "voice-silent-monks-evacuated.mp3",
+      "checksum": "ecef11051aaa",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 54378
+    },
+    {
+      "id": "voice-mystery-guest-loved",
+      "name": "Voice: The Mystery Guest — loved",
+      "prompt": "The Mystery Guest gives a knowing smile. You will never know who they were.",
+      "durationMs": 6250,
+      "mood": "voice",
+      "file": "voice-mystery-guest-loved.mp3",
+      "checksum": "98ab61c17c66",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 76112
+    },
+    {
+      "id": "voice-mystery-guest-evacuated",
+      "name": "Voice: The Mystery Guest — evacuated",
+      "prompt": "The Mystery Guest vanishes mid-blink.",
+      "durationMs": 3083,
+      "mood": "voice",
+      "file": "voice-mystery-guest-evacuated.mp3",
+      "checksum": "7aa2142609c7",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 38914
     }
   ]
 }

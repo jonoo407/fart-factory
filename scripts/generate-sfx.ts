@@ -4,14 +4,18 @@
  *
  * Runs ONLY via `npm run sfx:generate`. Never on dev/build/CI.
  *
- * Kid-safety: prompts are STATIC (from sfx-seeds.ts) — no runtime
+ * Kid-safety: prompts AND text are STATIC (from sfx-seeds.ts) — no runtime
  * user input flows into the API.
+ *
+ * Two API surfaces, branched on seed.kind:
+ *   - 'sfx' → POST /v1/sound-generation     (prompt + duration_seconds)
+ *   - 'tts' → POST /v1/text-to-speech/{voice_id}  (text)
  *
  * Cost containment:
  * - HARD_CAP throws after N successful API calls.
- * - Checksum cache: unchanged (prompt, duration, version) → skip the call,
- *   reuse the existing mp3 + manifest entry.
- * - 4xx/429: skip the seed, mark `procedural-fallback: true` in the
+ * - Checksum cache: unchanged (kind, prompt|text, duration, voice_id) → skip
+ *   the call, reuse the existing mp3 + manifest entry.
+ * - 4xx/429: skip the seed, mark `proceduralFallback: true` in the
  *   manifest, runtime substitutes procedural synthesis for that id.
  */
 import 'dotenv/config';
@@ -27,21 +31,27 @@ if (!KEY) {
   process.exit(1);
 }
 
-const HARD_CAP = 30;
-const ENDPOINT = 'https://api.elevenlabs.io/v1/sound-generation';
-const VERSION = 'v1';
+const HARD_CAP = 80;
+const SFX_ENDPOINT = 'https://api.elevenlabs.io/v1/sound-generation';
+const TTS_MODEL_ID = 'eleven_multilingual_v2';
+const VERSION = 'v2';
 const OUT_DIR = resolve('public/sfx');
 const MANIFEST_PATH = resolve(OUT_DIR, 'manifest.json');
 
 interface ManifestEntry {
   id: string;
   name: string;
+  /** SFX seeds → prompt text. TTS seeds → spoken text. */
   prompt: string;
   durationMs: number;
   mood: string;
   file: string;
   bytes: number;
   checksum: string;
+  /** Set on TTS entries — the ElevenLabs voice id used. */
+  voiceId?: string;
+  /** Marker so the runtime knows whether to expect SFX vs TTS semantics. */
+  kind?: 'sfx' | 'tts';
   proceduralFallback?: boolean;
 }
 
@@ -52,10 +62,22 @@ interface Manifest {
 }
 
 function checksumFor(seed: Seed): string {
-  return createHash('sha256')
-    .update(`${VERSION}|${seed.prompt}|${seed.duration_seconds}|${seed.mood}`)
-    .digest('hex')
-    .slice(0, 12);
+  const parts =
+    seed.kind === 'sfx'
+      ? `${VERSION}|sfx|${seed.prompt}|${seed.duration_seconds}|${seed.mood}`
+      : `${VERSION}|tts|${seed.text}|${seed.voice_id}`;
+  return createHash('sha256').update(parts).digest('hex').slice(0, 12);
+}
+
+function ttsEndpoint(voiceId: string): string {
+  return `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+}
+
+/** Approx duration for TTS (we don't have ffprobe). ~12 chars/sec gives
+ *  a usable estimate for the manifest; runtime decodes the actual buffer. */
+function estimateTtsDurationMs(text: string): number {
+  const chars = text.length;
+  return Math.max(1000, Math.round((chars / 12) * 1000));
 }
 
 async function loadExistingManifest(): Promise<Manifest | null> {
@@ -66,6 +88,37 @@ async function loadExistingManifest(): Promise<Manifest | null> {
   } catch {
     return null;
   }
+}
+
+async function callSfx(seed: Seed & { kind: 'sfx' }): Promise<Response> {
+  return fetch(SFX_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': KEY,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text: seed.prompt,
+      duration_seconds: seed.duration_seconds,
+      prompt_influence: 0.7,
+    }),
+  });
+}
+
+async function callTts(seed: Seed & { kind: 'tts' }): Promise<Response> {
+  return fetch(ttsEndpoint(seed.voice_id), {
+    method: 'POST',
+    headers: {
+      'xi-api-key': KEY,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      text: seed.text,
+      model_id: TTS_MODEL_ID,
+    }),
+  });
 }
 
 await mkdir(OUT_DIR, { recursive: true });
@@ -91,68 +144,42 @@ for (const seed of SEEDS) {
   }
 
   if (++calls > HARD_CAP) {
-    console.error(`HARD_CAP=${HARD_CAP} reached — aborting`);
+    console.error(`HARD_CAP=${HARD_CAP} reached — aborting; re-run to continue.`);
     process.exit(2);
   }
 
-  console.log(`generating: ${seed.id} (${seed.duration_seconds}s)…`);
+  const baseEntry: Omit<ManifestEntry, 'bytes'> = {
+    id: seed.id,
+    name: seed.name,
+    prompt: seed.kind === 'sfx' ? seed.prompt : seed.text,
+    durationMs:
+      seed.kind === 'sfx'
+        ? Math.round(seed.duration_seconds * 1000)
+        : estimateTtsDurationMs(seed.text),
+    mood: seed.mood,
+    file,
+    checksum,
+    kind: seed.kind,
+    ...(seed.kind === 'tts' ? { voiceId: seed.voice_id } : {}),
+  };
+
+  console.log(`generating: ${seed.id} (${seed.kind})…`);
   try {
-    const res = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': KEY,
-        'Content-Type': 'application/json',
-        Accept: 'audio/mpeg',
-      },
-      body: JSON.stringify({
-        text: seed.prompt,
-        duration_seconds: seed.duration_seconds,
-        prompt_influence: 0.7,
-      }),
-    });
+    const res = seed.kind === 'sfx' ? await callSfx(seed) : await callTts(seed);
     if (!res.ok) {
       const errBody = await res.text();
       console.warn(`  skip ${seed.id}: ${res.status} ${errBody.slice(0, 200)}`);
-      entries.push({
-        id: seed.id,
-        name: seed.name,
-        prompt: seed.prompt,
-        durationMs: Math.round(seed.duration_seconds * 1000),
-        mood: seed.mood,
-        file,
-        bytes: 0,
-        checksum,
-        proceduralFallback: true,
-      });
+      entries.push({ ...baseEntry, bytes: 0, proceduralFallback: true });
       continue;
     }
     const buf = Buffer.from(await res.arrayBuffer());
     await writeFile(filePath, buf);
     const stats = await stat(filePath);
-    entries.push({
-      id: seed.id,
-      name: seed.name,
-      prompt: seed.prompt,
-      durationMs: Math.round(seed.duration_seconds * 1000),
-      mood: seed.mood,
-      file,
-      bytes: stats.size,
-      checksum,
-    });
+    entries.push({ ...baseEntry, bytes: stats.size });
     console.log(`  wrote ${file} (${stats.size} bytes)`);
   } catch (err) {
     console.warn(`  skip ${seed.id}: ${(err as Error).message}`);
-    entries.push({
-      id: seed.id,
-      name: seed.name,
-      prompt: seed.prompt,
-      durationMs: Math.round(seed.duration_seconds * 1000),
-      mood: seed.mood,
-      file,
-      bytes: 0,
-      checksum,
-      proceduralFallback: true,
-    });
+    entries.push({ ...baseEntry, bytes: 0, proceduralFallback: true });
   }
 }
 
