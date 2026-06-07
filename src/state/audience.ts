@@ -15,8 +15,30 @@
  */
 
 import type { FoodProperties } from './food';
+import { TARGET_DIV } from '../scoring/tuning';
 
 export type DifficultyTier = 'easy' | 'medium' | 'hard' | 'boss';
+
+/** A single judged axis derived from an audience's cravings + restrictions. */
+export interface AudienceWant {
+  axis: keyof FoodProperties;
+  /** desired level, normalized into 0-1 (craving/TARGET_DIV; 0 for a hated axis). */
+  target: number;
+  /** relative importance in the weakest-link blend (1 until per-axis weights exist). */
+  weight: number;
+  /** true for a "no-<axis>" rule — being this thing tanks the score (multiplicative penalty). */
+  hate: boolean;
+}
+
+const AXIS_KEYS: ReadonlyArray<keyof FoodProperties> = [
+  'wet',
+  'dry',
+  'stink',
+  'loud',
+  'musical',
+  'length',
+  'temp',
+];
 
 export interface Audience {
   id: string;
@@ -274,4 +296,32 @@ export function getDailyAudience(_d: Date = new Date(), pool?: readonly Audience
 
 export function getAudience(id: string): Audience | undefined {
   return AUDIENCES.find((a) => a.id === id);
+}
+
+/**
+ * The machine-readable judged set for the closeness scorer + Order Ticket
+ * chips (PLAN v9 P0.2). Each non-zero craving becomes a positive want with
+ * `target = craving/TARGET_DIV` (0-1); each `no-<axis>` restriction becomes a
+ * hate want (`target 0`). Ingredient/quantity restrictions (no-dairy,
+ * min-foods:N, need-cursed-or-rare, min/max-<axis>:N) are NOT axis wants and
+ * stay with `checkRestrictions`. No raw 0-5 integer ever leaves this boundary
+ * (doc 06 §3 — never expose literal targets).
+ */
+export function deriveWants(audience: Audience): AudienceWant[] {
+  const hated = new Set<keyof FoodProperties>();
+  for (const r of audience.restrictions ?? []) {
+    const m = /^no-([a-z]+)$/.exec(r);
+    if (m && (AXIS_KEYS as readonly string[]).includes(m[1]!)) {
+      hated.add(m[1] as keyof FoodProperties);
+    }
+  }
+  const wants: AudienceWant[] = [];
+  for (const axis of AXIS_KEYS) {
+    if (hated.has(axis)) {
+      wants.push({ axis, target: 0, weight: 1, hate: true });
+    } else if (audience.cravings[axis] > 0) {
+      wants.push({ axis, target: audience.cravings[axis] / TARGET_DIV, weight: 1, hate: false });
+    }
+  }
+  return wants;
 }

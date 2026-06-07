@@ -244,3 +244,70 @@ export function bumpBestMatchOverall(pct: number): number {
   return pct;
 }
 
+// ----- PLAN v9 P0.3 — per-encounter Story-mode stores -----
+//
+// Four stores the Order Ticket pass/retry gate (01 §4) + venue ladder (01 §7)
+// need, mirroring the doc 01 §8 save shape:
+//   earnedGold  — per-audience best full-gold paid; the anti-grind payout is the
+//                 IMPROVEMENT over this (max(0, full - earnedGold)). Distinct from
+//                 the existing fart_best_ pct ratchet, which stores percentages.
+//   stars       — per-audience best stars (0-3), drives ladder node states.
+//   treatment   — the single equipped kitchen treatment id (or null).
+//   introShown  — per-audience one-time intro-card flag (also gates food grants).
+
+const KEY_EARNED_PREFIX = 'fart_earned_';
+const KEY_STARS_PREFIX = 'fart_stars_';
+const KEY_TREATMENT = 'fart_treatment';
+const KEY_INTRO_PREFIX = 'fart_intro_';
+
+export function loadEarnedGold(audienceId: string): number {
+  return safeLoad<number>(`${KEY_EARNED_PREFIX}${audienceId}`, 0, validNum);
+}
+
+/** Ratchet the best full-gold seen for an audience (never decreases). */
+export function bumpEarnedGold(audienceId: string, full: number): number {
+  if (!validNum(full)) return loadEarnedGold(audienceId);
+  const cur = loadEarnedGold(audienceId);
+  const next = Math.max(cur, Math.floor(full));
+  if (next !== cur) safeSave(`${KEY_EARNED_PREFIX}${audienceId}`, next);
+  return next;
+}
+
+const validStars = (v: unknown): v is number =>
+  typeof v === 'number' && Number.isInteger(v) && v >= 0 && v <= 3;
+
+export function loadStars(audienceId: string): number {
+  return safeLoad<number>(`${KEY_STARS_PREFIX}${audienceId}`, 0, validStars);
+}
+
+/** Ratchet the best stars (0-3) for an audience (never decreases). */
+export function bumpStars(audienceId: string, stars: number): number {
+  if (!validStars(stars)) return loadStars(audienceId);
+  const cur = loadStars(audienceId);
+  if (stars <= cur) return cur;
+  safeSave(`${KEY_STARS_PREFIX}${audienceId}`, stars);
+  return stars;
+}
+
+export function loadEquippedTreatment(): string | null {
+  return safeLoad<string | null>(
+    KEY_TREATMENT,
+    null,
+    (v): v is string | null => v === null || typeof v === 'string',
+  );
+}
+export function setEquippedTreatment(id: string | null): void {
+  safeSave(KEY_TREATMENT, id);
+}
+
+export function loadIntroShown(audienceId: string): boolean {
+  return safeLoad<boolean>(
+    `${KEY_INTRO_PREFIX}${audienceId}`,
+    false,
+    (v): v is boolean => typeof v === 'boolean',
+  );
+}
+export function markIntroShown(audienceId: string): void {
+  safeSave(`${KEY_INTRO_PREFIX}${audienceId}`, true);
+}
+
