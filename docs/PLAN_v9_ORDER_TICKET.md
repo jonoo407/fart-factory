@@ -156,7 +156,8 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **Accessibility:** reduced-motion fallback so nothing renders at `opacity:0` (05 §2) — RED `reduced-motion.spec.ts`.
 - **VERIFY (Rule 3):** ladder shows cleared/current/locked correctly; boss flow scores via the new system.
 
-### Phase 6 — Audio · effort XL  *(02 — partly built; the readout is the real work)*
+### Phase 6 — Audio · effort XL · ✅ DONE (channels/captions/haptics/settings; stem ASSETS deferred)  *(02 — partly built; the readout is the real work)*
+> Done: audio-settings → 4 channels under a Master (effectiveVolume) + captions-ON-by-default + haptics toggle; Voices routed on its own channel; the reaction caption honors the toggle; haptics gated on the toggle; the Sound settings popover gained all 5 sliders + Captions/Rumble toggles (browser-verified). The axis→readout **selector logic** (fart-stems.ts selectFartLayers: base rip × wet/dry × length, melody/sizzle/haze thresholds, gain 0.18+loud*0.7) is implemented + unit-tested. **Deferred: the ~50 new ElevenLabs stem ASSETS + layered playback** — generation is a paid external action not run autonomously; until then playFart uses the existing whole-clip bank. Run the sfx pipeline to generate, then wire selectFartLayers into playFart.
 - **MODIFY** `src/audio/audio-settings.ts`: 2→**4 channels** (Master/Farts&SFX/Voices/Music) + `captionsEnabled` (default **true**) + `hapticsEnabled`; migrate the localStorage shape. **RECONCILE** `mute.test.ts`.
 - **MODIFY** `src/audio/event-sfx.ts`: gate `playAudienceVoice` on **Voices**; add music bed (Music); emit a `{character,text}` **caption** payload. **NEW** `src/ui/caption-bubble.ts` (on by default). RED: `audio-channels.test.ts`, `captions.test.ts`.
 - **MODIFY** `src/ui/audio-popover.ts` → promote to the **Sound settings screen** (04 §11): 4 sliders + Captions + Rumble toggles.

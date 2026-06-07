@@ -9,6 +9,7 @@
  * rendering is verified in the browser.
  */
 import { axisEmoji } from './axis-emoji';
+import { loadCaptionsEnabled } from '../audio/audio-settings';
 import type { AxisFeedback, Grade } from '../scoring/match';
 import type { Audience } from '../state/audience';
 
@@ -165,7 +166,7 @@ export function showReactionOverlay(d: ReactionData): void {
     <div class="rxn-crowd">${faces}</div>
     <div class="stamp ${gradeClass(d.grade)}"><span class="g">${d.grade}</span><span class="l">${gradeLabel(d.grade)}</span></div>
     <div class="rxn-verdict">${d.verdict}</div>
-    <div class="rxn-cap"><span class="who">🔊 ${d.audience.name}</span>“${d.caption}”</div>
+    ${loadCaptionsEnabled() ? `<div class="rxn-cap"><span class="who">🔊 ${d.audience.name}</span>“${d.caption}”</div>` : ''}
     ${starsHtml}
     ${judgeCardHtml(d.audience, d.axisFeedback, d.passed)}
     ${breakdownHtml}

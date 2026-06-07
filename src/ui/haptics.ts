@@ -1,9 +1,13 @@
+import { loadHapticsEnabled } from '../audio/audio-settings';
+
 /**
  * Trigger a haptic vibration on mobile devices.
  * Returns true if the platform accepted the request, false otherwise
- * (no API, blocked by browser policy, or throws).
+ * (no API, blocked by browser policy, disabled by the user, or throws).
+ * PLAN v9 P6 — respects the user's Rumble toggle (02 §7).
  */
 export function triggerHaptic(pattern: number | readonly number[]): boolean {
+  if (!loadHapticsEnabled()) return false;
   const v = (
     navigator as unknown as {
       vibrate?: (p: number | number[]) => boolean;
