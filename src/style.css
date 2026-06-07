@@ -1,3 +1,21 @@
+/* PLAN v9 §1 / 04 §1 — Order Ticket design tokens. Defined here in P2 so the
+   reaction takeover can use the real palette; P4 rolls them across the rest. */
+:root {
+  --paper: #f4ecd8;
+  --paper2: #eadfc4;
+  --ink: #231d16;
+  --green: #8fd11e;
+  --green-d: #6fae12;
+  --orange: #ff7a2f;
+  --gold: #f59e0b;
+  --muted: #8a7d63;
+  --rar-c: #9ca3af;
+  --rar-u: #22c55e;
+  --rar-r: #3b82f6;
+  --rar-e: #a855f7;
+  --rar-l: #f59e0b;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   /*
@@ -2939,4 +2957,229 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
     animation: none !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ============================================================
+   PLAN v9 P2 — charge meter, reaction takeover, judge card.
+   Order Ticket language (paper & ink, hard offset shadows).
+   ============================================================ */
+
+/* ---- charge meter (above the BLAST button) ---- */
+.charge-meter {
+  position: relative;
+  height: 16px;
+  margin: 0 auto 8px;
+  max-width: 320px;
+  background: var(--paper2);
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.charge-meter .charge-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: linear-gradient(180deg, var(--green), var(--green-d));
+  border-radius: 999px;
+}
+.charge-meter .charge-sweet {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 74%; width: 18%;
+  border: 2px dashed var(--ink);
+  border-radius: 6px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.charge-meter .charge-hint {
+  position: absolute;
+  inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--ink);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  pointer-events: none;
+}
+#storyLaunchBtn.charging {
+  animation: blast-shake 0.18s linear infinite;
+}
+@keyframes blast-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, -1px); }
+}
+
+/* ---- reaction takeover (full-screen, opaque) ---- */
+.reaction-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--paper);
+  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px);
+  color: var(--ink);
+  font-family: 'Nunito', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+.reaction-overlay[hidden] { display: none; }
+.reaction-overlay.reaction-show .stamp { animation: stamp-slam 0.45s cubic-bezier(.2,1.4,.4,1) both; }
+.rxn-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 18px 12px;
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+.rxn-crowd { font-size: 30px; letter-spacing: 4px; margin-bottom: 8px; }
+.rxn-crowd span { display: inline-block; animation: face-bob 1.1s ease-in-out infinite; }
+.rxn-crowd span:nth-child(2) { animation-delay: 0.1s; }
+.rxn-crowd span:nth-child(3) { animation-delay: 0.2s; }
+.rxn-crowd span:nth-child(4) { animation-delay: 0.3s; }
+.rxn-crowd span:nth-child(5) { animation-delay: 0.4s; }
+@keyframes face-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 26px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 5px 6px 0 var(--ink);
+  margin: 6px 0 10px;
+  background: var(--green);
+}
+.stamp.grade-s { background: #a855f7; color: #fff; }
+.stamp.grade-a { background: var(--orange); color: #fff; }
+.stamp.grade-b { background: var(--green); }
+.stamp.grade-f { background: #ef4444; color: #fff; }
+.stamp .g { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 52px; line-height: 1; }
+.stamp .l { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+@keyframes stamp-slam {
+  0% { transform: scale(2.4) rotate(-12deg); }
+  100% { transform: scale(1) rotate(-4deg); }
+}
+.rxn-verdict { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; margin: 4px 0; }
+.rxn-cap {
+  display: inline-block;
+  background: #fff;
+  border: 2.5px dashed var(--ink);
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 13px;
+  margin: 6px 0 10px;
+  max-width: 90%;
+}
+.rxn-cap .who { display: block; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+.rxn-stars { font-size: 30px; letter-spacing: 4px; margin: 4px 0 12px; color: var(--muted); }
+.rxn-stars .on { color: var(--gold); }
+
+/* ---- judge card ---- */
+.judge-card {
+  background: #fff;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 12px;
+  margin: 10px 0;
+  text-align: left;
+}
+.judge-h { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+.judge-row { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+.judge-row .je { font-size: 20px; width: 24px; text-align: center; }
+.jmid { flex: 1; }
+.jname { font-size: 12px; font-weight: 800; }
+.jname small { color: var(--muted); font-weight: 700; font-family: 'Space Mono', monospace; font-size: 9px; }
+.jbar {
+  position: relative;
+  height: 12px;
+  margin-top: 3px;
+  background: var(--paper2);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.jgot { position: absolute; inset: 0 auto 0 0; background: var(--green); border-radius: 999px; }
+.judge-row.miss .jgot { background: #ef4444; }
+.judge-row.near .jgot { background: var(--gold); }
+.jtarget {
+  position: absolute;
+  top: -3px; bottom: -3px;
+  width: 0;
+  border-left: 2.5px dashed var(--ink);
+  z-index: 2;
+}
+.jtarget.hate { border-color: #ef4444; }
+.jstatus { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; width: 22px; text-align: center; }
+.jstatus.hit { color: var(--green-d); }
+.jstatus.near { color: var(--gold); }
+.jstatus.miss { color: #ef4444; }
+.judge-foot { font-size: 10.5px; color: var(--muted); font-weight: 700; margin-top: 8px; font-style: italic; }
+
+/* ---- score breakdown ---- */
+.bd-card {
+  background: var(--paper2);
+  border: 2.5px solid var(--ink);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin: 10px 0;
+  text-align: left;
+}
+.bd-line, .bd-tot { display: flex; justify-content: space-between; font-size: 12px; padding: 3px 0; }
+.bd-line .l { color: var(--ink); }
+.bd-tot { border-top: 2px solid var(--ink); margin-top: 6px; padding-top: 8px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 15px; }
+.bd-gold { color: var(--orange); }
+
+/* ---- toasts ---- */
+.rxn-toast {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 var(--ink);
+  padding: 8px 10px;
+  margin: 8px 0;
+  text-align: left;
+  font-size: 12px;
+}
+.rxn-toast.recipe { background: var(--orange); color: #fff; }
+.rxn-toast .em { font-size: 20px; }
+
+/* ---- footer ---- */
+.rxn-foot {
+  display: flex;
+  gap: 10px;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  max-width: 460px;
+  width: 100%;
+  margin: 0 auto;
+  border-top: 2.5px solid var(--ink);
+  background: var(--paper);
+}
+.rxn-cta {
+  flex: 1;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 14px 10px;
+  min-height: 48px;
+  color: var(--ink);
+  background: var(--green);
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 var(--ink);
+  cursor: pointer;
+}
+.rxn-cta.ghost { background: #fff; }
+.rxn-cta.wide { flex: 1; }
+.rxn-cta:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+
+/* ---- Move On gate (disabled until the crowd is passed) ---- */
+.move-on-btn:disabled, .move-on-btn.move-on-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
 }

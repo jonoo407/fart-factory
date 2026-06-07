@@ -15,9 +15,11 @@
  * good play. See PLAN.md §D Tier 7 Phase G item 50 for shop pricing.)
  */
 
-import { addGold } from '../state/persistence';
+import { addGold, loadEarnedGold, bumpEarnedGold } from '../state/persistence';
 import { hotSpotGoldMultiplier } from './gameplus';
 import { legendaryGoldMultiplier } from './legendary-buffs';
+import { GOLD_BY_TIER } from './tuning';
+import type { Audience } from '../state/audience';
 
 export function goldForMatch(pct: number): number {
   if (!Number.isFinite(pct) || pct < 50) return 0;
@@ -35,4 +37,29 @@ export function awardGoldForLaunch(pct: number, locationId?: string, extraMult =
   const hotMult = locationId ? hotSpotGoldMultiplier(locationId) : 1;
   const legendaryMult = legendaryGoldMultiplier();
   return addGold(Math.floor(base * hotMult * extraMult * legendaryMult));
+}
+
+/** Base gold paid at a 100% match (D4): the audience's override, else the tier table. */
+export function baseGoldForAudience(aud: Audience): number {
+  return aud.baseGold ?? GOLD_BY_TIER[aud.difficultyTier];
+}
+
+/**
+ * PLAN v9 P2 / 01 §4.3 — anti-grind encounter payout. The full gold at this
+ * match is `round(baseGold * pct/100)`; you are paid only the IMPROVEMENT over
+ * your stored best on this crowd (so re-clearing to "Improve" pays the
+ * difference, never the full amount again). Caller gates on a pass (pct ≥ 50).
+ *
+ * @returns the gold actually paid this call (0 if no improvement).
+ */
+export function awardGoldForEncounter(audienceId: string, baseGold: number, pct: number): number {
+  const clampedPct = Math.max(0, Math.min(100, pct));
+  const full = Math.round(baseGold * (clampedPct / 100));
+  const prev = loadEarnedGold(audienceId);
+  const payout = Math.max(0, full - prev);
+  if (payout > 0) {
+    addGold(payout);
+    bumpEarnedGold(audienceId, full);
+  }
+  return payout;
 }

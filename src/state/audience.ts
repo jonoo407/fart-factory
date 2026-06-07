@@ -57,6 +57,12 @@ export interface Audience {
   description: string;
   /** V8 T6 — drives clue density in `description`. */
   difficultyTier: DifficultyTier;
+  /**
+   * PLAN v9 D4 — base gold paid at a 100% match. When omitted, defaults from
+   * `difficultyTier` via GOLD_BY_TIER. The anti-grind rule pays only the
+   * improvement over the stored best (see scoring/reward.ts awardGoldForEncounter).
+   */
+  baseGold?: number;
 }
 
 const c = (

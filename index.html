@@ -110,7 +110,12 @@
         </div>
 
         <div class="story-launch-wrap">
-          <button type="button" class="btn launch" id="storyLaunchBtn" aria-label="Launch the fart with this recipe">🚀 LAUNCH FART</button>
+          <div id="chargeMeter" class="charge-meter" aria-hidden="true">
+            <div class="charge-sweet"></div>
+            <div class="charge-fill" id="chargeFill"></div>
+            <div class="charge-hint">hold to charge · or just tap</div>
+          </div>
+          <button type="button" class="btn launch" id="storyLaunchBtn" aria-label="Hold to charge, release to launch the fart">🚀 LAUNCH FART</button>
         </div>
 
         <div class="story-result" id="storyResult" hidden aria-live="polite">
@@ -222,6 +227,8 @@
     </div>
 
     <div id="ultimateOverlay" class="ultimate-overlay" hidden role="status" aria-live="polite"></div>
+
+    <div id="reactionOverlay" class="reaction-overlay" hidden role="dialog" aria-modal="true" aria-label="Show reaction"></div>
 
     <div class="gas-overlay" id="gasOverlay" aria-hidden="true"></div>
 

@@ -119,7 +119,7 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **RECONCILE (will break — rewrite to new oracle):** `match.test.ts` (identity≠100 now), `match-breakdown.test.ts` (keep cost/matched, add closeness assertions), `critical-tier.test.ts` (unchanged — D6 keeps it).
 - **VERIFY:** full suite green on the new numbers.
 
-### Phase 2 — Judge card + reaction takeover + pass/retry gate · effort XL  *(06 §4, §5)*
+### Phase 2 — Judge card + reaction takeover + pass/retry gate · effort XL · ✅ DONE  *(06 §4, §5)*
 **Goal:** feedback you can read; flops can't advance.
 - **NEW** `src/ui/reaction-overlay.ts` (ports `Reaction`): opaque full-screen `#reactionOverlay`, single status bar, crowd-faces, slam **grade stamp** (from `gradeForPct`), verdict+VO caption bubble, star slam, **judge card** (from `computeAxisFeedback`), breakdown card, toasts, footer. RED: `reaction-overlay.test.ts` — mounts covering screen; **footer = one "Try this crowd again" on fail; "Improve"+"Next" on pass; "Finish …" on boss**.
 - **NEW** `src/ui/charge-meter.ts` (ports `BlastButton`): rAF sweep 2.2/frame, sweet zone marker, pointer hold/release → `quality` via `charge.ts`. RED already in `charge-meter.test.ts` (pure fn); component mount verified behaviorally.
