@@ -3183,3 +3183,28 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   cursor: not-allowed;
   filter: grayscale(0.6);
 }
+
+/* ---- PLAN v9 P3 — inline pantry learned-axis strip ---- */
+.pax { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-items: center; margin-top: 3px; font-size: 10px; line-height: 1; }
+.pax-i { display: inline-flex; align-items: center; gap: 1px; }
+.pax-i b { font-weight: 800; }
+.pax-q { letter-spacing: 1.5px; opacity: 0.55; font-weight: 800; }
+.pax-new { font-size: 11px; }
+
+/* ---- PLAN v9 P3 — live recipe ribbon (slides in below the plate) ---- */
+.recipe-ribbon {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 8px;
+  background: linear-gradient(180deg, var(--green), var(--green-d));
+  color: var(--ink);
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 7px 10px;
+  animation: ribbon-in 0.3s ease both;
+}
+.recipe-ribbon[hidden] { display: none; }
+.recipe-ribbon .rb-spark { font-size: 20px; flex-shrink: 0; }
+.recipe-ribbon .rb-nm { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px; }
+.recipe-ribbon .rb-ef { font-size: 10.5px; opacity: 0.85; }
+@keyframes ribbon-in { from { transform: translateY(-6px) scale(0.96); } to { transform: translateY(0) scale(1); } }

@@ -63,6 +63,12 @@ export interface Audience {
    * improvement over the stored best (see scoring/reward.ts awardGoldForEncounter).
    */
   baseGold?: number;
+  /**
+   * PLAN v9 P3 / 01 §7.4 — a food id granted the first time the player meets
+   * this audience ("a new thing every show"). Teaches a new ingredient just in
+   * time (e.g. Granny grants the secretly-musical broccoli she craves).
+   */
+  grant?: string;
 }
 
 const c = (
@@ -85,6 +91,7 @@ export const AUDIENCES: readonly Audience[] = [
     flavor: 'Polite. Mild. Almost imperceptible.',
     description: 'Edna prefers a polite little hum — nothing too loud, nothing too long, just a tidy tune she can pretend not to hear.',
     difficultyTier: 'easy',
+    grant: 'broccoli', // secretly musical — exactly what Edna craves (01 §7.4)
   },
   {
     id: 'toddler-bday',
@@ -134,6 +141,7 @@ export const AUDIENCES: readonly Audience[] = [
     flavor: 'Louder is better. Bigger is better.',
     description: "Chad and the boys are chanting for something LOUD, NASTY, and BIG — and if your plate's looking thin, don't even bother walking in.",
     difficultyTier: 'medium',
+    grant: 'hot-pepper', // loud + hot, for the rowdy crowd (01 §7.4)
   },
   {
     id: 'goth-teens',

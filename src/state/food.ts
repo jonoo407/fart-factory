@@ -59,7 +59,7 @@ export const FOODS: readonly Food[] = [
   // ====== UNCOMMON (6) — unlock via gold or research ======
   { id: 'kimchi',      name: 'Kimchi',         emoji: '🥬', rarity: 'uncommon',  bellyCost: 3, properties: p(3, 1, 4, 2, 1, 3, 4), description: 'Fermented thunder.' },
   { id: 'sardines',    name: 'Sardines',       emoji: '🐟', rarity: 'uncommon',  bellyCost: 3, properties: p(4, 0, 4, 1, 0, 3, 2), description: 'The ocean wants out.' },
-  { id: 'broccoli',    name: 'Broccoli',       emoji: '🥦', rarity: 'uncommon',  bellyCost: 3, properties: p(2, 2, 4, 2, 0, 4, 1), description: 'Greens at full volume.' },
+  { id: 'broccoli',    name: 'Broccoli',       emoji: '🥦', rarity: 'uncommon',  bellyCost: 2, properties: p(1, 1, 2, 1, 3, 2, 1), description: 'Secretly musical 🎺 — a polite little tune.' },
   { id: 'asparagus',   name: 'Asparagus',      emoji: '🌿', rarity: 'uncommon',  bellyCost: 3, properties: p(2, 1, 4, 1, 2, 3, 2), description: 'Musical and pungent.' },
   { id: 'pickle',      name: 'Pickle',         emoji: '🥒', rarity: 'uncommon',  bellyCost: 3, properties: p(4, 0, 3, 2, 1, 2, 0), description: 'Brine in motion.' },
   { id: 'hot-pepper',  name: 'Hot Pepper',     emoji: '🌶️', rarity: 'uncommon',  bellyCost: 4, properties: p(0, 2, 3, 3, 0, 3, 5), description: 'Pressure rises with the heat.' },

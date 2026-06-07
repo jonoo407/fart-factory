@@ -300,6 +300,26 @@ export function setEquippedTreatment(id: string | null): void {
   safeSave(KEY_TREATMENT, id);
 }
 
+// PLAN v9 P3 / 01 §6.5 — novelty: a never-before-launched food combination
+// pays a bonus research note even on a flop (curiosity is always rewarded).
+const KEY_COMBOS = 'fart_combos_seen';
+
+export function loadSeenCombos(): string[] {
+  return safeLoad<string[]>(
+    KEY_COMBOS,
+    [],
+    (v): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string'),
+  );
+}
+
+/** Record a plate signature; returns true if it was NOVEL (not seen before). */
+export function markComboSeen(signature: string): boolean {
+  const cur = loadSeenCombos();
+  if (cur.includes(signature)) return false;
+  safeSave(KEY_COMBOS, [...cur, signature]);
+  return true;
+}
+
 export function loadIntroShown(audienceId: string): boolean {
   return safeLoad<boolean>(
     `${KEY_INTRO_PREFIX}${audienceId}`,

@@ -77,9 +77,13 @@ import {
 } from '../state/encounter-progress';
 import { mountChargeMeter } from './charge-meter';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
+import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
+import { markComboSeen } from '../state/persistence';
+import { axisEmoji } from './axis-emoji';
+import { matchRecipe } from '../state/recipes';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
-import { bumpStars, refillBelly, loadLastMatch } from '../state/persistence';
+import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
 import { recordConquest } from '../state/conquests';
 import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
@@ -164,7 +168,7 @@ export function renderPantryGrid(): void {
   if (!grid) return;
   const unlocked = new Set(loadPantry());
   const showLocked = loadPantryShowLocked();
-  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked, loadFoodMastery);
+  const { html, lockedCount } = buildPantryGridHtml(FOODS, unlocked, showLocked, loadFoodMastery, loadFoodReveals);
   grid.innerHTML = html;
   // V8 T5 — toggle button reflects the current state and the locked count.
   const toggle = $('pantryShowLockedBtn') as HTMLButtonElement | null;
@@ -245,6 +249,31 @@ export function renderPlate(): void {
     }
   }
   renderPlatePreview();
+  renderRecipeRibbon();
+}
+
+/**
+ * PLAN v9 P3 / 04 §2 — the live recipe ribbon. As soon as the plate forms a
+ * named combo (exact-set match), a ribbon slides in below the slots so the
+ * synergy is felt BEFORE blasting. Uses the real exact-set matchRecipe (D3:
+ * extra foods suppress the recipe).
+ */
+function renderRecipeRibbon(): void {
+  const el = $('recipeRibbon');
+  if (!el) return;
+  const id = matchRecipe(plateIngredientIds());
+  const recipe = id ? getRecipe(id) : null;
+  if (!recipe) {
+    el.setAttribute('hidden', '');
+    el.innerHTML = '';
+    return;
+  }
+  const bonusAxes = (Object.keys(recipe.bonus) as Array<keyof FoodProperties>)
+    .filter((k) => (recipe.bonus[k] ?? 0) > 0)
+    .map((k) => axisEmoji(k))
+    .join('');
+  el.innerHTML = `<span class="rb-spark">⚡</span><div class="rb-body"><div class="rb-nm">${recipe.emoji} ${recipe.name}</div><div class="rb-ef">${recipe.description ?? 'Named combo bonus'} ${bonusAxes}</div></div>`;
+  el.removeAttribute('hidden');
 }
 
 /**
@@ -483,6 +512,29 @@ export function renderAudiencePortrait(): void {
   // Hide legacy cravings/restrictions DOM (T6 — exposition is gone).
   if (cravingsEl) cravingsEl.textContent = '';
   if (restrictionsEl) restrictionsEl.textContent = '';
+  maybeGrantOnEncounter(aud);
+}
+
+/**
+ * PLAN v9 P3 / 01 §7.4 — "a new thing every show". The first time the player
+ * meets an audience, grant its `grant` food (once) and announce it. Gated by
+ * the per-audience intro-shown flag so it fires exactly once.
+ */
+function maybeGrantOnEncounter(aud: Audience): void {
+  if (loadIntroShown(aud.id)) return;
+  markIntroShown(aud.id);
+  if (!aud.grant) return;
+  const food = getFood(aud.grant);
+  if (!food || loadPantry().includes(aud.grant)) return;
+  unlockFood(aud.grant);
+  renderPantryGrid();
+  showFeatureIntro({
+    id: `grant_${aud.id}`,
+    emoji: food.emoji,
+    title: 'A new food appeared!',
+    body: `<b>${food.name}</b> joined your pantry — ${aud.name} will love what it brings.`,
+    cta: 'Plate it up',
+  });
 }
 
 
@@ -603,6 +655,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     : evaluateMatch(propsAfterArea, ids, aud.cravings, restrictions, 1).pct;
   const passedThisLaunch = match.pct >= PASS_PCT;
   let goldPaid = 0;
+  const learnedToasts: string[] = [];
   const breakdown = computeMatchBreakdown(propsAfterArea, aud.cravings);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
@@ -663,6 +716,15 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     if (notesBonus > 0) addResearchNotes(notesBonus);
     // T2.3: record food uses for mastery
     recordFoodUse(ids);
+    // PLAN v9 P3 / 01 §6 — reveal one axis per unique food (strongest first).
+    for (const id of new Set(ids)) {
+      const f = getFood(id);
+      if (!f) continue;
+      const rev = revealNextAxis(id, f.properties);
+      if (rev) learnedToasts.push(`${f.name} is ${adjForValue(rev.value)} ${axisEmoji(rev.axis)}`);
+    }
+    // PLAN v9 P3 / 01 §6.5 — novelty: a never-launched combo pays +1 note (even on a flop).
+    if (markComboSeen([...ids].sort().join('+'))) addResearchNotes(1);
     // T2.1: roll loot drop on PERFECT (chance scales with legendary on plate).
     // T4.1: hidden combos can FORCE a drop (chance=1) and/or boost bonuses.
     const forceDrop = hiddenCombo?.guaranteedDrop ?? false;
@@ -756,6 +818,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       goldPaid,
       passed: passedThisLaunch,
       propsAfterArea,
+      learned: learnedToasts,
       newRecipeName:
         discovery && discovery.freshlyDiscovered ? (getRecipe(discovery.recipeId)?.name ?? null) : null,
     });
@@ -780,7 +843,12 @@ interface ReactionArgs {
   goldPaid: number;
   passed: boolean;
   propsAfterArea: FoodProperties;
+  learned: string[];
   newRecipeName: string | null;
+}
+
+function adjForValue(v: number): string {
+  return v >= 5 ? 'SUPER' : v >= 4 ? 'really' : v >= 3 ? 'pretty' : v >= 2 ? 'a little' : 'barely';
 }
 
 /** PLAN v9 P2 — assemble + show the full-screen reaction takeover (04 §3). */
@@ -806,7 +874,7 @@ function presentReactionOverlay(a: ReactionArgs): void {
     axisFeedback: computeAxisFeedback(a.propsAfterArea, a.aud),
     breakdownLines,
     goldPaid: a.goldPaid,
-    learned: [],
+    learned: a.learned,
     newRecipe: a.newRecipeName,
     onAction: handleReactionAction,
   });

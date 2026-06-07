@@ -10,8 +10,28 @@
  * is unit-testable independently of DOM wiring (which lives in plate.ts).
  */
 
-import type { Food } from '../state/food';
+import type { Food, FoodProperties } from '../state/food';
 import { masteryLevel, type MasteryLevel } from '../scoring/food-mastery';
+import { axisEmoji } from './axis-emoji';
+
+type AxisName = keyof FoodProperties;
+const PAX_ORDER: readonly AxisName[] = ['wet', 'dry', 'stink', 'loud', 'musical', 'length', 'temp'];
+
+/**
+ * PLAN v9 P3 / 01 §6.2 — the inline learned-axis strip. Shows discovered axes
+ * (emoji + true value), `·` for each still-hidden non-zero axis, and a ✨ on a
+ * never-launched food, so the player reads a food's known properties without
+ * opening the Field Guide.
+ */
+function paxStripHtml(food: Food, revealed: ReadonlySet<AxisName>, uses: number): string {
+  const nonzero = PAX_ORDER.filter((ax) => food.properties[ax] > 0);
+  const known = nonzero.filter((ax) => revealed.has(ax));
+  const hidden = nonzero.length - known.length;
+  const newDot = uses === 0 ? '<span class="pax-new">✨</span>' : '';
+  const items = known.map((ax) => `<span class="pax-i">${axisEmoji(ax)}<b>${food.properties[ax]}</b></span>`).join('');
+  const dots = hidden > 0 ? `<span class="pax-q">${'·'.repeat(hidden)}</span>` : '';
+  return `<span class="pax">${newDot}${items}${dots}</span>`;
+}
 
 const RARITY_ORDER: Record<string, number> = {
   common: 0, uncommon: 1, rare: 2, epic: 3, legendary: 4,
@@ -42,6 +62,8 @@ export interface BuildFoodCardOpts {
   clickable?: boolean;
   /** Mastery uses (per-food launch count). Drives the chip. */
   masteryUses?: number;
+  /** PLAN v9 P3 — per-food revealed axes for the inline learned-axis strip. */
+  revealedAxes?: readonly AxisName[];
 }
 
 export function buildFoodCard(food: Food, opts: BuildFoodCardOpts): string {
@@ -62,10 +84,13 @@ export function buildFoodCard(food: Food, opts: BuildFoodCardOpts): string {
       chipHtml = `<span class="mastery-chip mastery-chip-${masteryLevel(opts.masteryUses)}" aria-label="Mastery: ${chip.label}">${chip.emoji}</span>`;
     }
   }
+  const paxHtml = opts.locked
+    ? ''
+    : paxStripHtml(food, new Set(opts.revealedAxes ?? []), opts.masteryUses ?? 0);
   return `<${tag} ${type} class="food-card ${rarityClassFor(food)} ${lockedClass} ${clickableClass}" data-food="${food.id}" ${aria}>
     <span class="food-emoji">${emoji}</span>
     <span class="food-name">${name}</span>
-    <span class="food-cost">🍽️ ${cost}</span>${chipHtml}
+    <span class="food-cost">🍽️ ${cost}</span>${chipHtml}${paxHtml}
   </${tag}>`;
 }
 
@@ -74,6 +99,7 @@ export function buildPantryGridHtml(
   unlocked: ReadonlySet<string>,
   showLocked: boolean,
   getMasteryUses: (id: string) => number = () => 0,
+  getRevealedAxes: (id: string) => readonly AxisName[] = () => [],
 ): { html: string; lockedCount: number } {
   const sorted = [...foods].sort((a, b) => {
     const au = unlocked.has(a.id) ? 0 : 1;
@@ -90,6 +116,7 @@ export function buildPantryGridHtml(
       locked: !unlocked.has(f.id),
       clickable: unlocked.has(f.id),
       masteryUses: unlocked.has(f.id) ? getMasteryUses(f.id) : 0,
+      revealedAxes: unlocked.has(f.id) ? getRevealedAxes(f.id) : [],
     }))
     .join('');
   const lockedCount = sorted.filter((f) => !unlocked.has(f.id)).length;
