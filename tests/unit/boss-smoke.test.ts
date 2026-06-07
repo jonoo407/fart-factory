@@ -8,6 +8,7 @@ import {
   isBossLost,
 } from '../../src/scoring/boss-match';
 import type { FoodProperties } from '../../src/state/food';
+import { AXIS_CAP, TARGET_DIV } from '../../src/scoring/tuning';
 
 beforeEach(() => {
   localStorage.clear();
@@ -46,7 +47,21 @@ function avgProfile(audIds: string[]): FoodProperties {
 }
 
 function perfectFor(id: string): FoodProperties {
-  return { ...AUDIENCES.find((a) => a.id === id)!.cravings };
+  // PLAN v9 P1: a plate fully satisfies craving C when its normalized level
+  // (sum/AXIS_CAP) reaches the normalized target (C/TARGET_DIV), i.e. C*1.6.
+  // Axes forbidden by a "no-<axis>" rule stay at 0 (matching how the scorer
+  // judges them — bringing any of it violates the rule + the hate penalty).
+  const a = AUDIENCES.find((x) => x.id === id)!;
+  const hated = new Set<string>();
+  for (const r of a.restrictions ?? []) {
+    const m = /^no-([a-z]+)$/.exec(r);
+    if (m) hated.add(m[1]!);
+  }
+  const out: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
+  for (const axis of Object.keys(out) as (keyof FoodProperties)[]) {
+    out[axis] = hated.has(axis) ? 0 : Math.min(AXIS_CAP, a.cravings[axis] * (AXIS_CAP / TARGET_DIV));
+  }
+  return out;
 }
 
 describe('Boss balance smoke — every boss can be defeated by perfect play', () => {
