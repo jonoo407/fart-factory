@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fart Factory — Systems: Audio · Discovery · Recipes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="ff-redesign.css"/>
+<link rel="stylesheet" href="ff-d1.css"/>
+<link rel="stylesheet" href="ff-d1-screens.css"/>
+<link rel="stylesheet" href="ff-systems.css"/>
+</head>
+<body>
+
+<header class="memo-hd">
+  <div class="wrap">
+    <div class="kicker">Systems spec · building on The Order Ticket</div>
+    <h1>Three systems that turn a calculator<br/><em>into a game.</em></h1>
+    <p class="lede">You flagged three real problems: the game is silent, the plating is solved arithmetic, and recipes are just the sum of their parts. Here's a methodical fix for each — and the trick is they <b>reinforce one another</b>: the fart's <em>sound</em> teaches you what ingredients do; learning ingredients makes you hunt for <em>recipes</em>; recipes have <em>signature sounds</em> that feed back into the audio. That flywheel then hangs on a <b>progression ladder</b> (Part 4) so the whole thing visibly climbs.</p>
+    <div class="memo-meta">
+      <span><b>01</b> · Audio as a design system</span>
+      <span><b>02</b> · Ingredient discovery &amp; progression</span>
+      <span><b>03</b> · Recipe bonuses worth chasing</span>
+      <span><b>04</b> · Progression: rarity + venue ladders</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===================================================== -->
+<!-- PART 1 — AUDIO -->
+<!-- ===================================================== -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">01</span> Audio as a design system</div>
+  <h2 class="sec-h">The fart isn't a sound effect. It's the readout.</h2>
+  <p class="sec-intro">In most games audio is garnish. Here it's load-bearing: a fart is the <em>output</em> of your recipe, so it should be <b>legible by ear</b> — a wet brew squelches, a musical one plays notes, a hot one sizzles. Get that right and sound becomes the game's secret teacher (that's how Part 2 works). We build the whole mix from five layers — every clip <b>pre-generated with ElevenLabs into a fixed sound bank</b>, then chosen and layered at runtime. Nothing is generated live in the app.</p>
+
+  <div class="layers">
+    <div class="layer" style="--accent:#ff7a2f">
+      <div class="ix">💨</div>
+      <div class="tx"><h4>The Fart <b>the lead · the star</b></h4><p>Assembled at runtime by layering a few pre-baked stems — a base rip + a stink tail + optional accents — chosen by your 7 recipe axes. A small bank covers thousands of perceived farts.</p></div>
+      <div class="vol">always on<br/>loudest</div>
+    </div>
+    <div class="layer" style="--accent:#8fd11e">
+      <div class="ix">👥</div>
+      <div class="tx"><h4>The Crowd <b>the response</b></h4><p>A low ambient murmur of anticipation before, then a reaction stinger keyed to the grade — gasp, golf-clap, belly-laughs, retching, a standing-ovation roar, chairs scraping as they evacuate.</p></div>
+      <div class="vol">ducks under<br/>the fart</div>
+    </div>
+    <div class="layer" style="--accent:#ffd56b">
+      <div class="ix">🗣️</div>
+      <div class="tx"><h4>Voices <b>the narration</b></h4><p>Each crowd has a character voice — one craving line before, a reaction line after. A host mascot guides first-timers. Short, gross, in-character.</p></div>
+      <div class="vol">on key<br/>moments</div>
+    </div>
+    <div class="layer" style="--accent:#b07cff">
+      <div class="ix">🫧</div>
+      <div class="tx"><h4>Foley &amp; UI <b>the candy</b></h4><p>Every tap pays off: a squishy <em>plop</em> when you plate a food, a chunky <em>thunk</em> on buttons, a rising pressure whoosh as you charge, a sweet-spot <em>ding</em>, coin <em>cha-ching</em>, unlock fanfare.</p></div>
+      <div class="vol">constant<br/>quiet</div>
+    </div>
+    <div class="layer" style="--accent:#21e6ff">
+      <div class="ix">🎵</div>
+      <div class="tx"><h4>Music &amp; beds <b>the mood</b></h4><p>One light, loopable theme per screen — lab hum, jaunty travel tune, tense boss drums, twinkly notebook. Mixed low so the fart always wins.</p></div>
+      <div class="vol">bed<br/>−18dB</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:48px"><span class="n">1.1</span> The fart is an instrument</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">Each axis bends the sound a different way</h2>
+  <p class="sec-intro">This mapping is the heart of the audio system. Because the sound encodes the recipe, a player <em>hears</em> what they made — and over time learns to predict it. Musical is the show-stealer: high-musical recipes literally play pitched toots, so a perfect "Lullaby Toot" plays a little tune.</p>
+  <div class="imap">
+    <div class="row h"><div>Axis</div><div>What it does to the sound</div><div>Texture</div></div>
+    <div class="row"><div class="ax"><span class="e">💦</span>Wet</div><div class="so">Bubbly, squelchy, flubbering low gurgle — more wet = more liquid burble.</div><div class="wf">~ blub ~</div></div>
+    <div class="row"><div class="ax"><span class="e">🍂</span>Dry</div><div class="so">Papery rasp, crisp tearing rip — the classic "brrrap."</div><div class="wf">brrrap</div></div>
+    <div class="row"><div class="ax"><span class="e">🤢</span>Stink</div><div class="so">Can't be heard — so it's a sour detuned overtone + a lingering green reverb "haze" tail. Stinkier = longer tail + crowd sniff foley.</div><div class="wf">·∼haze∼·</div></div>
+    <div class="row"><div class="ax"><span class="e">🔊</span>Loud</div><div class="so">Master volume + sub-bass thump + room reverb. Loud ones make the crowd flinch audibly.</div><div class="wf">BOOM</div></div>
+    <div class="row"><div class="ax"><span class="e">🎺</span>Musical</div><div class="so">Toots become <b>pitched notes</b>. High musical = an actual little melody/arpeggio. The signature hook.</div><div class="wf">♪♫♪</div></div>
+    <div class="row"><div class="ax"><span class="e">⏱️</span>Length</div><div class="so">Duration of the whole event — a quick "pft" vs a sustained four-second "braaaaaap."</div><div class="wf">pft → braaap</div></div>
+    <div class="row"><div class="ax"><span class="e">🌶️</span>Heat</div><div class="so">A sizzle/crackle layer + a rising pitch-bend, like a kettle coming to the boil.</div><div class="wf">tssss↗</div></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:48px"><span class="n">1.2</span> The bank is finite</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">~200 clips cover the whole game</h2>
+  <p class="sec-intro">No live generation — so the trick is keeping the bank small. We <b>quantise each axis into a few buckets</b> and treat the fart as <em>layers</em>: one base rip (chosen by wet/dry + length bucket) plus optional stems (a melody if musical is high, a sizzle if hot, a longer haze tail if stinky), with loudness as a master gain. A handful of fart stems thus covers thousands of <em>perceived</em> results. Everything else is crowd, voice and UI. Here's a realistic budget:</p>
+  <div class="bank">
+    <div class="r h"><div>Category</div><div>What's in it</div><div>Clips</div></div>
+    <div class="r"><div class="cat">💨 Fart stems</div><div class="ds">Base rips (wet/dry × short/med/long × a few takes) + sub-bass thumps</div><div class="ct">~24</div></div>
+    <div class="r"><div class="cat">🎺 Musical toots</div><div class="ds">A playable octave × 2 timbres — melodic recipes play real notes</div><div class="ct">~16</div></div>
+    <div class="r"><div class="cat">∼ Tails &amp; accents</div><div class="ds">Stink hazes, heat sizzles, fizz layers</div><div class="ct">~10</div></div>
+    <div class="r"><div class="cat">👥 Crowd</div><div class="ds">Region murmur beds + reaction stingers across 6 grade tiers</div><div class="ct">~24</div></div>
+    <div class="r"><div class="cat">⚡ Signature recipes</div><div class="ds">One short jingle per hero recipe (grows as you add recipes)</div><div class="ct">~40</div></div>
+    <div class="r"><div class="cat">🗣️ Character VO</div><div class="ds">Host + ~12 crowds × ~4 lines (craving + 3 reactions)</div><div class="ct">~60</div></div>
+    <div class="r"><div class="cat">🫧 Foley &amp; UI</div><div class="ds">Plops, thunks, charge whoosh, sweet-spot ding, coins, fanfare</div><div class="ct">~22</div></div>
+    <div class="r tot"><div class="cat">Total to pre-generate</div><div class="ds">A weekend of ElevenLabs prompts — fully within your “couple hundred.”</div><div class="ct">~196</div></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:48px"><span class="n">1.3</span> Per-screen cue sheet</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">Every screen has a voice</h2>
+  <div class="cue">
+    <div class="r h"><div>Screen</div><div>Ambient bed</div><div>Key SFX</div><div>Voice / sting</div></div>
+    <div class="r"><div class="scr">Play</div><div class="c">Lab hum + faint crowd murmur</div><div class="c">Food <b>plop</b> on plate · belly tick</div><div class="c">Crowd's craving line on entry</div></div>
+    <div class="r"><div class="scr">Charge &amp; Blast</div><div class="c">Murmur drops to silence…</div><div class="c">Rising pressure whoosh · sweet-spot <b>DING</b> · the FART</div><div class="c">Recipe-activated <b>chord</b></div></div>
+    <div class="r"><div class="scr">Reaction</div><div class="c">Crowd erupts (grade-keyed)</div><div class="c">Grade stamp <b>THUNK</b> · coin cha-ching</div><div class="c">Character reaction line</div></div>
+    <div class="r"><div class="scr">Shop</div><div class="c">Cosy market loop</div><div class="c">Paper shuffle · cash register</div><div class="c">"Sold!" stamp</div></div>
+    <div class="r"><div class="scr">Kitchen</div><div class="c">Bubbling ferment jars</div><div class="c">Knob clicks · treatment <b>fwoosh</b></div><div class="c">Jar "ready" chime</div></div>
+    <div class="r"><div class="scr">Map</div><div class="c">Jaunty travel tune</div><div class="c">Pin <b>pop</b> · locked "nuh-uh"</div><div class="c">Region fanfare on arrival</div></div>
+    <div class="r"><div class="scr">Boss</div><div class="c">Tense drums + heartbeat</div><div class="c">Drumroll · impact hit</div><div class="c">Boss taunt VO</div></div>
+    <div class="r"><div class="scr">Notebook</div><div class="c">Twinkly, curious</div><div class="c">Page flip · discovery sparkle</div><div class="c">Host: "Nice find!"</div></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:48px"><span class="n">1.4</span> Cast &amp; voice</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">Characters carry the comedy</h2>
+  <p class="sec-intro">Voiced lines are what make a 9-year-old crack up and an adult smirk. Keep every line under ~2 seconds, parent-safe, and captioned (kids read along). One host ties the game together; each crowd has a personality.</p>
+  <div class="voices">
+    <div class="vcard"><div class="top"><div class="av">🧑‍🔬</div><div><div class="nm">Prof. Phinneas Pump</div><div class="ty">Host · narrator</div></div></div><div class="ln">"Ahh, a fresh victim— er, <em>audience!</em> Let's cook something unforgivable."</div></div>
+    <div class="vcard"><div class="top"><div class="av">👵</div><div><div class="nm">Granny Edna</div><div class="ty">Crowd · sweet</div></div></div><div class="ln">"Oh! …well that was <em>quite</em> the little melody, dear."</div></div>
+    <div class="vcard"><div class="top"><div class="av">😎</div><div><div class="nm">The Frat Pack</div><div class="ty">Crowd · rowdy</div></div></div><div class="ln">"BROOO that one had LAYERS. Do it again!!"</div></div>
+    <div class="vcard"><div class="top"><div class="av">🧐</div><div><div class="nm">The Mayor</div><div class="ty">Boss · pompous</div></div></div><div class="ln">"I have smelled diplomacy. <em>This</em> was not it."</div></div>
+    <div class="vcard"><div class="top"><div class="av">🛟</div><div><div class="nm">The Lifeguard</div><div class="ty">Boss · chill</div></div></div><div class="ln">"Whoa. That cleared the whole beach, dude."</div></div>
+    <div class="vcard"><div class="top"><div class="av">🤖</div><div><div class="nm">The Critic-Bot</div><div class="ty">Crowd · deadpan</div></div></div><div class="ln">"Analysis: offensive. Rating: superb."</div></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:48px"><span class="n">1.5</span> Accessible &amp; in-control</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">Loud is a choice, never a surprise</h2>
+  <p class="sec-intro">Kids play in bedrooms and classrooms; sound must be controllable and captioned. Separate sliders, a one-tap mute, captions on for all dialogue, and haptics paired to the big moments so the game still <em>feels</em> great on silent.</p>
+  <div class="compo">
+    <!-- audio settings (Order Ticket) -->
+    <div class="shot">
+      <div class="frame wide">
+        <div class="d1-mtop" style="margin-top:0"><h2><span class="e">🔊</span> Sound</h2><div class="d1-close">✕</div></div>
+        <div class="set-row"><span class="e">🔈</span><span class="nm">Master</span><div class="set-track"><i style="width:80%"></i><span class="knob" style="left:80%"></span></div></div>
+        <div class="set-row"><span class="e">💨</span><span class="nm">Farts &amp; SFX</span><div class="set-track"><i style="width:95%"></i><span class="knob" style="left:95%"></span></div></div>
+        <div class="set-row"><span class="e">🗣️</span><span class="nm">Voices</span><div class="set-track"><i style="width:70%"></i><span class="knob" style="left:70%"></span></div></div>
+        <div class="set-row"><span class="e">🎵</span><span class="nm">Music</span><div class="set-track"><i style="width:45%"></i><span class="knob" style="left:45%"></span></div></div>
+        <div class="set-row"><span class="e">💬</span><span class="nm">Captions</span><div class="set-toggle"></div></div>
+        <div class="set-row"><span class="e">📳</span><span class="nm">Rumble</span><div class="set-toggle"></div></div>
+      </div>
+      <div class="cap"><b>Sound settings.</b> Four channels, captions &amp; haptics — same chunky language.</div>
+    </div>
+    <!-- reaction w/ caption + sfx tag -->
+    <div class="shot">
+      <div class="phone"><div class="screen d1 d1r">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d1r-stink"></div>
+        <div class="d1r-crowd"><span>😂</span><span>🤩</span><span>👵</span><span>😆</span><span>🤣</span></div>
+        <div class="d1r-stamp"><span class="g">A+</span><span class="l">Standing O</span></div>
+        <div class="d1r-card">
+          <div class="d1r-verdict">She wept with joy. 🥹</div>
+          <div class="d1r-match"><i></i><b>92% match</b></div>
+        </div>
+        <div class="cap-bubble"><span class="who">🔊 Granny Edna</span>"Oh my! What a <em>lovely</em> little tune, dear!"</div>
+      </div></div>
+      <div class="cap"><b>Captioned VO.</b> The character speaks; the caption reads along for kids &amp; silent play.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- PART 2 — DISCOVERY -->
+<!-- ===================================================== -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">02</span> Ingredient discovery &amp; progression</div>
+  <h2 class="sec-h">Don't show the numbers. Make them earn the knowledge.</h2>
+  <p class="sec-intro">Right now every food wears its stats on its sleeve, so "matching" is just addition — solved, not played. The fix: <b>hide a food's properties and let players discover them by launching it</b> and reading the result (the sound from Part 1, and the crowd's face). Your pantry becomes a field guide that <b>fills itself in automatically as you play</b> — no menus, nothing to manage — and foods you use a lot get <em>better</em>. Easy to start (just try stuff, watch faces); deep to master (full knowledge + optimisation).</p>
+
+  <div class="loop">
+    <div class="beat"><div class="step">TRY</div><div class="ico">🧪</div><h4>Experiment</h4><p>Plate a food you don't fully know and launch it — even a wild guess.</p></div>
+    <div class="arrow">→</div>
+    <div class="beat"><div class="step">SENSE</div><div class="ico">👂</div><h4>Listen &amp; watch</h4><p>The fart <em>sounds</em> wet/loud/musical; the crowd's face tells you if you were close.</p></div>
+    <div class="arrow">→</div>
+    <div class="beat"><div class="step">DEDUCE</div><div class="ico">💡</div><h4>Learn an axis</h4><p>Each use reveals one more property: "Beans seem… STINKY." It logs to the field guide.</p></div>
+    <div class="arrow">→</div>
+    <div class="beat" style="border-color:var(--hi)"><div class="step" style="color:#fff">MASTER</div><div class="ico">⭐</div><h4>Level it up</h4><p>Use it enough and it's fully known <em>and</em> stronger — a mastery perk kicks in.</p></div>
+  </div>
+
+  <p class="dnote" style="margin-top:34px"><b>Progressive axes keep it gentle.</b> Hometown crowds only judge <b>stink</b> &amp; <b>loud</b> — two things to learn. New regions introduce wet, then dry, musical, length and heat one at a time, so a 9-year-old is never staring at seven unknowns. Cravings are qualitative too ("nothing too loud," "make it rotten"), so you read vibes, not target integers.</p>
+
+  <div class="sec-label" style="margin-top:46px"><span class="n">2.1</span> How a food reveals itself</div>
+  <div class="compo">
+    <div class="shot">
+      <div class="tile-row">
+        <div class="mtile fog">
+          <div class="cell"><div class="mlvl">Lv.1</div><div class="qmark">？</div><div class="nm">Sardines</div>
+            <div class="axset"><span class="axchip unk"><span class="q">？</span></span><span class="axchip unk"><span class="q">？</span></span><span class="axchip unk"><span class="q">？</span></span><span class="axchip unk"><span class="q">？</span></span></div></div>
+          <span class="cap2"><b>New.</b> All hidden. "Smells… ominous."</span>
+        </div>
+        <div class="mtile">
+          <div class="cell"><div class="mlvl">Lv.2</div><div class="em">🐟</div><div class="nm">Sardines</div>
+            <div class="axset"><span class="axchip justrevealed">💦<span class="lv">4</span></span><span class="axchip justrevealed">🤢<span class="lv">4</span></span><span class="axchip unk"><span class="q">？</span></span><span class="axchip unk"><span class="q">？</span></span></div></div>
+          <span class="cap2"><b>Used 2×.</b> 💦 wet &amp; 🤢 stink revealed.</span>
+        </div>
+        <div class="mtile">
+          <div class="cell"><div class="mlvl">★ Lv.5</div><div class="em">🐟</div><div class="nm">Sardines</div>
+            <div class="axset"><span class="axchip">💦<span class="lv">4</span></span><span class="axchip">🤢<span class="lv">4</span></span><span class="axchip">🔊<span class="lv">1</span></span><span class="axchip">🌶️<span class="lv hot">2</span></span></div></div>
+          <span class="cap2"><b>Mastered.</b> Full profile + perk: <b>−1 belly</b>.</span>
+        </div>
+      </div>
+      <div class="compo-note">Each launch flips a hidden 💦/🤢/🔊/🌶️ icon on — you watch the food's real profile appear, slot by slot.</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:30px"><span class="n">2.2</span> The Field Guide entry &amp; the "aha"</div>
+  <div class="compo">
+    <div class="shot">
+      <div class="frame">
+        <div class="fg-head">
+          <div class="em">🥬</div>
+          <div><div class="nm">Kimchi</div><div class="ml">Field guide · Lv.3 of 5</div></div>
+          <div class="stars">⭐⭐⭐✩✩</div>
+        </div>
+        <div class="fg-body">
+          <div class="fg-axis"><span class="k">Stink</span><div class="bar"><i style="width:80%"></i></div></div>
+          <div class="fg-axis"><span class="k">Wet</span><div class="bar"><i style="width:60%"></i></div></div>
+          <div class="fg-axis"><span class="k">Loud</span><div class="bar"><i style="width:40%"></i></div></div>
+          <div class="fg-axis unknown"><span class="k">Heat</span><div class="bar"></div><span class="qm">？ use 2 more</span></div>
+          <div class="fg-note">"Fermented thunder." — Master it to unlock its <b>Afterburn</b> perk.</div>
+        </div>
+      </div>
+      <div class="cap"><b>Field guide entry.</b> Fills itself as you play — no menus, no buttons. Known axes shown; unknowns hatched with how to reveal them.</div>
+    </div>
+    <div class="shot">
+      <div class="learn"><span class="em">💡</span><div><div class="t1">You figured something out</div><div class="t2">Garlic is seriously STINKY 🤢</div></div></div>
+      <div class="cap" style="margin-top:14px"><b>Discovery toast.</b> Fires right after a launch — novel combos pay bonus research notes even on a flop, so curiosity always wins.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- PART 3 — RECIPES -->
+<!-- ===================================================== -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">03</span> Recipe bonuses worth chasing</div>
+  <h2 class="sec-h">A recipe should be more than the sum of its smells.</h2>
+  <p class="sec-intro">If a named recipe just outputs the totals of its ingredients, there's no reason to care that it's named. So named recipes become <b>combos that fire an emergent effect</b> — a multiplier, an axis transform, a signature sound, a crowd bonus — that you can't get by adding numbers. Now the plate is closer to deckbuilding: you assemble known recipes and improvise, hunting synergies. And because every crowd wants something different, there's no single "best" recipe — you want a whole stable of them.</p>
+
+  <div class="eff-legend">
+    <div class="e"><div class="ic">✖️</div><h5>Multiplier</h5><p>x1.5–x2 on an axis or the whole score.</p></div>
+    <div class="e"><div class="ic">🔄</div><h5>Axis transform</h5><p>Converts one property into a new one crowds adore (e.g. Stink → "Class").</p></div>
+    <div class="e"><div class="ic">🎺</div><h5>Signature sound</h5><p>Its own fart jingle — the audio hook from Part 1.</p></div>
+    <div class="e"><div class="ic">👑</div><h5>Crowd bonus</h5><p>"+1 reaction tier" with the right audience.</p></div>
+    <div class="e"><div class="ic">🎁</div><h5>Loot</h5><p>Guaranteed drop, gold bonus, or a buff token.</p></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:46px"><span class="n">3.1</span> It fires <em>while</em> you plate</div>
+  <div class="compo">
+    <div class="shot">
+      <div class="ribbon">
+        <div class="top">⚡ RECIPE DETECTED!</div>
+        <div class="bd">
+          <div class="nm"><span class="foods">🫘🧀</span> The Classic</div>
+          <div class="eff"><span class="e">✖️</span><span>+50% STINK &amp; a deep signature rumble</span></div>
+          <div class="sig">🎺 plays its own sound · ⭐ Lv.2 — cook 3× more to power up</div>
+        </div>
+      </div>
+      <div class="cap"><b>Live on the plate.</b> The instant your ingredients form a known combo, the ribbon slides in <em>before</em> you blast — so you feel the synergy land.</div>
+    </div>
+    <div class="shot">
+      <div class="rc2">
+        <div class="top">
+          <span class="foods">🧀🧄🥚</span>
+          <div><div class="nm">Royal Rumbler</div><div class="rtag" style="color:#3b82f6">◆ Rare recipe</div></div>
+          <div class="stars">⭐⭐⭐⭐✩<small>Lv.4</small></div>
+        </div>
+        <div class="bd">
+          <div class="eff"><span class="e">🔄</span><div class="tx">Turns <b>STINK → CLASS</b> — posh crowds swoon</div></div>
+          <div class="eff"><span class="e">👑</span><div class="tx"><b>+1 reaction tier</b> with nobility</div></div>
+          <div class="meta">
+            <div class="mxp"><div class="bar"><i></i></div><div class="t">3 / 5 cooks to Lv.5 (max)</div></div>
+            <button class="cook">🍴 Cook</button>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><b>Notebook card v2.</b> Shows the <em>effect</em> and a mastery track — re-cooking a recipe levels its bonus. The collection finally has teeth.</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:30px"><span class="n">3.2</span> Why the match jumped to A+</div>
+  <div class="compo">
+    <div class="shot">
+      <div class="bd-card">
+        <div class="h"><span>Score breakdown</span><span>vs Granny Edna</span></div>
+        <div class="bd-line base"><span class="l">🎯 Base match</span><span class="v">64%</span></div>
+        <div class="bd-line"><span class="l">⚡ Recipe · The Lullaby Toot</span><span class="v plus">+18%</span></div>
+        <div class="bd-line"><span class="l">🎵 Signature tune (she loves music)</span><span class="v plus">+1 tier</span></div>
+        <div class="bd-line"><span class="l">💥 Perfect charge</span><span class="v plus">×1.2</span></div>
+        <div class="bd-line"><span class="l">✨ Novel combo bonus</span><span class="v plus">+5 📝</span></div>
+        <div class="bd-tot"><span class="l">Final</span><span class="v">A+ · 92% <span class="g">+38💰</span></span></div>
+      </div>
+      <div class="cap"><b>Transparent payoff.</b> The reaction shows the math: the recipe bonus and the perfect charge are visibly why you won — so players learn what to chase.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- PART 4 — PROGRESSION -->
+<!-- ===================================================== -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">04</span> Progression: The Tour</div>
+  <h2 class="sec-h">Make every crowd a rung on a ladder you can see.</h2>
+  <p class="sec-intro">Hopping audience-to-audience felt flat because nothing framed the climb. The fix is three nested loops plus one new screen. Crowds gain <b>rarity &amp; difficulty</b>; each location becomes a <b>ladder of shows</b> you watch yourself climb; and <b>every show hands you something new</b> — a food, an axis, a recipe. A 9-year-old feels a Candy-Crush clear; an adult feels a roguelite run.</p>
+
+  <div class="nest">
+    <div class="lp"><div class="tier">Loop 1 · seconds</div><div class="ic">🎭</div><h4>The Show</h4><p>One crowd sits down. Read → plate → blast → react. Earn <b>1–3 ⭐</b> on how well you matched.</p><div class="out"><b>gives:</b> stars · gold · a discovery</div></div>
+    <div class="lp"><div class="tier">Loop 2 · a sitting</div><div class="ic">🏟️</div><h4>The Venue</h4><p>~6 shows climb in difficulty to a boss headliner. Stars unlock the next rung; the boss unlocks the next location.</p><div class="out"><b>gives:</b> the location cleared · a legendary</div></div>
+    <div class="lp"><div class="tier">Loop 3 · the game</div><div class="ic">🗺️</div><h4>The Tour</h4><p>New locations bring new tastes, foods and axes. Encores &amp; mastery keep venues alive after you clear them.</p><div class="out"><b>gives:</b> the long game</div></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:46px"><span class="n">4.1</span> Crowds get rarity &amp; difficulty</div>
+  <p class="sec-intro">Most crowds are common townsfolk, but a show can roll a rare <b>VIP</b> — glowing, pickier, with a juicier guaranteed drop. Rarity reads instantly (the same Diablo-style ring as foods), difficulty shows as pips, and a reward preview tells you what's at stake before you commit.</p>
+  <div class="compo">
+    <div class="shot">
+      <div class="cmini common">
+        <div class="rar">Common</div>
+        <div class="ring" style="border-color:#9ca3af">👵</div>
+        <div class="nm">Granny Edna</div>
+        <div class="diff">Difficulty <span class="pips">●○○</span></div>
+        <div class="want"><span>🎺</span><span>🍃</span></div>
+        <div class="reward"><span class="e">💰</span>~25 gold · ⭐⭐⭐</div>
+      </div>
+      <div class="cap"><b>Common crowd.</b> Easy, forgiving, steady gold.</div>
+    </div>
+    <div class="shot">
+      <div class="cmini rarevip">
+        <div class="rar">★ Rare VIP</div>
+        <div class="ring">🤖</div>
+        <div class="nm">The Critic-Bot</div>
+        <div class="diff">Difficulty <span class="pips">●●●</span></div>
+        <div class="want"><span>🤢</span><span>🔊</span><span>🚫💦</span></div>
+        <div class="reward"><span class="e">🎁</span>Guaranteed rare food + 80💰</div>
+      </div>
+      <div class="cap"><b>Rare VIP.</b> Shows up unpredictably; harder demand, guaranteed unlock.</div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:30px"><span class="n">4.2</span> The venue ladder — the connective tissue</div>
+  <p class="sec-intro">This is the screen that was missing. After each reaction you land back here and your token hops to the next node. You see the whole climb at once: stars banked, a rare VIP glinting ahead, a "NEW FOOD" flag on the node that introduces one, and the boss headliner waiting at the top.</p>
+  <div class="compo">
+    <div class="shot">
+      <div class="phone"><div class="screen d1 d1-sheet" style="display:flex;flex-direction:column">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d1-mtop"><h2><span class="e">🏖️</span> Beach Town</h2><div class="d1-gold">⭐ 9/24</div><div class="d1-close">✕</div></div>
+        <div class="d1-scroll">
+          <div class="venue">
+            <svg viewbox="0 0 100 100" preserveaspectratio="none">
+              <polyline points="26,88 62,74 30,58 66,42 32,26 60,10" fill="none" stroke="#231d16" stroke-width="1.4" stroke-dasharray="2 3" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity=".5"/>
+            </svg>
+            <div class="vnode done" style="left:26%;top:88%"><div class="stars">⭐⭐⭐</div><div class="circle">🎪</div><div class="lab">Show 1</div></div>
+            <div class="vnode done" style="left:62%;top:74%"><div class="stars">⭐⭐</div><div class="circle">🎤</div><div class="lab">Show 2</div></div>
+            <div class="vnode done" style="left:30%;top:58%"><div class="stars">⭐⭐⭐</div><div class="circle">🎟️</div><div class="lab">Show 3</div></div>
+            <div class="vnode cur" style="left:66%;top:42%"><div class="newtag">NEW FOOD</div><div class="stars"></div><div class="circle">▶</div><div class="lab">Show 4</div></div>
+            <div class="vnode rare lock" style="left:32%;top:26%"><div class="stars"></div><div class="circle"><span>🔒</span></div><div class="lab">VIP show</div></div>
+            <div class="vnode boss" style="left:60%;top:11%"><div class="stars"></div><div class="circle"><span>👑</span></div><div class="lab">Headliner</div></div>
+          </div>
+          <div class="venue-foot">
+            <span class="av">🏄</span>
+            <div><div class="nm">Up next: The Surf Bros</div><div class="ds">Want it LOUD &amp; WET · introduces 🥥 Coconut · ⭐⭐⭐ up for grabs</div></div>
+          </div>
+        </div>
+        <div class="d1-cta">Play Show 4 ▶</div>
+      </div></div>
+      <div class="cap"><b>Venue ladder.</b> The visible climb between crowds — the thing that turns "next audience" into progress.</div>
+    </div>
+  </div>
+
+  <p class="dnote"><b>A new thing every show.</b> Each node can introduce exactly one new element — a food, an axis the crowd cares about, a treatment, or a recipe hint — and rare/boss nodes drop guaranteed unlocks. The field guide auto-fills across these shows, so <em>discovery and progression are the same motion</em>: climb the ladder, the world opens up.</p>
+
+  <div class="sec-label" style="margin-top:46px"><span class="n">4.3</span> Stakes, feedback &amp; the pass gate</div>
+  <h2 class="sec-h" style="font-size:clamp(22px,2.6vw,30px)">You have to earn the win — and you can see why</h2>
+  <p class="sec-intro">Playtest fix: the early build let you pass by adding random foods, with no feedback and no failure. Three rules close that gap (all live in the prototype now):</p>
+  <div class="diag" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="card good"><h3>🎯 Matching has teeth</h3><p>Being off-target hurts on a curve, the <b>weakest judged axis</b> counts for 45% of the score (you can't coast by nailing one), and violating a <b>"hates"</b> rule cuts up to 65%. Random plating now flops.</p></div>
+    <div class="card good"><h3>🧾 The judge card</h3><p>Every reaction shows each judged axis with a ✓ / ~ / ✗, the crowd's target marker, and your actual level. The player learns exactly what to fix — no bare percentage.</p></div>
+    <div class="card good"><h3>🚦 Pass to advance</h3><p>Under 50% = a flop: the only option is <b>↻ Try this crowd again</b> — no advancing. Pass and you choose <b>↻ Improve</b> (beat your score) or <b>Next show ▶</b>. Stars (1–3) gate the harder nodes.</p></div>
+  </div>
+  <p class="dnote" style="margin-top:24px"><b>No grind, no dead-ends.</b> Gold pays only the <em>improvement</em> over your best on a crowd (no farming), and because more of a wanted axis always helps, a stuck player is one "add another" away from passing — the failure screen literally points at the ✗ axis. Exact formulas &amp; constants live in the handoff package.</p>
+</section>
+
+<!-- ===================================================== -->
+<!-- CLOSING -->
+<!-- ===================================================== -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">05</span> The flywheel</div>
+  <h2 class="sec-h">Each system feeds the next</h2>
+  <div class="diag" style="grid-template-columns:1fr 1fr 1fr">
+    <div class="card good"><h3>🔊 Audio → Discovery</h3><p>Because the fart <em>sounds</em> like its recipe, your ears teach you what ingredients do — no stat sheet needed.</p></div>
+    <div class="card good"><h3>🧪 Discovery → Recipes</h3><p>Learning ingredients makes you experiment, and experiments stumble into named recipes worth keeping.</p></div>
+    <div class="card good"><h3>⚡ Recipes → Audio</h3><p>Each recipe has a signature sound, so nailing one is an audio-visual payoff that pulls you back to Part 1.</p></div>
+  </div>
+
+  <div class="sec-label" style="margin-top:46px"><span class="n">5.1</span> Build notes</div>
+  <div class="diag">
+    <div class="card">
+      <h3 style="color:var(--hi)">🎙️ ElevenLabs asset list</h3>
+      <ul style="margin-top:12px">
+        <li><b>Fart SFX kit</b> — wet/dry base rips, a pitched "toot" scale for musical, sizzle + haze tails, short→long takes. All <b>pre-baked</b>; the app only selects + layers them.</li>
+        <li><b>Crowd beds + reaction stingers</b> — murmur loops per region; gasp / clap / laugh / retch / ovation / evacuate.</li>
+        <li><b>Character VO</b> — host + each crowd: 1 craving line, 3 reaction lines (love / meh / evacuate). Distinct voices, &lt;2s each.</li>
+        <li><b>Foley &amp; UI</b> — plops, thunks, charge whoosh, sweet-spot ding, coins, unlock fanfare, recipe-activate chord.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--hi)">⚙️ For Claude Code</h3>
+      <ul style="margin-top:12px">
+        <li><b>Audio engine</b> — 5-layer bus with per-channel volume; a <b>clip selector</b> that maps bucketed axes to pre-baked stems + layers (zero runtime generation); caption + haptic hooks (the repo already has procedural + sample-player + haptics).</li>
+        <li><b>Discovery</b> — per-food <code>masteryLevel</code> &amp; <code>revealedAxes</code>; reveal-on-use; gate stat display behind it; region-gated active axes; novelty bonus on unseen combos.</li>
+        <li><b>Recipes</b> — combo table with typed <code>effect</code>s (multiplier / transform / signature / crowdBonus / loot); recipe mastery; live detection on plate change; score breakdown in the result.</li>
+        <li><b>Progression</b> — 1–3★ rating per show; a venue = an ordered node graph with star-gated unlocks; crowd rarity roll + difficulty scaling; a “one new element per node” content hook; boss clear → travel unlock.</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="dnote" style="margin-top:30px"><b>Want me to keep going?</b> I can fold all of this into the <b>clickable prototype</b> next — audible farts that change with your recipe, a pantry that reveals itself as you play, and recipe ribbons firing live — so you can actually feel the flywheel before any of it ships.</p>
+  <footer class="memo">The Fart Factory — systems spec v1 · Audio · Discovery · Recipes 🧪</footer>
+</section>
+
+</body>
+</html>

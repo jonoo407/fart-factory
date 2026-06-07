@@ -1,0 +1,114 @@
+/* ============================================================
+   DIRECTION 2 — "BLAART! ARCADE"
+   Max juice. Living cartoon crowd. Saturday-morning spectacle.
+   Dark stage + hot magenta / cyan / acid yellow / lime.
+   Type: Luckiest Guy + Bangers (shout) / Nunito (body)
+   ============================================================ */
+.d2{
+  --d2-bg:#170a24;
+  --d2-bg2:#24123a;
+  --d2-mag:#ff2e9a;
+  --d2-cyan:#21e6ff;
+  --d2-yel:#ffe11a;
+  --d2-lime:#b6ff3a;
+  --d2-ink:#10061c;
+  font-family:"Nunito",sans-serif;color:#fff;
+  background:
+    radial-gradient(circle at 50% 0%, #3a1860 0%, var(--d2-bg) 55%),
+    var(--d2-bg);
+}
+.d2 .statusbar{color:#fff;text-shadow:1px 1px 0 var(--d2-ink)}
+.d2-halftone{position:absolute;inset:0;opacity:.10;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.9) 1px,transparent 1.4px);
+  background-size:11px 11px}
+.d2-body{flex:1;position:relative;z-index:2;display:flex;flex-direction:column;padding:44px 13px 0;gap:10px;overflow:hidden}
+
+/* sticker helper look via outlines */
+.d2-top{display:flex;align-items:center;justify-content:space-between}
+.d2-logo{font-family:"Bangers",cursive;font-size:21px;letter-spacing:.04em;color:var(--d2-yel);
+  -webkit-text-stroke:2px var(--d2-ink);text-shadow:2px 2px 0 var(--d2-mag);transform:rotate(-3deg)}
+.d2-coins{font-family:"Luckiest Guy",cursive;font-size:14px;color:var(--d2-ink);background:var(--d2-yel);
+  border:3px solid #fff;border-radius:999px;padding:3px 11px;box-shadow:0 3px 0 var(--d2-ink);transform:rotate(2deg)}
+
+/* crowd grandstand */
+.d2-crowd{
+  background:linear-gradient(180deg,rgba(255,46,154,.18),rgba(33,230,255,.10));
+  border:3px solid #fff;border-radius:18px;padding:10px 10px 12px;position:relative;
+  box-shadow:0 5px 0 var(--d2-ink)}
+.d2-crowd .heads{display:flex;justify-content:center;gap:1px;font-size:30px}
+.d2-crowd .heads span{display:inline-block}
+.d2-crowd .heads span:nth-child(1){transform:translateY(-4px) rotate(-6deg)}
+.d2-crowd .heads span:nth-child(2){transform:translateY(3px)}
+.d2-crowd .heads span:nth-child(3){transform:translateY(-6px) rotate(5deg)}
+.d2-crowd .heads span:nth-child(4){transform:translateY(2px) rotate(-3deg)}
+.d2-crowd .heads span:nth-child(5){transform:translateY(-3px) rotate(4deg)}
+.d2-think{margin:6px auto 0;width:fit-content;background:#fff;color:var(--d2-ink);border-radius:14px;
+  padding:6px 12px;display:flex;align-items:center;gap:7px;font-family:"Luckiest Guy",cursive;font-size:14px;
+  position:relative;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.d2-think::after{content:"";position:absolute;bottom:-8px;left:24px;border:7px solid transparent;border-top-color:#fff;border-bottom:0}
+.d2-think .want{font-size:18px}
+.d2-think .nope{font-size:15px;filter:grayscale(1);opacity:.55;position:relative}
+.d2-crowd .who{position:absolute;top:-11px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  font-family:"Bangers",cursive;font-size:13px;letter-spacing:.05em;background:var(--d2-mag);color:#fff;
+  border:2.5px solid #fff;border-radius:999px;padding:1px 12px;white-space:nowrap}
+
+/* plate / cannon */
+.d2-cannon .lbl{font-family:"Bangers",cursive;font-size:15px;letter-spacing:.06em;color:var(--d2-cyan);margin:2px 0 6px;
+  text-shadow:1px 1px 0 var(--d2-ink)}
+.d2-loaded{display:flex;gap:8px;justify-content:center}
+.d2-load{width:54px;height:54px;border-radius:14px;background:var(--d2-bg2);border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 3px 0 var(--d2-ink)}
+.d2-load.empty{border-style:dashed;border-color:rgba(255,255,255,.4);background:transparent;font-size:22px;color:rgba(255,255,255,.4)}
+
+/* pantry stickers */
+.d2-pgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.d2-pc{aspect-ratio:1;border-radius:13px;background:var(--d2-bg2);border:3px solid #fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;box-shadow:0 3px 0 var(--d2-ink)}
+.d2-pc .rar{position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;border:2px solid #fff}
+.d2-pc.lock{background:#241636;color:rgba(255,255,255,.3)}
+.d2-pc.lock span{filter:grayscale(1);opacity:.4}
+
+/* charge meter + button */
+.d2-charge{margin-top:auto;padding:0 2px 14px}
+.d2-meter{height:22px;border-radius:999px;background:var(--d2-bg2);border:3px solid #fff;position:relative;overflow:hidden;margin-bottom:10px}
+.d2-meter i{position:absolute;inset:0;width:66%;background:linear-gradient(90deg,var(--d2-cyan),var(--d2-lime),var(--d2-yel),var(--d2-mag))}
+.d2-meter .sweet{position:absolute;top:-3px;bottom:-3px;left:70%;width:16%;border:3px dashed #fff;border-radius:8px}
+.d2-meter .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:"Luckiest Guy",cursive;font-size:11px;letter-spacing:.1em;color:var(--d2-ink);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.d2-blast{width:100%;border-radius:20px;padding:16px 0;text-align:center;
+  background:linear-gradient(180deg,var(--d2-mag),#c70d6e);border:4px solid #fff;
+  box-shadow:0 6px 0 var(--d2-ink);font-family:"Luckiest Guy",cursive;color:#fff}
+.d2-blast .b{font-size:30px;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:9px;text-shadow:0 2px 0 rgba(0,0,0,.35)}
+.d2-blast .s{font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.85;font-family:"Nunito";font-weight:800}
+
+/* ---------- D2 REACTION / BLAST SPECTACLE ---------- */
+.d2r{background:radial-gradient(circle at 50% 42%, #ff2e9a 0%, #7a0f4a 45%, var(--d2-bg) 80%);overflow:hidden;position:relative}
+.d2r .statusbar{color:#fff}
+.d2r-rays{position:absolute;top:42%;left:50%;width:600px;height:600px;transform:translate(-50%,-50%);
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,.16) 0deg 10deg, transparent 10deg 20deg);z-index:1}
+.d2r-cloud{position:absolute;top:34%;left:50%;transform:translate(-50%,-50%);font-size:150px;z-index:2;
+  filter:drop-shadow(0 0 24px rgba(182,255,58,.6));opacity:.9}
+.d2r-shout{position:relative;z-index:4;text-align:center;margin-top:54px}
+.d2r-shout .word{font-family:"Bangers",cursive;font-size:60px;letter-spacing:.02em;color:var(--d2-yel);
+  -webkit-text-stroke:3px var(--d2-ink);text-shadow:5px 5px 0 var(--d2-mag);transform:rotate(-4deg);line-height:.9}
+.d2r-combo{display:inline-block;margin-top:6px;font-family:"Luckiest Guy",cursive;font-size:15px;color:var(--d2-ink);
+  background:var(--d2-lime);border:3px solid #fff;border-radius:999px;padding:3px 14px;transform:rotate(3deg);box-shadow:0 3px 0 var(--d2-ink)}
+.d2r-grade{position:relative;z-index:4;margin:18px auto 0;width:160px;height:160px;display:flex;align-items:center;justify-content:center}
+.d2r-grade .star{position:absolute;inset:0;background:var(--d2-yel);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  border:0;filter:drop-shadow(0 6px 0 var(--d2-ink))}
+.d2r-grade .g{position:relative;z-index:2;font-family:"Luckiest Guy",cursive;font-size:72px;color:var(--d2-mag);
+  -webkit-text-stroke:3px var(--d2-ink);transform:rotate(-4deg)}
+.d2r-crowdrow{position:relative;z-index:4;display:flex;justify-content:center;gap:1px;font-size:34px;margin-top:12px}
+.d2r-crowdrow span:nth-child(even){transform:translateY(-7px) scale(1.1)}
+.d2r-score{position:relative;z-index:4;text-align:center;margin-top:10px;font-family:"Luckiest Guy",cursive;
+  font-size:30px;color:#fff;text-shadow:2px 2px 0 var(--d2-ink)}
+.d2r-score small{display:block;font-family:"Nunito";font-weight:800;font-size:11px;letter-spacing:.2em;color:var(--d2-yel);text-shadow:none}
+.d2r-rewards{position:relative;z-index:4;display:flex;gap:9px;justify-content:center;margin-top:12px;padding:0 16px}
+.d2r-rw{flex:1;font-family:"Luckiest Guy",cursive;font-size:18px;text-align:center;color:var(--d2-ink);
+  background:#fff;border:3px solid var(--d2-ink);border-radius:13px;padding:7px 4px;box-shadow:0 4px 0 var(--d2-ink)}
+.d2r-rw small{display:block;font-family:"Nunito";font-weight:800;font-size:8px;letter-spacing:.1em;color:#7a6}
+.d2r-rw.gold{background:var(--d2-yel)}.d2r-rw.cyan{background:var(--d2-cyan)}
+.d2r-cont{position:relative;z-index:4;margin:auto 16px 18px;text-align:center;font-family:"Luckiest Guy",cursive;
+  font-size:18px;color:#fff;background:var(--d2-ink);border:3px solid #fff;border-radius:16px;padding:13px;box-shadow:0 5px 0 rgba(0,0,0,.4)}
+.d2r-motion{position:absolute;z-index:3;font-family:"Bangers",cursive;color:#fff;font-size:18px;opacity:.85}

@@ -1,0 +1,169 @@
+/* ============================================================
+   FART FACTORY — Redesign Directions
+   Design memo + 3 directions × 2 screens (Play + Reaction)
+   Page chrome is intentionally neutral so the colourful
+   phone mockups carry all the personality.
+   ============================================================ */
+
+:root{
+  --ink:#15110d;
+  --paper:#f3ede1;
+  --page:#16130f;
+  --page-2:#1f1a14;
+  --line:#332b22;
+  --muted:#a99e8c;
+  --soft:#cabfa9;
+  --hi:#ffd56b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #241d15 0%, rgba(36,29,21,0) 60%),
+    var(--page);
+  color:var(--paper);
+  font-family:"Nunito","Segoe UI",system-ui,sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:120px;
+}
+
+/* ---------- editorial layout ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.memo-hd{
+  border-bottom:1px solid var(--line);
+  padding:60px 0 34px;
+  margin-bottom:8px;
+}
+.kicker{
+  font-family:"Space Mono",monospace;
+  font-size:12.5px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--hi);
+  display:flex;align-items:center;gap:10px;
+}
+.kicker::before{content:"";width:26px;height:2px;background:var(--hi);display:inline-block}
+.memo-hd h1{
+  font-family:"Space Grotesk",sans-serif;
+  font-weight:700;font-size:clamp(34px,5vw,58px);
+  letter-spacing:-.02em;line-height:1.02;margin:16px 0 14px;
+}
+.memo-hd h1 em{font-style:normal;color:var(--hi)}
+.memo-hd .lede{max-width:760px;color:var(--soft);font-size:18px}
+.memo-meta{
+  display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:24px;
+  font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);
+}
+.memo-meta b{color:var(--paper);font-weight:400}
+
+section{padding:54px 0}
+.sec-label{
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:18px;
+  display:flex;align-items:baseline;gap:12px;
+}
+.sec-label .n{color:var(--hi)}
+h2.sec-h{
+  font-family:"Space Grotesk",sans-serif;font-weight:700;
+  font-size:clamp(26px,3.4vw,40px);letter-spacing:-.015em;margin-bottom:14px;
+}
+.sec-intro{max-width:780px;color:var(--soft);font-size:17px;margin-bottom:8px}
+
+/* ---------- diagnosis ---------- */
+.diag{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:30px}
+@media(max-width:820px){.diag{grid-template-columns:1fr}}
+.card{
+  background:linear-gradient(180deg,var(--page-2),#1a160f);
+  border:1px solid var(--line);border-radius:18px;padding:24px 24px 26px;
+}
+.card h3{font-family:"Space Grotesk",sans-serif;font-size:18px;margin-bottom:6px;letter-spacing:-.01em}
+.card.bad h3{color:#ff8b6b}
+.card.good h3{color:#9ee06a}
+.card p{color:var(--soft);font-size:15px}
+.card ul{list-style:none;margin-top:14px;display:flex;flex-direction:column;gap:11px}
+.card li{position:relative;padding-left:26px;color:var(--soft);font-size:15px}
+.card.bad li::before{content:"✕";position:absolute;left:0;color:#ff8b6b;font-weight:800}
+.card.good li::before{content:"✓";position:absolute;left:0;color:#9ee06a;font-weight:800}
+.card li b{color:var(--paper);font-weight:800}
+
+/* ---------- loop diagram ---------- */
+.loop{
+  display:flex;align-items:stretch;gap:0;margin-top:34px;flex-wrap:wrap;
+}
+.beat{
+  flex:1 1 0;min-width:180px;
+  background:linear-gradient(180deg,var(--page-2),#19150e);
+  border:1px solid var(--line);border-radius:18px;
+  padding:22px 20px;position:relative;
+}
+.beat .step{font-family:"Space Mono",monospace;font-size:12px;color:var(--hi);letter-spacing:.18em}
+.beat .ico{font-size:34px;margin:10px 0 8px;line-height:1}
+.beat h4{font-family:"Space Grotesk",sans-serif;font-size:19px;letter-spacing:-.01em;margin-bottom:6px}
+.beat p{font-size:13.5px;color:var(--muted)}
+.beat .pill{display:inline-block;margin-top:12px;font-size:11px;font-family:"Space Mono",monospace;
+  color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
+.loop .arrow{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:22px;padding:0 6px;flex:0 0 auto}
+@media(max-width:900px){.loop .arrow{transform:rotate(90deg)}.loop{flex-direction:column}.beat{min-width:0}}
+
+.dnote{
+  margin-top:26px;border-left:3px solid var(--hi);padding:6px 0 6px 18px;
+  color:var(--soft);font-size:15px;max-width:820px;
+}
+.dnote b{color:var(--paper)}
+
+/* ============================================================
+   DIRECTION blocks
+   ============================================================ */
+.dir{padding-top:30px;border-top:1px solid var(--line);margin-top:18px}
+.dir-hd{display:flex;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:30px}
+.dir-num{
+  font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:64px;line-height:.8;
+  color:transparent;-webkit-text-stroke:2px var(--line);
+}
+.dir-hd .tt{flex:1 1 320px}
+.dir-tag{font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--hi)}
+.dir-hd h3{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:32px;letter-spacing:-.015em;margin:6px 0 8px}
+.dir-hd p{color:var(--soft);font-size:16px;max-width:640px}
+.dir-wins{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.dir-wins span{font-size:12px;font-family:"Space Mono",monospace;color:var(--soft);
+  border:1px solid var(--line);border-radius:999px;padding:4px 11px}
+
+.stage{
+  display:flex;gap:30px;flex-wrap:wrap;justify-content:center;align-items:flex-start;
+  background:
+    radial-gradient(700px 380px at 30% 20%, rgba(255,255,255,.03), transparent 70%);
+  padding:38px 20px;border:1px solid var(--line);border-radius:24px;
+}
+.shot{display:flex;flex-direction:column;align-items:center;gap:14px}
+.shot .cap{
+  font-family:"Space Mono",monospace;font-size:12px;color:var(--muted);
+  letter-spacing:.08em;text-align:center;max-width:300px;
+}
+.shot .cap b{color:var(--paper)}
+
+/* ---------- phone frame ---------- */
+.phone{
+  width:330px;height:680px;border-radius:46px;
+  background:linear-gradient(150deg,#2b2b30,#0c0c0e);
+  padding:12px;
+  box-shadow:0 40px 80px -30px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.05) inset;
+  position:relative;flex:0 0 auto;
+}
+.screen{
+  width:100%;height:100%;border-radius:36px;overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
+}
+.notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  width:118px;height:26px;background:#0c0c0e;border-radius:0 0 16px 16px;z-index:50}
+.statusbar{position:absolute;top:0;left:0;right:0;height:40px;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;
+  font-family:"Space Mono",monospace;font-size:12px;font-weight:700;pointer-events:none}
+
+/* utility shared by screens */
+.sbtime{letter-spacing:.02em}
+.sbicons{display:flex;gap:5px;align-items:center;font-size:11px}
+
+.next{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+@media(max-width:820px){.next{grid-template-columns:1fr}}
+.next .card h3{color:var(--hi);font-size:16px}
+.next .card .stepn{font-family:"Space Mono",monospace;color:var(--muted);font-size:12px;margin-bottom:6px}
+footer.memo{border-top:1px solid var(--line);margin-top:40px;padding-top:26px;color:var(--muted);font-size:13px;font-family:"Space Mono",monospace}

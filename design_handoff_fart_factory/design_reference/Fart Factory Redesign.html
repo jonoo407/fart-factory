@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Fart Factory — Redesign Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Bangers&family=Luckiest+Guy&family=Nunito:wght@400;700;800;900&family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="ff-redesign.css"/>
+<link rel="stylesheet" href="ff-d1.css"/>
+<link rel="stylesheet" href="ff-d2.css"/>
+<link rel="stylesheet" href="ff-d3.css"/>
+</head>
+<body>
+
+<!-- ============ HEADER / MEMO ============ -->
+<header class="memo-hd">
+  <div class="wrap">
+    <div class="kicker">Design memo · Play-screen redesign</div>
+    <h1>Make the one thing you should do<br/><em>impossible to miss</em> — and make the payoff a moment.</h1>
+    <p class="lede">The core loop of <b>The Fart Factory</b> is genuinely good. The problem is staging: every system shouts at equal volume, so a new player (especially a 9-year-old) can't tell what to touch first, and the big reward — the crowd reacting — is a tiny line of text. Here's the re-staging, then three directions to react to.</p>
+    <div class="memo-meta">
+      <span><b>Scope</b> · whole app, screen by screen</span>
+      <span><b>Device</b> · phone-first</span>
+      <span><b>Tone</b> · gross-out &amp; proud</span>
+      <span><b>Audience</b> · 9-yo accessible, adult-deep</span>
+      <span><b>Stage</b> · static mockups → prototype</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ DIAGNOSIS ============ -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">01</span> What's going wrong today</div>
+  <h2 class="sec-h">One screen, fourteen jobs, no leader</h2>
+  <p class="sec-intro">The current play screen stacks the audience card, an eight-button toolbar (gold, notes, Kitchen Mode, Kitchen, Travel, Notebook, Shop, Mute), a daily quest, a belly meter, buffs, the plate, the location, the pantry, the launch button and the result — all at the same visual weight, top to bottom.</p>
+  <div class="diag">
+    <div class="card bad">
+      <h3>The problems</h3>
+      <ul>
+        <li><b>No focal point.</b> The Launch button has the same pull as the mute toggle.</li>
+        <li><b>The goal is buried.</b> What this crowd actually wants is one small italic line.</li>
+        <li><b>The payoff is text.</b> The best moment in the game — the crowd reacting — barely registers.</li>
+        <li><b>Eight systems at once.</b> Shop, Kitchen, Travel, Research, Notebook… all shown before a kid has launched a single fart.</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>The fix, in one sentence</h3>
+      <p>Stage the screen as a <b>three-beat rhythm</b> with a single hero action per beat, blow the reaction up into a full-screen celebration, and reveal the meta-systems one at a time as the player earns them.</p>
+      <ul>
+        <li><b>Read → Build → Blast → React.</b> A clear verb at every step.</li>
+        <li><b>The crowd's craving becomes the headline,</b> shown as icons a 9-yo can read.</li>
+        <li><b>The reaction takes over the screen</b> — faces, stink cloud, a grade that slams down.</li>
+        <li><b>Progressive unlock</b> (the code already has a feature-intro hook) keeps day one to four buttons.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE LOOP ============ -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">02</span> The re-staged loop</div>
+  <h2 class="sec-h">Easy to learn on the surface, deep underneath</h2>
+  <p class="sec-intro">Same mechanics, restaged so the surface reads instantly and the mastery hides one layer down. The seven hidden axes (wet · dry · stink · loud · musical · length · temp) stay — kids match the big icon, adults tune the exact profile.</p>
+  <div class="loop">
+    <div class="beat">
+      <div class="step">BEAT 1</div>
+      <div class="ico">👀</div>
+      <h4>Read the crowd</h4>
+      <p>Who's here and what they're craving — shown as 2–3 big icon tags, not a paragraph.</p>
+      <span class="pill">surface: icons · depth: 7 axes</span>
+    </div>
+    <div class="arrow">→</div>
+    <div class="beat">
+      <div class="step">BEAT 2</div>
+      <div class="ico">🍽️</div>
+      <h4>Load the plate</h4>
+      <p>Tap foods; they fly onto the plate. Belly limits how much fits — the first real decision.</p>
+      <span class="pill">surface: tap · depth: synergy + cost</span>
+    </div>
+    <div class="arrow">→</div>
+    <div class="beat">
+      <div class="step">BEAT 3</div>
+      <div class="ico">💨</div>
+      <h4>Charge &amp; blast</h4>
+      <p>One giant button. Tap to fire — or hold for a timed "perfect charge" multiplier.</p>
+      <span class="pill">surface: tap · depth: timing combo</span>
+    </div>
+    <div class="arrow">→</div>
+    <div class="beat" style="border-color:var(--hi)">
+      <div class="step" style="color:#fff">PAYOFF</div>
+      <div class="ico">🎉</div>
+      <h4>The reaction</h4>
+      <p>Full-screen takeover: crowd loses it, grade slams down, score counts up, loot drops.</p>
+      <span class="pill">the moment everything builds to</span>
+    </div>
+  </div>
+  <p class="dnote"><b>New-player day one shows four things only:</b> the crowd, the plate, the pantry, and BLAST. Gold, Shop, Kitchen, Map, Notebook, Research and Bosses each slide into a bottom dock the first time they're unlocked — so the screen grows with the player instead of overwhelming them on launch.</p>
+</section>
+
+<!-- ============ DIRECTIONS INTRO ============ -->
+<section class="wrap" style="padding-bottom:8px">
+  <div class="sec-label"><span class="n">03</span> Three directions</div>
+  <h2 class="sec-h">Same loop, three personalities</h2>
+  <p class="sec-intro">Each is phone-first and gross-out. They differ in where the energy lives. Every direction is shown on the two screens that matter most: the <b>play screen</b> and the <b>reaction payoff</b>. Pick a lane (or mix) and I'll build it into a full clickable prototype, screen by screen.</p>
+</section>
+
+<!-- ===================================================== -->
+<!-- DIRECTION 1 — THE ORDER TICKET -->
+<!-- ===================================================== -->
+<section class="wrap dir">
+  <div class="dir-hd">
+    <div class="dir-num">1</div>
+    <div class="tt">
+      <div class="dir-tag">Clarity-first · the easy-to-learn champion</div>
+      <h3>The Order Ticket</h3>
+      <p>The crowd hands you an order; you fill it. Chunky, high-contrast, paper-and-toxic-green. Huge tap targets, almost no words, a single green BLAST bar you can't miss. Built so a 9-year-old is launching farts in ten seconds.</p>
+      <div class="dir-wins"><span>fastest to understand</span><span>biggest tap targets</span><span>calmest screen</span></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- D1 PLAY -->
+    <div class="shot">
+      <div class="phone"><div class="screen d1">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d1-top">
+          <div class="d1-menu">☰</div>
+          <div class="d1-day">Day 3 · Hometown</div>
+          <div class="d1-gold">💰 142</div>
+        </div>
+        <div class="d1-body">
+          <div class="d1-ticket">
+            <div class="d1-tk-head">
+              <div class="d1-avatar">👵</div>
+              <div>
+                <div class="d1-tk-name">Granny Edna</div>
+                <div class="d1-tk-role">Today's crowd</div>
+              </div>
+            </div>
+            <div class="d1-bubble">“A polite little tune, dear. Nothing too loud!”</div>
+            <div class="d1-wants">
+              <div class="lbl">She's craving</div>
+              <div class="d1-chips">
+                <span class="d1-chip want big">🎺 Tooty</span>
+                <span class="d1-chip want">🍃 Gentle</span>
+                <span class="d1-chip no"><span class="x">🔊</span> Loud</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="d1-gut">
+            <span class="lbl">Belly</span>
+            <span class="dots"><i class="dot full"></i><i class="dot full"></i><i class="dot full"></i><i class="dot"></i><i class="dot"></i></span>
+          </div>
+
+          <div class="d1-platebox">
+            <div class="lbl">Your brew <span>2 / 4 slots</span></div>
+            <div class="d1-slots">
+              <div class="d1-slot filled">🫘</div>
+              <div class="d1-slot filled">🎶</div>
+              <div class="d1-slot empty">＋</div>
+              <div class="d1-slot empty">＋</div>
+            </div>
+          </div>
+
+          <div class="d1-pantry">
+            <div class="lbl">Pantry — tap to add</div>
+            <div class="d1-pgrid">
+              <div class="d1-pcell"><span class="rar rar-c"></span><span class="em">🫘</span><span class="nm">Beans</span></div>
+              <div class="d1-pcell"><span class="rar rar-c"></span><span class="em">🧀</span><span class="nm">Cheese</span></div>
+              <div class="d1-pcell"><span class="rar rar-c"></span><span class="em">🧅</span><span class="nm">Onion</span></div>
+              <div class="d1-pcell"><span class="rar rar-c"></span><span class="em">🥚</span><span class="nm">Egg</span></div>
+              <div class="d1-pcell"><span class="rar rar-c"></span><span class="em">🧄</span><span class="nm">Garlic</span></div>
+              <div class="d1-pcell"><span class="rar rar-u"></span><span class="em">🥦</span><span class="nm">Broccoli</span></div>
+              <div class="d1-pcell"><span class="rar rar-u"></span><span class="em">🌿</span><span class="nm">'Gus</span></div>
+              <div class="d1-pcell"><span class="rar rar-u"></span><span class="em">🥒</span><span class="nm">Pickle</span></div>
+              <div class="d1-pcell"><span class="rar rar-r"></span><span class="em">🫖</span><span class="nm">Kombucha</span></div>
+              <div class="d1-pcell lock"><span class="em">🔒</span><span class="nm">Locked</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d1-blast">
+          <div class="big">💨 BLAST!</div>
+          <div class="sub">hold to charge</div>
+        </div>
+        <div class="d1-dock">
+          <div class="di on"><span class="e">🎭</span>Stage</div>
+          <div class="di lock"><span class="e">🛒</span>Shop</div>
+          <div class="di lock"><span class="e">🍳</span>Kitchen</div>
+          <div class="di lock"><span class="e">📖</span>Book</div>
+          <div class="di lock"><span class="e">🗺️</span>Map</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>Play screen.</b> Crowd's craving is the headline. One green bar to fire.</div>
+    </div>
+
+    <!-- D1 REACTION -->
+    <div class="shot">
+      <div class="phone"><div class="screen d1r">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d1r-stink"></div>
+        <div class="d1r-confetti">
+          <i style="left:14%;top:30%;background:#ff7a2f;transform:rotate(20deg)"></i>
+          <i style="left:80%;top:24%;background:#231d16;transform:rotate(-15deg)"></i>
+          <i style="left:30%;top:52%;background:#fff;transform:rotate(40deg)"></i>
+          <i style="left:68%;top:60%;background:#ff7a2f;transform:rotate(-30deg)"></i>
+          <i style="left:50%;top:20%;background:#231d16;transform:rotate(10deg)"></i>
+        </div>
+        <div class="d1r-crowd"><span>😂</span><span>🤩</span><span>👵</span><span>😆</span><span>🤣</span></div>
+        <div class="d1r-stamp"><span class="g">A+</span><span class="l">Standing O</span></div>
+        <div class="d1r-card">
+          <div class="d1r-verdict">She wept with joy. 🥹</div>
+          <div class="d1r-match"><i></i><b>92% match</b></div>
+          <div class="d1r-rewards">
+            <div class="d1r-rw"><div class="v">+38 💰</div><div class="k">Gold</div></div>
+            <div class="d1r-rw"><div class="v">+1 ⭐</div><div class="k">Star</div></div>
+            <div class="d1r-rw"><div class="v">x3 🔥</div><div class="k">Streak</div></div>
+          </div>
+        </div>
+        <div class="d1r-new">
+          <span class="em">🎺</span>
+          <div><div class="t1">New recipe discovered</div><div class="t2">The Lullaby Toot</div></div>
+        </div>
+        <div class="d1r-cont">Next crowd ▶</div>
+      </div></div>
+      <div class="cap"><b>The payoff.</b> Crowd erupts, grade slams down, rewards &amp; a new recipe drop.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- DIRECTION 2 — BLAART! ARCADE -->
+<!-- ===================================================== -->
+<section class="wrap dir">
+  <div class="dir-hd">
+    <div class="dir-num">2</div>
+    <div class="tt">
+      <div class="dir-tag">Max juice · the spectacle champion</div>
+      <h3>BLAART! Arcade</h3>
+      <p>A loud Saturday-morning cartoon. The crowd is a living, bouncing mob; the launch is a charge-meter with a sweet spot; the blast detonates the whole screen with comic lettering, a starburst grade and a combo counter. The one that makes kids and adults both crack up.</p>
+      <div class="dir-wins"><span>most fun</span><span>biggest payoff</span><span>built around timing skill</span></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- D2 PLAY -->
+    <div class="shot">
+      <div class="phone"><div class="screen d2">
+        <div class="d2-halftone"></div>
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d2-body">
+          <div class="d2-top">
+            <div class="d2-logo">FART FACTORY</div>
+            <div class="d2-coins">💰 142</div>
+          </div>
+
+          <div class="d2-crowd">
+            <div class="who">The Frat Pack wants…</div>
+            <div class="heads"><span>😎</span><span>🤙</span><span>🧢</span><span>😜</span><span>🤠</span></div>
+            <div class="d2-think">
+              <span class="want">🤢</span><span class="want">🔊</span><span class="want">⏱️</span>
+              <span style="opacity:.4">·</span><span class="nope">💦</span>
+            </div>
+          </div>
+
+          <div class="d2-cannon">
+            <div class="lbl">▸ LOADED IN THE CANNON</div>
+            <div class="d2-loaded">
+              <div class="d2-load">🫘</div>
+              <div class="d2-load">🌶️</div>
+              <div class="d2-load">🧄</div>
+              <div class="d2-load empty">＋</div>
+            </div>
+          </div>
+
+          <div class="d2-cannon">
+            <div class="lbl">▸ PANTRY</div>
+            <div class="d2-pgrid">
+              <div class="d2-pc"><span class="rar rar-c" style="background:#9ca3af"></span><span>🫘</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#9ca3af"></span><span>🧀</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#9ca3af"></span><span>🥚</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#22c55e"></span><span>🌶️</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#22c55e"></span><span>🐟</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#22c55e"></span><span>🥦</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#3b82f6"></span><span>🫖</span></div>
+              <div class="d2-pc"><span class="rar" style="background:#3b82f6"></span><span>🧀</span></div>
+              <div class="d2-pc lock"><span>🔒</span></div>
+              <div class="d2-pc lock"><span>🔒</span></div>
+            </div>
+          </div>
+
+          <div class="d2-charge">
+            <div class="d2-meter">
+              <i></i><span class="sweet"></span>
+              <span class="lbl">HOLD TO CHARGE → HIT THE 💥 ZONE</span>
+            </div>
+            <div class="d2-blast">
+              <div class="b">💥 BLAAART!</div>
+              <div class="s">release in the sweet spot for x2</div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="cap"><b>Play screen.</b> Living crowd up top, charge-meter skill at the bottom.</div>
+    </div>
+
+    <!-- D2 REACTION -->
+    <div class="shot">
+      <div class="phone"><div class="screen d2r">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d2r-rays"></div>
+        <div class="d2r-cloud">💨</div>
+        <div class="d2r-motion" style="left:8%;top:30%;transform:rotate(-20deg)">POW!</div>
+        <div class="d2r-motion" style="right:6%;top:46%;transform:rotate(15deg)">WHIFF!</div>
+        <div class="d2r-shout">
+          <div class="word">BLAAART!!</div>
+          <div class="d2r-combo">🔥 x3 COMBO!</div>
+        </div>
+        <div class="d2r-grade"><span class="star"></span><span class="g">S</span></div>
+        <div class="d2r-crowdrow"><span>🤣</span><span>🤮</span><span>😵</span><span>🤣</span><span>😂</span></div>
+        <div class="d2r-score">+264<small>STINK POINTS</small></div>
+        <div class="d2r-rewards">
+          <div class="d2r-rw gold">+52💰<small>GOLD</small></div>
+          <div class="d2r-rw cyan">🎺💎<small>NEW RECIPE</small></div>
+        </div>
+        <div class="d2r-cont">SMASH FOR NEXT ▶</div>
+      </div></div>
+      <div class="cap"><b>The payoff.</b> Whole screen detonates — comic shout, starburst grade, combo.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- DIRECTION 3 — THE BREW CONSOLE -->
+<!-- ===================================================== -->
+<section class="wrap dir">
+  <div class="dir-hd">
+    <div class="dir-num">3</div>
+    <div class="tt">
+      <div class="dir-tag">Depth-forward · the hard-to-master champion</div>
+      <h3>The Brew Console</h3>
+      <p>A tactile machine you operate. Foods are vials of goo, the plate is a mixing chamber, treatments are knobs, and the launch is a pressure valve. It puts the seven axes on screen as little target windows — so a kid can still tap-and-fire, but an adult can dial in a near-perfect profile. The "premium toy" option.</p>
+      <div class="dir-wins"><span>shows the depth</span><span>most satisfying to master</span><span>homes the Kitchen + treatments</span></div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <!-- D3 PLAY -->
+    <div class="shot">
+      <div class="phone"><div class="screen d3">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d3-body">
+          <div class="d3-client">
+            <div class="d3-cl-top">
+              <div class="d3-cl-av">👑</div>
+              <div>
+                <div class="d3-cl-name">The Royal Court</div>
+                <div class="d3-cl-tag">Client · target profile</div>
+              </div>
+              <div class="d3-cl-diff">HARD</div>
+            </div>
+            <div class="d3-axes">
+              <div class="d3-axis"><span class="k">Stink</span><div class="bar"><span class="win" style="left:62%;width:24%"></span><span class="cur" style="left:70%"></span></div></div>
+              <div class="d3-axis"><span class="k">Loud</span><div class="bar"><span class="win" style="left:48%;width:22%"></span><span class="cur" style="left:55%"></span></div></div>
+              <div class="d3-axis miss"><span class="k">Wet</span><div class="bar"><span class="win" style="left:8%;width:20%"></span><span class="cur" style="left:46%"></span></div></div>
+              <div class="d3-axis"><span class="k">Length</span><div class="bar"><span class="win" style="left:55%;width:26%"></span><span class="cur" style="left:64%"></span></div></div>
+            </div>
+            <div class="d3-cl-rule">⚠ RULE · <b>must include 1 fermented item</b></div>
+          </div>
+
+          <div class="d3-chamber">
+            <div class="d3-ch-h"><span class="t">Mixing chamber</span><span class="p">3 / 4 loaded · belly 11/30</span></div>
+            <div class="d3-tank">
+              <div class="vials">
+                <div class="d3-vial">🥬</div>
+                <div class="d3-vial">🧀</div>
+                <div class="d3-vial">🧄</div>
+              </div>
+              <div class="liquid"></div>
+            </div>
+          </div>
+
+          <div class="d3-knobs">
+            <div class="d3-knob"><div class="dial" style="--deg:200deg"><i style="transform:rotate(20deg)"></i></div><div class="n">Ferment</div><div class="v">+2 stink</div></div>
+            <div class="d3-knob"><div class="dial" style="--deg:120deg"><i style="transform:rotate(-40deg)"></i></div><div class="n">Spice</div><div class="v">+1 temp</div></div>
+            <div class="d3-knob locked"><div class="dial" style="--deg:0deg"><i></i></div><div class="n">Chill</div><div class="v">🔒 Lv.4</div></div>
+          </div>
+
+          <div class="d3-launch">
+            <div class="d3-press"><span class="k">Pressure</span><div class="bar"><i></i></div><span class="pct">78%</span></div>
+            <div class="d3-valve"><div class="t">⟱ RELEASE VALVE</div><div class="s">hold to build pressure · release to fire</div></div>
+          </div>
+        </div>
+        <div class="d3-dock">
+          <div class="di on"><span class="e">⚗️</span>Brew</div>
+          <div class="di"><span class="e">🍳</span>Kitchen</div>
+          <div class="di"><span class="e">🛒</span>Shop</div>
+          <div class="di lock"><span class="e">🗺️</span>Map</div>
+          <div class="di lock"><span class="e">📖</span>Codex</div>
+        </div>
+      </div></div>
+      <div class="cap"><b>Play screen.</b> Target windows you aim into; knobs tune the profile.</div>
+    </div>
+
+    <!-- D3 REACTION -->
+    <div class="shot">
+      <div class="phone"><div class="screen d3 d3r">
+        <div class="notch"></div>
+        <div class="statusbar"><span class="sbtime">9:41</span><span class="sbicons">📶 🔋</span></div>
+        <div class="d3r-h">
+          <div class="ttl">Launch analysis · specimen #0481</div>
+          <div class="verdict">Court bows. 👑</div>
+        </div>
+        <div class="d3r-scope">
+          <div class="grid"></div>
+          <div class="d3r-dial">peak 4.6 / 5.0</div>
+          <svg viewbox="0 0 300 90" preserveaspectratio="none">
+            <polyline points="0,70 30,68 55,66 70,30 85,58 100,20 120,72 140,45 165,12 185,64 205,40 230,66 255,62 300,64"
+              fill="none" stroke="#9ef01a" stroke-width="2.5"/>
+          </svg>
+        </div>
+        <div class="d3r-grade">
+          <div class="ring"><b>A</b></div>
+          <div class="meta">
+            <div class="m1">Profile match</div>
+            <div class="m2">87% — Excellent</div>
+            <div class="m3">3 / 4 axes in window</div>
+          </div>
+        </div>
+        <div class="d3r-pay">
+          <div class="d3r-p gold"><div class="k">Gold earned</div><div class="v">+44</div></div>
+          <div class="d3r-p note"><div class="k">Research notes</div><div class="v">+2</div></div>
+        </div>
+        <div class="d3r-log">
+          <span class="em">🧪</span>
+          <div><div class="t1">Specimen logged to codex</div><div class="t2">Royal Rumbler — Rare</div></div>
+        </div>
+        <div class="d3r-cont">Next client ▶</div>
+      </div></div>
+      <div class="cap"><b>The payoff.</b> Waveform + target-match readout; specimen logged to the codex.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEXT STEPS ============ -->
+<section class="wrap">
+  <div class="sec-label"><span class="n">04</span> Where this goes next</div>
+  <h2 class="sec-h">Pick a lane — or mix them</h2>
+  <p class="sec-intro">These are deliberately distinct so you can react. They also combine well: Order Ticket's clarity for day-one, Arcade's charge-meter + blast for the juice, Console's target-windows as an unlockable "expert view."</p>
+  <div class="next">
+    <div class="card"><div class="stepn">STEP 1</div><h3>You react</h3><p>Tell me which direction (or hybrid) feels right, and what to push further — grossness, juice, depth.</p></div>
+    <div class="card"><div class="stepn">STEP 2</div><h3>I prototype</h3><p>I build the chosen direction into a clickable phone prototype: working pantry → plate → charge → reaction, every screen.</p></div>
+    <div class="card"><div class="stepn">STEP 3</div><h3>We spec the new mechanics</h3><p>Charge-timing combo, progressive unlock dock, target-window matching — written up so Claude Code can wire them into the real build.</p></div>
+  </div>
+  <footer class="memo">The Fart Factory — a serious scientific institution 🧪 · redesign directions v1</footer>
+</section>
+
+</body>
+</html>

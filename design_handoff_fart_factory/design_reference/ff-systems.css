@@ -1,0 +1,290 @@
+/* ============================================================
+   FART FACTORY — Systems spec (Audio · Discovery · Recipes)
+   Built on the Order Ticket language (ff-d1 tokens) + the
+   neutral memo chrome (ff-redesign). Adds diagrams, tables,
+   and new in-game UI states.
+   ============================================================ */
+
+/* ---------- component close-up stage (non-phone UI pieces) ---------- */
+.compo{
+  background:
+    repeating-linear-gradient(0deg,rgba(0,0,0,.014) 0 2px,transparent 2px 4px),
+    var(--d1-paper);
+  border:1px solid var(--line);border-radius:20px;padding:30px 26px;
+  display:flex;flex-wrap:wrap;gap:26px;justify-content:center;align-items:flex-start;
+}
+.compo .shot .cap{color:#8a7d63}
+.compo .shot .cap b{color:var(--d1-ink)}
+.frame{
+  width:300px;background:#fff;border:3px solid var(--d1-ink);border-radius:18px;
+  box-shadow:5px 6px 0 var(--d1-ink);padding:0;overflow:hidden;color:var(--d1-ink);
+  font-family:"Nunito",sans-serif;
+}
+.frame.wide{width:330px}
+
+/* ---------- AUDIO: layer stack ---------- */
+.layers{display:flex;flex-direction:column;gap:10px;margin-top:30px}
+.layer{display:flex;align-items:center;gap:16px;border:1px solid var(--line);border-radius:14px;
+  padding:15px 18px;background:linear-gradient(90deg, color-mix(in srgb, var(--accent,#ffd56b) 13%, transparent) 0%, transparent 58%), var(--page-2)}
+.layer .ix{width:46px;height:46px;border-radius:12px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  font-size:24px;background:#0c0c0e;border:1px solid var(--line)}
+.layer .tx{flex:1}
+.layer .tx h4{font-family:"Space Grotesk",sans-serif;font-size:16px;letter-spacing:-.01em;margin-bottom:2px}
+.layer .tx h4 b{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent,#ffd56b);margin-left:8px;font-weight:400}
+.layer .tx p{font-size:13.5px;color:var(--soft)}
+.layer .vol{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:0 0 auto;text-align:right;width:80px}
+
+/* ---------- AUDIO: instrument map ---------- */
+.imap{margin-top:28px;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.imap .row{display:grid;grid-template-columns:130px 1fr 92px;gap:0;border-bottom:1px solid var(--line)}
+.imap .row:last-child{border-bottom:none}
+.imap .row.h{background:var(--page-2);font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted)}
+.imap .row.h>div{padding:11px 16px}
+.imap .row>div{padding:13px 16px;display:flex;align-items:center}
+.imap .ax{gap:9px;font-family:"Space Grotesk";font-weight:700;font-size:14.5px;border-right:1px solid var(--line)}
+.imap .ax .e{font-size:18px}
+.imap .so{color:var(--soft);font-size:13.5px;line-height:1.4}
+.imap .wf{border-left:1px solid var(--line);justify-content:center;color:var(--hi);font-family:"Space Mono";font-size:11px;letter-spacing:.05em}
+.imap .row:nth-child(even){background:rgba(255,255,255,.012)}
+
+/* ---------- AUDIO: cue sheet ---------- */
+.cue{margin-top:26px;border:1px solid var(--line);border-radius:16px;overflow:hidden;font-size:13px}
+.cue .r{display:grid;grid-template-columns:118px 1fr 1fr 1fr;border-bottom:1px solid var(--line)}
+.cue .r:last-child{border-bottom:none}
+.cue .r.h{background:var(--page-2);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cue .r>div{padding:11px 14px;border-right:1px solid var(--line)}
+.cue .r>div:last-child{border-right:none}
+.cue .r .scr{font-family:"Space Grotesk";font-weight:700;color:var(--paper);font-size:13px}
+.cue .r .c{color:var(--soft);line-height:1.35}
+.cue .r .c b{color:var(--hi);font-weight:400;font-family:"Space Mono";font-size:11px}
+
+/* ---------- AUDIO: voices ---------- */
+.voices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+@media(max-width:820px){.voices{grid-template-columns:1fr 1fr}.imap .row{grid-template-columns:110px 1fr 60px}.cue .r{grid-template-columns:1fr}}
+.vcard{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--page-2)}
+.vcard .top{display:flex;align-items:center;gap:11px;margin-bottom:9px}
+.vcard .av{width:42px;height:42px;border-radius:50%;background:#0c0c0e;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px}
+.vcard .nm{font-family:"Space Grotesk";font-weight:700;font-size:15px;line-height:1.05}
+.vcard .ty{font-family:"Space Mono";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--hi)}
+.vcard .ln{font-size:12.5px;color:var(--soft);font-style:italic;line-height:1.45;border-left:2px solid var(--line);padding-left:10px;margin-top:7px}
+
+/* ---------- AUDIO settings (in-game, Order Ticket) ---------- */
+.set-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:2px dashed #d8cbb0}
+.set-row:last-child{border-bottom:none}
+.set-row .e{font-size:22px;width:28px;text-align:center}
+.set-row .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:14px;flex:0 0 96px}
+.set-track{flex:1;height:14px;border-radius:999px;background:var(--d1-paper2);border:2.5px solid var(--d1-ink);position:relative}
+.set-track i{position:absolute;top:-3px;bottom:-3px;left:0;background:var(--d1-green);border-radius:999px}
+.set-track .knob{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid var(--d1-ink);transform:translate(-50%,-50%);box-shadow:1px 1px 0 var(--d1-ink)}
+.set-toggle{flex:0 0 auto;width:48px;height:26px;border-radius:999px;border:2.5px solid var(--d1-ink);position:relative;background:var(--d1-green)}
+.set-toggle.off{background:var(--d1-paper2)}
+.set-toggle::after{content:"";position:absolute;top:1px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--d1-ink);right:1px}
+.set-toggle.off::after{right:auto;left:1px}
+
+/* caption bubble */
+.cap-bubble{position:absolute;left:14px;right:14px;bottom:14px;z-index:6;background:rgba(35,29,22,.92);color:#fff;
+  border-radius:13px;padding:9px 13px;font-family:"Baloo 2",cursive;font-weight:700;font-size:13px;text-align:center;border:2px solid #fff}
+.cap-bubble .who{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--d1-green);margin-bottom:2px}
+
+/* mini speaker viz on reaction */
+.sfx-tag{display:inline-flex;align-items:center;gap:6px;font-family:"Space Mono";font-size:11px;color:var(--muted);
+  border:1px solid var(--line);border-radius:999px;padding:4px 11px;margin-top:14px}
+.sfx-tag .bars{display:inline-flex;gap:2px;align-items:flex-end;height:13px}
+.sfx-tag .bars i{width:2.5px;background:var(--hi);border-radius:1px}
+
+/* ---------- DISCOVERY: mastery pantry tiles ---------- */
+.tile-row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.mtile{width:118px;text-align:center}
+.mtile .cell{aspect-ratio:1;border-radius:16px;border:3px solid var(--d1-ink);background:#fff;box-shadow:3px 3px 0 var(--d1-ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;padding:8px}
+.mtile .em{font-size:38px;line-height:1}
+.mtile .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:13px}
+.mtile .stat{display:flex;gap:3px;justify-content:center}
+.mtile .stat .s{width:10px;height:10px;border-radius:3px;background:var(--d1-paper2);border:1.5px solid var(--d1-ink)}
+.mtile .stat .s.q{background:repeating-linear-gradient(45deg,#cabfa9 0 3px,#fff 3px 6px)}
+.mtile .stat .s.on{background:var(--d1-green)}
+.mtile .stat .s.hot{background:var(--d1-orange)}
+.mtile .mlvl{position:absolute;top:5px;right:7px;font-family:"Baloo 2";font-weight:800;font-size:9px;color:#8a7d63}
+.mtile .cap2{font-family:"Space Mono";font-size:10px;color:#8a7d63;margin-top:9px;line-height:1.3;display:block}
+.mtile .cap2 b{color:var(--d1-ink)}
+.mtile.fog .em{filter:blur(.4px);opacity:.85}
+.mtile .qmark{font-size:34px;font-family:"Baloo 2";font-weight:800;color:#c9bd9f}
+
+/* field guide card */
+.fg-head{display:flex;align-items:center;gap:12px;padding:14px;border-bottom:3px solid var(--d1-ink)}
+.fg-head .em{width:52px;height:52px;border-radius:13px;background:var(--d1-paper);border:2.5px solid var(--d1-ink);
+  display:flex;align-items:center;justify-content:center;font-size:30px}
+.fg-head .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:18px;line-height:1}
+.fg-head .ml{font-family:"Space Mono";font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--d1-orange);margin-top:2px}
+.fg-head .stars{margin-left:auto;font-size:13px;letter-spacing:1px}
+.fg-body{padding:14px}
+.fg-axis{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.fg-axis .k{font-family:"Baloo 2";font-weight:800;font-size:11px;width:64px;text-transform:uppercase;letter-spacing:.03em}
+.fg-axis .bar{flex:1;height:11px;border-radius:999px;background:var(--d1-paper2);border:2px solid var(--d1-ink);overflow:hidden;position:relative}
+.fg-axis .bar i{position:absolute;inset:0;background:var(--d1-green)}
+.fg-axis.unknown .bar{background:repeating-linear-gradient(45deg,#e4d8bd 0 6px,#f4ecd8 6px 12px)}
+.fg-axis.unknown .k{color:#b3a587}
+.fg-axis .qm{font-family:"Baloo 2";font-weight:800;font-size:11px;color:#b3a587}
+.fg-note{font-size:11.5px;font-weight:700;color:#8a7d63;font-style:italic;border-top:2px dashed #d8cbb0;padding-top:10px;margin-top:4px}
+
+/* "you learned" toast */
+.learn{width:300px;background:var(--d1-green);border:3px solid var(--d1-ink);border-radius:16px;box-shadow:5px 6px 0 var(--d1-ink);
+  padding:13px 15px;display:flex;align-items:center;gap:12px;color:var(--d1-ink)}
+.learn .em{font-size:34px}
+.learn .t1{font-family:"Space Mono";font-size:9px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.learn .t2{font-family:"Baloo 2";font-weight:800;font-size:16px;line-height:1.05;margin-top:2px}
+
+/* ---------- RECIPES: activated ribbon ---------- */
+.ribbon{width:300px;background:linear-gradient(180deg,#fff,#fff);border:3px solid var(--d1-ink);border-radius:15px;
+  box-shadow:4px 5px 0 var(--d1-ink);overflow:hidden}
+.ribbon .top{background:linear-gradient(90deg,var(--d1-orange),#ff9a52);padding:7px 14px;display:flex;align-items:center;gap:8px;
+  font-family:"Baloo 2",cursive;font-weight:800;font-size:13px;color:#fff;letter-spacing:.04em;border-bottom:3px solid var(--d1-ink)}
+.ribbon .bd{padding:12px 14px}
+.ribbon .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:19px;display:flex;align-items:center;gap:9px}
+.ribbon .foods{font-size:16px}
+.ribbon .eff{display:flex;align-items:center;gap:8px;margin-top:9px;background:#eafad0;border:2.5px solid var(--d1-green-d);
+  border-radius:11px;padding:8px 11px;font-family:"Baloo 2";font-weight:800;font-size:13px}
+.ribbon .eff .e{font-size:17px}
+.ribbon .sig{font-size:10.5px;font-weight:700;color:#8a7d63;margin-top:8px;display:flex;align-items:center;gap:6px}
+
+/* recipe card v2 (notebook) */
+.rc2{width:300px;background:#fff;border:3px solid var(--d1-ink);border-radius:15px;box-shadow:4px 5px 0 var(--d1-ink);overflow:hidden}
+.rc2 .top{display:flex;align-items:center;gap:10px;padding:12px 13px;border-bottom:2px dashed #d8cbb0}
+.rc2 .foods{font-size:24px}
+.rc2 .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:17px;line-height:1}
+.rc2 .rtag{font-family:"Space Mono";font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+.rc2 .stars{margin-left:auto;font-size:14px;letter-spacing:1px;text-align:right}
+.rc2 .stars small{display:block;font-family:"Space Mono";font-size:8px;color:#8a7d63;letter-spacing:.05em}
+.rc2 .bd{padding:12px 13px;display:flex;flex-direction:column;gap:9px}
+.rc2 .eff{display:flex;align-items:center;gap:9px;background:#eafad0;border:2.5px solid var(--d1-green-d);border-radius:11px;padding:8px 11px}
+.rc2 .eff .e{font-size:18px}
+.rc2 .eff .tx{font-size:12px;font-weight:800}
+.rc2 .eff .tx b{color:var(--d1-green-d)}
+.rc2 .meta{display:flex;justify-content:space-between;align-items:center}
+.rc2 .mxp{flex:1;margin-right:11px}
+.rc2 .mxp .bar{height:10px;border-radius:999px;background:var(--d1-paper2);border:2px solid var(--d1-ink);overflow:hidden;position:relative}
+.rc2 .mxp .bar i{position:absolute;inset:0;background:var(--d1-orange);width:60%}
+.rc2 .mxp .t{font-family:"Space Mono";font-size:8.5px;color:#8a7d63;margin-top:3px}
+.rc2 .cook{padding:8px 14px;border-radius:10px;border:2.5px solid var(--d1-ink);background:var(--d1-green);
+  font-family:"Baloo 2",cursive;font-weight:800;font-size:13px;color:var(--d1-ink)}
+
+/* score breakdown */
+.bd-card{width:300px;background:#fff;border:3px solid var(--d1-ink);border-radius:15px;box-shadow:4px 5px 0 var(--d1-ink);overflow:hidden}
+.bd-card .h{padding:11px 14px;border-bottom:3px solid var(--d1-ink);font-family:"Baloo 2",cursive;font-weight:800;font-size:15px;display:flex;justify-content:space-between}
+.bd-line{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:2px dashed #d8cbb0;font-size:13px;font-weight:700}
+.bd-line .l{display:flex;align-items:center;gap:8px;color:#5a4f3d}
+.bd-line .v{font-family:"Baloo 2",cursive;font-weight:800}
+.bd-line .v.plus{color:var(--d1-green-d)}
+.bd-line.base .l{color:var(--d1-ink)}
+.bd-tot{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#eafad0}
+.bd-tot .l{font-family:"Baloo 2",cursive;font-weight:800;font-size:15px}
+.bd-tot .v{font-family:"Baloo 2",cursive;font-weight:800;font-size:26px;color:var(--d1-green-d);display:flex;align-items:center;gap:8px}
+.bd-tot .g{font-size:18px;color:var(--d1-orange)}
+
+/* effect-type legend */
+.eff-legend{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:24px}
+@media(max-width:820px){.eff-legend{grid-template-columns:1fr 1fr}}
+.eff-legend .e{border:1px solid var(--line);border-radius:13px;padding:14px;background:var(--page-2);text-align:center}
+.eff-legend .e .ic{font-size:26px}
+.eff-legend .e h5{font-family:"Space Grotesk";font-weight:700;font-size:13px;margin:7px 0 4px}
+.eff-legend .e p{font-size:11.5px;color:var(--muted);line-height:1.35}
+
+/* small inline note under a compo */
+.compo-note{flex-basis:100%;text-align:center;color:var(--muted);font-family:"Space Mono";font-size:11.5px;margin-top:2px}
+
+/* ============================================================
+   v2 ADDITIONS — axis-icon reveal, sound bank, crowd rarity,
+   venue level-ladder
+   ============================================================ */
+
+/* ---------- axis-icon stat chips (replaces plain green squares) ---------- */
+.axset{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;margin-top:2px}
+.axchip{display:flex;align-items:center;gap:3px;font-size:13px;line-height:1;
+  padding:3px 6px;border-radius:8px;border:2px solid var(--d1-ink);background:#fff}
+.axchip .lv{font-family:"Baloo 2",cursive;font-weight:800;font-size:10px;color:var(--d1-green-d)}
+.axchip .lv.hot{color:var(--d1-orange)}
+.axchip.unk{background:repeating-linear-gradient(45deg,#e7dcc1 0 4px,#fff 4px 8px);border-style:dashed;color:#b3a587}
+.axchip.unk .q{font-family:"Baloo 2",cursive;font-weight:800}
+.axchip.justrevealed{box-shadow:0 0 0 3px rgba(143,209,30,.5);position:relative}
+.axchip.justrevealed::after{content:"NEW";position:absolute;top:-9px;right:-6px;font-family:"Space Mono";font-size:7px;font-weight:700;
+  background:var(--d1-green-d);color:#fff;border-radius:5px;padding:1px 3px;letter-spacing:.04em}
+
+/* ---------- sound-bank budget table ---------- */
+.bank{margin-top:26px;border:1px solid var(--line);border-radius:16px;overflow:hidden;font-size:13px}
+.bank .r{display:grid;grid-template-columns:1fr 2fr 74px;border-bottom:1px solid var(--line)}
+.bank .r:last-child{border-bottom:none}
+.bank .r.h{background:var(--page-2);font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.bank .r>div{padding:11px 15px;border-right:1px solid var(--line)}
+.bank .r>div:last-child{border-right:none}
+.bank .r .cat{font-family:"Space Grotesk";font-weight:700;color:var(--paper);display:flex;align-items:center;gap:8px}
+.bank .r .ds{color:var(--soft);line-height:1.35}
+.bank .r .ct{font-family:"Space Mono";color:var(--hi);text-align:right;font-weight:700}
+.bank .r.tot{background:rgba(143,209,30,.08)}
+.bank .r.tot .cat{color:#9ee06a}
+.bank .r.tot .ct{color:#9ee06a;font-size:15px}
+
+/* ---------- crowd rarity / difficulty mini cards ---------- */
+.cmini{width:236px;background:#fff;border:3px solid var(--d1-ink);border-radius:16px;box-shadow:4px 5px 0 var(--d1-ink);
+  padding:16px 14px 14px;text-align:center;position:relative}
+.cmini .rar{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;
+  font-family:"Space Mono";font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  border:2px solid var(--d1-ink);border-radius:999px;padding:2px 10px;color:#fff}
+.cmini .ring{width:72px;height:72px;border-radius:50%;margin:4px auto 0;display:flex;align-items:center;justify-content:center;
+  font-size:38px;background:var(--d1-paper);border:4px solid #9ca3af}
+.cmini .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:17px;margin-top:8px;line-height:1}
+.cmini .diff{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:5px;
+  font-family:"Space Mono";font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#8a7d63}
+.cmini .diff .pips{letter-spacing:1px}
+.cmini .want{display:flex;gap:5px;justify-content:center;margin-top:9px}
+.cmini .want span{font-size:11px;border:2px solid var(--d1-ink);border-radius:7px;padding:2px 6px;background:var(--d1-paper)}
+.cmini .reward{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:11px;padding-top:10px;
+  border-top:2px dashed #d8cbb0;font-family:"Baloo 2",cursive;font-weight:800;font-size:12px}
+.cmini .reward .e{font-size:15px}
+/* rare/elite glow */
+.cmini.rarevip{border-color:#b8860b;box-shadow:4px 5px 0 #8a6508, 0 0 22px rgba(245,158,11,.45)}
+.cmini.rarevip .ring{border-color:#f59e0b;box-shadow:0 0 14px rgba(245,158,11,.6)}
+.cmini.rarevip .rar{background:#f59e0b}
+.cmini.common .rar{background:#9ca3af}
+
+/* ---------- venue level-ladder ---------- */
+.venue{flex:1;position:relative;min-height:430px;border:2.5px solid var(--d1-ink);border-radius:16px;
+  background:
+    radial-gradient(circle at 78% 16%, #d7e9f6 0%, transparent 40%),
+    radial-gradient(circle at 22% 84%, #e7f3c8 0%, transparent 42%),
+    var(--d1-paper2);
+  box-shadow:inset 0 0 0 3px #fff;overflow:hidden}
+.venue svg{position:absolute;inset:0;width:100%;height:100%}
+.vnode{position:absolute;transform:translate(-50%,-50%);width:74px;text-align:center}
+.vnode .circle{width:50px;height:50px;border-radius:50%;border:3px solid var(--d1-ink);background:#fff;margin:0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:3px 3px 0 var(--d1-ink);position:relative}
+.vnode .stars{height:13px;font-size:11px;line-height:1;letter-spacing:-1px;margin-bottom:3px;color:var(--d1-orange)}
+.vnode .lab{font-family:"Baloo 2",cursive;font-weight:800;font-size:9px;margin-top:3px;line-height:1.1}
+.vnode.done .circle{background:var(--d1-green)}
+.vnode.cur .circle{background:var(--d1-orange);color:#fff;animation:vpulse 1.4s ease-in-out infinite}
+@keyframes vpulse{0%,100%{box-shadow:3px 3px 0 var(--d1-ink),0 0 0 0 rgba(255,122,47,.5)}50%{box-shadow:3px 3px 0 var(--d1-ink),0 0 0 9px rgba(255,122,47,0)}}
+.vnode.lock .circle{background:var(--d1-paper2);color:#b3a587}
+.vnode.lock .circle span{filter:grayscale(1);opacity:.5}
+.vnode.lock .lab{color:#8a7d63}
+.vnode.rare .circle{border-color:#b8860b;box-shadow:3px 3px 0 #8a6508,0 0 14px rgba(245,158,11,.55);background:#fff7e6}
+.vnode.boss .circle{width:64px;height:64px;font-size:32px;border-color:#fff;background:radial-gradient(circle at 40% 35%,#ff9a52,#c2410c);
+  box-shadow:0 0 0 4px var(--d1-orange),3px 5px 0 rgba(0,0,0,.35);color:#fff}
+.vnode .newtag{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:"Space Mono";font-size:7.5px;font-weight:700;
+  background:#3b82f6;color:#fff;border:2px solid var(--d1-ink);border-radius:6px;padding:1px 5px;letter-spacing:.05em;white-space:nowrap;z-index:3}
+.venue-foot{display:flex;align-items:center;gap:11px;background:#fff;border:2.5px solid var(--d1-ink);border-radius:13px;
+  box-shadow:3px 3px 0 var(--d1-ink);padding:9px 12px;margin-top:11px}
+.venue-foot .av{width:42px;height:42px;border-radius:50%;background:var(--d1-paper);border:3px solid #f59e0b;
+  display:flex;align-items:center;justify-content:center;font-size:23px;flex:0 0 auto;box-shadow:0 0 10px rgba(245,158,11,.5)}
+.venue-foot .nm{font-family:"Baloo 2",cursive;font-weight:800;font-size:14px;line-height:1}
+.venue-foot .ds{font-size:10px;font-weight:700;color:#8a7d63}
+
+/* nested-loop cards */
+.nest{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+@media(max-width:820px){.nest{grid-template-columns:1fr}.bank .r{grid-template-columns:1fr 1.4fr 56px}.cmini{width:100%;max-width:260px}}
+.nest .lp{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--page-2);position:relative}
+.nest .lp .tier{font-family:"Space Mono";font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--hi)}
+.nest .lp .ic{font-size:30px;margin:8px 0 6px}
+.nest .lp h4{font-family:"Space Grotesk";font-weight:700;font-size:18px;margin-bottom:6px;letter-spacing:-.01em}
+.nest .lp p{font-size:13.5px;color:var(--soft);line-height:1.45}
+.nest .lp .out{margin-top:11px;font-family:"Space Mono";font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:9px}
+.nest .lp .out b{color:var(--paper);font-weight:400}
