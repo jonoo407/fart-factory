@@ -18,14 +18,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-  /*
-   * V23 / docs/PALETTE.md §3: handwritten primary, handwritten Apple
-   * fallback, deterministic system-ui last-resort. Replaces the prior
-   * 'cursive' fallback which was non-deterministic across OSes.
-   */
-  font-family: 'Comic Sans MS', 'Marker Felt', system-ui, sans-serif;
-  background: linear-gradient(180deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
-  color: #fff;
+  /* PLAN v9 P4 / 04 §1 — Order Ticket: paper & ink, Nunito body, 2px scanline. */
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  background-color: var(--paper);
+  background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.014) 0 2px, transparent 2px 4px);
+  color: var(--ink);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -3208,3 +3206,128 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 .recipe-ribbon .rb-nm { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px; }
 .recipe-ribbon .rb-ef { font-size: 10.5px; opacity: 0.85; }
 @keyframes ribbon-in { from { transform: translateY(-6px) scale(0.96); } to { transform: translateY(0) scale(1); } }
+
+/* ============================================================
+   PLAN v9 P4 — Order Ticket theme override layer (04 §1).
+   Re-skins the dark-glow play screen to paper & ink with hard
+   offset shadows + the "sticker" press idiom. Appended last so
+   these rules win over the legacy theme without rewriting it.
+   ============================================================ */
+
+h1, .subtitle, h2, h3 { color: var(--ink) !important; text-shadow: none !important; font-family: 'Baloo 2', sans-serif; }
+h1 { font-weight: 800; }
+
+/* shell + cards → white/paper with ink border + hard shadow */
+.story-shell,
+.audience-wrap,
+.daily-quest-strip,
+.shop-modal-card, .notebook-modal-card, .research-modal-card, .map-screen-card,
+.kitchen-overlay-card, .arena-card, .intermission-card, .codex-picker-card {
+  background: #fff !important;
+  border: 3px solid var(--ink) !important;
+  border-radius: 16px !important;
+  box-shadow: 4px 4px 0 var(--ink) !important;
+  color: var(--ink) !important;
+}
+.story-shell { background: var(--paper) !important; }
+
+/* the crowd ticket (audience portrait area) */
+.audience-portrait {
+  background: var(--paper2) !important;
+  border: 3px solid var(--ink) !important;
+  box-shadow: 2px 2px 0 var(--ink) !important;
+  color: var(--ink) !important;
+}
+.audience-name { color: var(--ink) !important; font-family: 'Baloo 2', sans-serif; font-weight: 800; }
+.audience-flavor { color: var(--muted) !important; }
+
+/* generic text inside the shell */
+.story-shell .area-display-prefix,
+.story-shell .plate-label,
+.story-shell .pantry-label,
+.belly-meter-label, .belly-value { color: var(--ink) !important; }
+
+/* belly meter */
+.belly-track { background: var(--paper2) !important; border: 2.5px solid var(--ink) !important; border-radius: 999px !important; }
+.belly-fill { background: linear-gradient(180deg, var(--green), var(--green-d)) !important; box-shadow: none !important; }
+
+/* plate + slots */
+.plate-slot {
+  background: var(--paper2) !important;
+  border: 2.5px dashed var(--ink) !important;
+  border-radius: 13px !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+}
+.plate-slot-filled { border-style: solid !important; background: #fff !important; box-shadow: 2px 2px 0 var(--ink) !important; }
+
+/* pantry tiles */
+.food-card {
+  background: #fff !important;
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 13px !important;
+  box-shadow: 2px 2px 0 var(--ink) !important;
+  color: var(--ink) !important;
+}
+.food-card-locked { opacity: 0.5 !important; }
+.food-card .food-name { color: var(--ink) !important; }
+.food-card .food-cost { color: var(--muted) !important; }
+
+/* all sticker buttons: ink border, hard shadow, press translate */
+.btn, .chip-btn, .progression-stat-btn, .kitchen-mode-toggle, .move-on-btn,
+.area-display-change, .pantry-toggle, .save-io-btn, .onboarding-next, .onboarding-skip,
+.cta-big, .cta-ghost, .feature-intro-cta {
+  background: #fff !important;
+  color: var(--ink) !important;
+  border: 2.5px solid var(--ink) !important;
+  border-radius: 12px !important;
+  box-shadow: 3px 3px 0 var(--ink) !important;
+  font-family: 'Baloo 2', sans-serif !important;
+  font-weight: 800 !important;
+  text-shadow: none !important;
+}
+.btn:active, .chip-btn:active, .progression-stat-btn:active, .kitchen-mode-toggle:active,
+.move-on-btn:active, .area-display-change:active, .pantry-toggle:active, .save-io-btn:active,
+.onboarding-next:active, .onboarding-skip:active, .cta-big:active, .cta-ghost:active,
+.food-card-clickable:active, .feature-intro-cta:active {
+  transform: translate(3px, 3px) !important;
+  box-shadow: 0 0 0 var(--ink) !important;
+}
+
+/* the BLAST button — toxic green hero */
+.btn.launch, #storyLaunchBtn {
+  background: linear-gradient(180deg, var(--green), var(--green-d)) !important;
+  color: var(--ink) !important;
+  border: 3px solid var(--ink) !important;
+  border-radius: 16px !important;
+  box-shadow: 5px 6px 0 var(--ink) !important;
+  font-size: 20px !important;
+}
+.btn.launch:active, #storyLaunchBtn:active { transform: translate(5px, 6px) !important; box-shadow: 0 0 0 var(--ink) !important; }
+
+/* equipped-treatment Kitchen tab goes orange (04 §2) */
+.kitchen-mode-toggle[aria-pressed="true"] { background: var(--orange) !important; color: #fff !important; }
+
+/* daily quest + hint chips */
+.hint-chip, .active-buff-chip { background: var(--paper2) !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
+
+/* modal overlays: dim with ink, not purple glow */
+.shop-modal, .notebook-modal, .research-modal, .map-screen, .codex-picker-modal { background: rgba(35, 29, 22, 0.55) !important; }
+
+footer { color: var(--muted) !important; }
+
+/* PLAN v9 P4 — crowd ticket "they're craving" chips */
+#audienceCravings { display: block; margin-top: 8px; }
+.craving-label { font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 4px; }
+.craving-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.craving-chip {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 4px 9px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.craving-chip.want { background: var(--green); color: var(--ink); }
+.craving-chip.no { background: #fff; color: var(--ink); text-decoration: line-through; text-decoration-color: #ef4444; }

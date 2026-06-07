@@ -137,7 +137,8 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **NEW mechanic — food-grants-on-intro** (uncovered acceptance, 05 §2/01 §7.4): add `grant?` to `Audience` + wire intro-card dismissal to add the food to the pantry. RED: `crowd-grant.test.ts` — Granny grants broccoli, Frat grants pepper, once.
 - **VERIFY (Rule 3):** fresh food shows ✨+dots; after one launch its strongest axis appears on the tile + field guide; `kombucha+broccoli` shows the Lullaby ribbon **before** blasting; extra foods suppress it.
 
-### Phase 4 — Order Ticket visual language · effort XL  *(04 §1 — full re-theme; no scoring dep)*
+### Phase 4 — Order Ticket visual language · effort XL · ✅ DONE (theme + ticket chips; fixed-dock deferred)  *(04 §1 — full re-theme; no scoring dep)*
+> Implemented as an appended override layer (paper-ink, hard-shadow press idiom, toxic-green BLAST, 3 webfonts) + crowd-ticket craving chips. The full fixed Stage/Shop/Kitchen/Book/Venue **dock** is deferred — the existing nav buttons are re-skinned as sticker buttons and remain functional. Browser-verified: body=paper, BLAST=green w/ zero-blur shadow.
 - **NEW** `tests/unit/design-tokens.test.ts` (parse `style.css` text → `:root` defines the 14 tokens) and `fonts-loaded.test.ts` (index.html links Baloo 2 / Nunito / Space Mono; body no longer Comic Sans). RED today.
 - **MODIFY** `index.html`: load the 3 webfonts.
 - **MODIFY** `src/style.css`: add `:root` tokens; invert palette to **paper-ink**; replace press idiom (`scale(0.95)` → `translate(2px,2px)` + collapse hard-offset shadow) everywhere; toxic-green `.launch`; 2px scanline paper texture. **Retain existing class names / DOM ids** (re-theme in place — do NOT rename to the prototype's `.ticket/.pcell/.blast`) so `ui/*.ts` and geometry tests don't churn.

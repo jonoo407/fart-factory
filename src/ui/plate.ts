@@ -81,6 +81,7 @@ import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
 import { axisEmoji } from './axis-emoji';
 import { matchRecipe } from '../state/recipes';
+import { renderCravingChipsHtml } from './crowd-ticket';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
 import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
@@ -509,8 +510,12 @@ export function renderAudiencePortrait(): void {
     nameEl.setAttribute('data-audience-id', aud.id);
   }
   if (flavorEl) flavorEl.textContent = aud.description;
-  // Hide legacy cravings/restrictions DOM (T6 — exposition is gone).
-  if (cravingsEl) cravingsEl.textContent = '';
+  // PLAN v9 P4 — the Order Ticket "They're craving" chips (labels only, no
+  // integers). The prose `description` remains the speech-bubble hint.
+  if (cravingsEl) {
+    cravingsEl.innerHTML = renderCravingChipsHtml(aud);
+    cravingsEl.removeAttribute('hidden');
+  }
   if (restrictionsEl) restrictionsEl.textContent = '';
   maybeGrantOnEncounter(aud);
 }
