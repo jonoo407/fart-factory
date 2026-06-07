@@ -91,7 +91,7 @@ Each phase: **RED** (write failing tests) → **GREEN** (minimal impl) → **VER
 **RECONCILE** (existing tests to update). UI phases require **Rule 3** behavioral verification (Preview MCP at a
 phone viewport) — "tests pass" is necessary, not sufficient.
 
-### Phase 0 — Foundations (no UI, pure data) · effort M
+### Phase 0 — Foundations (no UI, pure data) · effort M · ✅ DONE (commit 9ba33f5)
 **Goal:** make the rest writable. No behavior visible to the player yet.
 - **NEW** `src/scoring/tuning.ts` (all constants, §1). RED: `tuning.test.ts` asserts the pinned values.
 - **MODIFY** `src/state/audience.ts`: add `deriveWants(audience) → {axis,target(0–1),weight,hate}[]` mapping
@@ -105,7 +105,7 @@ phone viewport) — "tests pass" is necessary, not sufficient.
   (`fart_intro_<id>`). RED: `persistence.test.ts` additive cases (default 0/0/null/false; ratchet/idempotent).
 - **VERIFY:** `npm test` — new files green, **all 673 existing still green** (changes are additive).
 
-### Phase 1 — Scoring core + charge math · effort L  *(06 §7 step 1 — biggest gameplay win, lowest UI risk)*
+### Phase 1 — Scoring core + charge math · effort L · ✅ DONE (commit 0884b69)  *(06 §7 step 1 — biggest gameplay win, lowest UI risk)*
 **Goal:** the "instantly 80%" fix, behind existing signatures.
 - **NEW** `src/scoring/charge.ts`: pure `chargeQuality(value, heldMs)`. RED: `charge-meter.test.ts` (all 5 bands + the `<200ms` short-circuit).
 - **NEW** `tests/unit/prototype-parity.test.ts` + a small `tests/fixtures/proto.ts` (the prototype's foods/crowds/recipes). RED: asserts every golden number in §2 table.
