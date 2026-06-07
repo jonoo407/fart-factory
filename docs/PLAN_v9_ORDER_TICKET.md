@@ -147,7 +147,8 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **MODIFY** shop/kitchen/notebook(lab-book) to the Order-Ticket card language (04 §4/§5/§6) — **uncovered re-skin scope** flagged by the audit.
 - **VERIFY (Rule 3):** `order-ticket-theme.spec.ts` e2e — body bg = paper cream, launch button shadow matches `/\d+px \d+px 0px/` (zero blur); `touch-targets.spec.ts` still ≥44px; screenshot the play screen.
 
-### Phase 5 — Progression screens · effort L  *(04 §7/§8/§9/§10)*
+### Phase 5 — Progression screens · effort L · ✅ DONE (ladder + onboarding + reduced-motion; boss/intermission polish deferred)  *(04 §7/§8/§9/§10)*
+> Done: venue-ladder.ts (region roster node states done/current/upcoming/boss, browser-verified), the 3rd onboarding card (04 §10), reduced-motion opacity:1 fallback for splash cards. Deferred polish: the boss-arena orange-hazard reskin (bosses already consume the new scorer via boss-match) and the intermission +20%-loud buff card; venue *windowing* to ~6 shows (currently shows the full region roster).
 - **NEW** `src/ui/venue-ladder.ts` (ports `Ladder`, D7 region-scoped): node states done/current/locked/rare/boss from per-crowd stars + position; NEW FOOD/VIP tags; next-crowd footer; "Play {next} ▶". RED: `venue-ladder.test.ts` (node-state + next-crowd selector — DOM not reachable in vitest).
 - **MODIFY** `src/ui/boss-arena.ts`: orange-hazard reskin that consumes the new scoring/charge/judge-card/gate (uncovered).
 - **MODIFY** `src/ui/intermission.ts`: the 3 choice cards incl. **Practice +20%-loud-next-blast** (a NEW scoring input — thread a one-shot buff) + Forage; fire on pass→Next, not on flop.

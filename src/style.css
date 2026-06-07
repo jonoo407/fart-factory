@@ -2955,6 +2955,17 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
     animation: none !important;
     transition-duration: 0.001ms !important;
   }
+  /* PLAN v9 P5 / 04 §1 — content that animates in from opacity:0 must stay
+     visible when animations are disabled (never leave content at opacity:0). */
+  .ultimate-card,
+  .critical-splash-card,
+  .discovery-splash-card,
+  .axis-discovery-card,
+  .reaction-overlay .stamp,
+  .recipe-ribbon {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 /* ============================================================
@@ -3331,3 +3342,42 @@ footer { color: var(--muted) !important; }
 }
 .craving-chip.want { background: var(--green); color: var(--ink); }
 .craving-chip.no { background: #fff; color: var(--ink); text-decoration: line-through; text-decoration-color: #ef4444; }
+
+/* PLAN v9 P5 — venue ladder screen */
+.venue-ladder {
+  position: fixed; inset: 0; z-index: 900;
+  background: rgba(35, 29, 22, 0.55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.venue-ladder[hidden] { display: none; }
+.venue-ladder-card {
+  background: var(--paper); color: var(--ink);
+  border: 3px solid var(--ink); border-radius: 18px;
+  box-shadow: 6px 6px 0 var(--ink);
+  width: 100%; max-width: 420px; max-height: 88vh; overflow-y: auto; padding: 16px;
+}
+.venue-ladder-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.venue-ladder-head h2 { flex: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; }
+.venue-ladder-stars { font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--gold); }
+.venue-ladder-close { background: #fff; border: 2.5px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink); width: 34px; height: 34px; font-weight: 800; cursor: pointer; }
+.venue-ladder-path { display: flex; flex-direction: column; gap: 10px; }
+.vnode {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--ink); padding: 8px 12px;
+}
+.vnode-current { background: var(--orange); color: #fff; animation: vnode-pulse 1.2s ease-in-out infinite; }
+.vnode-upcoming { opacity: 0.6; }
+.vnode-boss { border-width: 3px; background: var(--paper2); }
+.vnode-boss.vnode-current { background: var(--orange); }
+.vnode-circle { font-size: 24px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--paper2); border: 2.5px solid var(--ink); border-radius: 999px; flex-shrink: 0; }
+.vnode-current .vnode-circle { background: #fff; }
+.vnode-stars { color: var(--gold); font-size: 13px; min-width: 48px; }
+.vnode-label { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px; flex: 1; }
+.vnode-tag { position: absolute; top: -8px; right: 10px; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; background: var(--orange); color: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 1px 5px; }
+.venue-foot { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 2.5px solid var(--ink); }
+.venue-foot-av { font-size: 28px; }
+.venue-foot-nm { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 14px; }
+@keyframes vnode-pulse { 0%, 100% { box-shadow: 3px 3px 0 var(--ink); } 50% { box-shadow: 3px 3px 0 var(--ink), 0 0 0 4px rgba(255, 122, 47, 0.3); } }
