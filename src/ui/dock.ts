@@ -22,8 +22,9 @@ const OVERLAY: Record<Overlayed, string> = {
   book: 'notebookModal',
   venue: 'venueLadder',
 };
-const TAB: Record<Surface, string> = {
-  stage: 'stageBtn',
+// No Stage tab: the play screen is the persistent base. `current === 'stage'`
+// is the "nothing open" sentinel — no tab is lit in that state.
+const TAB: Record<Overlayed, string> = {
   shop: 'shopBtn',
   kitchen: 'kitchenModeToggle',
   book: 'notebookBtn',
@@ -41,6 +42,8 @@ interface SurfaceHooks {
   render?: () => void;
   /** When present and false, the tab is locked and won't open. */
   gate?: () => boolean;
+  /** Called when a tap is refused by the gate (e.g. show an unlock hint). */
+  onBlocked?: () => void;
 }
 
 const hooks: Partial<Record<Overlayed, SurfaceHooks>> = {};
@@ -69,7 +72,10 @@ export function openSurface(s: Surface): void {
     closeSurface();
     return;
   }
-  if (hooks[s]?.gate && !hooks[s]!.gate!()) return; // locked — no-op
+  if (hooks[s]?.gate && !hooks[s]!.gate!()) {
+    hooks[s]?.onBlocked?.(); // locked — surface its unlock hint instead of a silent no-op
+    return;
+  }
   hideAllOverlays();
   hooks[s]?.render?.();
   setHidden(OVERLAY[s], false);
@@ -94,7 +100,7 @@ export function activateSurface(s: Surface): void {
 
 /** Reflect `current` onto the dock: exactly one tab lit (.on + aria-current). */
 export function syncActiveTab(): void {
-  for (const s of Object.keys(TAB) as Surface[]) {
+  for (const s of Object.keys(TAB) as Overlayed[]) {
     const btn = document.getElementById(TAB[s]);
     if (!btn) continue;
     const active = s === current;
@@ -113,9 +119,6 @@ export function renderDock(): void {
 export function wireDock(): void {
   renderDock();
   window.addEventListener('fart:treatment-changed', renderDock);
-
-  // Stage = home.
-  document.getElementById(TAB.stage)?.addEventListener('click', () => closeSurface());
 
   for (const s of Object.keys(OVERLAY) as Overlayed[]) {
     document.getElementById(TAB[s])?.addEventListener('click', () => activateSurface(s));

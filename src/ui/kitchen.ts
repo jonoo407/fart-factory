@@ -24,30 +24,17 @@ import {
   type FermentSlot,
 } from '../state/ferment-rack';
 import { unlockFood, loadEquippedTreatment, setEquippedTreatment } from '../state/persistence';
+import { loadKitchenMode, setKitchenMode } from '../state/kitchen-mode';
+import { loadGoodLaunchCount, KITCHEN_AUTO_UNLOCK_THRESHOLD } from '../scoring/kitchen-unlock';
+import { showKitchenLockedHint } from './splashes';
 import { registerSurface } from './dock';
+
+// The unlock flag now lives in state/kitchen-mode; re-export for callers that
+// have long imported it from here (plate.ts, the auto-unlock tests).
+export { loadKitchenMode, setKitchenMode };
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
-}
-
-// ----- Kitchen-unlock flag (doubles as the dock-tab unlock gate) -----
-
-const KITCHEN_MODE_KEY = 'fart_kitchen_mode';
-
-export function loadKitchenMode(): boolean {
-  try {
-    return localStorage.getItem(KITCHEN_MODE_KEY) === 'true';
-  } catch {
-    return false;
-  }
-}
-
-export function setKitchenMode(v: boolean): void {
-  try {
-    localStorage.setItem(KITCHEN_MODE_KEY, String(v));
-  } catch {
-    // ignore
-  }
 }
 
 // ----- Treatment list (single-equip) -----
@@ -175,6 +162,7 @@ export function wireKitchen(): void {
       renderFermentRack();
     },
     gate: loadKitchenMode,
+    onBlocked: () => showKitchenLockedHint(loadGoodLaunchCount(), KITCHEN_AUTO_UNLOCK_THRESHOLD),
   });
 }
 

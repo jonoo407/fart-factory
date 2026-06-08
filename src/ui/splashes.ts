@@ -28,6 +28,23 @@ export function showKitchenUnlockToast(): void {
   }
 }
 
+/**
+ * Tapping the still-locked Kitchen tab surfaces this hint (instead of a silent
+ * no-op) so players know the tab is a gated reward, not a broken button.
+ */
+export function showKitchenLockedHint(goodLaunches: number, threshold: number): void {
+  const toast = document.getElementById('bossUnlockToast');
+  if (!toast) return;
+  const left = Math.max(0, threshold - goodLaunches);
+  toast.textContent =
+    `🔒 Kitchen locked — land ${left} more ${left === 1 ? 'show' : 'shows'} at ≥50% match to unlock treatments (${goodLaunches}/${threshold}).`;
+  toast.removeAttribute('hidden');
+  toast.classList.remove('boss-unlock-toast-enter');
+  void toast.offsetWidth;
+  toast.classList.add('boss-unlock-toast-enter');
+  setTimeout(() => toast.setAttribute('hidden', ''), 3500);
+}
+
 export function showHiddenComboSplash(
   combo: { name: string; emoji: string; flavor: string; bonusGold: number; bonusNotes: number },
 ): void {
