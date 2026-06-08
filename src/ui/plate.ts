@@ -1022,7 +1022,12 @@ function wireAudiencePortraitInteraction(): void {
  * PR10 — Belly meter tap = mini-fart easter egg. Plays a tiny low-volume
  * fart without spending belly. After every 10 taps, a one-line toast.
  */
-function wireBellyMeterTap(): void {
+// Debounce the belly-tap easter egg so mashing it can't stack overlapping
+// mini-farts (WebAudio has no polyphony cap). Separate gate from the launch.
+const BELLY_TAP_COOLDOWN_MS = 300;
+const bellyTapGate = createCooldownGate(BELLY_TAP_COOLDOWN_MS);
+
+export function wireBellyMeterTap(): void {
   const track = document.querySelector<HTMLElement>('.belly-track');
   if (!track) return;
   // Don't override role="meter" / aria-label — those describe the value
@@ -1030,6 +1035,7 @@ function wireBellyMeterTap(): void {
   // layered on top; cursor change is enough hint for sighted players.
   track.style.cursor = 'pointer';
   track.addEventListener('click', () => {
+    if (!bellyTapGate.open()) return;
     playFart(2, 1, 2, 1, 5, 1);
     triggerHaptic(HAPTICS.launch);
     let taps = 0;
