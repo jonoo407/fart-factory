@@ -82,3 +82,37 @@ export function selectFartLayers(ax: AxisLevels): FartLayers {
   const gain = Math.min(1, 0.18 + ax.loud * 0.7);
   return { base, melody, sizzle, haze, gain };
 }
+
+/** At/above this normalized length, an `-xl` epic base variant (if it exists) wins. */
+const EPIC_LENGTH_MIN = 0.85;
+
+/**
+ * Resolve a base-rip FAMILY (e.g. 'rip-wet-long', from selectFartLayers) to a
+ * concrete variant that actually exists in the manifest, giving the core-loop
+ * fart real variety from a small stem set:
+ *   - `{family}` / `{family}-2` / `{family}-3` — interchangeable texture variants,
+ *     chosen at random so repeated recipes don't sound identical.
+ *   - `{family}-xl` — a genuinely long (~4.5s) "epic" rip that only plays at the
+ *     very top of the length axis (the fork's length-fit idea, placed in the tier
+ *     the core loop actually plays).
+ *
+ * Manifest-gated: `available` is the list of stem ids present, so a variant only
+ * plays once its asset is generated. Before any variant exists this returns the
+ * family unchanged — no behaviour change, no regression. Pure (rng injected).
+ */
+export function pickBaseVariant(
+  family: string,
+  available: readonly string[],
+  ax: AxisLevels,
+  rng: () => number = Math.random,
+): string {
+  const pool = available.filter((id) => id === family || id.startsWith(`${family}-`));
+  if (pool.length === 0) return family;
+  const xl = pool.filter((id) => id.endsWith('-xl'));
+  const regular = pool.filter((id) => !id.endsWith('-xl'));
+  if (ax.length >= EPIC_LENGTH_MIN && xl.length > 0) {
+    return xl[Math.floor(rng() * xl.length) % xl.length]!;
+  }
+  const choices = regular.length > 0 ? regular : pool;
+  return choices[Math.floor(rng() * choices.length) % choices.length]!;
+}

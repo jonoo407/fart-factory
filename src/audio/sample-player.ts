@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { loadMuted, isChannelAudible, effectiveVolume } from './audio-settings';
-import { selectFartLayers, type AxisLevels } from './fart-stems';
+import { selectFartLayers, pickBaseVariant, type AxisLevels } from './fart-stems';
 
 /**
  * Sample-bank player that complements the procedural synth in
@@ -221,7 +221,14 @@ export async function playFartStems(
 ): Promise<boolean> {
   if (loadMuted() || !isChannelAudible('farts')) return false;
   const layers = selectFartLayers(ax);
-  const ids = [layers.base, layers.melody, layers.sizzle, layers.haze].filter((x): x is string => x !== null);
+  // Resolve the base FAMILY (e.g. rip-wet-long) to a concrete variant present in
+  // the manifest — gives the core loop real variety + an epic-long rip at max
+  // length. Falls back to the family id until variant assets are generated.
+  const availStems = manifest.entries
+    .filter((e) => e.category === 'stem' && !e.proceduralFallback)
+    .map((e) => e.id);
+  const baseId = pickBaseVariant(layers.base, availStems, ax);
+  const ids = [baseId, layers.melody, layers.sizzle, layers.haze].filter((x): x is string => x !== null);
   const fartsScale = effectiveVolume('farts') / 100; // 0-1
   let played = false;
   for (const id of ids) {
@@ -233,7 +240,7 @@ export async function playFartStems(
     src.buffer = buf;
     const g = ctx.createGain();
     // The base carries the master gain; the colour layers sit a bit under it.
-    const layerGain = id === layers.base ? layers.gain : layers.gain * 0.55;
+    const layerGain = id === baseId ? layers.gain : layers.gain * 0.55;
     g.gain.value = Math.min(0.95, layerGain * fartsScale);
     src.connect(g);
     g.connect(ctx.destination);

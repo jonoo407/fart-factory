@@ -23,7 +23,7 @@ import {
   addResearchNotes,
   markHiddenComboFound,
 } from '../state/persistence';
-import { resolveLaunchProps } from '../scoring/launch-resolver';
+import { resolveEquippedLaunch } from '../scoring/launch-resolver';
 import { evaluateMatch, computeMatchBreakdown, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForEncounter, baseGoldForAudience } from '../scoring/reward';
@@ -31,7 +31,7 @@ import { PASS_PCT } from '../scoring/tuning';
 import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak } from '../scoring/streak';
 import { recordFoodUse, applyMasteryBonuses, loadFoodMastery, masteryLevel } from '../scoring/food-mastery';
-import { unlockFood } from '../state/persistence';
+import { unlockFood, loadEquippedTreatment } from '../state/persistence';
 import { encounterSeed, currentEncounterIdx } from '../state/run-state';
 import { detectHiddenCombo } from '../scoring/hidden-combos';
 import { rollUnicornEncounter, UNICORN_AUDIENCE } from '../state/unicorn-encounter';
@@ -91,7 +91,6 @@ import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
 import { renderDailyQuest } from './daily-quest';
 import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './boss-arena';
-import { isKitchenOpen, tryAddToPrep, loadPlateTreatments, clearPlateTreatments } from './kitchen';
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
@@ -191,11 +190,6 @@ export function renderPantryGrid(): void {
     const id = el.getAttribute('data-food');
     if (!id) return;
     el.addEventListener('click', () => {
-      // Phase U item 95 — if Kitchen is open, route to the prep table.
-      if (isKitchenOpen()) {
-        tryAddToPrep(id);
-        return;
-      }
       const result = addFoodToPlate(id);
       if (result.ok) {
         // P3: random food-eating cue (silent until operator runs sfx:generate).
@@ -379,7 +373,6 @@ function advanceToNextEncounter(): void {
       // After the intermission resolves: re-render everything that
       // depends on encounter idx (audience, hot-spot, belly meter, etc.).
       clearPlate();
-      clearPlateTreatments();
       renderAudiencePortrait();
       renderAreaDisplay();
       renderActiveBuffStrip();
@@ -603,10 +596,9 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
 async function onStoryLaunch(quality = 1): Promise<void> {
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
-  // P1: resolve launch through prep-aware path. If treatments are
-  // persisted from a Kitchen send, they apply here; otherwise raw.
-  const treatments = loadPlateTreatments();
-  const resolved = resolveLaunchProps(ids, treatments);
+  // P6: resolve launch through the single-equip path — the one equipped
+  // Kitchen treatment (if any) applies to every plated food; otherwise raw.
+  const resolved = resolveEquippedLaunch(ids, loadEquippedTreatment());
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
@@ -637,7 +629,6 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       targetAudienceIdx: targetIdx !== null && !Number.isNaN(targetIdx) ? targetIdx : null,
     });
     clearPlate();
-    clearPlateTreatments(); // P1: treatments consumed by the arena launch too
     renderPlate();
     renderBellyMeter();
     return;
@@ -765,7 +756,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     recordLaunchEvent({
       matchPct: match.pct,
       ids,
-      hadTreatment: treatments.length > 0,
+      hadTreatment: resolved.usedTreatments,
       recipeDiscovered: Boolean(discovery?.freshlyDiscovered),
     });
     renderDailyQuest();
@@ -778,8 +769,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       showFeatureIntro({
         id: 'kitchen',
         emoji: '🍳',
-        title: 'Kitchen Mode unlocked!',
-        body: 'Tap 🍳 Kitchen Mode to switch into prep view. There you can apply treatments (roast / chill / blend / ferment) to your plate before launching — each treatment shifts properties (e.g. roast adds dry + temp, ferment adds wet + stink). Send the prepped plate to perform.',
+        title: 'Kitchen unlocked!',
+        body: 'Tap 🍳 Kitchen to equip a treatment (roast / chill / ferment). The one you equip tweaks every brew you launch — shifting its properties — until you swap it. Roast adds stink + heat; chill dries it out and sharpens the sound; ferment ramps stink + musical. The Kitchen tab glows while a treatment is equipped.',
         cta: 'Let me cook',
       });
     }
@@ -804,7 +795,6 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   }
 
   clearPlate();
-  clearPlateTreatments(); // P1: one-shot consumption — next launch is raw unless re-prepped
   renderPlate();
   renderBellyMeter();
   renderProgression();
@@ -907,7 +897,6 @@ function handleReactionAction(action: FooterAction): void {
   refillBelly();
   bellySpentThisSession = 0;
   clearPlate();
-  clearPlateTreatments();
   renderPlate();
   renderBellyMeter();
   renderPantryGrid();

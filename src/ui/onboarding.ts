@@ -58,7 +58,7 @@ export function showOnboarding(): void {
       <div class="onboarding-emoji" aria-hidden="true"></div>
       <h2 class="onboarding-title" id="onboardingTitle"></h2>
       <p class="onboarding-body"></p>
-      <div class="onboarding-step-indicator"></div>
+      <div class="onboarding-step-indicator" role="img"></div>
       <div class="onboarding-actions">
         <button class="btn onboarding-skip" id="onboardingSkip" type="button">Skip</button>
         <button class="btn onboarding-next" id="onboardingNext" type="button">Next →</button>
@@ -81,7 +81,12 @@ export function showOnboarding(): void {
     titleEl.textContent = step.title;
     bodyEl.textContent = step.body;
     emojiEl.textContent = step.emoji;
-    indicatorEl.textContent = `Step ${stepIndex + 1} of ${TUTORIAL_STEPS.length}`;
+    // PLAN v9 P7 — progress DOTS (one per step, current one .on) instead of
+    // "Step N of M" text; a11y progress is preserved via the aria-label.
+    indicatorEl.innerHTML = TUTORIAL_STEPS.map(
+      (_, i) => `<i${i === stepIndex ? ' class="on"' : ''}></i>`,
+    ).join('');
+    indicatorEl.setAttribute('aria-label', `Step ${stepIndex + 1} of ${TUTORIAL_STEPS.length}`);
     nextBtn.textContent =
       stepIndex === TUTORIAL_STEPS.length - 1 ? "Let's go! 🚀" : 'Next →';
   }

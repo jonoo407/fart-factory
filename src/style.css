@@ -1465,16 +1465,16 @@ h1 {
   margin: 8px 0;
   font-size: 0.95em;
 }
-.audio-popover-label { color: #e2e8f0; }
+.audio-popover-label { color: var(--ink); }
 .audio-popover-row input[type='range'] {
   width: 100%;
   height: 28px;
-  accent-color: #fde047;
+  accent-color: var(--green);
 }
 .audio-popover-value {
   text-align: right;
   font-variant-numeric: tabular-nums;
-  color: #fde68a;
+  color: var(--muted);
   font-size: 0.85em;
 }
 .audio-popover-mute-all {
@@ -1483,9 +1483,10 @@ h1 {
   margin-top: 10px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgba(248, 113, 113, 0.18);
-  border: 2px solid #f87171;
-  color: #fee2e2;
+  background: #fff;
+  border: 2px solid var(--ink);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
   font-family: inherit;
   font-weight: bold;
   font-size: 0.9em;
@@ -1493,7 +1494,8 @@ h1 {
   min-height: 44px;
 }
 .audio-popover-mute-all[aria-pressed='true'] {
-  background: rgba(248, 113, 113, 0.35);
+  background: var(--orange);
+  color: #fff;
 }
 
 .gas-overlay {
@@ -1595,11 +1597,19 @@ footer {
 }
 .onboarding-body { font-size: 1.05em; line-height: 1.4; margin-bottom: 16px; color: var(--ink); }
 .onboarding-step-indicator {
-  font-family: 'Space Mono', monospace;
-  font-size: 0.85em;
-  color: var(--muted);
+  display: flex;
+  justify-content: center;
+  gap: 7px;
   margin-bottom: 16px;
 }
+.onboarding-step-indicator i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--paper2);
+  border: 2px solid var(--ink);
+}
+.onboarding-step-indicator i.on { background: var(--orange); }
 .onboarding-actions {
   display: flex;
   gap: 12px;
@@ -1766,70 +1776,61 @@ footer {
   margin: 12px 0 6px;
   font-weight: bold;
 }
-.prep-table {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+/* PLAN v9 P6 — single-equip Kitchen: hint banner + tappable treatment rows
+   (ported from the prototype ff-proto.css, using the paper/ink tokens). */
+.kit-hint {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  line-height: 1.45;
+  background: var(--paper2);
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  padding: 10px 13px;
+  margin: 4px 0 12px;
 }
-.prep-slot {
-  border: 2px dashed rgba(253, 186, 116, 0.4);
-  border-radius: 10px;
-  padding: 8px;
-  min-height: 88px;
+.kit-hint b { color: var(--ink); }
+.kit-list { display: flex; flex-direction: column; gap: 9px; }
+.kit-treat {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 11px;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  border-radius: 13px;
+  padding: 11px 13px;
+  box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.kit-treat:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.kit-treat.on { background: #eafad0; border-color: var(--green-d); }
+.kit-treat .kem { font-size: 26px; flex: 0 0 auto; }
+.kit-treat .ktx { flex: 1; }
+.kit-treat .knm {
+  font-family: "Baloo 2", cursive;
+  font-weight: 800;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--ink);
+}
+.kit-treat .kef { font-size: 11px; font-weight: 800; color: var(--muted); margin-top: 2px; }
+.kit-treat .kchk {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: 2.5px solid var(--ink);
+  flex: 0 0 auto;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.25);
-  position: relative;
-}
-.prep-slot-filled {
-  border-style: solid;
-  border-color: rgba(253, 186, 116, 0.7);
-}
-.prep-slot-filled .food-emoji { font-size: 1.8em; line-height: 1; }
-.prep-slot-filled .food-name { font-size: 0.78em; }
-.prep-slot-remove {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
   color: #fff;
-  font-size: 0.7em;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
+  font-weight: 800;
 }
-.prep-slot-remove:hover { background: rgba(248, 113, 113, 0.5); }
-.prep-treatment-select {
-  font-size: 0.78em;
-  padding: 2px 6px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 4px;
-  font-family: inherit;
-  margin-top: 2px;
-}
-.prep-empty { font-size: 0.82em; opacity: 0.5; }
-.prep-send-to-rack-btn {
-  margin-top: 4px;
-  background: linear-gradient(135deg, #5eead4, #0d9488);
-  border: 1px solid #99f6e4;
-  color: #042525;
-  font-weight: bold;
-  font-size: 0.72em;
-  padding: 2px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.prep-send-to-rack-btn:hover { filter: brightness(1.1); }
-.prep-send-refused { animation: shop-refuse 0.6s ease-out; }
+.kit-treat.on .kchk { background: var(--green); }
 
 .ferment-rack {
   display: grid;
@@ -1872,29 +1873,6 @@ footer {
   cursor: pointer;
 }
 .ferment-empty { font-size: 0.75em; opacity: 0.5; }
-
-.kitchen-actions {
-  margin-top: 14px;
-  text-align: center;
-}
-.kitchen-send-btn {
-  background: linear-gradient(135deg, #22c55e, #15803d);
-  border: 2px solid #4ade80;
-  color: #fff;
-  font-weight: bold;
-  font-size: 1em;
-  padding: 10px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.kitchen-send-btn:hover { filter: brightness(1.1); }
-.kitchen-flavor {
-  font-size: 0.82em;
-  opacity: 0.65;
-  text-align: center;
-  font-style: italic;
-  margin-top: 10px;
-}
 
 /* --- Travel button --- */
 .travel-btn {
@@ -2375,14 +2353,16 @@ body[data-region='city'] .audience-wrap    { border-color: #3b82f6; }
   margin-bottom: 14px;
   border-radius: 14px;
   padding: 4px;
-  background: radial-gradient(ellipse at center, rgba(40, 0, 60, 0.6), rgba(0, 0, 0, 0.4));
+  background: var(--paper2);
 }
 .arena-overlay[hidden] { display: none; }
-.arena-vignette-intersection { background: linear-gradient(135deg, rgba(60, 30, 20, 0.8), rgba(40, 10, 5, 0.6)); }
-.arena-vignette-escalation   { background: linear-gradient(135deg, rgba(60, 50, 0, 0.8), rgba(40, 30, 0, 0.6)); }
-.arena-vignette-prioritization { background: linear-gradient(135deg, rgba(40, 40, 70, 0.8), rgba(20, 20, 40, 0.6)); }
-.arena-vignette-deduction { background: linear-gradient(135deg, rgba(70, 10, 10, 0.8), rgba(40, 0, 0, 0.6)); }
-.arena-vignette-resource-allocation { background: linear-gradient(135deg, rgba(30, 0, 70, 0.8), rgba(10, 0, 30, 0.6)); }
+/* P8 palette: the per-skill vignettes are legacy dark/purple flavour; neutralise
+   to paper so no neon backdrop bleeds around the (white) arena card. */
+.arena-vignette-intersection,
+.arena-vignette-escalation,
+.arena-vignette-prioritization,
+.arena-vignette-deduction,
+.arena-vignette-resource-allocation { background: var(--paper2); }
 .arena-card {
   background: linear-gradient(135deg, #1a0a30, #0a0520);
   border: 3px solid #f59e0b;
@@ -2455,13 +2435,13 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   align-items: center;
   gap: 4px;
   padding: 6px 10px;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid var(--ink);
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.3);
+  background: #fff;
   min-width: 90px;
 }
-.arena-audience-passed { border-color: #4ade80; background: rgba(20, 60, 30, 0.5); }
-.arena-audience-lost   { border-color: #f87171; background: rgba(60, 20, 20, 0.5); opacity: 0.6; }
+.arena-audience-passed { border-color: var(--green-d); background: #eafad0; }
+.arena-audience-lost   { border-color: #c0392b; background: #f7d9d4; opacity: 0.6; }
 .arena-audience-emoji { font-size: 1.8em; line-height: 1; }
 .arena-audience-name { font-size: 0.82em; text-align: center; }
 .arena-rounds {
@@ -2478,9 +2458,9 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 .arena-target-label select {
   margin-left: 6px;
   padding: 4px 8px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #fff;
+  color: var(--ink);
+  border: 2px solid var(--ink);
   border-radius: 4px;
 }
 .arena-history {
@@ -3433,11 +3413,7 @@ h1 { font-weight: 800; }
    on the now-white card (the treatment-row rebuild is a follow-up). The legacy
    slots/select used dark-translucent backgrounds; on white + ink text they read
    as dark-on-dark / gray-on-gray and fail AA contrast. ---- */
-.kitchen-card .prep-slot,
 .kitchen-card .ferment-slot { background: var(--paper2) !important; border-color: var(--ink) !important; }
-.kitchen-card .prep-treatment-select { background: #fff !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; }
-.kitchen-card .prep-slot-remove { background: #c0392b !important; color: #fff !important; border-color: #fff !important; }
-.kitchen-card .prep-empty,
 .kitchen-card .ferment-empty,
 .kitchen-card .ferment-status,
 .kitchen-card .ferment-slot-empty,

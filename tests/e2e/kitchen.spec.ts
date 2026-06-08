@@ -6,10 +6,11 @@ async function loadStory(page: import('@playwright/test').Page) {
     localStorage.setItem('fart_onboarding_seen', 'true');
     localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
-    // Phase W item 99 — Kitchen Mode is opt-in. Enable it for these tests.
+    // Kitchen is opt-in/unlocked. Enable it for these tests.
     localStorage.setItem('fart_kitchen_mode', 'true');
     localStorage.removeItem('fart_pantry');
     localStorage.removeItem('fart_ferment_rack');
+    localStorage.removeItem('fart_treatment');
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
@@ -30,11 +31,41 @@ test('Kitchen button opens the kitchen overlay', async ({ page }) => {
   await expect(page.locator('#kitchenOverlay')).toBeVisible();
 });
 
-test('Kitchen has 4 prep-table slots + 3 ferment-rack slots', async ({ page }) => {
+test('Kitchen shows a None row + one row per treatment, and a 3-slot ferment rack', async ({ page }) => {
   await loadStory(page);
   await page.click('#kitchenModeToggle');
-  await expect(page.locator('.prep-slot')).toHaveCount(4);
+  // None + roast + ferment + chill = 4 treatment rows.
+  await expect(page.locator('#treatmentList .kit-treat')).toHaveCount(4);
+  await expect(page.locator('.kit-treat[data-treatment="none"]')).toBeVisible();
+  await expect(page.locator('.kit-treat[data-treatment="roast"]')).toBeVisible();
   await expect(page.locator('.ferment-slot')).toHaveCount(3);
+});
+
+test('Equipping a treatment marks that row .on and lights the dock Kitchen tab', async ({ page }) => {
+  await loadStory(page);
+  await page.click('#kitchenModeToggle');
+  // Nothing equipped → None is active, dock not hot.
+  await expect(page.locator('.kit-treat[data-treatment="none"]')).toHaveClass(/on/);
+  await expect(page.locator('#kitchenModeToggle')).not.toHaveClass(/hot/);
+  // Equip roast.
+  await page.click('.kit-treat[data-treatment="roast"]');
+  await expect(page.locator('.kit-treat[data-treatment="roast"]')).toHaveClass(/on/);
+  await expect(page.locator('.kit-treat[data-treatment="none"]')).not.toHaveClass(/on/);
+  await expect(page.locator('#kitchenModeToggle')).toHaveClass(/hot/);
+  // It persists.
+  const stored = await page.evaluate(() => localStorage.getItem('fart_treatment'));
+  expect(stored).toBe('"roast"');
+});
+
+test('Selecting None clears the equipped treatment and the dock light', async ({ page }) => {
+  await loadStory(page);
+  await page.click('#kitchenModeToggle');
+  await page.click('.kit-treat[data-treatment="chill"]');
+  await expect(page.locator('#kitchenModeToggle')).toHaveClass(/hot/);
+  await page.click('.kit-treat[data-treatment="none"]');
+  await expect(page.locator('#kitchenModeToggle')).not.toHaveClass(/hot/);
+  const stored = await page.evaluate(() => localStorage.getItem('fart_treatment'));
+  expect(stored).toBe('null');
 });
 
 test('Kitchen close button hides the overlay', async ({ page }) => {
@@ -42,35 +73,4 @@ test('Kitchen close button hides the overlay', async ({ page }) => {
   await page.click('#kitchenModeToggle');
   await page.click('#kitchenCloseBtn');
   await expect(page.locator('#kitchenOverlay')).toBeHidden();
-});
-
-test('Clicking a pantry food while Kitchen is open adds it to the first empty prep slot', async ({ page }) => {
-  await loadStory(page);
-  await page.click('#kitchenModeToggle');
-  // Click a pantry food (uses the same pantry grid).
-  await page.locator('[data-food="beans"]').first().click();
-  // First prep slot now contains beans.
-  await expect(page.locator('#prepSlot1.prep-slot-filled')).toBeVisible();
-});
-
-test('Each prep slot has a treatment selector with 5 options', async ({ page }) => {
-  await loadStory(page);
-  await page.click('#kitchenModeToggle');
-  await page.locator('[data-food="beans"]').first().click();
-  const select = page.locator('#prepSlot1 .prep-treatment-select');
-  await expect(select).toBeVisible();
-  const options = await select.locator('option').count();
-  expect(options).toBe(5);
-});
-
-test('Send to Performance closes Kitchen and propagates prepped plate', async ({ page }) => {
-  await loadStory(page);
-  await page.click('#kitchenModeToggle');
-  await page.locator('[data-food="beans"]').first().click();
-  await page.locator('#prepSlot1 .prep-treatment-select').selectOption('roast');
-  await page.click('#kitchenSendBtn');
-  await expect(page.locator('#kitchenOverlay')).toBeHidden();
-  // The main plate's slot 1 should be filled (the prepped plate flows
-  // back to the launch plate).
-  await expect(page.locator('#plateSlot1.plate-slot-filled')).toBeVisible();
 });
