@@ -3007,7 +3007,10 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
    Order Ticket language (paper & ink, hard offset shadows).
    ============================================================ */
 
-/* ---- charge meter (above the BLAST button) ---- */
+/* ---- charge meter (above the BLAST button) ----
+   PLAN v9 UI-overhaul Phase 3 — the meter DIMS to .55 at rest and wakes to full
+   on hold (.active toggled by charge-meter.ts). That idle-dim is what stops the
+   dashed sweet-zone from reading as a hard standalone "dotted box". */
 .charge-meter {
   position: relative;
   height: 16px;
@@ -3017,37 +3020,45 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   border: 2.5px solid var(--ink);
   border-radius: 999px;
   overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
 }
+.charge-meter.active { opacity: 1; }
 .charge-meter .charge-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: 0;
-  background: linear-gradient(180deg, var(--green), var(--green-d));
-  border-radius: 999px;
+  /* heats up toward the sweet zone */
+  background: linear-gradient(90deg, var(--green), var(--gold), var(--orange));
 }
 .charge-meter .charge-sweet {
   position: absolute;
   top: 0; bottom: 0;
   left: 74%; width: 18%;
-  border: 2px dashed var(--ink);
-  border-radius: 6px;
-  opacity: 0.7;
+  border: 2.5px dashed var(--ink);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.25);
   pointer-events: none;
 }
 .charge-meter .charge-hint {
   position: absolute;
   inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
   font-size: 9px;
   color: var(--ink);
+  opacity: 0.7;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1em;
   pointer-events: none;
 }
-#storyLaunchBtn.charging {
-  animation: blast-shake 0.18s linear infinite;
-}
+/* two-line BLAST button: "💨 BLAST!" over a small "hold to charge" sub */
+.btn.launch.blast { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.btn.launch .big { display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1; }
+.btn.launch .sub { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.65; }
+#storyLaunchBtn.charging { transform: translate(2px, 3px); }
+.btn.launch.charging .big { animation: blast-shake 0.12s linear infinite; }
 @keyframes blast-shake {
   0%, 100% { transform: translate(0, 0); }
   25% { transform: translate(-1px, 1px); }
