@@ -76,6 +76,7 @@ import {
   ENCORE_BONUS_GOLD,
 } from '../state/encounter-progress';
 import { mountChargeMeter } from './charge-meter';
+import { createCooldownGate } from './cooldown-gate';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
 import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
@@ -593,7 +594,16 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
 }
 
 
+// PLAN v9 — single-flight launch. WebAudio has no polyphony cap, so a second
+// Launch while the first fart is still ringing stacks a whole second fart chain
+// that sums at the destination (the "sounds overlap" report). Gate re-launches
+// to one per LAUNCH_COOLDOWN_MS; in normal play the plate must be re-filled
+// between launches so this only blocks a pathological double-tap.
+const LAUNCH_COOLDOWN_MS = 1200;
+const launchGate = createCooldownGate(LAUNCH_COOLDOWN_MS);
+
 async function onStoryLaunch(quality = 1): Promise<void> {
+  if (!launchGate.open()) return;
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
   // P6: resolve launch through the single-equip path — the one equipped
@@ -1012,7 +1022,12 @@ function wireAudiencePortraitInteraction(): void {
  * PR10 — Belly meter tap = mini-fart easter egg. Plays a tiny low-volume
  * fart without spending belly. After every 10 taps, a one-line toast.
  */
-function wireBellyMeterTap(): void {
+// Debounce the belly-tap easter egg so mashing it can't stack overlapping
+// mini-farts (WebAudio has no polyphony cap). Separate gate from the launch.
+const BELLY_TAP_COOLDOWN_MS = 300;
+const bellyTapGate = createCooldownGate(BELLY_TAP_COOLDOWN_MS);
+
+export function wireBellyMeterTap(): void {
   const track = document.querySelector<HTMLElement>('.belly-track');
   if (!track) return;
   // Don't override role="meter" / aria-label — those describe the value
@@ -1020,6 +1035,7 @@ function wireBellyMeterTap(): void {
   // layered on top; cursor change is enough hint for sighted players.
   track.style.cursor = 'pointer';
   track.addEventListener('click', () => {
+    if (!bellyTapGate.open()) return;
     playFart(2, 1, 2, 1, 5, 1);
     triggerHaptic(HAPTICS.launch);
     let taps = 0;

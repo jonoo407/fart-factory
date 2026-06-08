@@ -2,6 +2,7 @@ import './style.css';
 import {
   suspendAudio,
   resumeAudio,
+  wireAudioUnlock,
   getAudioContext,
   getLastFartSchedule,
 } from './audio/procedural';
@@ -34,6 +35,7 @@ function wireVisibilityChange(): void {
 function init(): void {
   wireAudioPopover();
   wireVisibilityChange();
+  wireAudioUnlock(); // resume/create the AudioContext on first interaction (iOS-safe)
   initStoryPantry();
   wireShop();
   wireNotebook();

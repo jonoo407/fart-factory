@@ -27,6 +27,17 @@ import type { Audience } from '../state/audience';
 type Tier = ReturnType<typeof audienceReaction>['tier'];
 type Trend = ReturnType<typeof audienceReaction>['trend'];
 
+/**
+ * Post-launch audio stagger. The crowd reaction must land AFTER the fart's main
+ * hit — the fart schedules a cue at t=0, its main hit ~0.2s later and its body
+ * runs ~1s — so firing the stinger at t=0 (as it used to) started it before the
+ * fart, ran longer and ~3x louder, and masked the fart entirely. We defer the
+ * stinger past the fart's main hit; the voice line lands as a punchline after
+ * the stinger. Exported for the timing test.
+ */
+export const REACTION_SFX_DELAY_MS = 700;
+export const VOICE_AFTER_REACTION_MS = 800;
+
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
 }
@@ -94,19 +105,24 @@ export function renderAudienceReaction(pct: number, audience: Audience): void {
       streakEl.setAttribute('hidden', '');
     }
   }
+  // Stagger the crowd reaction past the fart's main hit so it reacts TO the
+  // fart instead of masking it (see REACTION_SFX_DELAY_MS).
   const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
-  if (reactionSfx) void playEventSfx(reactionSfx, 5);
+  if (reactionSfx) {
+    setTimeout(() => {
+      void playEventSfx(reactionSfx, 5);
+    }, REACTION_SFX_DELAY_MS);
+  }
   void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
     spawnReactionParticles(r.tier);
   });
   // PR10 — voiced reaction line. Only loved + evacuated are voiced today.
-  // Scheduled ~800ms after the generic tier cue so the audience VOICE lands
-  // as a punchline rather than overlapping the applause/moan.
+  // Lands as a punchline after the stinger (reaction delay + voice delay).
   if (r.tier === 'loved' || r.tier === 'evacuated') {
     const tier = r.tier;
     setTimeout(() => {
       void playAudienceVoice(audience.id, tier);
-    }, 800);
+    }, REACTION_SFX_DELAY_MS + VOICE_AFTER_REACTION_MS);
   }
 }
 

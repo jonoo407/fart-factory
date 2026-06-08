@@ -53,12 +53,21 @@ export async function loadManifest(): Promise<Manifest | null> {
   manifestLoadPromise = (async () => {
     try {
       const res = await fetch(MANIFEST_URL);
-      if (!res.ok) return null;
+      if (!res.ok) {
+        // A 404 here (commonly a wrong base path) silently drops every sample +
+        // stem to procedural fallback. Surface it so "no fart" is diagnosable.
+        console.warn(`[audio] sfx manifest fetch failed (${res.status}) at ${MANIFEST_URL} — falling back to procedural audio`);
+        return null;
+      }
       const json = (await res.json()) as Manifest;
-      if (!json || !Array.isArray(json.entries)) return null;
+      if (!json || !Array.isArray(json.entries)) {
+        console.warn(`[audio] sfx manifest malformed at ${MANIFEST_URL} — falling back to procedural audio`);
+        return null;
+      }
       manifestCache = json;
       return json;
-    } catch {
+    } catch (err) {
+      console.warn(`[audio] sfx manifest load error at ${MANIFEST_URL} — falling back to procedural audio`, err);
       return null;
     }
   })();
@@ -253,6 +262,10 @@ export async function playFartStems(
 // Test/debug accessors.
 export function _resetLastSelected(): void {
   lastSelectedId = null;
+}
+export function _resetManifestCache(): void {
+  manifestCache = null;
+  manifestLoadPromise = null;
 }
 export function _getLastSelected(): string | null {
   return lastSelectedId;
