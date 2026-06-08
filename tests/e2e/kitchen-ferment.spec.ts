@@ -22,14 +22,14 @@ async function loadStory(page: import('@playwright/test').Page, opts: { rack?: A
 
 test('Each prep slot has a "Send to Rack" button (Phase V item 97)', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await expect(page.locator('#prepSlot1 .prep-send-to-rack-btn')).toBeVisible();
 });
 
 test('Clicking Send to Rack removes the prep slot AND adds to ferment rack', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await page.locator('#prepSlot1 .prep-send-to-rack-btn').click();
   // Prep slot 1 is now empty.
@@ -45,7 +45,7 @@ test('Ferment slot placed at idx 0 shows Ready + Claim at idx 1', async ({ page 
   });
   await page.evaluate(() => localStorage.setItem('fart_encounter_idx', '1'));
   await page.reload();
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await expect(page.locator('.ferment-slot-ready').first()).toBeVisible();
   await expect(page.locator('.ferment-claim-btn').first()).toBeVisible();
 });
@@ -56,7 +56,7 @@ test('Clicking Claim removes the slot and increments the ferment-claims counter 
   });
   await page.evaluate(() => localStorage.setItem('fart_encounter_idx', '1'));
   await page.reload();
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('.ferment-claim-btn').first().click();
   // Rack slot disappears (now empty placeholder).
   await expect(page.locator('.ferment-slot-ready')).toHaveCount(0);

@@ -18,34 +18,35 @@ async function loadStory(page: import('@playwright/test').Page) {
   await page.reload();
 }
 
-test('Kitchen button is visible in the progression strip', async ({ page }) => {
+test('Kitchen tab is present in the dock and unlocked once kitchen mode is on', async ({ page }) => {
   await loadStory(page);
-  await expect(page.locator('#kitchenBtn')).toBeVisible();
+  await expect(page.locator('#kitchenModeToggle')).toBeVisible();
+  await expect(page.locator('#kitchenModeToggle')).not.toHaveClass(/locked/);
 });
 
 test('Kitchen button opens the kitchen overlay', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await expect(page.locator('#kitchenOverlay')).toBeVisible();
 });
 
 test('Kitchen has 4 prep-table slots + 3 ferment-rack slots', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await expect(page.locator('.prep-slot')).toHaveCount(4);
   await expect(page.locator('.ferment-slot')).toHaveCount(3);
 });
 
 test('Kitchen close button hides the overlay', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.click('#kitchenCloseBtn');
   await expect(page.locator('#kitchenOverlay')).toBeHidden();
 });
 
 test('Clicking a pantry food while Kitchen is open adds it to the first empty prep slot', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   // Click a pantry food (uses the same pantry grid).
   await page.locator('[data-food="beans"]').first().click();
   // First prep slot now contains beans.
@@ -54,7 +55,7 @@ test('Clicking a pantry food while Kitchen is open adds it to the first empty pr
 
 test('Each prep slot has a treatment selector with 5 options', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').first().click();
   const select = page.locator('#prepSlot1 .prep-treatment-select');
   await expect(select).toBeVisible();
@@ -64,7 +65,7 @@ test('Each prep slot has a treatment selector with 5 options', async ({ page }) 
 
 test('Send to Performance closes Kitchen and propagates prepped plate', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').first().click();
   await page.locator('#prepSlot1 .prep-treatment-select').selectOption('roast');
   await page.click('#kitchenSendBtn');

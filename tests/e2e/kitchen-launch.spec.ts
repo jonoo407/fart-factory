@@ -19,7 +19,7 @@ async function loadStory(page: import('@playwright/test').Page) {
 
 test('Send to Performance persists treatments to localStorage (P1 plumbing)', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await page.locator('#prepSlot1 .prep-treatment-select').selectOption('roast');
   await page.click('#kitchenSendBtn');
@@ -29,7 +29,7 @@ test('Send to Performance persists treatments to localStorage (P1 plumbing)', as
 
 test('Launch consumes the treatments (cleared after launch)', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await page.locator('#prepSlot1 .prep-treatment-select').selectOption('roast');
   await page.click('#kitchenSendBtn');
@@ -50,7 +50,7 @@ test('Opposing treatments produce different match scores (P1 regression)', async
   // the same daily audience.
   await loadStory(page);
   // Ferment+Ferment.
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.locator('#prepSlot1 .prep-treatment-select').selectOption('ferment');
@@ -69,7 +69,7 @@ test('Opposing treatments produce different match scores (P1 regression)', async
   });
   await page.reload();
   // Chill+Chill.
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.locator('#prepSlot1 .prep-treatment-select').selectOption('chill');

@@ -36,3 +36,7 @@ Thumbs.db
 reports/mutation/
 
 test-out.log
+e2e-out.log
+e2e-retest.log
+e2e-full.log
+unit-out.log

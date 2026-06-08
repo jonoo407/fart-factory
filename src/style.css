@@ -371,8 +371,8 @@ body {
   margin-bottom: 4px;
 }
 .chip-btn {
-  height: 40px;
-  min-width: 40px;
+  height: 44px;
+  min-width: 44px;
   padding: 0 11px;
   display: inline-flex;
   align-items: center;
@@ -3429,6 +3429,20 @@ h1 { font-weight: 800; }
 /* 🚫 no-chip → red text + red border (no strike-through on the chip) */
 .craving-chip.no { background: #fff !important; color: #c0392b !important; border-color: #c0392b !important; text-decoration: none !important; }
 
+/* ---- PLAN v9 UI-overhaul Phase 6a — kitchen workbench inner elements readable
+   on the now-white card (the treatment-row rebuild is a follow-up). The legacy
+   slots/select used dark-translucent backgrounds; on white + ink text they read
+   as dark-on-dark / gray-on-gray and fail AA contrast. ---- */
+.kitchen-card .prep-slot,
+.kitchen-card .ferment-slot { background: var(--paper2) !important; border-color: var(--ink) !important; }
+.kitchen-card .prep-treatment-select { background: #fff !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; }
+.kitchen-card .prep-slot-remove { background: #c0392b !important; color: #fff !important; border-color: #fff !important; }
+.kitchen-card .prep-empty,
+.kitchen-card .ferment-empty,
+.kitchen-card .ferment-status,
+.kitchen-card .ferment-slot-empty,
+.kitchen-card .ferment-slot-waiting { opacity: 1 !important; color: #5a4f3d !important; }
+
 /* all sticker buttons: ink border, hard shadow, press translate */
 .btn, .chip-btn, .progression-stat-btn, .kitchen-mode-toggle, .move-on-btn,
 .area-display-change, .pantry-toggle, .save-io-btn, .onboarding-next, .onboarding-skip,
@@ -3496,7 +3510,7 @@ body { padding-bottom: 66px; }
   text-transform: uppercase; letter-spacing: 0.03em;
   cursor: pointer;
 }
-.dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; opacity: 0.85; }
+.dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; color: #c9bd9f; }
 .dock-item.on { color: var(--green); }
 .dock-item.hot { color: var(--orange); }
 .dock-item.hot .dock-e { filter: none; }

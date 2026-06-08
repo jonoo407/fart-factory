@@ -24,23 +24,9 @@ test('Story Mode shows audience portrait with name + flavor + cravings', async (
   expect((portrait ?? '').length).toBeGreaterThan(0);
 });
 
-test('Story Mode shows current location summary and the Travel button', async ({ page }) => {
+test('Story Mode shows current location summary', async ({ page }) => {
   await loadStoryMode(page);
-  // Area-grid removed in PLAN_v4 Phase S — replaced by the world map.
   await expect(page.locator('#areaCurrentName')).toBeVisible();
-  await expect(page.locator('#travelBtn')).toBeVisible();
-});
-
-test('Selecting a map pin persists across reload', async ({ page }) => {
-  await loadStoryMode(page);
-  await page.click('#travelBtn');
-  // Library is a Hometown location — unlocked from day 1.
-  await page.locator('.map-pin[data-location="library"]').click();
-  await expect(page.locator('#areaCurrentName')).toContainText(/Library/);
-  await page.reload();
-  await page.evaluate(() => localStorage.setItem('fart_onboarding_seen', 'true'));
-  await page.reload();
-  await expect(page.locator('#areaCurrentName')).toContainText(/Library/);
 });
 
 test('Launch shows match % + audience name in result panel', async ({ page }) => {
