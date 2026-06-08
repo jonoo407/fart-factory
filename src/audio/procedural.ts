@@ -3,8 +3,11 @@ import {
   loadManifest,
   pickSampleId,
   playSample,
+  hasStemBase,
+  playFartStems,
   type SliderConfig,
 } from './sample-player';
+import type { AxisLevels } from './fart-stems';
 
 let audioCtx: AudioContext | null = null;
 let samplePathTried = false;
@@ -100,10 +103,33 @@ export function playFart(
   stinkiness: number,
   temp: number,
   musical: number,
+  ax?: AxisLevels,
 ): number {
   if (!isChannelAudible('farts')) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
+
+  // PLAN v9 P6 — the READOUT path. When the caller supplies the normalized axes
+  // AND the stem bank is present, assemble the fart from layered stems (the
+  // base rip + melody/sizzle/haze) so the sound encodes the recipe. Keeps the
+  // procedural anticipation cue. Decision is synchronous (manifest lookup);
+  // the layered playback is fire-and-forget.
+  if (manifestReady && ax && hasStemBase(manifestReady, ax)) {
+    const cueDur = 0.15;
+    const cueGap = 0.05;
+    const cueStart = ctx.currentTime;
+    const mainStartAt = cueStart + cueDur + cueGap;
+    schedulCue(ctx, cueStart, cueDur, temp, volume);
+    void playFartStems(ctx, manifestReady, ax, mainStartAt);
+    const mainDurationMs = 2000; // stems run up to ~2s
+    lastSchedule = {
+      cuePresent: true,
+      cueDurationMs: Math.round(cueDur * 1000),
+      mainStartOffsetMs: Math.round((cueDur + cueGap) * 1000),
+      mainDurationMs,
+    };
+    return cueDur + cueGap + mainDurationMs / 1000;
+  }
 
   // Sample-bank path: if the manifest is loaded, schedule the cue
   // (procedural — keeps comic timing) AND play the sample for the main hit.

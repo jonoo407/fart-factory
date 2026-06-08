@@ -95,6 +95,7 @@ import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
 import { playFart } from '../audio/procedural';
+import { normalizeAxes } from '../audio/fart-stems';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
 
@@ -667,7 +668,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
 
   triggerHaptic(HAPTICS.launch);
-  playFart(length, wetness, volume, stink, temp, musical);
+  // PLAN v9 P6 — pass the normalized axes so the fart plays as a layered readout.
+  playFart(length, wetness, volume, stink, temp, musical, normalizeAxes(propsAfterArea));
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.

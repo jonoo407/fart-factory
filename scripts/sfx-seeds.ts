@@ -36,6 +36,7 @@ export type Mood =
  */
 export type SfxCategory =
   | 'fart'
+  | 'stem'
   | 'reaction'
   | 'food'
   | 'event'
@@ -102,6 +103,35 @@ const FART_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'symphony',      name: 'Symphony',         mood: 'triumphant',  duration_seconds: 1.8, prompt: 'a melodic harmonized cartoon fart that sounds almost musical, with rising arpeggio, comedic' },
 
 ], 'fart');
+
+// ====== PLAN v9 P6 — fart READOUT stems (02 §3-§4) ======
+// Layerable building blocks the runtime assembles per the normalized axes
+// (src/audio/fart-stems.ts selectFartLayers): a base rip from wet|dry × length,
+// plus optional melody / sizzle / haze. Category 'stem' so the whole-clip
+// Launch picker never selects them — they are only played layered. ids MUST
+// match selectFartLayers' output exactly.
+const STEM_SFX: SfxSeed[] = withCat([
+  // base rips — wet × short/med/long
+  { kind: 'sfx', id: 'rip-wet-short', name: 'Wet Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short wet squelchy bubbly fart, quick juicy blubber, dry studio recording, no music' },
+  { kind: 'sfx', id: 'rip-wet-med',   name: 'Wet Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet flubbering bubbly fart, juicy sputtering raspberry, no music' },
+  { kind: 'sfx', id: 'rip-wet-long',  name: 'Wet Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long sustained wet gurgling fart, drawn-out bubbly blubber, no music' },
+  // base rips — dry × short/med/long
+  { kind: 'sfx', id: 'rip-dry-short', name: 'Dry Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short dry papery fart rip, crisp quick brrrap, no music' },
+  { kind: 'sfx', id: 'rip-dry-med',   name: 'Dry Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry raspy fart rip, papery brrrrap tearing, no music' },
+  { kind: 'sfx', id: 'rip-dry-long',  name: 'Dry Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry sustained raspy fart, drawn-out braaaaap, papery, no music' },
+  // melody — pitched tooty notes (selector emits melody-3..7)
+  { kind: 'sfx', id: 'melody-3', name: 'Toot Note 3', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single low-mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
+  { kind: 'sfx', id: 'melody-4', name: 'Toot Note 4', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
+  { kind: 'sfx', id: 'melody-5', name: 'Toot Note 5', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid-high tooty musical fart note like a kazoo, one bright comedic pitch' },
+  { kind: 'sfx', id: 'melody-6', name: 'Toot Note 6', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single high tooty musical fart note like a kazoo, one bright squeaky comedic pitch' },
+  { kind: 'sfx', id: 'melody-7', name: 'Toot Note 7', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single very high squeaky tooty musical fart note like a piccolo kazoo, comedic' },
+  // sizzle — hot crackle layer
+  { kind: 'sfx', id: 'sizzle-lo', name: 'Sizzle (low)',  mood: 'triumphant', duration_seconds: 0.6, prompt: 'a soft sizzling crackling hot layer, gentle kettle steam crackle, subtle' },
+  { kind: 'sfx', id: 'sizzle-hi', name: 'Sizzle (high)', mood: 'triumphant', duration_seconds: 0.6, prompt: 'an intense sizzling crackling hot layer, fierce kettle steam hiss and crackle' },
+  // haze — lingering stink tail
+  { kind: 'sfx', id: 'haze-lo', name: 'Haze (low)',  mood: 'eerie', duration_seconds: 1.2, prompt: 'a faint lingering eerie haze drone tail, subtle sour detuned overtone, soft' },
+  { kind: 'sfx', id: 'haze-hi', name: 'Haze (high)', mood: 'eerie', duration_seconds: 1.4, prompt: 'a thick lingering eerie haze drone tail, sour detuned overtone hum, unsettling' },
+], 'stem');
 
 // ====== Phase K audience-reaction seeds (item 61) ======
 const REACTION_SFX: SfxSeed[] = withCat([
@@ -245,6 +275,7 @@ const VOICE_SEEDS = buildVoiceSeeds();
 
 export const SEEDS: readonly Seed[] = [
   ...FART_SFX,
+  ...STEM_SFX,
   ...REACTION_SFX,
   ...FOOD_SFX,
   ...EVENT_SFX,
