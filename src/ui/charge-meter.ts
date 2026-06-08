@@ -35,6 +35,15 @@ export function mountChargeMeter(
   let startT = 0;
   let charging = false;
 
+  // PLAN v9 UI-overhaul Phase 3 — the meter idles dimmed and wakes on hold, and
+  // the BLAST label swaps to "CHARGING…". Derived from the button's container so
+  // the call signature stays the same; all lookups are null-safe.
+  const wrap = button.closest('.story-launch-wrap');
+  const meter = wrap?.querySelector('.charge-meter') ?? null;
+  const bigEl = button.querySelector('#launchBig');
+  const subEl = button.querySelector('#launchSub');
+  const hintEl = meter?.querySelector('.charge-hint') ?? null;
+
   const paint = (): void => {
     if (fill) fill.style.width = `${value}%`;
   };
@@ -60,7 +69,18 @@ export function mountChargeMeter(
     value = 0;
     startT = performance.now();
     button.classList.add('charging');
+    meter?.classList.add('active');
+    if (bigEl) bigEl.textContent = 'CHARGING…';
+    if (subEl) subEl.textContent = 'release in the zone!';
+    if (hintEl) hintEl.textContent = 'release in the dashed zone!';
     raf = requestAnimationFrame(tick);
+  };
+
+  const resetLabel = (): void => {
+    meter?.classList.remove('active');
+    if (bigEl) bigEl.textContent = 'BLAST!';
+    if (subEl) subEl.textContent = 'hold to charge';
+    if (hintEl) hintEl.textContent = 'hold to charge · or just tap';
   };
 
   const end = (): void => {
@@ -72,6 +92,7 @@ export function mountChargeMeter(
     value = 0;
     paint();
     button.classList.remove('charging');
+    resetLabel();
     if (!isDisabled(button)) onRelease(result);
   };
 

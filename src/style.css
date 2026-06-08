@@ -360,25 +360,53 @@ body {
 .area-card .area-emoji { font-size: 1.7em; line-height: 1; }
 .area-card .area-name { font-size: 0.75em; line-height: 1.1; text-align: center; }
 
-/* --- Progression strip (gold + research notes + Shop) --- */
-.progression-strip {
+/* --- PLAN v9 UI-overhaul Phase 1 / 04 §2 — pure-status top bar.
+   [ mute chip ] · [ REGION / Show N of M ] · [ gold chip ]. No phone-frame, so
+   no status-bar margin-top — the bar sits flush at the top of the play screen. */
+.top {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 14px;
-  background: rgba(40, 20, 70, 0.35);
-  border: 2px solid #f59e0b;
-  border-radius: 10px;
-  padding: 8px 14px;
-  margin-bottom: 14px;
+  gap: 8px;
+  padding: 6px 4px 10px;
+  margin-bottom: 4px;
 }
-.progression-stat {
-  font-weight: bold;
-  color: #ffe79a;
-  font-size: 1.05em;
+.chip-btn {
+  height: 44px;
+  min-width: 44px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
 }
-.progression-stat:nth-child(2) {
-  color: #aaffe2;
+.chip-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.day {
+  flex: 1;
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+}
+.day small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  text-transform: uppercase;
 }
 .shop-btn {
   margin-left: auto;
@@ -490,19 +518,25 @@ body {
   transition: width 0.3s ease;
 }
 .belly-value { font-size: 0.95em; color: #e6f0ff; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+/* PLAN v9 UI-overhaul Phase 2 — Move On is a SECONDARY (ghost) sticker in its
+   own row, separate from the belly capacity readout and visually subordinate to
+   the green BLAST CTA. */
+.move-on-row { display: flex; justify-content: flex-end; margin-bottom: 14px; }
 .move-on-btn {
-  background: linear-gradient(135deg, #14b8a6, #0d6964);
-  border: 2px solid #5eead4;
-  color: #fff;
-  font-weight: bold;
+  background: #fff;
+  border: 2.5px solid var(--ink);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
   font-size: 0.92em;
-  padding: 8px 14px;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 var(--ink);
   cursor: pointer;
   min-height: 44px;
   white-space: nowrap;
 }
-.move-on-btn:hover { filter: brightness(1.1); }
+.move-on-btn:hover { filter: brightness(1.02); }
 /* PR9 — Wow encore Move On state. Pulses gold to draw the eye. */
 .move-on-btn.move-on-encore {
   background: linear-gradient(135deg, #facc15, #f59e0b);
@@ -1406,19 +1440,20 @@ h1 {
   bottom: 80px;
   right: 12px;
   z-index: 350;
-  background: linear-gradient(160deg, #2a1050, #1a0a3e);
-  border: 2px solid #fde047;
+  background: var(--paper);
+  border: 3px solid var(--ink);
   border-radius: 14px;
   padding: 14px;
   min-width: 240px;
   max-width: 320px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-  color: #fff;
+  box-shadow: 4px 4px 0 var(--ink);
+  color: var(--ink);
 }
 .audio-popover[hidden] { display: none !important; }
 .audio-popover-header {
-  font-weight: bold;
-  color: #fde68a;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  color: var(--ink);
   margin-bottom: 10px;
   font-size: 1em;
 }
@@ -1534,27 +1569,35 @@ footer {
 }
 .onboarding[hidden] { display: none !important; }
 .onboarding-card {
-  background: linear-gradient(160deg, #2a1050, #1a0a3e);
-  color: #fff;
-  border: 3px solid #00ff88;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
   border-radius: 20px;
   padding: 24px;
   max-width: 460px;
   width: 100%;
-  box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+  box-shadow: 6px 6px 0 var(--ink);
   text-align: center;
 }
-.onboarding-emoji { font-size: 4em; line-height: 1; margin-bottom: 8px; }
+/* PLAN v9 UI-overhaul — 96px hard-shadowed emoji circle (was a bare glyph) */
+.onboarding-emoji {
+  width: 96px; height: 96px; margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; line-height: 1;
+  background: #fff; border: 4px solid var(--ink); border-radius: 50%;
+  box-shadow: 5px 6px 0 var(--ink);
+}
 .onboarding-title {
+  font-family: 'Baloo 2', sans-serif; font-weight: 800;
   font-size: 1.5em;
   margin-bottom: 12px;
-  color: #aaffcc;
-  text-shadow: 0 0 12px #00ff88;
+  color: var(--ink);
 }
-.onboarding-body { font-size: 1.05em; line-height: 1.4; margin-bottom: 16px; }
+.onboarding-body { font-size: 1.05em; line-height: 1.4; margin-bottom: 16px; color: var(--ink); }
 .onboarding-step-indicator {
-  font-size: 0.95em;
-  color: #ffeb3b;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85em;
+  color: var(--muted);
   margin-bottom: 16px;
 }
 .onboarding-actions {
@@ -2973,7 +3016,10 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
    Order Ticket language (paper & ink, hard offset shadows).
    ============================================================ */
 
-/* ---- charge meter (above the BLAST button) ---- */
+/* ---- charge meter (above the BLAST button) ----
+   PLAN v9 UI-overhaul Phase 3 — the meter DIMS to .55 at rest and wakes to full
+   on hold (.active toggled by charge-meter.ts). That idle-dim is what stops the
+   dashed sweet-zone from reading as a hard standalone "dotted box". */
 .charge-meter {
   position: relative;
   height: 16px;
@@ -2983,58 +3029,80 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   border: 2.5px solid var(--ink);
   border-radius: 999px;
   overflow: hidden;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
 }
+.charge-meter.active { opacity: 1; }
 .charge-meter .charge-fill {
   position: absolute;
   inset: 0 auto 0 0;
   width: 0;
-  background: linear-gradient(180deg, var(--green), var(--green-d));
-  border-radius: 999px;
+  /* heats up toward the sweet zone */
+  background: linear-gradient(90deg, var(--green), var(--gold), var(--orange));
 }
 .charge-meter .charge-sweet {
   position: absolute;
   top: 0; bottom: 0;
   left: 74%; width: 18%;
-  border: 2px dashed var(--ink);
-  border-radius: 6px;
-  opacity: 0.7;
+  border: 2.5px dashed var(--ink);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.25);
   pointer-events: none;
 }
 .charge-meter .charge-hint {
   position: absolute;
   inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
   font-size: 9px;
   color: var(--ink);
+  opacity: 0.7;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1em;
   pointer-events: none;
 }
-#storyLaunchBtn.charging {
-  animation: blast-shake 0.18s linear infinite;
-}
+/* two-line BLAST button: "💨 BLAST!" over a small "hold to charge" sub */
+.btn.launch.blast { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.btn.launch .big { display: flex; align-items: center; gap: 9px; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 27px; line-height: 1; }
+.btn.launch .sub { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.65; }
+#storyLaunchBtn.charging { transform: translate(2px, 3px); }
+.btn.launch.charging .big { animation: blast-shake 0.12s linear infinite; }
 @keyframes blast-shake {
   0%, 100% { transform: translate(0, 0); }
   25% { transform: translate(-1px, 1px); }
   75% { transform: translate(1px, -1px); }
 }
 
-/* ---- reaction takeover (full-screen, opaque) ---- */
+/* ---- reaction takeover (full-screen, opaque) ----
+   PLAN v9 UI-overhaul Phase 5 — celebratory takeover: green radial spotlight, a
+   warm-red .flop wash for F, a slammed white inked stamp, confetti + stink. */
 .reaction-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--paper);
-  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px);
+  background:
+    radial-gradient(680px 360px at 50% 12%, #eef7d6 0%, var(--paper) 62%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px),
+    var(--paper);
   color: var(--ink);
   font-family: 'Nunito', system-ui, sans-serif;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.reaction-overlay.flop {
+  background:
+    radial-gradient(680px 360px at 50% 12%, #f3ddd2 0%, var(--paper) 62%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px),
+    var(--paper);
 }
 .reaction-overlay[hidden] { display: none; }
-.reaction-overlay.reaction-show .stamp { animation: stamp-slam 0.45s cubic-bezier(.2,1.4,.4,1) both; }
+.reaction-overlay.reaction-show .rxn-scroll { animation: rxn-in 0.3s ease both; }
+@keyframes rxn-in { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .rxn-scroll {
+  position: relative;
+  z-index: 2;
   flex: 1;
   overflow-y: auto;
   padding: 22px 18px 12px;
@@ -3043,33 +3111,49 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   margin: 0 auto;
   text-align: center;
 }
-.rxn-crowd { font-size: 30px; letter-spacing: 4px; margin-bottom: 8px; }
-.rxn-crowd span { display: inline-block; animation: face-bob 1.1s ease-in-out infinite; }
-.rxn-crowd span:nth-child(2) { animation-delay: 0.1s; }
-.rxn-crowd span:nth-child(3) { animation-delay: 0.2s; }
-.rxn-crowd span:nth-child(4) { animation-delay: 0.3s; }
-.rxn-crowd span:nth-child(5) { animation-delay: 0.4s; }
-@keyframes face-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-.stamp {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 26px;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
-  box-shadow: 5px 6px 0 var(--ink);
-  margin: 6px 0 10px;
-  background: var(--green);
+/* falling confetti (non-F) + drifting stink cloud (stink ≥ .45) */
+.confetti, .rxn-stink { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.confetti i { position: absolute; top: -20px; width: 9px; height: 13px; border-radius: 2px; animation: rxn-fall 2.2s linear infinite; }
+@keyframes rxn-fall { 0% { transform: translateY(-20px) rotate(0); } 100% { transform: translateY(840px) rotate(540deg); } }
+.rxn-stink i {
+  position: absolute; bottom: 18%; width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(110,174,18,.55), transparent 70%);
+  animation: rxn-rise 3s ease-in infinite;
 }
-.stamp.grade-s { background: #a855f7; color: #fff; }
-.stamp.grade-a { background: var(--orange); color: #fff; }
-.stamp.grade-b { background: var(--green); }
-.stamp.grade-f { background: #ef4444; color: #fff; }
-.stamp .g { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 52px; line-height: 1; }
-.stamp .l { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+@keyframes rxn-rise {
+  0% { transform: translateY(40px) scale(.6); opacity: 0; }
+  30% { opacity: .8; }
+  100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .confetti, .rxn-stink { display: none; } }
+.rxn-crowd { font-size: 32px; letter-spacing: 4px; margin-bottom: 8px; }
+.rxn-crowd span { display: inline-block; animation: face-bob 0.7s ease-in-out infinite; }
+.rxn-crowd span:nth-child(2) { animation-delay: 0.1s; }
+.rxn-crowd span:nth-child(3) { animation-delay: 0.05s; }
+.rxn-crowd span:nth-child(4) { animation-delay: 0.15s; }
+.rxn-crowd span:nth-child(5) { animation-delay: 0.1s; }
+@keyframes face-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.stamp {
+  position: relative;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 6px auto 10px;
+  background: #fff;
+  border: 5px solid var(--ink);
+  box-shadow: 5px 7px 0 rgba(0,0,0,.22);
+  animation: stamp-slam 0.45s cubic-bezier(.2,1.6,.4,1) both;
+}
+.stamp .g { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 54px; line-height: 0.8; color: var(--ink); }
+.stamp .l { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+.stamp.grade-s .g { color: #a855f7; }
+.stamp.grade-a .g { color: var(--orange); }
+.stamp.grade-b .g { color: var(--green-d); }
+.stamp.grade-f .g { color: #c0392b; }
 @keyframes stamp-slam {
-  0% { transform: scale(2.4) rotate(-12deg); }
-  100% { transform: scale(1) rotate(-4deg); }
+  0% { transform: scale(2.2) rotate(18deg); opacity: 0; }
+  60% { transform: scale(0.85) rotate(-9deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-7deg); }
 }
 .rxn-verdict { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; margin: 4px 0; }
 .rxn-cap {
@@ -3232,8 +3316,8 @@ h1 { font-weight: 800; }
 .story-shell,
 .audience-wrap,
 .daily-quest-strip,
-.shop-modal-card, .notebook-modal-card, .research-modal-card, .map-screen-card,
-.kitchen-overlay-card, .arena-card, .intermission-card, .codex-picker-card {
+.shop-modal-card, .notebook-modal-card, .research-modal-card,
+.kitchen-card, .arena-card, .intermission-card, .codex-picker-card {
   background: #fff !important;
   border: 3px solid var(--ink) !important;
   border-radius: 16px !important;
@@ -3242,15 +3326,34 @@ h1 { font-weight: 800; }
 }
 .story-shell { background: var(--paper) !important; }
 
-/* the crowd ticket (audience portrait area) */
+/* the crowd ticket — round 46px avatar (gold ring for bosses) */
 .audience-portrait {
+  width: 46px !important; height: 46px !important;
+  border-radius: 50% !important;
+  display: flex !important; align-items: center; justify-content: center;
+  font-size: 26px !important;
+  flex: 0 0 auto;
   background: var(--paper2) !important;
   border: 3px solid var(--ink) !important;
   box-shadow: 2px 2px 0 var(--ink) !important;
   color: var(--ink) !important;
 }
+.audience-portrait.audience-portrait-tier-boss {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 16px rgba(245, 158, 11, 0.5) !important;
+}
 .audience-name { color: var(--ink) !important; font-family: 'Baloo 2', sans-serif; font-weight: 800; }
-.audience-flavor { color: var(--muted) !important; }
+/* flavor line → dashed speech bubble */
+.audience-flavor {
+  background: var(--paper);
+  border: 2.5px dashed #b7a98a;
+  border-radius: 12px;
+  padding: 7px 11px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--muted) !important;
+}
 
 /* generic text inside the shell */
 .story-shell .area-display-prefix,
@@ -3283,6 +3386,62 @@ h1 { font-weight: 800; }
 .food-card-locked { opacity: 0.5 !important; }
 .food-card .food-name { color: var(--ink) !important; }
 .food-card .food-cost { color: var(--muted) !important; }
+
+/* ---- PLAN v9 UI-overhaul Phase 4 — crowd ticket structure, platebox,
+   emoji-only slots, pantry rarity dot ---- */
+.audience-wrap { position: relative; display: flex; flex-direction: column; gap: 9px; overflow: visible; }
+.audience-wrap::before, .audience-wrap::after {
+  content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; background: var(--paper);
+  border: 3px solid var(--ink); border-radius: 50%; z-index: 2;
+}
+.audience-wrap::before { left: -9px; }
+.audience-wrap::after { right: -9px; }
+.tk-head { display: flex; align-items: center; gap: 12px; }
+.audience-meta { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.audience-meta .audience-name { flex: 1; font-size: 17px; }
+.diff-pips { flex: 0 0 auto; font-size: 11px; color: var(--orange); letter-spacing: 1px; }
+
+/* plate → paper2 panel with a "Your brew · N/4" head, 54px emoji-only slots */
+.plate-wrap.platebox { background: var(--paper2); border: 3px solid var(--ink); border-radius: 16px; padding: 9px 11px; }
+.plate-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.plate-head .plate-label { flex: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--ink); }
+.plate-count { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+.plate-slot { height: 54px; min-height: 54px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.plate-slot .food-emoji { font-size: 28px; }
+.plate-slot .rm {
+  position: absolute; top: -7px; right: -7px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #c0392b; color: #fff; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; line-height: 1;
+}
+
+/* pantry rarity dot (top-right of each tile) */
+.food-card { position: relative; }
+.food-card .rar { position: absolute; top: 4px; right: 5px; width: 7px; height: 7px; border-radius: 50%; }
+.food-card.rarity-common .rar { background: #9ca3af; }
+.food-card.rarity-uncommon .rar { background: #22c55e; }
+.food-card.rarity-rare .rar { background: #3b82f6; }
+.food-card.rarity-epic .rar { background: #a855f7; }
+.food-card.rarity-legendary .rar { background: #f59e0b; }
+
+/* 🚫 no-chip → red text + red border (no strike-through on the chip) */
+.craving-chip.no { background: #fff !important; color: #c0392b !important; border-color: #c0392b !important; text-decoration: none !important; }
+
+/* ---- PLAN v9 UI-overhaul Phase 6a — kitchen workbench inner elements readable
+   on the now-white card (the treatment-row rebuild is a follow-up). The legacy
+   slots/select used dark-translucent backgrounds; on white + ink text they read
+   as dark-on-dark / gray-on-gray and fail AA contrast. ---- */
+.kitchen-card .prep-slot,
+.kitchen-card .ferment-slot { background: var(--paper2) !important; border-color: var(--ink) !important; }
+.kitchen-card .prep-treatment-select { background: #fff !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; }
+.kitchen-card .prep-slot-remove { background: #c0392b !important; color: #fff !important; border-color: #fff !important; }
+.kitchen-card .prep-empty,
+.kitchen-card .ferment-empty,
+.kitchen-card .ferment-status,
+.kitchen-card .ferment-slot-empty,
+.kitchen-card .ferment-slot-waiting { opacity: 1 !important; color: #5a4f3d !important; }
 
 /* all sticker buttons: ink border, hard shadow, press translate */
 .btn, .chip-btn, .progression-stat-btn, .kitchen-mode-toggle, .move-on-btn,
@@ -3338,21 +3497,27 @@ body { padding-bottom: 66px; }
   background: var(--ink);
   padding: 5px 5px calc(5px + env(safe-area-inset-bottom, 0px));
 }
+/* PLAN v9 UI-overhaul Phase 1 / 04 §2 — borderless dark-bar dock. State is shown
+   by TINTING the label+emoji (green active / orange equipped), never by painting
+   a fill; locked items dim + grayscale the emoji. */
 .dock-item {
   flex: 1; min-height: 48px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  background: var(--paper); color: var(--ink);
-  border: 2px solid var(--ink); border-radius: 10px;
+  background: none; color: #9a8f78;
+  border: none; border-radius: 0;
   box-shadow: none;
   font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.03em;
   cursor: pointer;
 }
-.dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; opacity: 0.85; }
-.dock-item.on { background: var(--green); }
-.dock-item.hot { background: var(--orange); }
+.dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; color: #c9bd9f; }
+.dock-item.on { color: var(--green); }
+.dock-item.hot { color: var(--orange); }
+.dock-item.hot .dock-e { filter: none; }
 .dock-item.locked { opacity: 0.4; cursor: not-allowed; }
-.dock-item .dock-e { font-size: 18px; line-height: 1; }
-.dock-item:active:not(.locked) { transform: translate(1px, 1px); }
+.dock-item.locked .dock-e { filter: grayscale(1); }
+.dock-item .dock-e { font-size: 20px; line-height: 1; transition: transform 0.12s; }
+.dock-item:active:not(.locked) .dock-e { transform: scale(1.2); }
 
 /* PLAN v9 P5 §8 — boss arena orange-hazard reskin (a hotter cast of the loop). */
 .arena-card {
@@ -3377,8 +3542,7 @@ body { padding-bottom: 66px; }
 .story-shell, .story-shell *,
 .audience-wrap, .audience-wrap *,
 .daily-quest-strip, .daily-quest-strip *,
-.kitchen-overlay-card, .kitchen-overlay-card *,
-.map-screen-card, .map-screen-card *,
+.kitchen-card, .kitchen-card *,
 .shop-modal-card, .shop-modal-card *,
 .notebook-modal-card, .notebook-modal-card *,
 .research-modal-card, .research-modal-card *,
@@ -3422,23 +3586,75 @@ body { padding-bottom: 66px; }
 .venue-ladder-head h2 { flex: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 18px; }
 .venue-ladder-stars { font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--gold); }
 .venue-ladder-close { background: #fff; border: 2.5px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink); width: 34px; height: 34px; font-weight: 800; cursor: pointer; }
-.venue-ladder-path { display: flex; flex-direction: column; gap: 10px; }
-.vnode {
+/* PLAN v9 UI-overhaul Phase 2 / 04 §7 — the venue is a winding node-path canvas:
+   an SVG dashed polyline through round avatar nodes climbing bottom→top. */
+.venue {
   position: relative;
-  display: flex; align-items: center; gap: 10px;
-  background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
-  box-shadow: 3px 3px 0 var(--ink); padding: 8px 12px;
+  min-height: 380px;
+  border: 2.5px solid var(--ink);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 78% 14%, #d7e9f6 0, transparent 40%),
+    radial-gradient(circle at 20% 86%, #e7f3c8 0, transparent 42%),
+    var(--paper2);
+  box-shadow: inset 0 0 0 3px #fff;
+  overflow: hidden;
 }
-.vnode-current { background: var(--orange); color: #fff; animation: vnode-pulse 1.2s ease-in-out infinite; }
-.vnode-upcoming { opacity: 0.6; }
-.vnode-boss { border-width: 3px; background: var(--paper2); }
-.vnode-boss.vnode-current { background: var(--orange); }
-.vnode-circle { font-size: 24px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--paper2); border: 2.5px solid var(--ink); border-radius: 999px; flex-shrink: 0; }
-.vnode-current .vnode-circle { background: #fff; }
-.vnode-stars { color: var(--gold); font-size: 13px; min-width: 48px; }
-.vnode-label { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px; flex: 1; }
-.vnode-tag { position: absolute; top: -8px; right: 10px; font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700; background: var(--orange); color: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 1px 5px; }
-.venue-foot { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 2.5px solid var(--ink); }
-.venue-foot-av { font-size: 28px; }
+.venue-path { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.venue-path polyline {
+  fill: none; stroke: var(--ink); stroke-width: 1.4;
+  stroke-dasharray: 2 3; opacity: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+.vnode {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 78px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  text-align: center;
+}
+.vnode .vstars { height: 13px; color: var(--gold); font-size: 11px; line-height: 1; }
+.vnode .circle {
+  width: 50px; height: 50px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  font-size: 23px;
+}
+.vnode .vlab { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 9px; line-height: 1.05; }
+.vnode.done .circle { background: var(--green); }
+.vnode.cur .circle { background: var(--orange); color: #fff; animation: vpulse 1.4s ease-in-out infinite; }
+.vnode.lock .circle { background: var(--paper2); color: #b3a587; }
+.vnode.lock { opacity: 0.85; }
+.vnode.boss .circle {
+  width: 62px; height: 62px; font-size: 30px;
+  border-color: #fff; color: #fff;
+  background: radial-gradient(circle at 40% 35%, #ff9a52, #c2410c);
+  box-shadow: 0 0 0 4px var(--orange), 3px 5px 0 rgba(0, 0, 0, 0.3);
+}
+@keyframes vpulse {
+  0%, 100% { box-shadow: 3px 3px 0 var(--ink), 0 0 0 0 rgba(255, 122, 47, 0.5); }
+  50% { box-shadow: 3px 3px 0 var(--ink), 0 0 0 10px rgba(255, 122, 47, 0); }
+}
+.venue-foot {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 14px; padding: 10px 12px;
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.venue-foot-av { font-size: 28px; flex: 0 0 auto; }
+.venue-foot-info { flex: 1; min-width: 0; }
 .venue-foot-nm { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 14px; }
-@keyframes vnode-pulse { 0%, 100% { box-shadow: 3px 3px 0 var(--ink); } 50% { box-shadow: 3px 3px 0 var(--ink), 0 0 0 4px rgba(255, 122, 47, 0.3); } }
+.venue-foot-ds { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+.venue-play-cta {
+  flex: 0 0 auto;
+  background: var(--green); color: var(--ink);
+  border: 2.5px solid var(--ink); border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px;
+  padding: 9px 12px; cursor: pointer;
+}
+.venue-play-cta:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+@media (prefers-reduced-motion: reduce) {
+  .vnode.cur .circle { animation: none; }
+}

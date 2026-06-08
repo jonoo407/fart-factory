@@ -31,14 +31,28 @@
             <div class="arena-result" id="arenaResult" hidden aria-live="polite"></div>
           </div>
         </div>
-        <div class="audience-wrap" role="region" aria-label="Today's audience">
-          <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
-          <div class="audience-meta">
-            <div class="audience-name" id="audienceName">—</div>
-            <div class="audience-flavor" id="audienceFlavor">—</div>
-            <div class="audience-cravings" id="audienceCravings" hidden></div>
-            <div class="audience-restrictions" id="audienceRestrictions" hidden></div>
+        <!-- PLAN v9 UI-overhaul Phase 1 / 04 §2 — pure-status top bar:
+             [ mute chip ] · [ REGION / Show N of M ] · [ gold chip ].
+             All navigation lives in the fixed dock at the bottom. -->
+        <div class="top" role="region" aria-label="Status">
+          <button type="button" class="chip-btn mute" id="muteBtn" aria-pressed="false" aria-label="Mute audio">🔊</button>
+          <div class="day" id="dayLabel">
+            <span id="regionName">Hometown</span>
+            <small id="showCount">Show 1 of 6</small>
           </div>
+          <button type="button" class="chip-btn gold" id="goldChip" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></button>
+        </div>
+        <div class="audience-wrap" role="region" aria-label="Today's audience">
+          <div class="tk-head">
+            <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
+            <div class="audience-meta">
+              <div class="audience-name" id="audienceName">—</div>
+              <span class="diff-pips" id="audienceDiffPips" aria-hidden="true"></span>
+            </div>
+          </div>
+          <div class="audience-flavor" id="audienceFlavor">—</div>
+          <div class="audience-cravings" id="audienceCravings" hidden></div>
+          <div class="audience-restrictions" id="audienceRestrictions" hidden></div>
         </div>
         <div class="first-launch-hint" id="firstLaunchHint" hidden aria-live="polite"></div>
         <div class="audience-reaction" id="audienceReaction" hidden aria-live="polite">
@@ -46,22 +60,22 @@
           <span class="audience-reaction-trend" id="audienceReactionTrend"></span>
           <span class="audience-reaction-streak" id="audienceReactionStreak" hidden></span>
         </div>
-        <!-- PLAN v9 04 §2 — top bar: status + mute only. Nav lives in the fixed
-             dock at the bottom (no duplicated buttons). -->
-        <div class="progression-strip" role="region" aria-label="Progression">
-          <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
-          <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
-          <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
-          <button type="button" class="btn kitchen-btn" id="kitchenBtn" aria-label="Open kitchen (prep foods before launch)" hidden>🍳 Kitchen</button>
-          <button type="button" class="btn mute" id="muteBtn" aria-pressed="false" aria-label="Mute audio">🔊</button>
-        </div>
+        <!-- Research notes counter (relocated off the top bar; reachable from the
+             Lab Book / More surface). Kept hidden so renderProgression keeps
+             #notesCount + research wiring alive until Phase 6 builds the More tab. -->
+        <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)" hidden>📝 <span id="notesCount" aria-live="polite">0</span></button>
         <div class="daily-quest-strip" id="dailyQuest" role="region" aria-label="Today's daily quest"></div>
+        <!-- PLAN v9 UI-overhaul Phase 2 — belly is a pure capacity readout; the
+             Move On (advance) control lives in its own row so capacity and
+             progression are no longer conflated. -->
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
           <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="30" aria-valuenow="30" aria-label="Belly capacity">
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
           <span class="belly-value"><span id="bellyValue">30</span>/<span id="bellyCap">30</span></span>
+        </div>
+        <div class="move-on-row">
           <button type="button" class="move-on-btn" id="moveOnBtn" aria-label="Move On to the next audience (refills belly)">➡ Move On</button>
         </div>
 
@@ -92,8 +106,11 @@
           </div>
         </div>
 
-        <div class="plate-wrap" role="group" aria-label="Plate">
-          <div class="plate-label">🍴 Plate (tap a slot to remove):</div>
+        <div class="plate-wrap platebox" role="group" aria-label="Your brew">
+          <div class="plate-head">
+            <span class="plate-label">🍴 Your brew</span>
+            <span class="plate-count" id="plateCount">0 / 4 · tap to remove</span>
+          </div>
           <div id="platePreview" class="plate-preview" hidden aria-live="polite"></div>
           <div class="plate" id="plate">
             <button type="button" class="plate-slot" id="plateSlot1" data-slot="0" aria-label="Plate slot 1 (empty)">＋</button>
@@ -107,7 +124,6 @@
         <div class="area-display" role="region" aria-label="Current location">
           <span class="area-display-prefix">📍 Launching at:</span>
           <span class="area-display-current" id="areaCurrentName">—</span>
-          <button type="button" class="area-display-change" id="areaChangeBtn" aria-label="Change location">change</button>
         </div>
 
         <div class="pantry-wrap" role="region" aria-label="Pantry">
@@ -122,7 +138,10 @@
             <div class="charge-fill" id="chargeFill"></div>
             <div class="charge-hint">hold to charge · or just tap</div>
           </div>
-          <button type="button" class="btn launch" id="storyLaunchBtn" aria-label="Hold to charge, release to launch the fart">🚀 LAUNCH FART</button>
+          <button type="button" class="btn launch blast" id="storyLaunchBtn" aria-label="Hold to charge, release to BLAST the fart">
+            <span class="big">💨 <span id="launchBig">BLAST!</span></span>
+            <span class="sub" id="launchSub">hold to charge</span>
+          </button>
         </div>
 
         <div class="story-result" id="storyResult" hidden aria-live="polite">
@@ -135,17 +154,6 @@
       </div>
 
       <footer>The Fart Factory — A Serious Scientific Institution 🧪</footer>
-    </div>
-
-    <div id="mapScreen" class="map-screen" hidden role="dialog" aria-modal="true" aria-label="World map">
-      <div class="map-screen-card">
-        <div class="map-screen-header">
-          <h2>📍 World Map</h2>
-          <button type="button" id="mapCloseBtn" class="map-close" aria-label="Close map">✕</button>
-        </div>
-        <div class="map-canvas" id="mapCanvas"></div>
-        <div class="map-info" id="mapInfo">Tap a pin to travel there. Locked regions unlock through progression.</div>
-      </div>
     </div>
 
     <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">
@@ -171,6 +179,9 @@
         <div class="notebook-modal-progress" aria-live="polite">
           <span id="notebookProgressText">0 / 0 discovered</span>
         </div>
+        <!-- PLAN v9 UI-overhaul — research notes live in the Lab Book now (they
+             were relocated off the top bar). -->
+        <button type="button" id="notebookResearchBtn" class="btn notebook-research-btn">📝 Open Research Lab</button>
         <div class="notebook-recipes" id="notebookRecipes"></div>
         <h3 class="notebook-section-h">🏆 Legendary Quests</h3>
         <div class="legendary-quests" id="legendaryQuests"></div>
@@ -240,9 +251,9 @@
     <div id="venueLadder" class="venue-ladder" hidden role="dialog" aria-modal="true" aria-label="Venue ladder"></div>
 
     <nav id="dock" class="dock" aria-label="Main dock">
-      <span class="dock-item dock-stage on" aria-current="page"><span class="dock-e">🎭</span>Stage</span>
+      <button type="button" class="dock-item dock-stage on" id="stageBtn" aria-current="page" aria-label="Stage (current screen)"><span class="dock-e">🎭</span>Stage</button>
       <button type="button" class="dock-item shop-btn" id="shopBtn" aria-label="Open pantry shop"><span class="dock-e">🛒</span>Shop</button>
-      <button type="button" class="dock-item kitchen-mode-toggle" id="kitchenModeToggle" aria-pressed="false" aria-label="Toggle Kitchen Mode (advanced prep + treatments)"><span class="dock-e">🍳</span>Kitchen</button>
+      <button type="button" class="dock-item kitchen-mode-toggle locked" id="kitchenModeToggle" aria-disabled="true" aria-label="Open Kitchen — prep foods with treatments (unlocks as you play)"><span class="dock-e">🍳</span>Kitchen</button>
       <button type="button" class="dock-item notebook-btn" id="notebookBtn" aria-label="Open lab notebook"><span class="dock-e">📖</span>Book<span id="notebookCounter" class="dock-badge">0/0</span></button>
       <button type="button" class="dock-item venue-btn" id="venueBtn" aria-label="Open the venue ladder"><span class="dock-e">🏟️</span>Venue</button>
     </nav>

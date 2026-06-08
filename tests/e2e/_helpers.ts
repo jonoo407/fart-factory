@@ -21,10 +21,10 @@ export async function loadFreshStory(page: Page): Promise<void> {
 /** Dismiss any feature-intro modal (e.g. the Granny → broccoli food grant). */
 export async function dismissOverlays(page: Page): Promise<void> {
   const close = page.locator('#featureIntroCloseBtn');
-  for (let i = 0; i < 4; i++) {
-    if ((await close.count()) > 0 && (await close.first().isVisible())) {
+  for (let i = 0; i < 6; i++) {
+    if ((await close.count()) > 0 && (await close.first().isVisible().catch(() => false))) {
       await close.first().click();
-      await page.waitForTimeout(60);
+      await page.waitForTimeout(80);
     } else break;
   }
 }
@@ -36,9 +36,15 @@ export async function dismissOverlays(page: Page): Promise<void> {
  * it resolves as a safe tap.
  */
 export async function launchPassingPlate(page: Page): Promise<void> {
+  // The first encounter grants broccoli AND pops a feature-intro modal. Wait for
+  // the grant to land in the pantry, then dismiss the modal so the tile is
+  // clickable (not covered) — both are needed to avoid a timing flake.
+  const broc = page.locator('[data-food="broccoli"]').first();
+  await broc.waitFor({ state: 'attached' });
   await dismissOverlays(page);
-  await page.locator('[data-food="broccoli"]').click();
-  await page.locator('[data-food="broccoli"]').click();
+  await broc.click();
+  await broc.click();
+  await dismissOverlays(page);
   await page.click('#storyLaunchBtn');
   await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
 }

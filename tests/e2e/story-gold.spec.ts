@@ -44,6 +44,10 @@ test('Gold counter increments after a launch (and persists in localStorage)', as
 test('Gold counter is visible alongside research-notes counter and a Shop button', async ({ page }) => {
   await loadStoryMode(page);
   await expect(page.locator('#goldCount')).toBeVisible();
-  await expect(page.locator('#notesCount')).toBeVisible();
+  // PLAN v9 UI-overhaul — #notesCount relocated into the now-hidden #researchBtn
+  // (research is reached via the Lab Book). Assert the counter is wired (value
+  // readable) rather than visible.
+  await expect(page.locator('#notesCount')).toHaveCount(1);
+  expect((await page.locator('#notesCount').textContent())?.trim().length).toBeGreaterThan(0);
   await expect(page.locator('#shopBtn')).toBeVisible();
 });

@@ -90,6 +90,12 @@ export function closeResearch(): void {
 
 export function wireResearch(): void {
   $('researchBtn')?.addEventListener('click', openResearch);
+  // PLAN v9 UI-overhaul — research is reachable from the Lab Book (Book dock tab)
+  // now that it's off the top bar.
+  $('notebookResearchBtn')?.addEventListener('click', () => {
+    $('notebookModal')?.setAttribute('hidden', '');
+    openResearch();
+  });
   $('researchCloseBtn')?.addEventListener('click', closeResearch);
   $('researchModal')?.addEventListener('click', (ev) => {
     if (ev.target === $('researchModal')) closeResearch();

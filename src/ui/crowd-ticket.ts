@@ -4,13 +4,13 @@
  * want / 🚫 no chips by AXIS LABEL only (never raw integers, doc 06 §3). Clue
  * density scales with difficultyTier so bosses stay cryptic.
  */
-import { deriveWants, type Audience } from '../state/audience';
+import { deriveWants, type Audience, type DifficultyTier } from '../state/audience';
 import type { FoodProperties } from '../state/food';
 import { axisEmoji } from './axis-emoji';
 
 type AxisName = keyof FoodProperties;
 
-const AXIS_LABEL: Record<AxisName, string> = {
+export const AXIS_LABEL: Record<AxisName, string> = {
   wet: 'Wet',
   dry: 'Dry',
   stink: 'Stink',
@@ -32,6 +32,14 @@ function densityFor(aud: Audience): number {
     case 'hard': return 1;
     case 'boss': return 1;
   }
+}
+
+const DIFF_PIP_COUNT: Record<DifficultyTier, number> = { easy: 1, medium: 2, hard: 3, boss: 4 };
+
+/** Difficulty as ●●○○ (filled = how cryptic the crowd is), 4 pips total. */
+export function diffPips(tier: DifficultyTier): string {
+  const n = DIFF_PIP_COUNT[tier];
+  return '●'.repeat(n) + '○'.repeat(4 - n);
 }
 
 export function deriveCravingChips(aud: Audience): CravingChip[] {

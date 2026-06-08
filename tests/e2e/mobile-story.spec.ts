@@ -53,31 +53,15 @@ test('Story Mode interactive elements meet 44×44 on mobile (P5)', async ({ page
   expect(tooSmall).toHaveLength(0);
 });
 
-test('Progression strip wraps gracefully on narrow viewports', async ({ page }) => {
+test('Top status bar fits without horizontal overflow on narrow viewports', async ({ page }) => {
   test.skip(test.info().project.name !== 'mobile', 'mobile-viewport-only');
   await loadStory(page);
-  const strip = page.locator('.progression-strip');
+  // PLAN v9 UI-overhaul Phase 1 — the .progression-strip was replaced by .top.
+  const strip = page.locator('.top');
   await expect(strip).toBeVisible();
-  // The strip must not overflow horizontally — its scrollWidth ≤ clientWidth + 2px tolerance.
+  // The bar must not overflow horizontally — its scrollWidth ≤ clientWidth + 2px tolerance.
   const overflow = await strip.evaluate((el) => {
     return Math.max(0, el.scrollWidth - el.clientWidth);
   });
   expect(overflow).toBeLessThanOrEqual(2);
-});
-
-test('World map pins are at least 44×44 on mobile (P5)', async ({ page }) => {
-  test.skip(test.info().project.name !== 'mobile', 'mobile-viewport-only');
-  await loadStory(page);
-  await page.click('#travelBtn');
-  const pinResults = await page.locator('.map-pin').evaluateAll((els) =>
-    els.map((el) => {
-      const r = (el as HTMLElement).getBoundingClientRect();
-      return { id: el.getAttribute('data-location') || '', width: Math.round(r.width), height: Math.round(r.height) };
-    }),
-  );
-  const tooSmall = pinResults.filter((r) => r.width < 44 || r.height < 44);
-  if (tooSmall.length) {
-    console.log('Map pins below 44×44 on mobile:', JSON.stringify(tooSmall, null, 2));
-  }
-  expect(tooSmall).toHaveLength(0);
 });

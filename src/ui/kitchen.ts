@@ -264,29 +264,26 @@ export function clearPlateTreatments(): void {
 
 // ----- Wire-up -----
 
+/**
+ * PLAN v9 UI-overhaul Phase 1 — the dock Kitchen tab is the single entry point.
+ * It is locked (greyed, progressive disclosure) until the kitchen unlocks, then
+ * a tap opens the overlay. (Phase 6 rebuilds the overlay's contents.)
+ */
 function applyKitchenModeUI(): void {
-  const on = loadKitchenMode();
-  const toggle = $('kitchenModeToggle');
-  if (toggle) {
-    toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
-    toggle.classList.toggle('kitchen-mode-toggle-on', on);
-  }
-  const btn = $('kitchenBtn');
-  if (btn) {
-    if (on) btn.removeAttribute('hidden');
-    else btn.setAttribute('hidden', '');
+  const unlocked = loadKitchenMode();
+  const tab = $('kitchenModeToggle');
+  if (tab) {
+    tab.classList.toggle('locked', !unlocked);
+    tab.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
   }
 }
 
 export function wireKitchen(): void {
   applyKitchenModeUI();
   $('kitchenModeToggle')?.addEventListener('click', () => {
-    const next = !loadKitchenMode();
-    setKitchenMode(next);
-    applyKitchenModeUI();
-    if (!next && kitchenOpen) closeKitchen();
+    if (!loadKitchenMode()) return; // locked until unlocked
+    openKitchen();
   });
-  $('kitchenBtn')?.addEventListener('click', openKitchen);
   $('kitchenCloseBtn')?.addEventListener('click', closeKitchen);
   $('kitchenSendBtn')?.addEventListener('click', sendToPerformance);
   $('kitchenOverlay')?.addEventListener('click', (ev) => {

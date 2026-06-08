@@ -19,13 +19,13 @@ export function showKitchenUnlockToast(): void {
   void toast.offsetWidth;
   toast.classList.add('boss-unlock-toast-enter');
   setTimeout(() => toast.setAttribute('hidden', ''), 5000);
+  // PLAN v9 UI-overhaul Phase 1 — unlock the dock Kitchen tab (it opens the
+  // overlay directly now; there is no separate strip button anymore).
   const t = document.getElementById('kitchenModeToggle');
   if (t) {
-    t.setAttribute('aria-pressed', 'true');
-    t.classList.add('kitchen-mode-toggle-on');
+    t.classList.remove('locked');
+    t.setAttribute('aria-disabled', 'false');
   }
-  const kb = document.getElementById('kitchenBtn');
-  if (kb) kb.removeAttribute('hidden');
 }
 
 export function showHiddenComboSplash(

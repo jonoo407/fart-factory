@@ -114,6 +114,8 @@ export interface ReactionData {
   goldPaid: number;
   learned: string[];
   newRecipe: string | null;
+  /** PLAN v9 UI-overhaul Phase 5 — normalized 0-1 stink; ≥0.45 drifts a cloud. */
+  stink?: number;
   onAction: (a: FooterAction) => void;
 }
 
@@ -126,6 +128,24 @@ function facesFor(grade: Grade): string[] {
   if (grade === 'S') return ['🤣', '🤩', '😍', '🤣', '😆'];
   if (grade === 'A') return ['😂', '🤩', '😆', '😄', '😂'];
   return ['😀', '🙂', '😯', '😀', '😬'];
+}
+
+const CONFETTI_COLORS = ['#8fd11e', '#f59e0b', '#a855f7', '#3b82f6', '#ff7a2f'];
+
+/** Falling confetti for any non-F result (gated on prefers-reduced-motion in CSS). */
+function confettiHtml(): string {
+  const strips = Array.from({ length: 14 }, (_, i) =>
+    `<i style="left:${(i * 7 + 5) % 100}%;background:${CONFETTI_COLORS[i % CONFETTI_COLORS.length]};animation-delay:${(i % 7) * 0.12}s"></i>`,
+  ).join('');
+  return `<div class="confetti" aria-hidden="true">${strips}</div>`;
+}
+
+/** Drifting green stink cloud for a notably stinky launch. */
+function stinkHtml(): string {
+  const blobs = [12, 32, 50, 70, 88]
+    .map((p, i) => `<i style="left:${p}%;animation-delay:${i * 0.3}s"></i>`)
+    .join('');
+  return `<div class="rxn-stink" aria-hidden="true">${blobs}</div>`;
 }
 
 export function hideReactionOverlay(): void {
@@ -162,7 +182,7 @@ export function showReactionOverlay(d: ReactionData): void {
     )
     .join('');
 
-  ov.innerHTML = `<div class="rxn-scroll">
+  ov.innerHTML = `${d.grade !== 'F' ? confettiHtml() : ''}${(d.stink ?? 0) > 0.45 ? stinkHtml() : ''}<div class="rxn-scroll">
     <div class="rxn-crowd">${faces}</div>
     <div class="stamp ${gradeClass(d.grade)}"><span class="g">${d.grade}</span><span class="l">${gradeLabel(d.grade)}</span></div>
     <div class="rxn-verdict">${d.verdict}</div>
@@ -182,6 +202,7 @@ export function showReactionOverlay(d: ReactionData): void {
     });
   });
 
+  ov.classList.toggle('flop', d.grade === 'F');
   ov.removeAttribute('hidden');
   ov.classList.remove('reaction-show');
   void ov.offsetWidth;

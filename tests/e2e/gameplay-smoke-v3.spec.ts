@@ -45,8 +45,9 @@ test('Full v3 gameplay flow — fresh save → launch → notebook → shop → 
 
   // 1. Audience + area + pantry visible.
   await expect(page.locator('#audienceName')).not.toHaveText('—');
-  // PLAN_v4 Phase S: area-grid replaced by the world-map Travel button.
-  await expect(page.locator('#travelBtn')).toBeVisible();
+  // PLAN v9 UI-overhaul Phase 2: world map removed; the dock Venue tab is the
+  // progression surface.
+  await expect(page.locator('#venueBtn')).toBeVisible();
   await expect(page.locator('#areaCurrentName')).toBeVisible();
   await expect(page.locator('.food-card-clickable').first()).toBeVisible();
 

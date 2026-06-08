@@ -81,7 +81,8 @@ import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
 import { axisEmoji } from './axis-emoji';
 import { matchRecipe } from '../state/recipes';
-import { renderCravingChipsHtml } from './crowd-ticket';
+import { renderCravingChipsHtml, diffPips } from './crowd-ticket';
+import { renderTopBar } from './top-bar';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
 import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
@@ -242,7 +243,8 @@ export function renderPlate(): void {
       const food = getFood(id);
       if (!food) continue;
       slot.className = `plate-slot plate-slot-filled ${rarityClassFor(food)}`;
-      slot.innerHTML = `<span class="food-emoji">${food.emoji}</span><span class="food-name">${food.name}</span>`;
+      // PLAN v9 UI-overhaul Phase 4 — emoji-only tile + a red remove badge.
+      slot.innerHTML = `<span class="food-emoji">${food.emoji}</span><span class="rm" aria-hidden="true">×</span>`;
       slot.setAttribute('aria-label', `Plate slot ${i + 1}: ${food.name} (tap to remove)`);
     } else {
       slot.className = 'plate-slot';
@@ -250,6 +252,8 @@ export function renderPlate(): void {
       slot.setAttribute('aria-label', `Plate slot ${i + 1} (empty)`);
     }
   }
+  const countEl = $('plateCount');
+  if (countEl) countEl.textContent = `${plate.filter(Boolean).length} / ${SLOTS} · tap to remove`;
   renderPlatePreview();
   renderRecipeRibbon();
 }
@@ -437,6 +441,7 @@ export function renderProgression(): void {
   const notesEl = $('notesCount');
   if (goldEl) goldEl.textContent = String(loadGold());
   if (notesEl) notesEl.textContent = String(loadResearchNotes());
+  renderTopBar(); // PLAN v9 UI-overhaul Phase 1 — region + "Show N of M"
 }
 
 export function wirePlateSlots(): void {
@@ -510,6 +515,9 @@ export function renderAudiencePortrait(): void {
     nameEl.textContent = aud.name;
     nameEl.setAttribute('data-audience-id', aud.id);
   }
+  // PLAN v9 UI-overhaul Phase 4 — difficulty pips on the ticket head.
+  const pipsEl = $('audienceDiffPips');
+  if (pipsEl) pipsEl.textContent = diffPips(aud.difficultyTier);
   if (flavorEl) flavorEl.textContent = aud.description;
   // PLAN v9 P4 — the Order Ticket "They're craving" chips (labels only, no
   // integers). The prose `description` remains the speech-bubble hint.
@@ -883,6 +891,8 @@ function presentReactionOverlay(a: ReactionArgs): void {
     goldPaid: a.goldPaid,
     learned: a.learned,
     newRecipe: a.newRecipeName,
+    // PLAN v9 UI-overhaul Phase 5 — normalized stink drives the cloud (AXIS_CAP=8).
+    stink: Math.min(1, a.propsAfterArea.stink / 8),
     onAction: handleReactionAction,
   });
 }
@@ -925,12 +935,10 @@ function wirePantryShowLockedToggle(): void {
 }
 
 function wireAreaChangeButton(): void {
-  // The 'change' link next to the current-area display opens the map.
-  // We dispatch a click on #travelBtn to reuse the map UI.
-  $('areaChangeBtn')?.addEventListener('click', () => {
-    $('travelBtn')?.click();
-  });
-  // Listen for map's location-changed event to refresh the display.
+  // PLAN v9 UI-overhaul Phase 2 — the standalone world map is gone; region
+  // advance now folds into clearing the venue boss. The location is a read-only
+  // chip. We keep listening for a location-changed event so a future boss-clear
+  // region bump refreshes the display + portrait.
   window.addEventListener('fart:location-changed', () => {
     renderAreaDisplay();
     renderAudiencePortrait();

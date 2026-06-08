@@ -8,11 +8,13 @@
  * mirror the other overlay screens and are verified in the browser.
  */
 import type { Audience } from '../state/audience';
-import { audienceForEncounter, getAudience } from '../state/audience';
+import { audienceForEncounter } from '../state/audience';
 import { getArea, AREAS } from '../state/containment';
 import { audiencePoolForLocation } from '../state/location-progress';
 import { loadLastArea, loadStars } from '../state/persistence';
 import { currentEncounterIdx } from '../state/run-state';
+import { deriveCravingChips, AXIS_LABEL } from './crowd-ticket';
+import { axisEmoji } from './axis-emoji';
 
 export type NodeState = 'done' | 'current' | 'upcoming';
 
@@ -41,31 +43,72 @@ export function computeLadderNodes(
   });
 }
 
-function nodeHtml(node: LadderNode, index: number): string {
-  const starRow = node.stars > 0 ? '⭐'.repeat(node.stars) : '';
-  const glyph = node.state === 'current' ? '▶' : node.isBoss ? '👑' : node.state === 'done' ? node.emoji : '🔒';
-  const tag = node.isBoss ? '<span class="vnode-tag boss">BOSS</span>' : '';
-  return `<div class="vnode vnode-${node.state}${node.isBoss ? ' vnode-boss' : ''}">
-    ${tag}
-    <div class="vnode-stars">${starRow}</div>
-    <div class="vnode-circle">${glyph}</div>
-    <div class="vnode-label">${node.state === 'current' ? node.name : node.isBoss ? 'Headliner' : 'Show ' + (index + 1)}</div>
+/**
+ * Hand-placed winding positions (x%, y%) for the node-path: a zig-zag climbing
+ * from bottom-left up to top-right, so the SVG polyline reads as an ascent.
+ * Pure + deterministic (04 §7).
+ */
+export function ladderNodePositions(count: number): [number, number][] {
+  if (count <= 0) return [];
+  if (count === 1) return [[48, 50]];
+  const top = 14;
+  const bottom = 86;
+  return Array.from({ length: count }, (_, i): [number, number] => {
+    const y = Math.round(bottom - (bottom - top) * (i / (count - 1)));
+    const x = i % 2 === 0 ? 30 : 66;
+    return [x, y];
+  });
+}
+
+function nodeHtml(node: LadderNode, pos: [number, number], index: number): string {
+  const [x, y] = pos;
+  const stateClass = node.state === 'current' ? 'cur' : node.state === 'done' ? 'done' : 'lock';
+  const cls = `vnode ${stateClass}${node.isBoss ? ' boss' : ''}`;
+  const stars = node.state === 'done' && node.stars > 0 ? '⭐'.repeat(node.stars) : '';
+  // Locked non-boss shows a padlock; everything else shows its avatar emoji.
+  const glyph = node.state === 'upcoming' && !node.isBoss ? '🔒' : node.emoji;
+  const label = node.state === 'current' ? node.name : node.isBoss ? 'Headliner' : `Show ${index + 1}`;
+  return `<div class="${cls}" style="left:${x}%;top:${y}%">
+    <div class="vstars">${stars}</div>
+    <div class="circle">${glyph}</div>
+    <div class="vlab">${label}</div>
   </div>`;
 }
 
-export function renderVenueLadderHtml(nodes: LadderNode[], venueName: string, next: Audience | null): string {
+/** Footer card: the next show to play (the current node) + its wants + a CTA. */
+function footerHtml(current: Audience): string {
+  const wants = deriveCravingChips(current)
+    .filter((c) => c.type === 'want')
+    .slice(0, 2)
+    .map((c) => `${axisEmoji(c.axis)} ${AXIS_LABEL[c.axis]}`)
+    .join(' & ');
+  const wantsLine = wants ? `Wants ${wants} · ⭐⭐⭐ up for grabs` : '⭐⭐⭐ up for grabs';
+  return `<div class="venue-foot">
+    <span class="venue-foot-av">${current.emoji}</span>
+    <div class="venue-foot-info">
+      <div class="venue-foot-nm">${current.name}</div>
+      <div class="venue-foot-ds">${wantsLine}</div>
+    </div>
+    <button type="button" id="venuePlayBtn" class="venue-play-cta">Play ${current.name} ▶</button>
+  </div>`;
+}
+
+export function renderVenueLadderHtml(nodes: LadderNode[], venueName: string, current: Audience | null): string {
   const totalStars = nodes.reduce((s, n) => s + n.stars, 0);
-  const path = nodes.map(nodeHtml).join('');
-  const footer = next
-    ? `<div class="venue-foot"><span class="venue-foot-av">${next.emoji}</span><div><div class="venue-foot-nm">Up next: ${next.name}</div></div></div>`
-    : '';
+  const positions = ladderNodePositions(nodes.length);
+  const points = positions.map(([x, y]) => `${x},${y}`).join(' ');
+  const path = nodes.map((n, i) => nodeHtml(n, positions[i] ?? [50, 50], i)).join('');
+  const footer = current ? footerHtml(current) : '';
   return `<div class="venue-ladder-card">
     <div class="venue-ladder-head">
       <h2>🏟️ ${venueName}</h2>
       <span class="venue-ladder-stars">⭐ ${totalStars}</span>
       <button type="button" id="venueLadderCloseBtn" class="venue-ladder-close" aria-label="Close venue ladder">✕</button>
     </div>
-    <div class="venue-ladder-path">${path}</div>
+    <div class="venue">
+      <svg class="venue-path" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline points="${points}" /></svg>
+      ${path}
+    </div>
     ${footer}
   </div>`;
 }
@@ -88,12 +131,13 @@ export function openVenueLadder(): void {
   const windowStart = Math.floor(curFull / VENUE_SIZE) * VENUE_SIZE;
   const roster = fullRoster.slice(windowStart, windowStart + VENUE_SIZE);
   const nodes = computeLadderNodes(roster, current.id, loadStars);
-  // next = first upcoming-or-current after the current, else null
-  const curIdx = roster.findIndex((a) => a.id === current.id);
-  const next = curIdx >= 0 && curIdx + 1 < roster.length ? getAudience(roster[curIdx + 1]!.id) ?? null : null;
-  screen.innerHTML = renderVenueLadderHtml(nodes, area.name, next);
+  // The footer + CTA reference the CURRENT node — the next show the player will
+  // perform. The play screen already shows it, so "Play …" just closes the
+  // ladder (the loop-closer). Region advance happens by clearing the boss.
+  screen.innerHTML = renderVenueLadderHtml(nodes, area.name, current);
   screen.removeAttribute('hidden');
   $('venueLadderCloseBtn')?.addEventListener('click', closeVenueLadder);
+  $('venuePlayBtn')?.addEventListener('click', closeVenueLadder);
 }
 
 export function closeVenueLadder(): void {

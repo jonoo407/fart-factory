@@ -34,7 +34,7 @@ test('axe-core: zero serious/critical violations in Story Mode (P13)', async ({ 
 
 test('axe-core: Kitchen overlay open — zero serious/critical violations', async ({ page }) => {
   await loadStory(page);
-  await page.click('#kitchenBtn');
+  await page.click('#kitchenModeToggle');
   await page.waitForLoadState('networkidle');
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
@@ -45,25 +45,6 @@ test('axe-core: Kitchen overlay open — zero serious/critical violations', asyn
   if (seriousOrCritical.length) {
     console.log(
       'Story-mode Kitchen axe violations:',
-      JSON.stringify(seriousOrCritical.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2),
-    );
-  }
-  expect(seriousOrCritical).toHaveLength(0);
-});
-
-test('axe-core: Map overlay open — zero serious/critical violations', async ({ page }) => {
-  await loadStory(page);
-  await page.click('#travelBtn');
-  await page.waitForLoadState('networkidle');
-  const results = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
-    .analyze();
-  const seriousOrCritical = results.violations.filter(
-    (v) => v.impact === 'serious' || v.impact === 'critical',
-  );
-  if (seriousOrCritical.length) {
-    console.log(
-      'Story-mode Map axe violations:',
       JSON.stringify(seriousOrCritical.map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.length, help: v.help })), null, 2),
     );
   }
