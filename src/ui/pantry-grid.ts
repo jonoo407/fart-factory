@@ -87,8 +87,10 @@ export function buildFoodCard(food: Food, opts: BuildFoodCardOpts): string {
   const paxHtml = opts.locked
     ? ''
     : paxStripHtml(food, new Set(opts.revealedAxes ?? []), opts.masteryUses ?? 0);
+  // PLAN v9 UI-overhaul Phase 4 — a small rarity dot in the tile's top-right.
+  const rarDot = opts.locked ? '' : '<span class="rar" aria-hidden="true"></span>';
   return `<${tag} ${type} class="food-card ${rarityClassFor(food)} ${lockedClass} ${clickableClass}" data-food="${food.id}" ${aria}>
-    <span class="food-emoji">${emoji}</span>
+    ${rarDot}<span class="food-emoji">${emoji}</span>
     <span class="food-name">${name}</span>
     <span class="food-cost">🍽️ ${cost}</span>${chipHtml}${paxHtml}
   </${tag}>`;

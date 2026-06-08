@@ -43,13 +43,16 @@
           <button type="button" class="chip-btn gold" id="goldChip" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></button>
         </div>
         <div class="audience-wrap" role="region" aria-label="Today's audience">
-          <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
-          <div class="audience-meta">
-            <div class="audience-name" id="audienceName">—</div>
-            <div class="audience-flavor" id="audienceFlavor">—</div>
-            <div class="audience-cravings" id="audienceCravings" hidden></div>
-            <div class="audience-restrictions" id="audienceRestrictions" hidden></div>
+          <div class="tk-head">
+            <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
+            <div class="audience-meta">
+              <div class="audience-name" id="audienceName">—</div>
+              <span class="diff-pips" id="audienceDiffPips" aria-hidden="true"></span>
+            </div>
           </div>
+          <div class="audience-flavor" id="audienceFlavor">—</div>
+          <div class="audience-cravings" id="audienceCravings" hidden></div>
+          <div class="audience-restrictions" id="audienceRestrictions" hidden></div>
         </div>
         <div class="first-launch-hint" id="firstLaunchHint" hidden aria-live="polite"></div>
         <div class="audience-reaction" id="audienceReaction" hidden aria-live="polite">
@@ -103,8 +106,11 @@
           </div>
         </div>
 
-        <div class="plate-wrap" role="group" aria-label="Plate">
-          <div class="plate-label">🍴 Plate (tap a slot to remove):</div>
+        <div class="plate-wrap platebox" role="group" aria-label="Your brew">
+          <div class="plate-head">
+            <span class="plate-label">🍴 Your brew</span>
+            <span class="plate-count" id="plateCount">0 / 4 · tap to remove</span>
+          </div>
           <div id="platePreview" class="plate-preview" hidden aria-live="polite"></div>
           <div class="plate" id="plate">
             <button type="button" class="plate-slot" id="plateSlot1" data-slot="0" aria-label="Plate slot 1 (empty)">＋</button>

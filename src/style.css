@@ -3287,15 +3287,34 @@ h1 { font-weight: 800; }
 }
 .story-shell { background: var(--paper) !important; }
 
-/* the crowd ticket (audience portrait area) */
+/* the crowd ticket — round 46px avatar (gold ring for bosses) */
 .audience-portrait {
+  width: 46px !important; height: 46px !important;
+  border-radius: 50% !important;
+  display: flex !important; align-items: center; justify-content: center;
+  font-size: 26px !important;
+  flex: 0 0 auto;
   background: var(--paper2) !important;
   border: 3px solid var(--ink) !important;
   box-shadow: 2px 2px 0 var(--ink) !important;
   color: var(--ink) !important;
 }
+.audience-portrait.audience-portrait-tier-boss {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 0 16px rgba(245, 158, 11, 0.5) !important;
+}
 .audience-name { color: var(--ink) !important; font-family: 'Baloo 2', sans-serif; font-weight: 800; }
-.audience-flavor { color: var(--muted) !important; }
+/* flavor line → dashed speech bubble */
+.audience-flavor {
+  background: var(--paper);
+  border: 2.5px dashed #b7a98a;
+  border-radius: 12px;
+  padding: 7px 11px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--muted) !important;
+}
 
 /* generic text inside the shell */
 .story-shell .area-display-prefix,
@@ -3328,6 +3347,48 @@ h1 { font-weight: 800; }
 .food-card-locked { opacity: 0.5 !important; }
 .food-card .food-name { color: var(--ink) !important; }
 .food-card .food-cost { color: var(--muted) !important; }
+
+/* ---- PLAN v9 UI-overhaul Phase 4 — crowd ticket structure, platebox,
+   emoji-only slots, pantry rarity dot ---- */
+.audience-wrap { position: relative; display: flex; flex-direction: column; gap: 9px; overflow: visible; }
+.audience-wrap::before, .audience-wrap::after {
+  content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; background: var(--paper);
+  border: 3px solid var(--ink); border-radius: 50%; z-index: 2;
+}
+.audience-wrap::before { left: -9px; }
+.audience-wrap::after { right: -9px; }
+.tk-head { display: flex; align-items: center; gap: 12px; }
+.audience-meta { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.audience-meta .audience-name { flex: 1; font-size: 17px; }
+.diff-pips { flex: 0 0 auto; font-size: 11px; color: var(--orange); letter-spacing: 1px; }
+
+/* plate → paper2 panel with a "Your brew · N/4" head, 54px emoji-only slots */
+.plate-wrap.platebox { background: var(--paper2); border: 3px solid var(--ink); border-radius: 16px; padding: 9px 11px; }
+.plate-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.plate-head .plate-label { flex: 1; font-family: 'Baloo 2', sans-serif; font-weight: 800; color: var(--ink); }
+.plate-count { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+.plate-slot { height: 54px; min-height: 54px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.plate-slot .food-emoji { font-size: 28px; }
+.plate-slot .rm {
+  position: absolute; top: -7px; right: -7px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #c0392b; color: #fff; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; line-height: 1;
+}
+
+/* pantry rarity dot (top-right of each tile) */
+.food-card { position: relative; }
+.food-card .rar { position: absolute; top: 4px; right: 5px; width: 7px; height: 7px; border-radius: 50%; }
+.food-card.rarity-common .rar { background: #9ca3af; }
+.food-card.rarity-uncommon .rar { background: #22c55e; }
+.food-card.rarity-rare .rar { background: #3b82f6; }
+.food-card.rarity-epic .rar { background: #a855f7; }
+.food-card.rarity-legendary .rar { background: #f59e0b; }
+
+/* 🚫 no-chip → red text + red border (no strike-through on the chip) */
+.craving-chip.no { background: #fff !important; color: #c0392b !important; border-color: #c0392b !important; text-decoration: none !important; }
 
 /* all sticker buttons: ink border, hard shadow, press translate */
 .btn, .chip-btn, .progression-stat-btn, .kitchen-mode-toggle, .move-on-btn,

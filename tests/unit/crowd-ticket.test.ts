@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { deriveCravingChips, renderCravingChipsHtml } from '../../src/ui/crowd-ticket';
+import { deriveCravingChips, renderCravingChipsHtml, diffPips } from '../../src/ui/crowd-ticket';
 import { getAudience } from '../../src/state/audience';
 
 /**
@@ -29,5 +29,22 @@ describe('crowd ticket craving chips', () => {
     const html = renderCravingChipsHtml(getAudience('granny-edna')!);
     expect(html).toContain('They’re craving');
     expect(html).not.toMatch(/[0-9]\/5|target/i);
+  });
+});
+
+/**
+ * PLAN v9 UI-overhaul Phase 4 / 04 §2 — difficulty pips (●●○○) on the ticket,
+ * filled by tier so the player gauges how cryptic a crowd is at a glance.
+ */
+describe('diffPips', () => {
+  it('fills one of four for easy', () => {
+    expect(diffPips('easy')).toBe('●○○○');
+  });
+  it('fills two for medium, three for hard', () => {
+    expect(diffPips('medium')).toBe('●●○○');
+    expect(diffPips('hard')).toBe('●●●○');
+  });
+  it('fills all four for a boss', () => {
+    expect(diffPips('boss')).toBe('●●●●');
   });
 });
