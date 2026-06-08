@@ -19,6 +19,23 @@ work by its real dependency graph and writes the failing tests first.
 
 ---
 
+## 0b. Build status (as shipped on `claude/order-ticket-redesign-v9`)
+
+| Phase | Status | Commit |
+|---|---|---|
+| P0 Foundations (tuning, deriveWants, persistence) | ✅ done | `9ba33f5` |
+| P1 Scoring core (closeness fix + charge + grade/stars) | ✅ done | `0884b69` |
+| P2 Reaction takeover + judge card + pass gate + charge meter | ✅ done | `50fb69c` |
+| P3 Discovery + recipe ribbon + food grants + content fix | ✅ done | `28e3ed8` |
+| P4 Order Ticket visual language + ticket chips | ✅ done (dock deferred) | `04d0763` |
+| P5 Venue ladder + 3rd onboarding card + reduced-motion | ✅ done (boss/intermission polish deferred) | `226d96e` |
+| P6 Audio 4-channel + captions + haptics + readout selector | ✅ done (stem ASSETS deferred) | `a940a40` |
+| P7 Content/balance + e2e/a11y | ◻ partial | — |
+
+**Unit tests: 751 green / 84 files, tsc clean.** Every phase browser-verified at a phone viewport (Rule 3). **Known remaining work** (documented in-phase): the **e2e suite needs a flow-update pass** (33 specs encode the old click-launch / ungated-Move-On / inline-result flow), the **ElevenLabs stem assets** (paid generation, not run autonomously), a full **balance pass** across all 20 audiences, and minor polish (fixed dock, boss-arena reskin, intermission +20%-loud buff, venue windowing).
+
+---
+
 ## 1. Decisions that had to be pinned (resolved, with rationale)
 
 These were blocking: every asserted scoring number depends on them. Defaults chosen; **flagged where the user
@@ -164,7 +181,8 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **THE READOUT (D8, costed):** axis-driven layered selector in `sample-player.ts` — `pickBaseRip(wet,dry,lenBucket)` + `pickMelody(musical)` + `pickSizzle(temp)` + `pickHazeTail(stink)`, `gain=0.18+loud*0.7`; feed it the **same normalized `ax`** the scorer produces. Needs **new stem assets** via the ElevenLabs pipeline (real $). RED: `clip-selector.test.ts` (stems chosen per axis thresholds + gain formula). **RECONCILE** `sample-player.test.ts` (keep whole-clip path as fallback), `manifest-integrity.test.ts`, `sfx-seeds.test.ts`.
 - **VERIFY (Rule 3):** a wet recipe sounds wet, a musical one plays notes (perceptual, by ear); captions show by default; 4 channels independent.
 
-### Phase 7 — Content + balance + ship · effort M
+### Phase 7 — Content + balance + ship · effort M · ◻ PARTIAL
+> Done: the early-game content fix (broccoli musical → Granny passable, grants). Remaining: (1) **the e2e suite needs a flow-update pass** — the 33 specs encode the old flow (click-to-launch, ungated Move On, inline result) and break on the redesign; each needs: launch via the charge button (a pointer tap still works), dismiss the reaction overlay, and **pass the crowd before Move On** (it's gated). (2) full **balance pass** across all 20 audiences under the harder scorer (the new curve makes some mid/late crowds hard with the available foods — tune via `tuning.ts` + per-audience `baseGold`/content). (3) lighthouse/axe re-run. Unit suite is **751 green**; the whole loop is browser-verified.
 - Live-balance tuning via `tuning.ts` (incl. **optional**: retune real Granny/broccoli so the teaching examples land — see §9). Expand regions/recipes (03 §7) for economy room. Full e2e + lighthouse + axe a11y pass.
 
 ---
