@@ -131,6 +131,23 @@ const STEM_SFX: SfxSeed[] = withCat([
   // haze — lingering stink tail
   { kind: 'sfx', id: 'haze-lo', name: 'Haze (low)',  mood: 'eerie', duration_seconds: 1.2, prompt: 'a faint lingering eerie haze drone tail, subtle sour detuned overtone, soft' },
   { kind: 'sfx', id: 'haze-hi', name: 'Haze (high)', mood: 'eerie', duration_seconds: 1.4, prompt: 'a thick lingering eerie haze drone tail, sour detuned overtone hum, unsettling' },
+
+  // ====== Stem-bank extension — base-rip VARIANTS (variety in the core loop) ======
+  // selectFartLayers emits the family id (rip-wet-long); pickBaseVariant picks
+  // among these texture variants so repeated recipes don't sound identical.
+  // Distinct timbres from the originals; same duration bucket. Manifest-gated, so
+  // safe to define ahead of generation.
+  { kind: 'sfx', id: 'rip-wet-med-2',  name: 'Wet Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet sputtering bubbly fart, slappy flubber with a chunky pop, no music' },
+  { kind: 'sfx', id: 'rip-dry-med-2',  name: 'Dry Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry buzzy fart rip, brassy raspberry with a stuttering edge, no music' },
+  { kind: 'sfx', id: 'rip-wet-long-2', name: 'Wet Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long wet warbling fart, gurgling blubber that wobbles in pitch as it goes, no music' },
+  { kind: 'sfx', id: 'rip-dry-long-2', name: 'Dry Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry crackling fart rip, tearing braaap that splutters near the end, no music' },
+
+  // ====== Stem-bank extension — EPIC long rips (`-xl`, ~4.5s) ======
+  // Only played at the very top of the length axis (pickBaseVariant), so length=10
+  // finally FEELS long — fixing "the long bucket caps at ~2s" in the tier that
+  // actually plays the core-loop fart.
+  { kind: 'sfx', id: 'rip-wet-long-xl', name: 'Wet Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long wet gurgling fart that builds, sustains, and slowly peters out with bubbly aftershocks, comedic, no music' },
+  { kind: 'sfx', id: 'rip-dry-long-xl', name: 'Dry Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long dry braaaaap fart that rolls on and on with peaks and valleys before fading, comedic, no music' },
 ], 'stem');
 
 // ====== Phase K audience-reaction seeds (item 61) ======

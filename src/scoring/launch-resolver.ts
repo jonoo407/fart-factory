@@ -20,6 +20,7 @@
 import { computeFartFromPlate, type RecipeResult } from './fart-recipe';
 import {
   computeFartFromPreppedPlate,
+  TREATMENTS,
   type TreatmentId,
   type PreppedSlot,
 } from './treatments';
@@ -64,4 +65,29 @@ export function resolveLaunchProps(
     rawRecipe,
     totalBellyCost: prepped.totalBellyCost,
   };
+}
+
+/**
+ * PLAN v9 Phase 6 — single-equip Kitchen. Expand ONE equipped treatment id to a
+ * per-food array (one entry per plated food), so the equipped treatment applies
+ * to every brew. `null`, `'raw'`, an unknown id, or a zero-length plate all
+ * collapse to `[]` (a raw launch).
+ */
+export function equippedToTreatments(equipped: string | null, count: number): TreatmentId[] {
+  if (count <= 0) return [];
+  if (!equipped || equipped === 'raw') return [];
+  if (!TREATMENTS.some((t) => t.id === equipped)) return [];
+  return Array.from({ length: count }, () => equipped as TreatmentId);
+}
+
+/**
+ * The single seam the launch handler uses for the single-equip Kitchen: apply
+ * the one equipped treatment to every plated food, then resolve through the
+ * existing prep-aware path.
+ */
+export function resolveEquippedLaunch(
+  ingredientIds: string[],
+  equipped: string | null,
+): ResolvedLaunch {
+  return resolveLaunchProps(ingredientIds, equippedToTreatments(equipped, ingredientIds.length));
 }

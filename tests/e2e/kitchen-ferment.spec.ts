@@ -20,21 +20,16 @@ async function loadStory(page: import('@playwright/test').Page, opts: { rack?: A
   await page.reload();
 }
 
-test('Each prep slot has a "Send to Rack" button (Phase V item 97)', async ({ page }) => {
-  await loadStory(page);
-  await page.click('#kitchenModeToggle');
-  await page.locator('[data-food="beans"]').click();
-  await expect(page.locator('#prepSlot1 .prep-send-to-rack-btn')).toBeVisible();
-});
+// The single-equip rebuild removed the prep table (and with it the per-slot
+// "Send to Rack" add path). The fermentation rack stays in the Kitchen overlay
+// as a claim-only section for now (it moves behind the "More" surface later),
+// so these specs seed the rack directly and cover display + claim.
 
-test('Clicking Send to Rack removes the prep slot AND adds to ferment rack', async ({ page }) => {
-  await loadStory(page);
+test('A waiting ferment renders in the rack', async ({ page }) => {
+  await loadStory(page, {
+    rack: [{ foodId: 'cheese', startedAt: new Date().toISOString(), startedAtIdx: 0 }],
+  });
   await page.click('#kitchenModeToggle');
-  await page.locator('[data-food="beans"]').click();
-  await page.locator('#prepSlot1 .prep-send-to-rack-btn').click();
-  // Prep slot 1 is now empty.
-  await expect(page.locator('#prepSlot1.prep-slot-filled')).toHaveCount(0);
-  // Ferment rack now has a waiting slot.
   await expect(page.locator('.ferment-slot-waiting').first()).toBeVisible();
 });
 
