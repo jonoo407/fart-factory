@@ -64,6 +64,26 @@ export function resumeAudio(): void {
 }
 
 /**
+ * One-time audio unlock on the first user interaction. Browsers create an
+ * AudioContext in the 'suspended' state and only allow resume() inside a user
+ * gesture; we previously resumed ONLY on tab-visibility and the mute toggle, so
+ * on stricter browsers (notably iOS Safari) the context the first Launch
+ * created stayed suspended and every scheduled sound — fart included — was
+ * silent. Creating the context here also means pre-Launch cues (the audience
+ * signature on load, food-eating sounds) are no longer dropped by
+ * getAudioContext() returning null. Idempotent: unbinds after the first gesture.
+ */
+export function wireAudioUnlock(target: Pick<Document, 'addEventListener' | 'removeEventListener'> = document): void {
+  const events = ['pointerdown', 'keydown', 'touchstart'] as const;
+  const unlock = (): void => {
+    const ctx = ensureAudio();
+    if (ctx && ctx.state === 'suspended') void ctx.resume();
+    for (const ev of events) target.removeEventListener(ev, unlock);
+  };
+  for (const ev of events) target.addEventListener(ev, unlock);
+}
+
+/**
  * Anticipation cue oscillator — shared between sample-path and procedural-
  * only paths in playFart. 150ms triangle-wave rumble below the main fart's
  * frequency range, with a soft attack/decay envelope.
