@@ -1440,19 +1440,20 @@ h1 {
   bottom: 80px;
   right: 12px;
   z-index: 350;
-  background: linear-gradient(160deg, #2a1050, #1a0a3e);
-  border: 2px solid #fde047;
+  background: var(--paper);
+  border: 3px solid var(--ink);
   border-radius: 14px;
   padding: 14px;
   min-width: 240px;
   max-width: 320px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-  color: #fff;
+  box-shadow: 4px 4px 0 var(--ink);
+  color: var(--ink);
 }
 .audio-popover[hidden] { display: none !important; }
 .audio-popover-header {
-  font-weight: bold;
-  color: #fde68a;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  color: var(--ink);
   margin-bottom: 10px;
   font-size: 1em;
 }
@@ -1568,27 +1569,35 @@ footer {
 }
 .onboarding[hidden] { display: none !important; }
 .onboarding-card {
-  background: linear-gradient(160deg, #2a1050, #1a0a3e);
-  color: #fff;
-  border: 3px solid #00ff88;
+  background: var(--paper);
+  color: var(--ink);
+  border: 3px solid var(--ink);
   border-radius: 20px;
   padding: 24px;
   max-width: 460px;
   width: 100%;
-  box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+  box-shadow: 6px 6px 0 var(--ink);
   text-align: center;
 }
-.onboarding-emoji { font-size: 4em; line-height: 1; margin-bottom: 8px; }
+/* PLAN v9 UI-overhaul — 96px hard-shadowed emoji circle (was a bare glyph) */
+.onboarding-emoji {
+  width: 96px; height: 96px; margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; line-height: 1;
+  background: #fff; border: 4px solid var(--ink); border-radius: 50%;
+  box-shadow: 5px 6px 0 var(--ink);
+}
 .onboarding-title {
+  font-family: 'Baloo 2', sans-serif; font-weight: 800;
   font-size: 1.5em;
   margin-bottom: 12px;
-  color: #aaffcc;
-  text-shadow: 0 0 12px #00ff88;
+  color: var(--ink);
 }
-.onboarding-body { font-size: 1.05em; line-height: 1.4; margin-bottom: 16px; }
+.onboarding-body { font-size: 1.05em; line-height: 1.4; margin-bottom: 16px; color: var(--ink); }
 .onboarding-step-indicator {
-  font-size: 0.95em;
-  color: #ffeb3b;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85em;
+  color: var(--muted);
   margin-bottom: 16px;
 }
 .onboarding-actions {
@@ -3307,8 +3316,8 @@ h1 { font-weight: 800; }
 .story-shell,
 .audience-wrap,
 .daily-quest-strip,
-.shop-modal-card, .notebook-modal-card, .research-modal-card, .map-screen-card,
-.kitchen-overlay-card, .arena-card, .intermission-card, .codex-picker-card {
+.shop-modal-card, .notebook-modal-card, .research-modal-card,
+.kitchen-card, .arena-card, .intermission-card, .codex-picker-card {
   background: #fff !important;
   border: 3px solid var(--ink) !important;
   border-radius: 16px !important;
@@ -3519,8 +3528,7 @@ body { padding-bottom: 66px; }
 .story-shell, .story-shell *,
 .audience-wrap, .audience-wrap *,
 .daily-quest-strip, .daily-quest-strip *,
-.kitchen-overlay-card, .kitchen-overlay-card *,
-.map-screen-card, .map-screen-card *,
+.kitchen-card, .kitchen-card *,
 .shop-modal-card, .shop-modal-card *,
 .notebook-modal-card, .notebook-modal-card *,
 .research-modal-card, .research-modal-card *,
