@@ -7,6 +7,7 @@
  * The node-state computation is pure + unit-tested; the DOM render + open/close
  * mirror the other overlay screens and are verified in the browser.
  */
+import { registerSurface } from './dock';
 import type { Audience } from '../state/audience';
 import { audienceForEncounter } from '../state/audience';
 import { getArea, AREAS } from '../state/containment';
@@ -117,7 +118,7 @@ function $(id: string): HTMLElement | null {
   return document.getElementById(id);
 }
 
-export function openVenueLadder(): void {
+function renderVenueLadder(): void {
   const screen = $('venueLadder');
   if (!screen) return;
   const area = getArea(loadLastArea()) ?? AREAS[0]!;
@@ -132,18 +133,12 @@ export function openVenueLadder(): void {
   const roster = fullRoster.slice(windowStart, windowStart + VENUE_SIZE);
   const nodes = computeLadderNodes(roster, current.id, loadStars);
   // The footer + CTA reference the CURRENT node — the next show the player will
-  // perform. The play screen already shows it, so "Play …" just closes the
-  // ladder (the loop-closer). Region advance happens by clearing the boss.
+  // perform. The play screen already shows it, so the ✕ and "Play …" CTA just
+  // close the ladder (the loop-closer) — wired by the dock via delegation.
   screen.innerHTML = renderVenueLadderHtml(nodes, area.name, current);
-  screen.removeAttribute('hidden');
-  $('venueLadderCloseBtn')?.addEventListener('click', closeVenueLadder);
-  $('venuePlayBtn')?.addEventListener('click', closeVenueLadder);
-}
-
-export function closeVenueLadder(): void {
-  $('venueLadder')?.setAttribute('hidden', '');
 }
 
 export function wireVenueLadder(): void {
-  $('venueBtn')?.addEventListener('click', openVenueLadder);
+  // The dock owns open/close/highlight (see dock.ts).
+  registerSurface('venue', { render: renderVenueLadder });
 }

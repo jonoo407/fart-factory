@@ -1731,8 +1731,14 @@ footer {
 }
 .kitchen-btn:hover { filter: brightness(1.1); }
 .kitchen-overlay {
-  margin-bottom: 14px;
-  border-radius: 12px;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
 }
 .kitchen-overlay[hidden] { display: none; }
 .kitchen-card {
@@ -3458,7 +3464,7 @@ h1 { font-weight: 800; }
 .hint-chip, .active-buff-chip { background: var(--paper2) !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
 
 /* modal overlays: dim with ink, not purple glow */
-.shop-modal, .notebook-modal, .research-modal, .map-screen, .codex-picker-modal { background: rgba(35, 29, 22, 0.55) !important; }
+.shop-modal, .notebook-modal, .kitchen-overlay, .research-modal, .map-screen, .codex-picker-modal { background: rgba(35, 29, 22, 0.55) !important; }
 
 footer { color: var(--muted) !important; }
 

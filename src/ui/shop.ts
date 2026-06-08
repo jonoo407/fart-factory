@@ -9,6 +9,7 @@
  *   the offer card.
  */
 
+import { registerSurface } from './dock';
 import { getShopOffers, attemptPurchase } from '../state/shop';
 import { getFood } from '../state/food';
 import { renderPantryGrid, renderProgression } from './plate';
@@ -75,21 +76,8 @@ function renderOffers(): void {
   });
 }
 
-export function openShop(): void {
-  renderBalance();
-  renderOffers();
-  $('shopModal')?.removeAttribute('hidden');
-}
-
-export function closeShop(): void {
-  $('shopModal')?.setAttribute('hidden', '');
-}
-
 export function wireShop(): void {
-  $('shopBtn')?.addEventListener('click', openShop);
-  $('shopCloseBtn')?.addEventListener('click', closeShop);
-  // Click outside the card closes the modal.
-  $('shopModal')?.addEventListener('click', (ev) => {
-    if (ev.target === $('shopModal')) closeShop();
-  });
+  // The dock owns open/close/highlight (see dock.ts); we just register what to
+  // render when the Shop surface opens.
+  registerSurface('shop', { render: () => { renderBalance(); renderOffers(); } });
 }
