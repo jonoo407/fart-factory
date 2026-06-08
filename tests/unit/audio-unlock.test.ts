@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { wireAudioUnlock, getAudioContext } from '../../src/audio/procedural';
 
 // The bug: the AudioContext is created lazily and is born 'suspended' per the
