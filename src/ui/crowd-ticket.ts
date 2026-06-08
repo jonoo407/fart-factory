@@ -10,7 +10,7 @@ import { axisEmoji } from './axis-emoji';
 
 type AxisName = keyof FoodProperties;
 
-const AXIS_LABEL: Record<AxisName, string> = {
+export const AXIS_LABEL: Record<AxisName, string> = {
   wet: 'Wet',
   dry: 'Dry',
   stink: 'Stink',

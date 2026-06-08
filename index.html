@@ -62,12 +62,17 @@
              #notesCount + research wiring alive until Phase 6 builds the More tab. -->
         <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)" hidden>📝 <span id="notesCount" aria-live="polite">0</span></button>
         <div class="daily-quest-strip" id="dailyQuest" role="region" aria-label="Today's daily quest"></div>
+        <!-- PLAN v9 UI-overhaul Phase 2 — belly is a pure capacity readout; the
+             Move On (advance) control lives in its own row so capacity and
+             progression are no longer conflated. -->
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
           <div class="belly-track" role="meter" aria-valuemin="0" aria-valuemax="30" aria-valuenow="30" aria-label="Belly capacity">
             <div class="belly-fill" id="bellyFill" style="width:100%"></div>
           </div>
           <span class="belly-value"><span id="bellyValue">30</span>/<span id="bellyCap">30</span></span>
+        </div>
+        <div class="move-on-row">
           <button type="button" class="move-on-btn" id="moveOnBtn" aria-label="Move On to the next audience (refills belly)">➡ Move On</button>
         </div>
 
@@ -113,7 +118,6 @@
         <div class="area-display" role="region" aria-label="Current location">
           <span class="area-display-prefix">📍 Launching at:</span>
           <span class="area-display-current" id="areaCurrentName">—</span>
-          <button type="button" class="area-display-change" id="areaChangeBtn" aria-label="Change location">change</button>
         </div>
 
         <div class="pantry-wrap" role="region" aria-label="Pantry">
@@ -141,17 +145,6 @@
       </div>
 
       <footer>The Fart Factory — A Serious Scientific Institution 🧪</footer>
-    </div>
-
-    <div id="mapScreen" class="map-screen" hidden role="dialog" aria-modal="true" aria-label="World map">
-      <div class="map-screen-card">
-        <div class="map-screen-header">
-          <h2>📍 World Map</h2>
-          <button type="button" id="mapCloseBtn" class="map-close" aria-label="Close map">✕</button>
-        </div>
-        <div class="map-canvas" id="mapCanvas"></div>
-        <div class="map-info" id="mapInfo">Tap a pin to travel there. Locked regions unlock through progression.</div>
-      </div>
     </div>
 
     <div id="researchModal" class="research-modal" hidden role="dialog" aria-modal="true" aria-label="Research lab">

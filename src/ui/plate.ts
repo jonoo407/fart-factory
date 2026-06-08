@@ -927,12 +927,10 @@ function wirePantryShowLockedToggle(): void {
 }
 
 function wireAreaChangeButton(): void {
-  // The 'change' link next to the current-area display opens the map.
-  // We dispatch a click on #travelBtn to reuse the map UI.
-  $('areaChangeBtn')?.addEventListener('click', () => {
-    $('travelBtn')?.click();
-  });
-  // Listen for map's location-changed event to refresh the display.
+  // PLAN v9 UI-overhaul Phase 2 — the standalone world map is gone; region
+  // advance now folds into clearing the venue boss. The location is a read-only
+  // chip. We keep listening for a location-changed event so a future boss-clear
+  // region bump refreshes the display + portrait.
   window.addEventListener('fart:location-changed', () => {
     renderAreaDisplay();
     renderAudiencePortrait();
