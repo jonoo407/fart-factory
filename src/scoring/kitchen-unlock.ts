@@ -7,7 +7,7 @@
  * longer has zero discoverability.
  */
 
-import { loadKitchenMode } from '../ui/kitchen';
+import { loadKitchenMode } from '../state/kitchen-mode';
 
 const KEY_GOOD_LAUNCHES = 'fart_good_launches';
 export const KITCHEN_AUTO_UNLOCK_THRESHOLD = 5;

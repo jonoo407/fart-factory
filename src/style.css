@@ -3463,6 +3463,7 @@ body { padding-bottom: 66px; }
    by TINTING the label+emoji (green active / orange equipped), never by painting
    a fill; locked items dim + grayscale the emoji. */
 .dock-item {
+  position: relative;
   flex: 1; min-height: 48px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   background: none; color: #9a8f78;
@@ -3478,6 +3479,17 @@ body { padding-bottom: 66px; }
 .dock-item.hot .dock-e { filter: none; }
 .dock-item.locked { opacity: 0.4; cursor: not-allowed; }
 .dock-item.locked .dock-e { filter: grayscale(1); }
+/* Lock badge — only on a locked tab (e.g. Kitchen before it unlocks). */
+.dock-lock {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(7px);
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+}
+.dock-item:not(.locked) .dock-lock { display: none; }
 .dock-item .dock-e { font-size: 20px; line-height: 1; transition: transform 0.12s; }
 .dock-item:active:not(.locked) .dock-e { transform: scale(1.2); }
 
