@@ -7,6 +7,7 @@
  * undiscovered (the quest path IS the gameplay).
  */
 
+import { registerSurface, closeSurface } from './dock';
 import { RECIPES, getRecipe, type Recipe } from '../state/recipes';
 import { loadDiscoveredRecipes, loadPantry, loadHiddenCombosFound } from '../state/persistence';
 import { HIDDEN_COMBO_CATALOG } from '../scoring/hidden-combos';
@@ -121,7 +122,7 @@ function cookRecipe(recipeId: string): void {
   }
   renderPlate();
   renderBellyMeter();
-  closeNotebook();
+  closeSurface(); // cooked → back to Stage to play
 }
 
 function renderLegendaryQuests(): void {
@@ -279,31 +280,24 @@ function renderTrophyList(): void {
   }).join('');
 }
 
-export function openNotebook(): void {
-  renderNotebookCounter();
-  renderRecipes();
-  renderLegendaryQuests();
-  renderBossList();
-  renderFieldGuide();
-  renderHiddenCombos();
-  renderLegendaryCodex();
-  renderConquests();
-  renderTrophyList();
-  $('notebookModal')?.removeAttribute('hidden');
-}
-
-export function closeNotebook(): void {
-  $('notebookModal')?.setAttribute('hidden', '');
-}
-
 export function wireNotebook(): void {
   renderNotebookCounter();
-  $('notebookBtn')?.addEventListener('click', openNotebook);
-  $('notebookCloseBtn')?.addEventListener('click', closeNotebook);
-  $('notebookModal')?.addEventListener('click', (ev) => {
-    if (ev.target === $('notebookModal')) closeNotebook();
-  });
   wireCodexPicker();
+  // The dock owns open/close/highlight (see dock.ts); register what to render
+  // when the Book surface opens.
+  registerSurface('book', {
+    render: () => {
+      renderNotebookCounter();
+      renderRecipes();
+      renderLegendaryQuests();
+      renderBossList();
+      renderFieldGuide();
+      renderHiddenCombos();
+      renderLegendaryCodex();
+      renderConquests();
+      renderTrophyList();
+    },
+  });
 }
 
 // Re-export for callers that want to refresh the counter after a launch.

@@ -24,16 +24,10 @@ import {
   type FermentSlot,
 } from '../state/ferment-rack';
 import { unlockFood, loadEquippedTreatment, setEquippedTreatment } from '../state/persistence';
-
-/** Whether the Kitchen overlay is open. */
-let kitchenOpen = false;
+import { registerSurface } from './dock';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
-}
-
-export function isKitchenOpen(): boolean {
-  return kitchenOpen;
 }
 
 // ----- Kitchen-unlock flag (doubles as the dock-tab unlock gate) -----
@@ -155,20 +149,6 @@ function renderFermentRack(): void {
   });
 }
 
-// ----- Public API -----
-
-export function openKitchen(): void {
-  kitchenOpen = true;
-  renderTreatmentList();
-  renderFermentRack();
-  $('kitchenOverlay')?.removeAttribute('hidden');
-}
-
-export function closeKitchen(): void {
-  kitchenOpen = false;
-  $('kitchenOverlay')?.setAttribute('hidden', '');
-}
-
 // ----- Wire-up -----
 
 /**
@@ -187,13 +167,14 @@ function applyKitchenModeUI(): void {
 
 export function wireKitchen(): void {
   applyKitchenModeUI();
-  $('kitchenModeToggle')?.addEventListener('click', () => {
-    if (!loadKitchenMode()) return; // locked until unlocked
-    openKitchen();
-  });
-  $('kitchenCloseBtn')?.addEventListener('click', closeKitchen);
-  $('kitchenOverlay')?.addEventListener('click', (ev) => {
-    if (ev.target === $('kitchenOverlay')) closeKitchen();
+  // The dock owns open/close/highlight (see dock.ts). Register the render hook
+  // and the unlock gate (the tab is locked until kitchen mode unlocks).
+  registerSurface('kitchen', {
+    render: () => {
+      renderTreatmentList();
+      renderFermentRack();
+    },
+    gate: loadKitchenMode,
   });
 }
 
