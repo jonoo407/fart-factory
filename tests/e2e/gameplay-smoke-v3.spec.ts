@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { dismissReaction } from './_helpers';
 
 /**
  * Phase M #68 end-to-end gameplay smoke test (v3 flow). Per PLAN.md.
@@ -61,6 +62,8 @@ test('Full v3 gameplay flow — fresh save → launch → notebook → shop → 
   await expect(page.locator('#storyResultTitle')).toContainText(/%/);
   // Audience reaction strip renders.
   await expect(page.locator('#audienceReaction')).toBeVisible();
+  // The reaction takeover covers the play screen — close it before navigating.
+  await dismissReaction(page);
 
   // 4. Gold counter is a number (0+).
   const goldText = await page.locator('#goldCount').textContent();

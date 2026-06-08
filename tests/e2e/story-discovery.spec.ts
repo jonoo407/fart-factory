@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { dismissReaction } from './_helpers';
 
 async function loadStoryMode(page: import('@playwright/test').Page) {
   await page.goto('/');
@@ -36,6 +37,7 @@ test('Re-launching a known recipe shows muted "Recipe:" line, not NEW', async ({
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
   await page.waitForTimeout(50);
+  await dismissReaction(page); // close the takeover to re-plate
   // Second launch — should NOT show NEW.
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();

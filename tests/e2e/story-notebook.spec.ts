@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { dismissReaction } from './_helpers';
 
 async function loadStoryMode(page: import('@playwright/test').Page) {
   await page.goto('/');
@@ -60,6 +61,7 @@ test('Discovered recipe has a Cook button that auto-fills the plate', async ({ p
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
   await page.waitForTimeout(50);
+  await dismissReaction(page); // close the takeover covering the nav
   // Open notebook and click Cook on the discovered recipe.
   await page.click('#notebookBtn');
   const swampCard = page.locator('.notebook-recipe[data-recipe="swamp-beast"]');
