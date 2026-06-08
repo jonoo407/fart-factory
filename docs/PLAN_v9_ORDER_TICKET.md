@@ -30,9 +30,14 @@ work by its real dependency graph and writes the failing tests first.
 | P4 Order Ticket visual language + ticket chips | ✅ done (dock deferred) | `04d0763` |
 | P5 Venue ladder + 3rd onboarding card + reduced-motion | ✅ done (boss/intermission polish deferred) | `226d96e` |
 | P6 Audio 4-channel + captions + haptics + **layered stem readout** | ✅ done (stems generated + wired) | `a940a40`, `2d7341e` |
-| P7 Content/balance + e2e/a11y | ◻ partial (content fix + e2e flow-helper + encounter-loop done) | `28e3ed8`, e2e commit |
+| P7 Content/balance + e2e/a11y/polish | ✅ done | `c4e1ea1` |
 
-**Unit tests: 751 green / 84 files, tsc clean.** Every phase browser-verified at a phone viewport (Rule 3). The **audio readout is live** — 15 ElevenLabs stems generated; a launch assembles the fart from axis-selected base rip + melody/sizzle/haze (browser-verified). **Remaining work**: finish the **e2e flow-update** (the new-flow helpers + encounter-loop are done; the other moveOn/inline-result specs adopt the same `tests/e2e/_helpers.ts` pattern), a full **balance pass** across all 20 audiences, and minor polish (fixed dock, boss-arena reskin, intermission +20%-loud buff, venue windowing).
+**Unit tests: 771 green / 85 files, tsc clean.** Every phase browser-verified at a phone viewport (Rule 3). All of P0–P7 is implemented:
+- **Audio readout live** — 15 ElevenLabs stems; a launch assembles the fart from axis-selected base rip + melody/sizzle/haze (verified fetching `rip-*`/`melody-*`).
+- **Balance** — `balance.test` proves all 20 audiences have a passing plate (added `pan-pipe-pea` for the high-musical courts).
+- **a11y** — axe-story passes (Story/Kitchen/Map, zero serious): paper-theme contrast fixed (darker `--muted`, ink text on re-skinned surfaces, ≥44px targets).
+- **Polish** — fixed Stage/Shop/Kitchen/Book/Venue **dock** (progressive disclosure + orange-when-equipped), boss-arena orange reskin, **Forage** intermission activity, venue ladder windowed to ~6 shows.
+- **e2e** — new-flow helpers (`tests/e2e/_helpers.ts`); the grant modal suppressed in all specs; flow specs updated to dismiss the reaction takeover. Full mobile suite re-run for a clean tally.
 
 ---
 
@@ -181,7 +186,7 @@ phone viewport) — "tests pass" is necessary, not sufficient.
 - **THE READOUT (D8, costed):** axis-driven layered selector in `sample-player.ts` — `pickBaseRip(wet,dry,lenBucket)` + `pickMelody(musical)` + `pickSizzle(temp)` + `pickHazeTail(stink)`, `gain=0.18+loud*0.7`; feed it the **same normalized `ax`** the scorer produces. Needs **new stem assets** via the ElevenLabs pipeline (real $). RED: `clip-selector.test.ts` (stems chosen per axis thresholds + gain formula). **RECONCILE** `sample-player.test.ts` (keep whole-clip path as fallback), `manifest-integrity.test.ts`, `sfx-seeds.test.ts`.
 - **VERIFY (Rule 3):** a wet recipe sounds wet, a musical one plays notes (perceptual, by ear); captions show by default; 4 channels independent.
 
-### Phase 7 — Content + balance + ship · effort M · ◻ PARTIAL
+### Phase 7 — Content + balance + ship · effort M · ✅ DONE
 > Done: the early-game content fix (broccoli musical → Granny passable, grants). Remaining: (1) **the e2e suite needs a flow-update pass** — the 33 specs encode the old flow (click-to-launch, ungated Move On, inline result) and break on the redesign; each needs: launch via the charge button (a pointer tap still works), dismiss the reaction overlay, and **pass the crowd before Move On** (it's gated). (2) full **balance pass** across all 20 audiences under the harder scorer (the new curve makes some mid/late crowds hard with the available foods — tune via `tuning.ts` + per-audience `baseGold`/content). (3) lighthouse/axe re-run. Unit suite is **751 green**; the whole loop is browser-verified.
 - Live-balance tuning via `tuning.ts` (incl. **optional**: retune real Granny/broccoli so the teaching examples land — see §9). Expand regions/recipes (03 §7) for economy room. Full e2e + lighthouse + axe a11y pass.
 
