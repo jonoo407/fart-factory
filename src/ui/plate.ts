@@ -891,6 +891,8 @@ function presentReactionOverlay(a: ReactionArgs): void {
     goldPaid: a.goldPaid,
     learned: a.learned,
     newRecipe: a.newRecipeName,
+    // PLAN v9 UI-overhaul Phase 5 — normalized stink drives the cloud (AXIS_CAP=8).
+    stink: Math.min(1, a.propsAfterArea.stink / 8),
     onAction: handleReactionAction,
   });
 }

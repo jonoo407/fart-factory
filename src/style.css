@@ -3065,21 +3065,35 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   75% { transform: translate(1px, -1px); }
 }
 
-/* ---- reaction takeover (full-screen, opaque) ---- */
+/* ---- reaction takeover (full-screen, opaque) ----
+   PLAN v9 UI-overhaul Phase 5 — celebratory takeover: green radial spotlight, a
+   warm-red .flop wash for F, a slammed white inked stamp, confetti + stink. */
 .reaction-overlay {
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--paper);
-  background-image: repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px);
+  background:
+    radial-gradient(680px 360px at 50% 12%, #eef7d6 0%, var(--paper) 62%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px),
+    var(--paper);
   color: var(--ink);
   font-family: 'Nunito', system-ui, sans-serif;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.reaction-overlay.flop {
+  background:
+    radial-gradient(680px 360px at 50% 12%, #f3ddd2 0%, var(--paper) 62%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.02) 0 2px, transparent 2px 4px),
+    var(--paper);
 }
 .reaction-overlay[hidden] { display: none; }
-.reaction-overlay.reaction-show .stamp { animation: stamp-slam 0.45s cubic-bezier(.2,1.4,.4,1) both; }
+.reaction-overlay.reaction-show .rxn-scroll { animation: rxn-in 0.3s ease both; }
+@keyframes rxn-in { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .rxn-scroll {
+  position: relative;
+  z-index: 2;
   flex: 1;
   overflow-y: auto;
   padding: 22px 18px 12px;
@@ -3088,33 +3102,49 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   margin: 0 auto;
   text-align: center;
 }
-.rxn-crowd { font-size: 30px; letter-spacing: 4px; margin-bottom: 8px; }
-.rxn-crowd span { display: inline-block; animation: face-bob 1.1s ease-in-out infinite; }
-.rxn-crowd span:nth-child(2) { animation-delay: 0.1s; }
-.rxn-crowd span:nth-child(3) { animation-delay: 0.2s; }
-.rxn-crowd span:nth-child(4) { animation-delay: 0.3s; }
-.rxn-crowd span:nth-child(5) { animation-delay: 0.4s; }
-@keyframes face-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-.stamp {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 26px;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
-  box-shadow: 5px 6px 0 var(--ink);
-  margin: 6px 0 10px;
-  background: var(--green);
+/* falling confetti (non-F) + drifting stink cloud (stink ≥ .45) */
+.confetti, .rxn-stink { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.confetti i { position: absolute; top: -20px; width: 9px; height: 13px; border-radius: 2px; animation: rxn-fall 2.2s linear infinite; }
+@keyframes rxn-fall { 0% { transform: translateY(-20px) rotate(0); } 100% { transform: translateY(840px) rotate(540deg); } }
+.rxn-stink i {
+  position: absolute; bottom: 18%; width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(110,174,18,.55), transparent 70%);
+  animation: rxn-rise 3s ease-in infinite;
 }
-.stamp.grade-s { background: #a855f7; color: #fff; }
-.stamp.grade-a { background: var(--orange); color: #fff; }
-.stamp.grade-b { background: var(--green); }
-.stamp.grade-f { background: #ef4444; color: #fff; }
-.stamp .g { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 52px; line-height: 1; }
-.stamp .l { font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+@keyframes rxn-rise {
+  0% { transform: translateY(40px) scale(.6); opacity: 0; }
+  30% { opacity: .8; }
+  100% { transform: translateY(-120px) scale(1.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .confetti, .rxn-stink { display: none; } }
+.rxn-crowd { font-size: 32px; letter-spacing: 4px; margin-bottom: 8px; }
+.rxn-crowd span { display: inline-block; animation: face-bob 0.7s ease-in-out infinite; }
+.rxn-crowd span:nth-child(2) { animation-delay: 0.1s; }
+.rxn-crowd span:nth-child(3) { animation-delay: 0.05s; }
+.rxn-crowd span:nth-child(4) { animation-delay: 0.15s; }
+.rxn-crowd span:nth-child(5) { animation-delay: 0.1s; }
+@keyframes face-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.stamp {
+  position: relative;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 6px auto 10px;
+  background: #fff;
+  border: 5px solid var(--ink);
+  box-shadow: 5px 7px 0 rgba(0,0,0,.22);
+  animation: stamp-slam 0.45s cubic-bezier(.2,1.6,.4,1) both;
+}
+.stamp .g { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 54px; line-height: 0.8; color: var(--ink); }
+.stamp .l { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+.stamp.grade-s .g { color: #a855f7; }
+.stamp.grade-a .g { color: var(--orange); }
+.stamp.grade-b .g { color: var(--green-d); }
+.stamp.grade-f .g { color: #c0392b; }
 @keyframes stamp-slam {
-  0% { transform: scale(2.4) rotate(-12deg); }
-  100% { transform: scale(1) rotate(-4deg); }
+  0% { transform: scale(2.2) rotate(18deg); opacity: 0; }
+  60% { transform: scale(0.85) rotate(-9deg); opacity: 1; }
+  100% { transform: scale(1) rotate(-7deg); }
 }
 .rxn-verdict { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; margin: 4px 0; }
 .rxn-cap {
