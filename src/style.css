@@ -1700,25 +1700,6 @@ footer {
 }
 .area-display-change:hover { background: rgba(255, 255, 255, 0.08); border-style: solid; }
 
-/* --- Kitchen Mode toggle (in progression strip) --- */
-.kitchen-mode-toggle {
-  background: rgba(40, 20, 10, 0.4);
-  border: 1px dashed rgba(253, 186, 116, 0.5);
-  color: #fdba74;
-  font-size: 0.78em;
-  padding: 10px 14px;
-  min-height: 44px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.kitchen-mode-toggle-on {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.5), rgba(194, 65, 12, 0.5));
-  border-style: solid;
-  border-color: #f97316;
-  color: #fff;
-}
-
 /* --- Kitchen button + overlay --- */
 .kitchen-btn {
   padding: 6px 14px;
@@ -3426,7 +3407,7 @@ h1 { font-weight: 800; }
 .kitchen-card .ferment-slot-waiting { opacity: 1 !important; color: #5a4f3d !important; }
 
 /* all sticker buttons: ink border, hard shadow, press translate */
-.btn, .chip-btn, .progression-stat-btn, .kitchen-mode-toggle, .move-on-btn,
+.btn, .chip-btn, .progression-stat-btn, .move-on-btn,
 .area-display-change, .pantry-toggle, .save-io-btn, .onboarding-next, .onboarding-skip,
 .cta-big, .cta-ghost, .feature-intro-cta {
   background: #fff !important;
@@ -3438,7 +3419,7 @@ h1 { font-weight: 800; }
   font-weight: 800 !important;
   text-shadow: none !important;
 }
-.btn:active, .chip-btn:active, .progression-stat-btn:active, .kitchen-mode-toggle:active,
+.btn:active, .chip-btn:active, .progression-stat-btn:active,
 .move-on-btn:active, .area-display-change:active, .pantry-toggle:active, .save-io-btn:active,
 .onboarding-next:active, .onboarding-skip:active, .cta-big:active, .cta-ghost:active,
 .food-card-clickable:active, .feature-intro-cta:active {
@@ -3458,7 +3439,6 @@ h1 { font-weight: 800; }
 .btn.launch:active, #storyLaunchBtn:active { transform: translate(5px, 6px) !important; box-shadow: 0 0 0 var(--ink) !important; }
 
 /* equipped-treatment Kitchen tab goes orange (04 §2) */
-.kitchen-mode-toggle[aria-pressed="true"], .kitchen-mode-toggle-on { background: var(--orange) !important; color: var(--ink) !important; }
 
 /* daily quest + hint chips */
 .hint-chip, .active-buff-chip { background: var(--paper2) !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
