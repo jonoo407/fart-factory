@@ -29,10 +29,10 @@ work by its real dependency graph and writes the failing tests first.
 | P3 Discovery + recipe ribbon + food grants + content fix | ✅ done | `28e3ed8` |
 | P4 Order Ticket visual language + ticket chips | ✅ done (dock deferred) | `04d0763` |
 | P5 Venue ladder + 3rd onboarding card + reduced-motion | ✅ done (boss/intermission polish deferred) | `226d96e` |
-| P6 Audio 4-channel + captions + haptics + readout selector | ✅ done (stem ASSETS deferred) | `a940a40` |
-| P7 Content/balance + e2e/a11y | ◻ partial | — |
+| P6 Audio 4-channel + captions + haptics + **layered stem readout** | ✅ done (stems generated + wired) | `a940a40`, `2d7341e` |
+| P7 Content/balance + e2e/a11y | ◻ partial (content fix + e2e flow-helper + encounter-loop done) | `28e3ed8`, e2e commit |
 
-**Unit tests: 751 green / 84 files, tsc clean.** Every phase browser-verified at a phone viewport (Rule 3). **Known remaining work** (documented in-phase): the **e2e suite needs a flow-update pass** (33 specs encode the old click-launch / ungated-Move-On / inline-result flow), the **ElevenLabs stem assets** (paid generation, not run autonomously), a full **balance pass** across all 20 audiences, and minor polish (fixed dock, boss-arena reskin, intermission +20%-loud buff, venue windowing).
+**Unit tests: 751 green / 84 files, tsc clean.** Every phase browser-verified at a phone viewport (Rule 3). The **audio readout is live** — 15 ElevenLabs stems generated; a launch assembles the fart from axis-selected base rip + melody/sizzle/haze (browser-verified). **Remaining work**: finish the **e2e flow-update** (the new-flow helpers + encounter-loop are done; the other moveOn/inline-result specs adopt the same `tests/e2e/_helpers.ts` pattern), a full **balance pass** across all 20 audiences, and minor polish (fixed dock, boss-arena reskin, intermission +20%-loud buff, venue windowing).
 
 ---
 
@@ -258,8 +258,8 @@ worker. Audio (P6) sequences after scoring normalization settles (shared `ax`).
   Granny/broccoli pairing reproduce the "learn musical by launching broccoli" beat). This becomes an explicit
   work item folded into P1/P3 (and finalized in P7), not an optional polish. Synthetic prototype fixtures still
   lock the algorithm; real-catalog tests get re-baselined to the retuned content with real target numbers.
-- **C. Audio readout (D8):** **GENERATE NEW STEMS** via the ElevenLabs pipeline (base rips / melody octaves /
-  sizzle / haze) — accept the API cost — so the fart is a legible per-axis readout. Phase 6.
+- **C. Audio readout (D8):** ✅ **DONE** — 15 stems generated via the ElevenLabs pipeline (6 base rips, 5 melody
+  notes, 2 sizzles, 2 hazes) and wired into `playFart` via `selectFartLayers`; the fart now assembles per-axis.
 - **D. Execution:** **START P0 + P1 NOW** (test-first). Report back before the UI phases (P2+).
 
 > Note on B: retuning real content means the real-catalog scoring tests assert **specific retuned numbers**, not
