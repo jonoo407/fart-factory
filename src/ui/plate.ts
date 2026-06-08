@@ -76,6 +76,7 @@ import {
   ENCORE_BONUS_GOLD,
 } from '../state/encounter-progress';
 import { mountChargeMeter } from './charge-meter';
+import { createCooldownGate } from './cooldown-gate';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
 import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
@@ -593,7 +594,16 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
 }
 
 
+// PLAN v9 — single-flight launch. WebAudio has no polyphony cap, so a second
+// Launch while the first fart is still ringing stacks a whole second fart chain
+// that sums at the destination (the "sounds overlap" report). Gate re-launches
+// to one per LAUNCH_COOLDOWN_MS; in normal play the plate must be re-filled
+// between launches so this only blocks a pathological double-tap.
+const LAUNCH_COOLDOWN_MS = 1200;
+const launchGate = createCooldownGate(LAUNCH_COOLDOWN_MS);
+
 async function onStoryLaunch(quality = 1): Promise<void> {
+  if (!launchGate.open()) return;
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
   // P6: resolve launch through the single-equip path — the one equipped
