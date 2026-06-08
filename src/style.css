@@ -3343,9 +3343,11 @@ body { padding-bottom: 66px; }
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   background: var(--paper); color: var(--ink);
   border: 2px solid var(--ink); border-radius: 10px;
+  box-shadow: none;
   font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 9px;
   cursor: pointer;
 }
+.dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; opacity: 0.85; }
 .dock-item.on { background: var(--green); }
 .dock-item.hot { background: var(--orange); }
 .dock-item.locked { opacity: 0.4; cursor: not-allowed; }
