@@ -82,6 +82,7 @@ import { markComboSeen } from '../state/persistence';
 import { axisEmoji } from './axis-emoji';
 import { matchRecipe } from '../state/recipes';
 import { renderCravingChipsHtml } from './crowd-ticket';
+import { renderTopBar } from './top-bar';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
 import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
@@ -437,6 +438,7 @@ export function renderProgression(): void {
   const notesEl = $('notesCount');
   if (goldEl) goldEl.textContent = String(loadGold());
   if (notesEl) notesEl.textContent = String(loadResearchNotes());
+  renderTopBar(); // PLAN v9 UI-overhaul Phase 1 — region + "Show N of M"
 }
 
 export function wirePlateSlots(): void {

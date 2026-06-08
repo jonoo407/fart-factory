@@ -31,6 +31,17 @@
             <div class="arena-result" id="arenaResult" hidden aria-live="polite"></div>
           </div>
         </div>
+        <!-- PLAN v9 UI-overhaul Phase 1 / 04 §2 — pure-status top bar:
+             [ mute chip ] · [ REGION / Show N of M ] · [ gold chip ].
+             All navigation lives in the fixed dock at the bottom. -->
+        <div class="top" role="region" aria-label="Status">
+          <button type="button" class="chip-btn mute" id="muteBtn" aria-pressed="false" aria-label="Mute audio">🔊</button>
+          <div class="day" id="dayLabel">
+            <span id="regionName">Hometown</span>
+            <small id="showCount">Show 1 of 6</small>
+          </div>
+          <button type="button" class="chip-btn gold" id="goldChip" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></button>
+        </div>
         <div class="audience-wrap" role="region" aria-label="Today's audience">
           <div class="audience-portrait" id="audiencePortraitEmoji">❓</div>
           <div class="audience-meta">
@@ -46,15 +57,10 @@
           <span class="audience-reaction-trend" id="audienceReactionTrend"></span>
           <span class="audience-reaction-streak" id="audienceReactionStreak" hidden></span>
         </div>
-        <!-- PLAN v9 04 §2 — top bar: status + mute only. Nav lives in the fixed
-             dock at the bottom (no duplicated buttons). -->
-        <div class="progression-strip" role="region" aria-label="Progression">
-          <span class="progression-stat" aria-label="Gold">💰 <span id="goldCount" aria-live="polite">0</span></span>
-          <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)">📝 <span id="notesCount" aria-live="polite">0</span></button>
-          <button type="button" class="btn travel-btn" id="travelBtn" aria-label="Open world map and travel">📍 Travel</button>
-          <button type="button" class="btn kitchen-btn" id="kitchenBtn" aria-label="Open kitchen (prep foods before launch)" hidden>🍳 Kitchen</button>
-          <button type="button" class="btn mute" id="muteBtn" aria-pressed="false" aria-label="Mute audio">🔊</button>
-        </div>
+        <!-- Research notes counter (relocated off the top bar; reachable from the
+             Lab Book / More surface). Kept hidden so renderProgression keeps
+             #notesCount + research wiring alive until Phase 6 builds the More tab. -->
+        <button type="button" class="progression-stat-btn" id="researchBtn" aria-label="Open research panel (spend research notes)" hidden>📝 <span id="notesCount" aria-live="polite">0</span></button>
         <div class="daily-quest-strip" id="dailyQuest" role="region" aria-label="Today's daily quest"></div>
         <div class="belly-meter-wrap">
           <span class="belly-label">🍽️ Belly:</span>
@@ -240,9 +246,9 @@
     <div id="venueLadder" class="venue-ladder" hidden role="dialog" aria-modal="true" aria-label="Venue ladder"></div>
 
     <nav id="dock" class="dock" aria-label="Main dock">
-      <span class="dock-item dock-stage on" aria-current="page"><span class="dock-e">🎭</span>Stage</span>
+      <button type="button" class="dock-item dock-stage on" id="stageBtn" aria-current="page" aria-label="Stage (current screen)"><span class="dock-e">🎭</span>Stage</button>
       <button type="button" class="dock-item shop-btn" id="shopBtn" aria-label="Open pantry shop"><span class="dock-e">🛒</span>Shop</button>
-      <button type="button" class="dock-item kitchen-mode-toggle" id="kitchenModeToggle" aria-pressed="false" aria-label="Toggle Kitchen Mode (advanced prep + treatments)"><span class="dock-e">🍳</span>Kitchen</button>
+      <button type="button" class="dock-item kitchen-mode-toggle locked" id="kitchenModeToggle" aria-disabled="true" aria-label="Open Kitchen — prep foods with treatments (unlocks as you play)"><span class="dock-e">🍳</span>Kitchen</button>
       <button type="button" class="dock-item notebook-btn" id="notebookBtn" aria-label="Open lab notebook"><span class="dock-e">📖</span>Book<span id="notebookCounter" class="dock-badge">0/0</span></button>
       <button type="button" class="dock-item venue-btn" id="venueBtn" aria-label="Open the venue ladder"><span class="dock-e">🏟️</span>Venue</button>
     </nav>

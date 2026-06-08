@@ -34,3 +34,5 @@ Thumbs.db
 # Stryker mutation testing sandboxes + reports
 .stryker-tmp/
 reports/mutation/
+
+test-out.log

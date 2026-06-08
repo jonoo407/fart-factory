@@ -360,25 +360,53 @@ body {
 .area-card .area-emoji { font-size: 1.7em; line-height: 1; }
 .area-card .area-name { font-size: 0.75em; line-height: 1.1; text-align: center; }
 
-/* --- Progression strip (gold + research notes + Shop) --- */
-.progression-strip {
+/* --- PLAN v9 UI-overhaul Phase 1 / 04 §2 — pure-status top bar.
+   [ mute chip ] · [ REGION / Show N of M ] · [ gold chip ]. No phone-frame, so
+   no status-bar margin-top — the bar sits flush at the top of the play screen. */
+.top {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px 14px;
-  background: rgba(40, 20, 70, 0.35);
-  border: 2px solid #f59e0b;
-  border-radius: 10px;
-  padding: 8px 14px;
-  margin-bottom: 14px;
+  gap: 8px;
+  padding: 6px 4px 10px;
+  margin-bottom: 4px;
 }
-.progression-stat {
-  font-weight: bold;
-  color: #ffe79a;
-  font-size: 1.05em;
+.chip-btn {
+  height: 40px;
+  min-width: 40px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
 }
-.progression-stat:nth-child(2) {
-  color: #aaffe2;
+.chip-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.day {
+  flex: 1;
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+}
+.day small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+  text-transform: uppercase;
 }
 .shop-btn {
   margin-left: auto;
@@ -3338,21 +3366,27 @@ body { padding-bottom: 66px; }
   background: var(--ink);
   padding: 5px 5px calc(5px + env(safe-area-inset-bottom, 0px));
 }
+/* PLAN v9 UI-overhaul Phase 1 / 04 §2 — borderless dark-bar dock. State is shown
+   by TINTING the label+emoji (green active / orange equipped), never by painting
+   a fill; locked items dim + grayscale the emoji. */
 .dock-item {
   flex: 1; min-height: 48px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  background: var(--paper); color: var(--ink);
-  border: 2px solid var(--ink); border-radius: 10px;
+  background: none; color: #9a8f78;
+  border: none; border-radius: 0;
   box-shadow: none;
   font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.03em;
   cursor: pointer;
 }
 .dock-badge { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; opacity: 0.85; }
-.dock-item.on { background: var(--green); }
-.dock-item.hot { background: var(--orange); }
+.dock-item.on { color: var(--green); }
+.dock-item.hot { color: var(--orange); }
+.dock-item.hot .dock-e { filter: none; }
 .dock-item.locked { opacity: 0.4; cursor: not-allowed; }
-.dock-item .dock-e { font-size: 18px; line-height: 1; }
-.dock-item:active:not(.locked) { transform: translate(1px, 1px); }
+.dock-item.locked .dock-e { filter: grayscale(1); }
+.dock-item .dock-e { font-size: 20px; line-height: 1; transition: transform 0.12s; }
+.dock-item:active:not(.locked) .dock-e { transform: scale(1.2); }
 
 /* PLAN v9 P5 §8 — boss arena orange-hazard reskin (a hotter cast of the loop). */
 .arena-card {
