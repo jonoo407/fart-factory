@@ -4,6 +4,7 @@ async function loadStoryMode(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.removeItem('fart_mute');
     localStorage.setItem('fart_mode', '"story"');
     // Clear pantry / belly for clean test

@@ -4,6 +4,7 @@ async function loadApp(page: Page): Promise<void> {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.removeItem('fart_mute');
     localStorage.removeItem('fart_audio_channels');
   });

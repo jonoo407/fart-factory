@@ -1,9 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { dismissReaction } from './_helpers';
 
 async function loadStory(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     localStorage.removeItem('fart_pantry');
     localStorage.removeItem('fart_recipes_seen');
@@ -45,6 +47,8 @@ test('Re-launching a known recipe does NOT show the splash (only first discovery
   await expect(page.locator('#discoverySplash')).toBeVisible();
   // Wait for it to dismiss.
   await expect(page.locator('#discoverySplash')).toBeHidden({ timeout: 4000 });
+  // Close the reaction takeover so the pantry is reachable again.
+  await dismissReaction(page);
   // Second launch should NOT trigger a new splash.
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();

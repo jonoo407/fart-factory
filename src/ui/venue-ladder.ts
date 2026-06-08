@@ -79,8 +79,14 @@ export function openVenueLadder(): void {
   if (!screen) return;
   const area = getArea(loadLastArea()) ?? AREAS[0]!;
   const pool = audiencePoolForLocation(area);
-  const roster = pool.length > 0 ? pool : [];
-  const current = audienceForEncounter(currentEncounterIdx(), roster);
+  const fullRoster = pool.length > 0 ? [...pool] : [];
+  const current = audienceForEncounter(currentEncounterIdx(), fullRoster);
+  // Window the region roster into ~6-show venues (04 §7 — "a venue = ~6 shows"),
+  // so the ladder reads as a felt climb rather than the whole region at once.
+  const VENUE_SIZE = 6;
+  const curFull = Math.max(0, fullRoster.findIndex((a) => a.id === current.id));
+  const windowStart = Math.floor(curFull / VENUE_SIZE) * VENUE_SIZE;
+  const roster = fullRoster.slice(windowStart, windowStart + VENUE_SIZE);
   const nodes = computeLadderNodes(roster, current.id, loadStars);
   // next = first upcoming-or-current after the current, else null
   const curIdx = roster.findIndex((a) => a.id === current.id);

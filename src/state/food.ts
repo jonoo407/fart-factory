@@ -63,6 +63,10 @@ export const FOODS: readonly Food[] = [
   { id: 'asparagus',   name: 'Asparagus',      emoji: '🌿', rarity: 'uncommon',  bellyCost: 3, properties: p(2, 1, 4, 1, 2, 3, 2), description: 'Musical and pungent.' },
   { id: 'pickle',      name: 'Pickle',         emoji: '🥒', rarity: 'uncommon',  bellyCost: 3, properties: p(4, 0, 3, 2, 1, 2, 0), description: 'Brine in motion.' },
   { id: 'hot-pepper',  name: 'Hot Pepper',     emoji: '🌶️', rarity: 'uncommon',  bellyCost: 4, properties: p(0, 2, 3, 3, 0, 3, 5), description: 'Pressure rises with the heat.' },
+  // PLAN v9 P7 balance — a clean musical+dry+long food so the high-musical
+  // courts (Royal Court / Opera House / Silent Monks) are winnable; the other
+  // musical foods drag in stink/loud those crowds don't want.
+  { id: 'pan-pipe-pea', name: 'Pan-Pipe Pea',  emoji: '🫛', rarity: 'uncommon',  bellyCost: 3, properties: p(0, 3, 1, 0, 4, 4, 1), description: 'A long, dry, dignified aria. No moisture, no rumble.' },
 
   // ====== RARE (6) — unlock via shop or quests, more potent ======
   { id: 'aged-stilton',name: 'Aged Stilton',   emoji: '🧀', rarity: 'rare',      bellyCost: 4, properties: p(3, 1, 5, 2, 0, 4, 2), description: 'Blue veins. Bolder profile.' },

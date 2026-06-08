@@ -18,7 +18,7 @@ describe('Order Ticket design tokens', () => {
     expect(css).toMatch(/--green-d:\s*#6fae12/);
     expect(css).toMatch(/--orange:\s*#ff7a2f/);
     expect(css).toMatch(/--gold:\s*#f59e0b/);
-    expect(css).toMatch(/--muted:\s*#8a7d63/);
+    expect(css).toMatch(/--muted:\s*#6b5d3e/); // darkened for WCAG AA contrast on paper (P7)
   });
 
   it(':root defines the rarity ramp', () => {

@@ -48,6 +48,19 @@ export async function advanceToNext(page: Page): Promise<void> {
   await page.locator('#reactionOverlay .rxn-cta[data-action="next"]').click();
 }
 
+/**
+ * Close the reaction takeover (if open) by its first footer button — retry on a
+ * flop, Improve on a pass — staying on the same crowd. Specs that launch
+ * repeatedly need this so the overlay stops covering the pantry.
+ */
+export async function dismissReaction(page: Page): Promise<void> {
+  const ov = page.locator('#reactionOverlay');
+  if (await ov.isVisible().catch(() => false)) {
+    await ov.locator('.rxn-cta').first().click();
+    await ov.waitFor({ state: 'hidden' });
+  }
+}
+
 /** Launch the current plate and return the reaction grade shown on the stamp. */
 export async function launchAndReadGrade(page: Page): Promise<string> {
   await page.click('#storyLaunchBtn');

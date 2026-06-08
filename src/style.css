@@ -8,7 +8,7 @@
   --green-d: #6fae12;
   --orange: #ff7a2f;
   --gold: #f59e0b;
-  --muted: #8a7d63;
+  --muted: #6b5d3e;
   --rar-c: #9ca3af;
   --rar-u: #22c55e;
   --rar-r: #3b82f6;
@@ -3197,7 +3197,7 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 .pax { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-items: center; margin-top: 3px; font-size: 10px; line-height: 1; }
 .pax-i { display: inline-flex; align-items: center; gap: 1px; }
 .pax-i b { font-weight: 800; }
-.pax-q { letter-spacing: 1.5px; opacity: 0.55; font-weight: 800; }
+.pax-q { letter-spacing: 1.5px; opacity: 0.9; font-weight: 800; }
 .pax-new { font-size: 11px; }
 
 /* ---- PLAN v9 P3 — live recipe ribbon (slides in below the plate) ---- */
@@ -3317,7 +3317,7 @@ h1 { font-weight: 800; }
 .btn.launch:active, #storyLaunchBtn:active { transform: translate(5px, 6px) !important; box-shadow: 0 0 0 var(--ink) !important; }
 
 /* equipped-treatment Kitchen tab goes orange (04 §2) */
-.kitchen-mode-toggle[aria-pressed="true"] { background: var(--orange) !important; color: #fff !important; }
+.kitchen-mode-toggle[aria-pressed="true"], .kitchen-mode-toggle-on { background: var(--orange) !important; color: var(--ink) !important; }
 
 /* daily quest + hint chips */
 .hint-chip, .active-buff-chip { background: var(--paper2) !important; color: var(--ink) !important; border: 2px solid var(--ink) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
@@ -3326,6 +3326,65 @@ h1 { font-weight: 800; }
 .shop-modal, .notebook-modal, .research-modal, .map-screen, .codex-picker-modal { background: rgba(35, 29, 22, 0.55) !important; }
 
 footer { color: var(--muted) !important; }
+
+/* PLAN v9 P7 — touch targets ≥44px (mobile a11y). */
+.pantry-toggle, .area-display-change { min-height: 44px; }
+
+/* PLAN v9 P4 §2 — the fixed Order Ticket dock. */
+body { padding-bottom: 66px; }
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  display: flex; gap: 3px;
+  background: var(--ink);
+  padding: 5px 5px calc(5px + env(safe-area-inset-bottom, 0px));
+}
+.dock-item {
+  flex: 1; min-height: 48px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  background: var(--paper); color: var(--ink);
+  border: 2px solid var(--ink); border-radius: 10px;
+  font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 9px;
+  cursor: pointer;
+}
+.dock-item.on { background: var(--green); }
+.dock-item.hot { background: var(--orange); }
+.dock-item.locked { opacity: 0.4; cursor: not-allowed; }
+.dock-item .dock-e { font-size: 18px; line-height: 1; }
+.dock-item:active:not(.locked) { transform: translate(1px, 1px); }
+
+/* PLAN v9 P5 §8 — boss arena orange-hazard reskin (a hotter cast of the loop). */
+.arena-card {
+  border-color: var(--orange) !important;
+  box-shadow: 5px 6px 0 var(--orange) !important;
+}
+.arena-card::before {
+  content: '';
+  display: block;
+  height: 7px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  background: repeating-linear-gradient(45deg, var(--orange) 0 10px, var(--ink) 10px 20px);
+}
+.arena-boss-name { color: var(--orange) !important; }
+
+/* PLAN v9 P7 — a11y contrast. The legacy theme set light text for dark
+   backgrounds; on the Order Ticket paper/white surfaces that same text fails
+   WCAG contrast, so force readable ink across the re-skinned containers.
+   Colored chips/buttons keep their own (already contrast-checked) !important
+   colors and so are unaffected. */
+.story-shell, .story-shell *,
+.audience-wrap, .audience-wrap *,
+.daily-quest-strip, .daily-quest-strip *,
+.kitchen-overlay-card, .kitchen-overlay-card *,
+.map-screen-card, .map-screen-card *,
+.shop-modal-card, .shop-modal-card *,
+.notebook-modal-card, .notebook-modal-card *,
+.research-modal-card, .research-modal-card *,
+.intermission-card, .intermission-card *,
+.arena-card, .arena-card *,
+.codex-picker-card, .codex-picker-card * {
+  color: var(--ink);
+}
 
 /* PLAN v9 P4 — crowd ticket "they're craving" chips */
 #audienceCravings { display: block; margin-top: 8px; }

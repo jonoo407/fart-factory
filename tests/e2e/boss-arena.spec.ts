@@ -7,6 +7,7 @@ async function loadStoryWithUnlocks(
   await page.goto('/');
   await page.evaluate((p) => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     localStorage.removeItem('fart_hard_mode');
     if (p.pantry) localStorage.setItem('fart_pantry', JSON.stringify(p.pantry));
