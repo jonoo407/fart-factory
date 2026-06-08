@@ -10,22 +10,24 @@ const p = (wet = 0, dry = 0, stink = 0, loud = 0, musical = 0, length = 0, temp 
   wet, dry, stink, loud, musical, length, temp,
 });
 
-describe('computeMatchPct', () => {
-  it('100% when actual === target', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
-    expect(computeMatchPct(target, target)).toBe(100);
+describe('computeMatchPct (closeness curve, PLAN v9 P1)', () => {
+  const target = p(3, 1, 4, 2, 3, 2, 2);
+  // The scorer normalizes a plate's level by AXIS_CAP(8) and a craving by
+  // TARGET_DIV(5), so a plate fully satisfies craving C when its level reaches
+  // C*8/5 (= C*1.6). At that point closeness is 1 on every axis → 100%.
+  const saturating = p(4.8, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2);
+
+  it('100% when the plate saturates every craved axis (level = craving × 1.6)', () => {
+    expect(computeMatchPct(saturating, target)).toBe(100);
   });
 
-  it('100% when actual within ±1 on every axis (tolerance band)', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
-    const actual = p(4, 0, 5, 1, 4, 3, 1); // each axis ±1
-    expect(computeMatchPct(actual, target)).toBe(100);
+  it('a same-scale copy (actual === target) is NOT 100 — you must stack to reach', () => {
+    expect(computeMatchPct(target, target)).toBeLessThan(100);
   });
 
-  it('drops monotonically as actual moves away from target', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
-    const close = computeMatchPct(p(4, 1, 4, 2, 3, 2, 2), target); // wet +1
-    const farther = computeMatchPct(p(8, 1, 4, 2, 3, 2, 2), target); // wet +5
+  it('drops as the plate moves away from the saturation point', () => {
+    const close = computeMatchPct(p(4, 1, 4, 2, 3, 2, 2), target);
+    const farther = computeMatchPct(p(8, 1, 4, 2, 3, 2, 2), target); // wet way over
     expect(close).toBeGreaterThan(farther);
   });
 });
@@ -66,25 +68,34 @@ describe('checkRestrictions', () => {
 });
 
 describe('evaluateMatch', () => {
-  it('returns 100 + no violations when actual matches and no restrictions', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
-    const r = evaluateMatch(target, ['beans', 'cheese'], target, []);
+  const target = p(3, 1, 4, 2, 3, 2, 2);
+  const saturating = p(4.8, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2);
+
+  it('returns 100 + no violations when the plate saturates and no restrictions', () => {
+    const r = evaluateMatch(saturating, ['beans', 'cheese'], target, []);
     expect(r.pct).toBe(100);
     expect(r.violations).toEqual([]);
   });
 
-  it('subtracts 25% per violation', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
-    const r = evaluateMatch(target, ['beans'], target, ['min-foods:3']);
+  it('subtracts 25% per violation (off a saturated 100 base → 75)', () => {
+    const r = evaluateMatch(saturating, ['beans'], target, ['min-foods:3']);
     expect(r.violations).toEqual(['min-foods:3']);
     expect(r.pct).toBe(75);
   });
 
-  it('floors to 0 when many violations', () => {
-    const target = p(3, 1, 4, 2, 3, 2, 2);
+  it('floors to 0 when many violations stack on a poor base', () => {
     const wet = p(8, 1, 4, 2, 3, 2, 2);
     const r = evaluateMatch(wet, ['beans'], target, ['no-wet', 'min-foods:3']);
     expect(r.pct).toBeLessThan(50);
     expect(r.violations.length).toBe(2);
+  });
+
+  it('charge multiplier scales the final: perfect ≥ tap ≥ weak', () => {
+    const partial = p(2, 1, 3, 1, 3, 1, 1);
+    const tap = evaluateMatch(partial, ['beans'], target, [], 1.0).pct;
+    const perfect = evaluateMatch(partial, ['beans'], target, [], 1.25).pct;
+    const weak = evaluateMatch(partial, ['beans'], target, [], 0.85).pct;
+    expect(perfect).toBeGreaterThanOrEqual(tap);
+    expect(weak).toBeLessThanOrEqual(tap);
   });
 });

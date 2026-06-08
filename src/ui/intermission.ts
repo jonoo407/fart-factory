@@ -11,8 +11,11 @@ import { setActiveBuff } from '../scoring/buffs';
 import {
   currentEncounterIdx,
   incrementEncounter,
+  encounterSeed,
+  rngBetween,
 } from '../state/run-state';
-import { refillBelly } from '../state/persistence';
+import { refillBelly, loadPantry, unlockFood } from '../state/persistence';
+import { FOODS } from '../state/food';
 import { decrementAllCooldowns } from '../state/boss-cadence';
 
 function $(id: string): HTMLElement | null {
@@ -65,6 +68,14 @@ function applyActivityChoice(activity: Activity): void {
       refillBelly();
       if (activity.immediate.skipNextIntermission) {
         setSkipNextIntermission();
+      }
+    } else if (activity.immediate.kind === 'grant-food') {
+      // PLAN v9 — Forage: unlock a random not-yet-owned non-legendary food.
+      const owned = new Set(loadPantry());
+      const candidates = FOODS.filter((f) => !owned.has(f.id) && f.rarity !== 'legendary');
+      if (candidates.length > 0) {
+        const pick = candidates[rngBetween(encounterSeed(currentEncounterIdx()), 0, candidates.length - 1)]!;
+        unlockFood(pick.id);
       }
     }
   }

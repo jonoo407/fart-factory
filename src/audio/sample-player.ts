@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-import { loadMuted } from './audio-settings';
+import { loadMuted, isChannelAudible, effectiveVolume } from './audio-settings';
+import { selectFartLayers, type AxisLevels } from './fart-stems';
 
 /**
  * Sample-bank player that complements the procedural synth in
@@ -22,6 +23,13 @@ export interface ManifestEntry {
   file: string;
   bytes: number;
   checksum: string;
+  /**
+   * Role of the sound. The Launch picker (pickSampleId) only selects `fart`
+   * entries. Optional for resilience to legacy manifests that predate the
+   * field — a missing category is treated as non-fart, so the launcher falls
+   * back to procedural synthesis rather than blurting a reaction/voice clip.
+   */
+  category?: string;
   proceduralFallback?: boolean;
 }
 
@@ -85,12 +93,18 @@ export interface SliderConfig {
  */
 export function pickSampleId(cfg: SliderConfig, manifest: Manifest): string | null {
   const targetBucket = bucketForLength(cfg.length);
+  // The Launch sound must ALWAYS be a fart. The manifest also holds audience
+  // reactions, per-audience signatures, voice lines, food + boss cues — those
+  // are fired explicitly by event-sfx, never as the headline launch hit. Without
+  // this guard, a long Launch could pick a 6-second spoken voice line as "the
+  // fart" and the player heard the audience but no fart.
+  const isFart = (e: ManifestEntry): boolean => e.category === 'fart' && !e.proceduralFallback;
   const candidates = manifest.entries.filter(
-    (e) => !e.proceduralFallback && bucketOf(e.durationMs) === targetBucket && e.id !== lastSelectedId,
+    (e) => isFart(e) && bucketOf(e.durationMs) === targetBucket && e.id !== lastSelectedId,
   );
   if (!candidates.length) {
-    // Fall back to ANY non-fallback entry (shuffle-bag exhausted in bucket).
-    const any = manifest.entries.filter((e) => !e.proceduralFallback && e.id !== lastSelectedId);
+    // Fall back to ANY fart entry (shuffle-bag exhausted in this duration bucket).
+    const any = manifest.entries.filter((e) => isFart(e) && e.id !== lastSelectedId);
     if (!any.length) return null;
     const pick = any[Math.floor(Math.random() * any.length)]!;
     lastSelectedId = pick.id;
@@ -183,6 +197,50 @@ export async function playSample(
   gain.connect(ctx.destination);
   src.start(startAtSeconds);
   return buf.duration;
+}
+
+// ---- PLAN v9 P6 — the layered fart READOUT (02 §4) ----
+
+/** True when the base rip stem for these axes exists in the manifest. */
+export function hasStemBase(manifest: Manifest, ax: AxisLevels): boolean {
+  const baseId = selectFartLayers(ax).base;
+  return manifest.entries.some((e) => e.id === baseId && e.category === 'stem' && !e.proceduralFallback);
+}
+
+/**
+ * Assemble + play the fart as a readout: the base rip + optional melody /
+ * sizzle / haze stems, all started at `startAtSeconds`, with the master gain
+ * tracking loudness (0.18 + loud*0.7) scaled by the Farts channel. Returns true
+ * if at least one stem played (so the caller skips the procedural fallback).
+ */
+export async function playFartStems(
+  ctx: AudioContext,
+  manifest: Manifest,
+  ax: AxisLevels,
+  startAtSeconds: number,
+): Promise<boolean> {
+  if (loadMuted() || !isChannelAudible('farts')) return false;
+  const layers = selectFartLayers(ax);
+  const ids = [layers.base, layers.melody, layers.sizzle, layers.haze].filter((x): x is string => x !== null);
+  const fartsScale = effectiveVolume('farts') / 100; // 0-1
+  let played = false;
+  for (const id of ids) {
+    const entry = manifest.entries.find((e) => e.id === id && e.category === 'stem' && !e.proceduralFallback);
+    if (!entry) continue;
+    const buf = await decodeOnce(ctx, entry);
+    if (!buf) continue;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    // The base carries the master gain; the colour layers sit a bit under it.
+    const layerGain = id === layers.base ? layers.gain : layers.gain * 0.55;
+    g.gain.value = Math.min(0.95, layerGain * fartsScale);
+    src.connect(g);
+    g.connect(ctx.destination);
+    src.start(startAtSeconds);
+    played = true;
+  }
+  return played;
 }
 
 // Test/debug accessors.

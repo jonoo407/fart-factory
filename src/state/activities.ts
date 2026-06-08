@@ -38,7 +38,8 @@ export type Buff = PropertyBuff | GoldMultiplierBuff | CancelRestrictionBuff;
 
 export type ImmediateEffect =
   | { kind: 'refill-belly'; amount: number } // +N to belly right now
-  | { kind: 'full-belly'; skipNextIntermission: boolean }; // Power Nap
+  | { kind: 'full-belly'; skipNextIntermission: boolean } // Power Nap
+  | { kind: 'grant-food' }; // PLAN v9 — Forage: unlock 1 random new food (04 §9)
 
 export interface Activity {
   id: string;
@@ -134,6 +135,13 @@ export const ACTIVITIES: readonly Activity[] = [
     emoji: '🧘',
     description: 'Center yourself. Next launch: +1 musical, +1 length (steadier under pressure).',
     buff: { kind: 'property', delta: { musical: 1, length: 1 } },
+  },
+  {
+    id: 'forage',
+    name: 'Forage',
+    emoji: '🧺',
+    description: 'Rummage the bushes. Unlock 1 random new food.',
+    immediate: { kind: 'grant-food' },
   },
 ];
 

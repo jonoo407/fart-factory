@@ -11,12 +11,17 @@ beforeEach(() => {
 });
 
 describe('TUTORIAL_STEPS', () => {
-  it('has a thin opener of 2 steps with title + body (PR3 trim)', () => {
-    expect(TUTORIAL_STEPS.length).toBe(2);
+  it('has the three Order Ticket onboarding cards with title + body (04 §10)', () => {
+    expect(TUTORIAL_STEPS.length).toBe(3);
     for (const s of TUTORIAL_STEPS) {
       expect(s.title.length).toBeGreaterThan(0);
       expect(s.body.length).toBeGreaterThan(0);
     }
+  });
+
+  it('teaches discovery-by-doing (the redesign hook)', () => {
+    const allText = TUTORIAL_STEPS.map((s) => `${s.title} ${s.body}`).join(' ').toLowerCase();
+    expect(allText).toMatch(/discover|learn what it does|field guide/);
   });
 
   it('teaches the food game, not the v2 slider game (P2 regression)', () => {

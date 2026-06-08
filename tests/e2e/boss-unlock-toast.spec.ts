@@ -6,6 +6,7 @@ test('Boss-unlock toast fires once when a boss first becomes unlocked', async ({
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     const recipes = Array.from({ length: 9 }, (_, i) => `recipe-stub-${i}`);
     localStorage.setItem('fart_recipes_seen', JSON.stringify(recipes));
@@ -28,6 +29,7 @@ test('Boss-unlock toast does NOT re-fire on subsequent launches', async ({ page 
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     const recipes = Array.from({ length: 10 }, (_, i) => `recipe-stub-${i}`);
     localStorage.setItem('fart_recipes_seen', JSON.stringify(recipes));

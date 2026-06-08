@@ -19,6 +19,8 @@ import { wireSaveIo } from './ui/save-io';
 import { showOnboarding } from './ui/onboarding';
 import { playPerfectCinematic } from './ui/perfect-cinematic';
 import { showFeatureIntro, type FeatureIntroOptions } from './ui/feature-intro';
+import { wireVenueLadder } from './ui/venue-ladder';
+import { wireDock } from './ui/dock';
 
 function wireVisibilityChange(): void {
   document.addEventListener('visibilitychange', () => {
@@ -42,6 +44,8 @@ function init(): void {
   wireKitchen();
   wireDailyQuest();
   wireSaveIo();
+  wireVenueLadder();
+  wireDock();
   showOnboarding();
 
   const w = window as unknown as {

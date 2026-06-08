@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { SEEDS, VOICE_CAST, VOICE_TIERS, voiceSeedId } from '../../scripts/sfx-seeds';
+import { SEEDS, VOICE_CAST, VOICE_TIERS, voiceSeedId, type Seed } from '../../scripts/sfx-seeds';
 import { AUDIENCES } from '../../src/state/audience';
 import { REACTIONS } from '../../src/scoring/audience-reactions';
 
@@ -134,5 +134,43 @@ describe('utility SFX (Phase 2)', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
     expect(ids.has('plate-pluck')).toBe(true);
     expect(ids.has('drumroll')).toBe(true);
+  });
+});
+
+// The launch sound must always be a *fart*. `category` is the single source of
+// truth the runtime filters on (pickSampleId) so audience reactions, signatures,
+// voice lines, food + boss cues are never substituted for the headline fart.
+describe('seed categories (launch picks farts only)', () => {
+  const categoryOf = (id: string): string | undefined =>
+    (SEEDS.find((s) => s.id === id) as { category?: string } | undefined)?.category;
+
+  it('every seed carries a category', () => {
+    for (const s of SEEDS) {
+      expect((s as { category?: string }).category).toBeTruthy();
+    }
+  });
+
+  it('classifies headline farts as "fart" and everything else as its own kind', () => {
+    expect(categoryOf('wet-flapper')).toBe('fart');
+    expect(categoryOf('thunder-roll')).toBe('fart');
+    expect(categoryOf('tiny-toot')).toBe('fart');
+    expect(categoryOf('royal-court-applause')).toBe('reaction');
+    expect(categoryOf('food-munch')).toBe('food');
+    expect(categoryOf('legendary-fanfare')).toBe('event');
+    expect(categoryOf('boss-entrance-royal')).toBe('boss');
+    expect(categoryOf('drumroll')).toBe('utility');
+    expect(categoryOf('sig-royal-court')).toBe('signature');
+    expect(categoryOf('voice-royal-court-loved')).toBe('voice');
+  });
+
+  it('fart category spans all three duration buckets (short/medium/long)', () => {
+    const farts = SEEDS.filter(
+      (s): s is Extract<Seed, { kind: 'sfx' }> =>
+        s.kind === 'sfx' && (s as { category?: string }).category === 'fart',
+    );
+    const secs = farts.map((s) => s.duration_seconds);
+    expect(secs.some((d) => d <= 0.8)).toBe(true); // short
+    expect(secs.some((d) => d > 0.8 && d <= 1.7)).toBe(true); // medium
+    expect(secs.some((d) => d > 1.7)).toBe(true); // long
   });
 });

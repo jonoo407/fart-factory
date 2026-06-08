@@ -4,6 +4,7 @@ async function loadStoryMode(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.removeItem('fart_mute');
     localStorage.setItem('fart_mode', '"story"');
     localStorage.removeItem('fart_hard_mode');
@@ -48,6 +49,7 @@ test('Legendary food cards have rarity-legendary class for the glow (item 64)', 
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     localStorage.setItem('fart_pantry', JSON.stringify([
       'beans', 'cheese', 'onion', 'egg', 'garlic', 'cabbage', 'forbidden-burrito',

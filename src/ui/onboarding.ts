@@ -4,16 +4,23 @@ export interface TutorialStep {
   emoji: string;
 }
 
+// PLAN v9 P5 / 03 §6 + 04 §10 — the three Order Ticket onboarding cards.
+// New systems are introduced just-in-time via crowd intro cards, not up front.
 export const TUTORIAL_STEPS: readonly TutorialStep[] = [
   {
     emoji: '🧪',
     title: 'Welcome, Fart Scientist!',
-    body: "Today an audience is in town. Tap foods from your pantry to plate them, then smash 🚀 LAUNCH FART. The audience scores your match; ≥50% earns 💰 gold, less earns 📝 research notes — both unlock more.",
+    body: 'An audience just sat down. Tap foods from your pantry to plate them, then hold the big green button to BLAST.',
   },
   {
-    emoji: '🚀',
-    title: "You'll learn more as you play",
-    body: "Each new system (Kitchen, Bosses, Daily Quest) gets a quick intro the first time it appears. For now: plate, launch, see what happens. Good luck!",
+    emoji: '👀',
+    title: 'Read what they crave',
+    body: "Every crowd wants something different. Match their craving chips to win — but you don't know what each food does yet…",
+  },
+  {
+    emoji: '🔍',
+    title: 'Discover by doing',
+    body: "Launch a food and you'll learn what it does 💦🤢🔊🎵. Your field guide fills in by itself as you play — and you'll earn 💰 gold and 📝 notes along the way.",
   },
 ];
 

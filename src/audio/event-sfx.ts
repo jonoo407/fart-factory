@@ -20,21 +20,21 @@
 
 import { getAudioContext } from './procedural';
 import { loadManifest, playSample } from './sample-player';
-import { channelVolume, isChannelAudible } from './audio-settings';
+import { effectiveVolume, isChannelAudible, type AudioChannel } from './audio-settings';
 
 /**
- * Fire a one-shot SFX by id at slight reduced volume (these are
- * contextual cues, not the headline fart sound — they shouldn't crowd
- * the procedural payload). Gated on the 'sfx' channel volume.
+ * Fire a one-shot SFX by id at slight reduced volume (these are contextual
+ * cues, not the headline fart sound). Gated on the given channel's effective
+ * volume (channel × Master). PLAN v9 P6 — voice lines pass channel='voices'.
  */
-export async function playEventSfx(id: string, volumeSlider = 5): Promise<void> {
-  if (!isChannelAudible('sfx')) return;
+export async function playEventSfx(id: string, volumeSlider = 5, channel: AudioChannel = 'sfx'): Promise<void> {
+  if (!isChannelAudible(channel)) return;
   const ctx = getAudioContext();
   if (!ctx) return; // Pre-launch — no context yet; cue silently lost.
   const manifest = await loadManifest();
   if (!manifest) return;
-  // Scale the per-call volume slider by the channel volume (0-100 → 0-1).
-  const scaled = volumeSlider * (channelVolume('sfx') / 100);
+  // Scale the per-call volume slider by the effective channel volume (0-100 → 0-1).
+  const scaled = volumeSlider * (effectiveVolume(channel) / 100);
   await playSample(ctx, manifest, id, 0, scaled);
 }
 
@@ -88,5 +88,6 @@ export async function playAudienceVoice(
   tier: AudienceVoiceTier,
   volume = 7,
 ): Promise<void> {
-  await playEventSfx(audienceVoiceSfxId(audienceId, tier), volume);
+  // PLAN v9 P6 — character VO routes through the independent Voices channel.
+  await playEventSfx(audienceVoiceSfxId(audienceId, tier), volume, 'voices');
 }

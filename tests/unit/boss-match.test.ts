@@ -8,11 +8,28 @@ import {
 import { BOSSES } from '../../src/state/bosses';
 import { AUDIENCES } from '../../src/state/audience';
 import type { FoodProperties } from '../../src/state/food';
+import { AXIS_CAP, TARGET_DIV } from '../../src/scoring/tuning';
 
-// Helper: a property vector that perfectly matches an audience's cravings.
+// Helper: a property vector that FULLY satisfies an audience's cravings under
+// the PLAN v9 closeness scorer. A plate's level is normalized by AXIS_CAP(8)
+// and a craving by TARGET_DIV(5), so saturating craving C means reaching
+// C*AXIS_CAP/TARGET_DIV (= C*1.6), capped at AXIS_CAP. (Props == cravings, the
+// old same-scale assumption, now under-scores.)
 function perfectFor(audId: string): FoodProperties {
   const a = AUDIENCES.find((x) => x.id === audId)!;
-  return { ...a.cravings };
+  // An axis forbidden by a "no-<axis>" rule is left at 0 (bringing any of it
+  // violates the rule AND triggers the hate penalty), mirroring how the scorer
+  // judges it. Every craved, non-forbidden axis is saturated to its target.
+  const hated = new Set<string>();
+  for (const r of a.restrictions ?? []) {
+    const m = /^no-([a-z]+)$/.exec(r);
+    if (m) hated.add(m[1]!);
+  }
+  const out: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
+  for (const axis of Object.keys(out) as (keyof FoodProperties)[]) {
+    out[axis] = hated.has(axis) ? 0 : Math.min(AXIS_CAP, a.cravings[axis] * (AXIS_CAP / TARGET_DIV));
+  }
+  return out;
 }
 
 // Helper: a property vector deliberately FAR from a specific audience.

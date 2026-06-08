@@ -1,9 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
+import { dismissReaction } from './_helpers';
 
 async function loadApp(page: Page): Promise<void> {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.removeItem('fart_mute');
     localStorage.removeItem('fart_audio_channels');
   });
@@ -37,6 +39,8 @@ test('muting via popover suspends AudioContext after a story launch', async ({ p
   });
   expect(['running', 'suspended']).toContain(stateAfterLaunch);
 
+  // The reaction takeover covers the top bar — close it to reach #muteBtn.
+  await dismissReaction(page);
   await page.click('#muteBtn');
   await page.locator('#audioMuteAllBtn').click();
   await page.waitForTimeout(250);
@@ -47,22 +51,23 @@ test('muting via popover suspends AudioContext after a story launch', async ({ p
   expect(stateAfterMute).toBe('suspended');
 });
 
-test('per-channel sliders persist and affect the muted state', async ({ page }) => {
+test('per-channel sliders persist; Master drives the muted state (4-channel model)', async ({ page }) => {
   await loadApp(page);
   await page.click('#muteBtn');
-  // Drag farts to 0 — overall NOT muted (sfx still 100).
-  await page.evaluate(() => {
-    const s = document.getElementById('audioFartsSlider') as HTMLInputElement;
-    s.value = '0';
-    s.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  const setChannel = (ch: string, val: string) =>
+    page.evaluate(
+      ([c, v]) => {
+        const s = document.querySelector(`#audioPopover input[data-channel="${c}"]`) as HTMLInputElement;
+        s.value = v;
+        s.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      [ch, val],
+    );
+  // Farts → 0: overall NOT muted (Master still 100).
+  await setChannel('farts', '0');
   await expect(page.locator('#muteBtn')).toHaveAttribute('aria-pressed', 'false');
-  // Drag sfx to 0 too — now overall muted.
-  await page.evaluate(() => {
-    const s = document.getElementById('audioSfxSlider') as HTMLInputElement;
-    s.value = '0';
-    s.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+  // Master → 0: now overall muted.
+  await setChannel('master', '0');
   await expect(page.locator('#muteBtn')).toHaveAttribute('aria-pressed', 'true');
   // Reload — settings persist.
   await page.reload();
@@ -70,5 +75,5 @@ test('per-channel sliders persist and affect the muted state', async ({ page }) 
   await page.reload();
   const stored = await page.evaluate(() => localStorage.getItem('fart_audio_channels'));
   expect(stored).toContain('"farts":0');
-  expect(stored).toContain('"sfx":0');
+  expect(stored).toContain('"master":0');
 });

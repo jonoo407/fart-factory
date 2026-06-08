@@ -1,12 +1,8 @@
 /**
- * Audio settings popover. Anchored to the mute button in the
- * progression strip. Hosts:
- *   - 🔊 Farts volume slider
- *   - 🎵 SFX volume slider
- *   - 🔇 Master mute toggle (sets both to 0 / restores to 100)
- *
- * Click the mute button → toggles the popover open/closed. The button
- * label still reflects overall mute state (🔇 vs 🔊).
+ * Sound settings popover, anchored to the mute chip (PLAN v9 P6 / 02 §7 /
+ * 04 §11). Four channels under a Master (Master · Farts · SFX · Voices ·
+ * Music), a Captions toggle (ON by default) and a Rumble/haptics toggle, plus
+ * a one-tap "Mute everything". Same sticker language as the rest of the app.
  */
 
 import {
@@ -14,6 +10,11 @@ import {
   setChannelVolume,
   setMuted,
   loadMuted,
+  loadCaptionsEnabled,
+  setCaptionsEnabled,
+  loadHapticsEnabled,
+  setHapticsEnabled,
+  type AudioChannel,
 } from '../audio/audio-settings';
 import { suspendAudio, resumeAudio } from '../audio/procedural';
 
@@ -23,6 +24,14 @@ function $(id: string): HTMLElement | null {
 
 const POPOVER_ID = 'audioPopover';
 
+const ROWS: { ch: AudioChannel; label: string }[] = [
+  { ch: 'master', label: '🔊 Master' },
+  { ch: 'farts', label: '💨 Farts' },
+  { ch: 'sfx', label: '🎵 SFX' },
+  { ch: 'voices', label: '🗣️ Voices' },
+  { ch: 'music', label: '🎶 Music' },
+];
+
 function ensurePopover(): HTMLElement {
   let p = document.getElementById(POPOVER_ID);
   if (p) return p;
@@ -30,20 +39,27 @@ function ensurePopover(): HTMLElement {
   p.id = POPOVER_ID;
   p.className = 'audio-popover';
   p.setAttribute('role', 'dialog');
-  p.setAttribute('aria-label', 'Audio settings');
+  p.setAttribute('aria-label', 'Sound settings');
   p.setAttribute('hidden', '');
   const s = loadAudioSettings();
+  const sliders = ROWS.map(
+    (r) => `
+    <label class="audio-popover-row">
+      <span class="audio-popover-label">${r.label}</span>
+      <input type="range" data-channel="${r.ch}" min="0" max="100" value="${s[r.ch]}" aria-label="${r.label} volume" />
+      <span class="audio-popover-value" data-channel-value="${r.ch}">${s[r.ch]}</span>
+    </label>`,
+  ).join('');
   p.innerHTML = `
-    <div class="audio-popover-header">🔊 Audio</div>
-    <label class="audio-popover-row">
-      <span class="audio-popover-label">💨 Farts</span>
-      <input type="range" id="audioFartsSlider" min="0" max="100" value="${s.farts}" aria-label="Farts volume" />
-      <span class="audio-popover-value" id="audioFartsValue">${s.farts}</span>
+    <div class="audio-popover-header">🔊 Sound</div>
+    ${sliders}
+    <label class="audio-popover-toggle">
+      <span>📝 Captions</span>
+      <input type="checkbox" id="audioCaptionsToggle" ${loadCaptionsEnabled() ? 'checked' : ''} aria-label="Captions" />
     </label>
-    <label class="audio-popover-row">
-      <span class="audio-popover-label">🎵 SFX</span>
-      <input type="range" id="audioSfxSlider" min="0" max="100" value="${s.sfx}" aria-label="Sound effects volume" />
-      <span class="audio-popover-value" id="audioSfxValue">${s.sfx}</span>
+    <label class="audio-popover-toggle">
+      <span>📳 Rumble</span>
+      <input type="checkbox" id="audioHapticsToggle" ${loadHapticsEnabled() ? 'checked' : ''} aria-label="Haptics / rumble" />
     </label>
     <button type="button" id="audioMuteAllBtn" class="audio-popover-mute-all" aria-pressed="${loadMuted() ? 'true' : 'false'}">
       ${loadMuted() ? '🔇 Muted — tap to unmute' : '🔇 Mute everything'}
@@ -55,14 +71,16 @@ function ensurePopover(): HTMLElement {
 
 function paintPopover(): void {
   const s = loadAudioSettings();
-  const fartsSlider = $('audioFartsSlider') as HTMLInputElement | null;
-  const sfxSlider = $('audioSfxSlider') as HTMLInputElement | null;
-  const fartsValue = $('audioFartsValue');
-  const sfxValue = $('audioSfxValue');
-  if (fartsSlider) fartsSlider.value = String(s.farts);
-  if (sfxSlider) sfxSlider.value = String(s.sfx);
-  if (fartsValue) fartsValue.textContent = String(s.farts);
-  if (sfxValue) sfxValue.textContent = String(s.sfx);
+  for (const r of ROWS) {
+    const slider = document.querySelector<HTMLInputElement>(`#${POPOVER_ID} input[data-channel="${r.ch}"]`);
+    const val = document.querySelector<HTMLElement>(`#${POPOVER_ID} [data-channel-value="${r.ch}"]`);
+    if (slider) slider.value = String(s[r.ch]);
+    if (val) val.textContent = String(s[r.ch]);
+  }
+  const cap = $('audioCaptionsToggle') as HTMLInputElement | null;
+  if (cap) cap.checked = loadCaptionsEnabled();
+  const hap = $('audioHapticsToggle') as HTMLInputElement | null;
+  if (hap) hap.checked = loadHapticsEnabled();
   const btn = $('audioMuteAllBtn') as HTMLButtonElement | null;
   if (btn) {
     const muted = loadMuted();
@@ -77,13 +95,12 @@ function paintMuteBtn(): void {
   const muted = loadMuted();
   btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
   btn.textContent = muted ? '🔇' : '🔊';
-  btn.setAttribute('aria-label', muted ? 'Audio muted (open settings)' : 'Audio settings');
+  btn.setAttribute('aria-label', muted ? 'Audio muted (open settings)' : 'Sound settings');
 }
 
 function togglePopover(): void {
   const p = ensurePopover();
-  const hidden = p.hasAttribute('hidden');
-  if (hidden) {
+  if (p.hasAttribute('hidden')) {
     paintPopover();
     p.removeAttribute('hidden');
   } else {
@@ -98,7 +115,6 @@ function closePopover(): void {
 export function wireAudioPopover(): void {
   paintMuteBtn();
   ensurePopover();
-  // Click outside to close.
   document.addEventListener('click', (ev) => {
     const target = ev.target as Element | null;
     if (!target) return;
@@ -107,23 +123,22 @@ export function wireAudioPopover(): void {
     closePopover();
   });
   $('muteBtn')?.addEventListener('click', togglePopover);
-  // Slider events use 'input' for immediate feedback.
+  // Channel sliders (generic).
   document.addEventListener('input', (ev) => {
     const target = ev.target as HTMLInputElement | null;
-    if (!target) return;
-    if (target.id === 'audioFartsSlider') {
-      const v = Number(target.value);
-      setChannelVolume('farts', v);
-      const valEl = $('audioFartsValue');
-      if (valEl) valEl.textContent = String(v);
-      paintMuteBtn();
-    } else if (target.id === 'audioSfxSlider') {
-      const v = Number(target.value);
-      setChannelVolume('sfx', v);
-      const valEl = $('audioSfxValue');
-      if (valEl) valEl.textContent = String(v);
-      paintMuteBtn();
-    }
+    const ch = target?.getAttribute('data-channel') as AudioChannel | null;
+    if (!target || !ch) return;
+    const v = Number(target.value);
+    setChannelVolume(ch, v);
+    const val = document.querySelector<HTMLElement>(`#${POPOVER_ID} [data-channel-value="${ch}"]`);
+    if (val) val.textContent = String(v);
+    paintMuteBtn();
+  });
+  // Toggles + mute-all.
+  document.addEventListener('change', (ev) => {
+    const target = ev.target as HTMLInputElement | null;
+    if (target?.id === 'audioCaptionsToggle') setCaptionsEnabled(target.checked);
+    else if (target?.id === 'audioHapticsToggle') setHapticsEnabled(target.checked);
   });
   document.addEventListener('click', (ev) => {
     const target = ev.target as Element | null;

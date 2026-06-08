@@ -1,26 +1,33 @@
 /**
- * Per-channel audio volume. Replaces the binary mute toggle so parents
- * can keep audience reactions / stings on while killing the farts (or
- * vice versa).
+ * Per-channel audio volume + accessibility toggles.
  *
- * Two channels today (no background music): 'farts' and 'sfx'. Volumes
- * are 0–100 integers. Settings persist under fart_audio_channels.
+ * PLAN v9 P6 / 02 §7 — four independent channels under a Master, matching the
+ * Sound settings design: Master · Farts & SFX · Voices · Music. Plus captions
+ * (ON by default — non-negotiable) and a haptics/rumble toggle. Volumes are
+ * 0–100 integers; the effective volume of a channel is `channel * master/100`.
+ * Settings persist under fart_audio_channels.
  *
- * Backwards compat: loadMuted() / setMuted() are kept so existing
- * callers (visibility-change handler, sample player) still work.
+ * Backwards compat: loadMuted()/setMuted() are kept (they now act on Master)
+ * so the visibility-change handler + the mute chip still work.
  */
 
-export type AudioChannel = 'farts' | 'sfx';
+export type AudioChannel = 'master' | 'farts' | 'sfx' | 'voices' | 'music';
 
 const KEY = 'fart_audio_channels';
 const KEY_LEGACY_MUTE = 'fart_mute';
+const KEY_CAPTIONS = 'fart_captions';
+const KEY_HAPTICS = 'fart_haptics';
 
 export interface AudioSettings {
-  farts: number; // 0-100
-  sfx: number;   // 0-100
+  master: number;
+  farts: number;
+  sfx: number;
+  voices: number;
+  music: number;
 }
 
-const DEFAULT: AudioSettings = { farts: 100, sfx: 100 };
+const DEFAULT: AudioSettings = { master: 100, farts: 100, sfx: 100, voices: 100, music: 60 };
+const CHANNELS: AudioChannel[] = ['master', 'farts', 'sfx', 'voices', 'music'];
 
 function clamp(n: number): number {
   if (!Number.isFinite(n)) return 0;
@@ -32,7 +39,7 @@ function migrateLegacyMute(): AudioSettings | null {
     const legacy = localStorage.getItem(KEY_LEGACY_MUTE);
     if (legacy === null) return null;
     const parsed: unknown = JSON.parse(legacy);
-    if (parsed === true) return { farts: 0, sfx: 0 };
+    if (parsed === true) return { ...DEFAULT, master: 0 };
     if (parsed === false) return { ...DEFAULT };
     return null;
   } catch {
@@ -46,13 +53,11 @@ export function loadAudioSettings(): AudioSettings {
     if (raw !== null) {
       const parsed = JSON.parse(raw) as Partial<AudioSettings>;
       if (parsed && typeof parsed === 'object') {
-        return {
-          farts: clamp(parsed.farts ?? DEFAULT.farts),
-          sfx: clamp(parsed.sfx ?? DEFAULT.sfx),
-        };
+        const out = { ...DEFAULT };
+        for (const ch of CHANNELS) out[ch] = clamp(parsed[ch] ?? DEFAULT[ch]);
+        return out;
       }
     }
-    // First load on a save with the legacy mute key — migrate.
     const migrated = migrateLegacyMute();
     if (migrated) {
       saveAudioSettings(migrated);
@@ -66,10 +71,9 @@ export function loadAudioSettings(): AudioSettings {
 
 export function saveAudioSettings(s: AudioSettings): void {
   try {
-    localStorage.setItem(KEY, JSON.stringify({
-      farts: clamp(s.farts),
-      sfx: clamp(s.sfx),
-    }));
+    const out: AudioSettings = { ...DEFAULT };
+    for (const ch of CHANNELS) out[ch] = clamp(s[ch] ?? DEFAULT[ch]);
+    localStorage.setItem(KEY, JSON.stringify(out));
   } catch {
     // ignore
   }
@@ -80,22 +84,66 @@ export function setChannelVolume(channel: AudioChannel, volume: number): void {
   saveAudioSettings({ ...current, [channel]: clamp(volume) });
 }
 
+/** Raw 0-100 volume of a channel (before the Master multiplier). */
 export function channelVolume(channel: AudioChannel): number {
   return loadAudioSettings()[channel];
 }
 
-export function isChannelAudible(channel: AudioChannel): boolean {
-  return channelVolume(channel) > 0;
+/** Effective 0-100 volume = channel × master / 100 (Master returns itself). */
+export function effectiveVolume(channel: AudioChannel): number {
+  const s = loadAudioSettings();
+  if (channel === 'master') return s.master;
+  return Math.round((s[channel] * s.master) / 100);
 }
 
-// ----- Legacy API (binary mute) — kept for visibility-change handler etc. -----
+export function isChannelAudible(channel: AudioChannel): boolean {
+  return effectiveVolume(channel) > 0;
+}
+
+// ----- Captions (ON by default — accessibility, 02 §7) -----
+
+export function loadCaptionsEnabled(): boolean {
+  try {
+    const raw = localStorage.getItem(KEY_CAPTIONS);
+    if (raw === null) return true;
+    return JSON.parse(raw) !== false;
+  } catch {
+    return true;
+  }
+}
+export function setCaptionsEnabled(on: boolean): void {
+  try {
+    localStorage.setItem(KEY_CAPTIONS, JSON.stringify(on));
+  } catch {
+    // ignore
+  }
+}
+
+// ----- Haptics / Rumble toggle (ON by default) -----
+
+export function loadHapticsEnabled(): boolean {
+  try {
+    const raw = localStorage.getItem(KEY_HAPTICS);
+    if (raw === null) return true;
+    return JSON.parse(raw) !== false;
+  } catch {
+    return true;
+  }
+}
+export function setHapticsEnabled(on: boolean): void {
+  try {
+    localStorage.setItem(KEY_HAPTICS, JSON.stringify(on));
+  } catch {
+    // ignore
+  }
+}
+
+// ----- Legacy API (binary mute) — now acts on Master -----
 
 export function loadMuted(): boolean {
-  const s = loadAudioSettings();
-  return s.farts === 0 && s.sfx === 0;
+  return loadAudioSettings().master === 0;
 }
 
 export function setMuted(muted: boolean): void {
-  const v = muted ? 0 : 100;
-  saveAudioSettings({ farts: v, sfx: v });
+  setChannelVolume('master', muted ? 0 : 100);
 }

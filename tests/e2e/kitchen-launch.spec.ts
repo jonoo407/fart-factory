@@ -4,6 +4,7 @@ async function loadStory(page: import('@playwright/test').Page) {
   await page.goto('/');
   await page.evaluate(() => {
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
     localStorage.setItem('fart_mode', '"story"');
     localStorage.setItem('fart_kitchen_mode', 'true');
     localStorage.removeItem('fart_pantry');

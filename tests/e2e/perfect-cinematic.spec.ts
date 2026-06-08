@@ -5,6 +5,7 @@ async function loadStory(page: Page): Promise<void> {
   await page.evaluate(() => {
     localStorage.clear();
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
   });
   await page.reload();
 }
@@ -41,6 +42,7 @@ test('PERFECT cinematic is a no-op under prefers-reduced-motion (no confetti)', 
   await page.evaluate(() => {
     localStorage.clear();
     localStorage.setItem('fart_onboarding_seen', 'true');
+    localStorage.setItem('fart_intro_granny-edna', 'true');
   });
   await page.reload();
   await page.evaluate(async () => {
