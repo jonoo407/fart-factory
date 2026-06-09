@@ -3254,6 +3254,7 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
 /* ---- footer ---- */
 .rxn-foot {
   display: flex;
+  flex-wrap: wrap; /* the belly readout sits on its own row above the buttons */
   gap: 10px;
   padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
   max-width: 460px;
@@ -3261,6 +3262,19 @@ body[data-arena-active='true'] .audience-reaction { display: none; }
   margin: 0 auto;
   border-top: 2.5px solid var(--ink);
   background: var(--paper);
+}
+.rxn-belly {
+  flex: 1 0 100%;
+  text-align: center;
+  font-size: 0.9em;
+  color: var(--ink);
+  opacity: 0.85;
+}
+.rxn-belly.warn {
+  color: #d03a2c;
+  font-weight: 700;
+  opacity: 1;
+  animation: belly-danger 1s ease-in-out infinite;
 }
 .rxn-cta {
   flex: 1;
