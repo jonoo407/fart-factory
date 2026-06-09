@@ -24,7 +24,7 @@ import {
   markHiddenComboFound,
 } from '../state/persistence';
 import { resolveEquippedLaunch } from '../scoring/launch-resolver';
-import { evaluateMatch, computeMatchBreakdown, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
+import { evaluateMatch, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForEncounter, baseGoldForAudience } from '../scoring/reward';
 import { PASS_PCT } from '../scoring/tuning';
@@ -675,7 +675,10 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   const passedThisLaunch = match.pct >= PASS_PCT;
   let goldPaid = 0;
   const learnedToasts: string[] = [];
-  const breakdown = computeMatchBreakdown(propsAfterArea, aud.cravings);
+  // The "why N%?" breakdown is sourced from the same normalized feedback model
+  // as the headline % (not the legacy raw-scale computeMatchBreakdown) so its
+  // ✓/✗ can't contradict the score.
+  const axisFeedback = computeAxisFeedback(propsAfterArea, aud);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
@@ -818,7 +821,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   if (discovery && discovery.freshlyDiscovered) {
     showDiscoverySplash(discovery.recipeId);
   }
-  renderStoryResult(recipe, match, area, ingredientCount, discovery, aud, breakdown, propsAfterArea);
+  renderStoryResult(recipe, match, area, ingredientCount, discovery, aud, axisFeedback, propsAfterArea);
   // V8 T3 — pulse the Fart Profile bars in step with the audio playback.
   if (ingredientCount > 0) {
     pulseFartProfile($('fartProfile'));
