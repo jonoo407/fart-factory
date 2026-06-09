@@ -154,6 +154,8 @@ function applyKitchenModeUI(): void {
 
 export function wireKitchen(): void {
   applyKitchenModeUI();
+  // Auto-unlock mid-game (plate.ts) fires this so the tab un-greys immediately.
+  window.addEventListener('fart:kitchen-unlocked', applyKitchenModeUI);
   // The dock owns open/close/highlight (see dock.ts). Register the render hook
   // and the unlock gate (the tab is locked until kitchen mode unlocks).
   registerSurface('kitchen', {

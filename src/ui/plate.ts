@@ -49,7 +49,7 @@ import {
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
-import { applyActiveBuffs, consumeBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
+import { applyActiveBuffs, consumeBuffs, cancelOneRestrictionFromBuffs, goldMultiplierFromBuffs } from '../scoring/buffs';
 import { applyLegendaryProps } from '../scoring/legendary-buffs';
 import { pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
@@ -306,7 +306,7 @@ export function renderRecipeRibbon(): void {
  * sum (no synergies/treatments — those reveal at launch). Marks
  * UNCERTAIN whenever any plate food is below Apprentice mastery.
  */
-function renderPlatePreview(): void {
+export function renderPlatePreview(): void {
   const el = $('platePreview');
   if (!el) return;
   const ids = plateIngredientIds();
@@ -315,17 +315,12 @@ function renderPlatePreview(): void {
     el.innerHTML = '';
     return;
   }
-  const sum: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
-  let anyUnmastered = false;
-  for (const id of ids) {
-    const food = getFood(id);
-    if (!food) continue;
-    if (masteryLevel(loadFoodMastery(id)) === 'novice') anyUnmastered = true;
-    for (const a of Object.keys(sum) as Array<keyof FoodProperties>) {
-      sum[a] = Math.min(5, sum[a] + food.properties[a]);
-    }
-  }
-  el.innerHTML = renderPlatePreviewHtml(sum, loadDiscoveredAxes(), anyUnmastered);
+  // Predict the ACTUAL launched fart (same resolver as onStoryLaunch): equipped
+  // treatment + buffs + mastery + legendary + area. UNCERTAIN until every plated
+  // food is at least Apprentice mastery.
+  const anyUnmastered = ids.some((id) => masteryLevel(loadFoodMastery(id)) === 'novice');
+  const { props } = resolveLaunchProps(ids);
+  el.innerHTML = renderPlatePreviewHtml(props, loadDiscoveredAxes(), anyUnmastered);
   el.removeAttribute('hidden');
 }
 
@@ -644,24 +639,37 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
 const LAUNCH_COOLDOWN_MS = 1200;
 const launchGate = createCooldownGate(LAUNCH_COOLDOWN_MS);
 
+/**
+ * The deterministic launched-fart properties: equipped treatment + active buffs
+ * + mastery + legendary passive + current-area modifiers, in the exact order the
+ * launch applies them. SHARED by onStoryLaunch and the 🔮 PREDICTION preview so
+ * the two can never drift (the preview used to show a raw sum and silently
+ * disagreed with the actual fart on every launch — the area alone halves
+ * wet/stink and boosts loud at Backyard).
+ */
+export function resolveLaunchProps(ids: string[]): {
+  props: FoodProperties;
+  resolved: ReturnType<typeof resolveEquippedLaunch>;
+} {
+  const resolved = resolveEquippedLaunch(ids, loadEquippedTreatment());
+  const area = getArea(loadLastArea()) ?? AREAS[0]!;
+  const props = applyAreaModifiers(
+    applyLegendaryProps(applyMasteryBonuses(applyActiveBuffs(resolved.props), ids)),
+    area,
+  );
+  return { props, resolved };
+}
+
 async function onStoryLaunch(quality = 1): Promise<void> {
   if (!launchGate.open()) return;
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
-  // P6: resolve launch through the single-equip path — the one equipped
-  // Kitchen treatment (if any) applies to every plated food; otherwise raw.
-  const resolved = resolveEquippedLaunch(ids, loadEquippedTreatment());
+  // P6: launch resolution shared with the PREDICTION preview (resolveLaunchProps)
+  // so what you previewed is exactly what you launch.
+  const { props: propsAfterArea, resolved } = resolveLaunchProps(ids);
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
-  // PLAN_v5 Phase 6: apply active buffs BEFORE area modifiers, so the
-  // buff deltas are propagated through the area multipliers naturally.
-  const propsWithBuffs = applyActiveBuffs(resolved.props);
-  // T2.3: apply per-food mastery bonuses (Master+ foods get +1 on their highest axis).
-  const propsWithMastery = applyMasteryBonuses(propsWithBuffs, ids);
-  // V8 T7.d: apply permanent legendary-codex passives (e.g. Cosmic Symphony → +1 musical).
-  const propsWithLegendary = applyLegendaryProps(propsWithMastery);
-  const propsAfterArea = applyAreaModifiers(propsWithLegendary, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -755,7 +763,10 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     if (passedThisLaunch) {
       // launchBaseGold folds in the GamePlus Hot Spot 3x; awardGoldForEncounter
       // folds in the legendary +10% — both reach the live payout now.
-      goldPaid = awardGoldForEncounter(aud.id, launchBaseGold(aud, areaId), match.pct);
+      // Fold in the Watch Comedy "+20% gold" intermission buff (was inert —
+      // promised in the UI but never reached the payout).
+      const base = Math.round(launchBaseGold(aud, areaId) * goldMultiplierFromBuffs());
+      goldPaid = awardGoldForEncounter(aud.id, base, match.pct);
       bumpStars(aud.id, starsForPct(match.pct));
     }
     awardResearchForLaunch(match.pct);
@@ -822,6 +833,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
+      // Refresh the dock tab now — it was greyed/🔒 and stayed that way until
+      // reload even though the tap already worked.
+      window.dispatchEvent(new CustomEvent('fart:kitchen-unlocked'));
       showKitchenUnlockToast();
       // PR3: first time the kitchen unlocks, queue an explainer modal.
       showFeatureIntro({
@@ -1155,6 +1169,9 @@ export function initStoryPantry(): void {
   renderAreaDisplay();
   wirePlateSlots();
   wireStoryLaunchButton();
+  // Equipping/unequipping a Kitchen treatment changes the launched fart — keep
+  // the PREDICTION preview in sync (it resolves through the same launch path).
+  window.addEventListener('fart:treatment-changed', () => renderPlate());
   wireAreaChangeButton();
   wireMoveOnButton();
   wirePantryShowLockedToggle();
