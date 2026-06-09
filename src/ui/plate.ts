@@ -86,7 +86,7 @@ import { renderCravingChipsHtml, diffPips } from './crowd-ticket';
 import { renderTopBar } from './top-bar';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
-import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
+import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown, loadDiscoveredRecipes } from '../state/persistence';
 import { recordConquest } from '../state/conquests';
 import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
@@ -259,12 +259,16 @@ export function renderPlate(): void {
  * synergy is felt BEFORE blasting. Uses the real exact-set matchRecipe (D3:
  * extra foods suppress the recipe).
  */
-function renderRecipeRibbon(): void {
+export function renderRecipeRibbon(): void {
   const el = $('recipeRibbon');
   if (!el) return;
   const id = matchRecipe(plateIngredientIds());
   const recipe = id ? getRecipe(id) : null;
-  if (!recipe) {
+  // Discovery gate: the ribbon names a combo only once the player has actually
+  // discovered it (same rule the notebook uses — undiscovered recipes show as
+  // '???'). Without this, plating an undiscovered hidden recipe spoiled its
+  // name in the ribbon before the player ever launched it.
+  if (!recipe || !id || !new Set(loadDiscoveredRecipes()).has(id)) {
     el.setAttribute('hidden', '');
     el.innerHTML = '';
     return;
