@@ -25,10 +25,17 @@ describe('computeMatchPct (closeness curve, PLAN v9 P1)', () => {
     expect(computeMatchPct(target, target)).toBeLessThan(100);
   });
 
-  it('drops as the plate moves away from the saturation point', () => {
-    const close = computeMatchPct(p(4, 1, 4, 2, 3, 2, 2), target);
-    const farther = computeMatchPct(p(8, 1, 4, 2, 3, 2, 2), target); // wet way over
-    expect(close).toBeGreaterThan(farther);
+  it('an undershoot scores lower the farther below target it sits', () => {
+    // hold every other axis at saturation; only vary wet BELOW its 0.6 target.
+    const near = p(4, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2); // wet 4 → got 0.5 (just under)
+    const far = p(1, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2); //  wet 1 → got 0.125 (far under)
+    expect(computeMatchPct(near, target)).toBeGreaterThan(computeMatchPct(far, target));
+  });
+
+  it('overshooting a craved axis does NOT drop the score (closest-or-better)', () => {
+    // wet way over its target should be exactly as good as hitting it — no penalty.
+    const over = p(8, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2);
+    expect(computeMatchPct(over, target)).toBe(computeMatchPct(saturating, target));
   });
 });
 

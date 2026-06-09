@@ -60,6 +60,22 @@ export function closeness(target: number, got: number): number {
 }
 
 /**
+ * Per-axis credit (0-1). "Closest should be better": for a WANTED axis, giving
+ * the target level OR MORE earns full credit (you satisfied their craving —
+ * overshooting it never hurts), while falling short is scored by how close you
+ * got. A HATED ("want none") axis keeps less-is-better: any amount you bring
+ * drops the credit. This replaces the old symmetric closeness, which penalized
+ * "they want a lot, you brought a lot" as if it were a miss.
+ */
+export function axisCredit(target: number, got: number, hate: boolean): number {
+  // Hated axes are unchanged — less-is-better around their (near-zero) target.
+  if (hate) return closeness(target, got);
+  // Wanted axes: hitting OR exceeding the target is full credit; short of it,
+  // score by closeness so a closer plate beats a farther one.
+  return got >= target ? 1 : closeness(target, got);
+}
+
+/**
  * Weakest-link blend over a set of judged axes (each already normalized 0-1).
  * You cannot coast by nailing one axis and ignoring another: 55% of the score
  * is the weighted mean closeness, 45% is the single worst axis. A "hate" axis
@@ -73,7 +89,7 @@ export function computeBase(judged: JudgedAxis[]): number {
   let minClose = 1;
   let worstHate = 0;
   for (const j of judged) {
-    const c = closeness(j.target, j.got);
+    const c = axisCredit(j.target, j.got, j.hate);
     sum += j.weight * c;
     tot += j.weight;
     if (c < minClose) minClose = c;
@@ -173,7 +189,7 @@ export interface AxisFeedback {
 export function computeAxisFeedback(actual: FoodProperties, audience: Audience): AxisFeedback[] {
   return deriveWants(audience).map((w) => {
     const got = Math.min(1, actual[w.axis] / AXIS_CAP);
-    const c = closeness(w.target, got);
+    const c = axisCredit(w.target, got, w.hate);
     return {
       axis: w.axis,
       hate: w.hate,
