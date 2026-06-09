@@ -30,7 +30,7 @@ import { awardGoldForEncounter, launchBaseGold, legendaryGold } from '../scoring
 import { PASS_PCT } from '../scoring/tuning';
 import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak } from '../scoring/streak';
-import { recordFoodUse, applyMasteryBonuses, loadFoodMastery, masteryLevel } from '../scoring/food-mastery';
+import { recordFoodUse, applyMasteryBonuses, loadFoodMastery } from '../scoring/food-mastery';
 import { unlockFood, loadEquippedTreatment } from '../state/persistence';
 import { encounterSeed, currentEncounterIdx } from '../state/run-state';
 import { detectHiddenCombo } from '../scoring/hidden-combos';
@@ -80,7 +80,7 @@ import { mountChargeMeter } from './charge-meter';
 import { createCooldownGate } from './cooldown-gate';
 import { isHotSpotActive } from '../scoring/gameplus';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
-import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
+import { loadFoodReveals, revealNextAxis, isFoodFullyRevealed } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
 import { axisEmoji } from './axis-emoji';
 import { matchRecipe } from '../state/recipes';
@@ -315,12 +315,29 @@ export function renderPlatePreview(): void {
     el.innerHTML = '';
     return;
   }
-  // Predict the ACTUAL launched fart (same resolver as onStoryLaunch): equipped
-  // treatment + buffs + mastery + legendary + area. UNCERTAIN until every plated
-  // food is at least Apprentice mastery.
-  const anyUnmastered = ids.some((id) => masteryLevel(loadFoodMastery(id)) === 'novice');
-  const { props } = resolveLaunchProps(ids);
-  el.innerHTML = renderPlatePreviewHtml(props, loadDiscoveredAxes(), anyUnmastered);
+  // The prediction must NOT reveal the exact launched fart until you've fully
+  // LEARNED every plated ingredient (all its axes revealed) — otherwise you
+  // could read the answer off the card and trivialise the level. Until then it's
+  // a rough RAW estimate flagged UNCERTAIN; once fully known it shows the precise
+  // launched fart (same resolver as onStoryLaunch — the mastery payoff).
+  const fullyKnown = ids.every((id) => {
+    const food = getFood(id);
+    return food ? isFoodFullyRevealed(id, food.properties) : false;
+  });
+  let shown: FoodProperties;
+  if (fullyKnown) {
+    shown = resolveLaunchProps(ids).props;
+  } else {
+    shown = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
+    for (const id of ids) {
+      const food = getFood(id);
+      if (!food) continue;
+      for (const a of Object.keys(shown) as Array<keyof FoodProperties>) {
+        shown[a] = Math.min(5, shown[a] + food.properties[a]);
+      }
+    }
+  }
+  el.innerHTML = renderPlatePreviewHtml(shown, loadDiscoveredAxes(), !fullyKnown);
   el.removeAttribute('hidden');
 }
 
