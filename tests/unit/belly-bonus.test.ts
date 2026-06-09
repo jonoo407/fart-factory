@@ -4,7 +4,6 @@ import {
   grantBellyBonus,
   bellyCapacity,
   loadBelly,
-  refillBelly,
   spendBelly,
   BELLY_CAPACITY,
 } from '../../src/state/persistence';
@@ -43,13 +42,6 @@ describe('belly bonus capacity (per encounter)', () => {
     const r = spendBelly(BELLY_CAPACITY + 4, 3); // 24 of a boosted 26
     expect(r.ok).toBe(true);
     expect(r.remaining).toBe(2);
-  });
-
-  it('refillBelly tops up to the boosted capacity', () => {
-    grantBellyBonus(6, 3);
-    spendBelly(10, 3);
-    refillBelly(3);
-    expect(loadBelly(3)).toBe(BELLY_CAPACITY + 6);
   });
 
   it('is per-encounter — granting to one idx leaves neighbours at the base', () => {

@@ -43,6 +43,18 @@ test('Multi-encounter: pass crowd 1 → intermission activity → encounter adva
   await expect(page.locator('#plateSlot1.plate-slot-filled')).toBeVisible();
 });
 
+test('Retry on the same crowd KEEPS the belly fullness (fill-up model)', async ({ page }) => {
+  await loadFreshStory(page);
+  // broccoli ×2 (uncommon, 3 each) = 6/20 full at launch time.
+  await launchPassingPlate(page);
+  // The overlay hides the meter, so the footer carries the budget readout.
+  await expect(page.locator('#reactionOverlay .rxn-belly')).toContainText('6/20');
+  // "Improve" = another attempt at the SAME crowd — the stomach must stay
+  // 6/20 full, not pump back to empty (the per-crowd attempt budget).
+  await page.locator('#reactionOverlay .rxn-cta[data-action="improve"]').click();
+  await expect(page.locator('#bellyValue')).toHaveText('6');
+});
+
 test('Active buff strip appears after picking an activity with a buff', async ({ page }) => {
   // loadFreshStory pins fart_run_seed=7, which makes the intermission roll
   // deterministic: encounter 0 offers fizzy-drink / stretch-routine /

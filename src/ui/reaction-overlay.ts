@@ -25,15 +25,19 @@ export interface FooterButton {
 /**
  * Which footer buttons to show. A flop (not passed) offers ONLY a retry —
  * it cannot advance. A pass offers Improve (replay) + advance (Next, or
- * Finish on a boss).
+ * Finish on a boss) — unless the belly is too stuffed for another real
+ * attempt (canAttempt=false), in which case Improve is a dead end and only
+ * the advance shows. A stuffed flop never reaches the overlay (the
+ * stuffed-fail branch fires instead), so retry stays unconditional.
  */
-export function reactionFooterSpec(passed: boolean, isBoss: boolean): FooterButton[] {
+export function reactionFooterSpec(passed: boolean, isBoss: boolean, canAttempt = true): FooterButton[] {
   if (!passed) {
     return [{ action: 'retry', label: '↻ Try this crowd again', primary: true }];
   }
   const advance: FooterButton = isBoss
     ? { action: 'finish', label: 'Finish ▶', primary: true }
     : { action: 'next', label: 'Next show ▶', primary: true };
+  if (!canAttempt) return [advance];
   return [{ action: 'improve', label: '↻ Improve', primary: false }, advance];
 }
 
@@ -116,6 +120,15 @@ export interface ReactionData {
   newRecipe: string | null;
   /** PLAN v9 UI-overhaul Phase 5 — normalized 0-1 stink; ≥0.45 drifts a cloud. */
   stink?: number;
+  /**
+   * Belly fullness readout for the footer. The overlay covers the play screen,
+   * so the meter is invisible at the exact moment the player decides whether
+   * to retry — the budget has to travel with the decision. warn = nearly
+   * stuffed (mirrors the meter's danger threshold).
+   */
+  belly?: { used: number; cap: number; warn: boolean };
+  /** False when the belly is too stuffed for another real attempt. */
+  canAttempt?: boolean;
   onAction: (a: FooterAction) => void;
 }
 
@@ -148,6 +161,14 @@ function stinkHtml(): string {
   return `<div class="rxn-stink" aria-hidden="true">${blobs}</div>`;
 }
 
+/** The footer's belly budget line (the meter is hidden behind the overlay). */
+function bellyLineHtml(belly?: ReactionData['belly']): string {
+  if (!belly) return '';
+  const warn = belly.warn ? ' warn' : '';
+  const suffix = belly.warn ? ' — almost stuffed!' : '';
+  return `<div class="rxn-belly${warn}">🫃 Belly ${belly.used}/${belly.cap}${suffix}</div>`;
+}
+
 export function hideReactionOverlay(): void {
   const ov = $('reactionOverlay');
   if (ov) {
@@ -174,8 +195,8 @@ export function showReactionOverlay(d: ReactionData): void {
     d.learned.map((l) => `<div class="rxn-toast learn"><span class="em">💡</span><div>${l}</div></div>`).join('') +
     (d.newRecipe ? `<div class="rxn-toast recipe"><span class="em">⚡</span><div>New recipe — <strong>${d.newRecipe}</strong></div></div>` : '');
 
-  const footerBtns = reactionFooterSpec(d.passed, d.isBoss);
-  const footerHtml = footerBtns
+  const footerBtns = reactionFooterSpec(d.passed, d.isBoss, d.canAttempt);
+  const footerHtml = bellyLineHtml(d.belly) + footerBtns
     .map(
       (b) =>
         `<button type="button" class="rxn-cta${b.primary ? '' : ' ghost'}${footerBtns.length === 1 ? ' wide' : ''}" data-action="${b.action}">${b.label}</button>`,

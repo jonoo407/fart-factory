@@ -90,7 +90,7 @@ import { renderCravingChipsHtml, diffPips } from './crowd-ticket';
 import { renderTopBar } from './top-bar';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
-import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown, loadDiscoveredRecipes } from '../state/persistence';
+import { bumpStars, loadLastMatch, loadIntroShown, markIntroShown, loadDiscoveredRecipes } from '../state/persistence';
 import { recordConquest } from '../state/conquests';
 import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
@@ -379,7 +379,7 @@ export function paintMoveOnButton(wowed: boolean): void {
   } else {
     btn.textContent = '➡ Move On';
     btn.classList.remove('move-on-encore');
-    btn.setAttribute('aria-label', 'Move On to the next audience (refills belly)');
+    btn.setAttribute('aria-label', 'Move On to the next audience (fresh crowd, empty stomach)');
   }
 }
 
@@ -1019,6 +1019,9 @@ export function chargeBreakdownLine(quality: number): { icon: string; label: str
 function presentReactionOverlay(a: ReactionArgs): void {
   const grade = gradeForPct(a.finalPct);
   const tier = audienceReaction(a.finalPct, loadLastMatch()).tier;
+  // Belly budget travels with the retry decision (the overlay hides the meter).
+  const remaining = remainingBelly();
+  const capacity = bellyCapacity();
   const breakdownLines: { icon: string; label: string; val: string }[] = [
     { icon: '🎯', label: 'Base match', val: `${a.preChargePct}%` },
   ];
@@ -1042,18 +1045,27 @@ function presentReactionOverlay(a: ReactionArgs): void {
     newRecipe: a.newRecipeName,
     // PLAN v9 UI-overhaul Phase 5 — normalized stink drives the cloud (AXIS_CAP=8).
     stink: Math.min(1, a.propsAfterArea.stink / 8),
+    belly: {
+      used: capacity - remaining,
+      cap: capacity,
+      warn: remaining < MIN_ATTEMPT_BELLY + 4, // same danger threshold as the meter
+    },
+    canAttempt: remaining >= MIN_ATTEMPT_BELLY,
     onAction: handleReactionAction,
   });
 }
 
-/** Pass/retry gate routing from the reaction footer. */
-function handleReactionAction(action: FooterAction): void {
+/** Pass/retry gate routing from the reaction footer. Exported for tests. */
+export function handleReactionAction(action: FooterAction): void {
   if (action === 'next' || action === 'finish') {
     advanceToNextEncounter();
     return;
   }
-  // retry / improve — a fresh attempt at the SAME crowd (refill belly).
-  refillBelly();
+  // retry / improve — another attempt at the SAME crowd. The belly is NOT
+  // refilled: fullness is the per-crowd attempt budget (fill-up model), so
+  // what you ate on earlier attempts keeps counting until you Move On to a
+  // fresh crowd. (The legacy drain-model refillBelly() here silently reset
+  // the budget every retry and killed the stuffed-fail pressure loop.)
   bellySpentThisSession = 0;
   clearPlate();
   renderPlate();

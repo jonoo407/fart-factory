@@ -249,11 +249,6 @@ export function spendBelly(cost: number, idx?: number): { ok: boolean; remaining
   return { ok: true, remaining: next };
 }
 
-/** Force-refill belly for an encounter to its (possibly boosted) capacity. */
-export function refillBelly(idx?: number): void {
-  safeSave(bellyKey(idx), bellyCapacity(idx));
-}
-
 /** Base (unboosted) stomach capacity. The live cap is bellyCapacity(). */
 export const BELLY_CAPACITY = BELLY_MAX;
 
