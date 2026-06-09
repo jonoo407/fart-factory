@@ -255,8 +255,6 @@ function handleVictory(): void {
   });
   // P3: victory fanfare SFX (silent until operator runs sfx:generate).
   void playEventSfx(reward.firstWin ? LEGENDARY_FANFARE_SFX : QUEST_CLAIMED_SFX, 8);
-  // PLAN_v5 Phase 5: roll the next boss slot (boss outcome → re-pace).
-  void import('../state/boss-cadence').then(({ rollNextBossSlot }) => rollNextBossSlot());
   const r = $('arenaResult');
   if (!r) return;
   r.removeAttribute('hidden');
@@ -279,7 +277,6 @@ function handleDefeat(): void {
     import('../state/boss-snark'),
   ]).then(([cadence, hints, snarkMod]) => {
     cadence.setBossCooldown(bossId, 3);
-    cadence.rollNextBossSlot();
     const revealedCraving = hints.recordFirstLoss(bossId);
     const snark = snarkMod.snarkForBossLoss(bossId, Date.now() & 0xff);
     const r = $('arenaResult');

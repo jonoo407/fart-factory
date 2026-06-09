@@ -4,7 +4,6 @@ import {
   isAxisDiscovered,
   discoverAxesFromFart,
   DEFAULT_DISCOVERED,
-  type AxisName,
 } from '../../src/state/axis-discovery';
 import type { FoodProperties } from '../../src/state/food';
 
@@ -86,10 +85,5 @@ describe('axis discovery (V8 T1.b — Scheme 1)', () => {
     expect(list).not.toContain('banana');
     expect(list).toContain('wet');
     expect(list).toContain('loud');
-  });
-
-  it('AxisName type narrows correctly', () => {
-    const a: AxisName = 'musical';
-    expect(a).toBe('musical');
   });
 });

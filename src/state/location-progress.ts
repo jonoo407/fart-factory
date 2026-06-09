@@ -27,14 +27,6 @@ function safeLoad<T>(key: string, fallback: T, validate: (v: unknown) => v is T)
   }
 }
 
-function safeSave<T>(key: string, value: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // ignore
-  }
-}
-
 // ----- Explicit unlocks (story events) -----
 
 export function loadUnlockedLocations(): string[] {
@@ -45,11 +37,8 @@ export function loadUnlockedLocations(): string[] {
   );
 }
 
-export function unlockLocation(id: string): void {
-  const cur = loadUnlockedLocations();
-  if (cur.includes(id)) return;
-  safeSave(KEY_UNLOCKED, [...cur, id]);
-}
+// (The explicit-unlock WRITE path was removed with the v9 world-map removal;
+// loadUnlockedLocations is kept so old saves' story unlocks stay honored.)
 
 // ----- Audience-win counter for City unlock -----
 

@@ -1,17 +1,13 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { loadStory as loadStoryBase } from './_helpers';
 
 async function loadStory(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.setItem('fart_kitchen_mode', 'true');
+  await loadStoryBase(page, {
+    kitchen: true,
     // Stub recipes so Boss 1 is unlocked for arena coverage.
-    localStorage.setItem('fart_recipes_seen', JSON.stringify(Array.from({length: 12}, (_, i) => `r${i}`)));
+    recipes: Array.from({ length: 12 }, (_, i) => `r${i}`),
   });
-  await page.reload();
   await page.waitForLoadState('networkidle');
 }
 

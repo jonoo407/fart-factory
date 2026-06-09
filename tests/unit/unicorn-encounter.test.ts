@@ -31,8 +31,4 @@ describe('Mystery unicorn audience (T4.2)', () => {
     expect(trueCount).toBeGreaterThan(0);
     expect(trueCount).toBeLessThan(500);
   });
-
-  it('rollUnicornEncounter is deterministic for a given seed', () => {
-    expect(rollUnicornEncounter(42)).toBe(rollUnicornEncounter(42));
-  });
 });

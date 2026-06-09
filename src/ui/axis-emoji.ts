@@ -1,6 +1,6 @@
-import type { AxisBreakdown } from '../scoring/match';
+import type { FoodProperties } from '../state/food';
 
-export function axisEmoji(axis: AxisBreakdown['axis']): string {
+export function axisEmoji(axis: keyof FoodProperties): string {
   switch (axis) {
     case 'wet': return '💧';
     case 'dry': return '🌵';

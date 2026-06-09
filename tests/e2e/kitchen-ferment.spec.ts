@@ -1,23 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { loadStory as loadStoryBase } from './_helpers';
 
 async function loadStory(page: import('@playwright/test').Page, opts: { rack?: Array<{foodId: string; startedAt: string; startedAtIdx?: number}>; ferments?: number } = {}) {
-  await page.goto('/');
-  await page.evaluate((p) => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.setItem('fart_kitchen_mode', 'true');
-    localStorage.removeItem('fart_pantry');
-    if (p.rack) localStorage.setItem('fart_ferment_rack', JSON.stringify(p.rack));
-    else localStorage.removeItem('fart_ferment_rack');
-    if (p.ferments !== undefined) localStorage.setItem('fart_ferment_claims', String(p.ferments));
-    else localStorage.removeItem('fart_ferment_claims');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  }, { rack: opts.rack ?? null, ferments: opts.ferments ?? null });
-  await page.reload();
+  const extraKeys: Record<string, string> = {};
+  if (opts.rack) extraKeys['fart_ferment_rack'] = JSON.stringify(opts.rack);
+  if (opts.ferments !== undefined) extraKeys['fart_ferment_claims'] = String(opts.ferments);
+  await loadStoryBase(page, { kitchen: true, extraKeys });
 }
 
 // The single-equip rebuild removed the prep table (and with it the per-slot

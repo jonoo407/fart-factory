@@ -21,6 +21,7 @@ const allNonZero = (['wet', 'dry', 'stink', 'loud', 'musical', 'length', 'temp']
 
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
   localStorage.setItem('fart_pantry', JSON.stringify(['beans']));
   localStorage.setItem('fart_axes_discovered', JSON.stringify(['wet', 'dry', 'stink', 'loud', 'musical', 'length', 'temp']));
   document.body.innerHTML = '<div id="platePreview"></div>';

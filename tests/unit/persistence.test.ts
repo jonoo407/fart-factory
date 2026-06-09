@@ -10,11 +10,12 @@ import {
   loadDiscoveredRecipes,
   markRecipeDiscovered,
   loadLastArea,
-  setLastArea,
   loadLastMatch,
   setLastMatch,
   loadBelly,
   spendBelly,
+  grantBellyBonus,
+  bellyCapacity,
   BELLY_CAPACITY,
 } from '../../src/state/persistence';
 
@@ -100,10 +101,14 @@ describe('Last area + last match (trend)', () => {
     expect(loadLastArea()).toBe('outside');
     expect(loadLastMatch()).toBeNull();
   });
-  it('persists', () => {
-    setLastArea('elevator');
-    setLastMatch(73);
+  it('loadLastArea honors a stored value from an older save', () => {
+    // The v9 UI removed the location picker, so nothing writes this key
+    // anymore — but old saves may still carry one and it must be respected.
+    localStorage.setItem('fart_area', JSON.stringify('elevator'));
     expect(loadLastArea()).toBe('elevator');
+  });
+  it('last match persists', () => {
+    setLastMatch(73);
     expect(loadLastMatch()).toBe(73);
   });
 });
@@ -130,5 +135,28 @@ describe('Belly meter (per-encounter, post-PLAN_v5 redesign)', () => {
     spendBelly(10, 5);
     expect(loadBelly(5)).toBe(BELLY_CAPACITY - 10);
     expect(loadBelly(6)).toBe(BELLY_CAPACITY); // independent
+  });
+
+  it('belly bonus raises capacity for its encounter only, and spending works against the boosted cap', () => {
+    grantBellyBonus(4, 3);
+    expect(bellyCapacity(3)).toBe(BELLY_CAPACITY + 4);
+    expect(loadBelly(3)).toBe(BELLY_CAPACITY + 4); // fresh meter = boosted cap
+    expect(bellyCapacity(4)).toBe(BELLY_CAPACITY); // other encounters unboosted
+    const r = spendBelly(BELLY_CAPACITY + 2, 3); // over base, under boosted cap
+    expect(r.ok).toBe(true);
+    expect(loadBelly(3)).toBe(2);
+  });
+
+  it('CHARACTERIZATION: a stored belly above the current cap is discarded → meter resets to FULL', () => {
+    // loadBelly's validator rejects stored > cap. Today no in-game path lowers
+    // a granted bonus for the same encounter, so this is unreachable in play —
+    // but if one ever appears (or the cap constant shrinks), this is the
+    // resulting behavior: the spent-down meter silently refills to the new cap
+    // instead of clamping (min(stored, cap) would preserve the spend). Pinned
+    // here so a future change to this semantics is a conscious one.
+    grantBellyBonus(4, 7);
+    spendBelly(1, 7); // stored = BELLY_CAPACITY + 3
+    grantBellyBonus(0, 7); // bonus revoked → cap back to BELLY_CAPACITY
+    expect(loadBelly(7)).toBe(BELLY_CAPACITY); // full again — the spend is forgotten
   });
 });

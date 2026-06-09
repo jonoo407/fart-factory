@@ -1,20 +1,9 @@
 import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
+import { FOODS } from '../../src/state/food';
 
 async function loadStoryMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    // Clear pantry / belly for clean test
-    localStorage.removeItem('fart_pantry');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
+  await loadStory(page);
 }
 
 test('Story Mode renders pantry grid + plate + belly meter', async ({ page }) => {
@@ -29,9 +18,11 @@ test('Story Mode renders pantry grid + plate + belly meter', async ({ page }) =>
 test('pantry grid shows starter common foods (clickable)', async ({ page }) => {
   await loadStoryMode(page);
   const grid = page.locator('#pantryGrid');
-  // At least 6 common starter cards visible + clickable.
+  // One clickable card per startsUnlocked food, derived from the REAL catalog
+  // (a hardcoded 6 went stale when the garnish foods joined the starters).
+  const starterCount = FOODS.filter((f) => f.startsUnlocked).length;
   const clickableCards = grid.locator('.food-card-clickable');
-  await expect(clickableCards).toHaveCount(6); // 6 starter commons
+  await expect(clickableCards).toHaveCount(starterCount);
   await expect(grid.locator('[data-food="beans"]')).toBeVisible();
 });
 

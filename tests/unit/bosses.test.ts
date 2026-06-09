@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BOSSES, getBoss, type Boss, type BossSkill } from '../../src/state/bosses';
+import { BOSSES, getBoss, type BossSkill } from '../../src/state/bosses';
 import { getFood } from '../../src/state/food';
 
 describe('BOSSES catalog (Phase N item 71)', () => {
@@ -82,13 +82,5 @@ describe('BOSSES catalog (Phase N item 71)', () => {
       expect(b.emoji.length).toBeGreaterThan(0);
       expect(b.unlockReq.description.length).toBeGreaterThan(0);
     }
-  });
-});
-
-describe('Boss type narrowing', () => {
-  it('Boss type is exported and shaped per skill', () => {
-    const sample: Boss = BOSSES[0]!;
-    // Type-check escape: the catalog is the source of truth.
-    expect(sample.id).toBeDefined();
   });
 });

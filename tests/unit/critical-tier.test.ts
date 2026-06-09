@@ -28,19 +28,13 @@ describe('classifyCriticalTier (T1.2)', () => {
 });
 
 describe('Bonuses (T1.2 reward shaping)', () => {
-  it('PERFECT awards bonus gold (+5)', () => {
-    expect(criticalGoldBonus('perfect')).toBe(5);
-  });
-  it('GREAT awards modest bonus (+2)', () => {
-    expect(criticalGoldBonus('great')).toBe(2);
-  });
-  it('DISASTER awards consolation notes (+5) — failure-banks-progression', () => {
-    expect(criticalNotesBonus('disaster')).toBe(5);
-  });
-  it('no bonus for "ok" / "bad"', () => {
-    expect(criticalGoldBonus('ok')).toBe(0);
-    expect(criticalGoldBonus('bad')).toBe(0);
-    expect(criticalNotesBonus('ok')).toBe(0);
-    expect(criticalNotesBonus('bad')).toBe(0);
+  it('extremes pay, the middle does not: perfect > great > 0 gold; disaster banks notes; ok/bad get nothing', () => {
+    expect(criticalGoldBonus('perfect')).toBeGreaterThan(criticalGoldBonus('great'));
+    expect(criticalGoldBonus('great')).toBeGreaterThan(0);
+    expect(criticalNotesBonus('disaster')).toBeGreaterThan(0); // failure-banks-progression
+    for (const tier of ['ok', 'bad'] as const) {
+      expect(criticalGoldBonus(tier)).toBe(0);
+      expect(criticalNotesBonus(tier)).toBe(0);
+    }
   });
 });

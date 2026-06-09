@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { FOOD_EATING_SFX, AUDIENCE_REACTION_SFX } from '../../src/audio/event-sfx';
+import { AUDIENCE_REACTION_SFX } from '../../src/audio/event-sfx';
 
 beforeEach(() => {
   localStorage.clear();
 });
 
 describe('Event SFX constants (P3)', () => {
-  it('FOOD_EATING_SFX has 4 ids matching the Phase K seeds', () => {
-    expect(FOOD_EATING_SFX).toEqual(['food-munch', 'food-crunch', 'food-slurp', 'food-gulp']);
-  });
+  // (FOOD_EATING_SFX ↔ seed coverage is asserted in sfx-seeds.test.ts against
+  // the real SEEDS table — the verbatim restatement that lived here was a
+  // constant-equals-itself test and was removed.)
 
   it('AUDIENCE_REACTION_SFX maps each tier to an id or null', () => {
     expect(AUDIENCE_REACTION_SFX.loved).toBeTruthy();
@@ -20,11 +20,11 @@ describe('Event SFX constants (P3)', () => {
 });
 
 describe('Event SFX playback safety', () => {
-  it('playEventSfx does not throw when manifest is unloaded', async () => {
+  it('playEventSfx does not throw when no AudioContext exists (jsdom)', async () => {
     const { playEventSfx } = await import('../../src/audio/event-sfx');
-    // In a jsdom environment there is no AudioContext, so getAudioContext()
-    // returns null and the call exits silently. The contract is "must not
-    // throw."
+    // jsdom has no AudioContext, so getAudioContext() returns null and the
+    // call exits at that guard (it never reaches the manifest check). The
+    // contract under test is "must not throw."
     await expect(playEventSfx('legendary-fanfare')).resolves.toBeUndefined();
   });
 

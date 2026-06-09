@@ -44,11 +44,8 @@ function questGateCleared(r: Recipe): boolean {
   return r.ingredients.some((id) => pantry.has(id));
 }
 
-export function renderCodexEntryHtml(
-  r: Recipe,
-  opts: { lockedOverride?: boolean } = {},
-): string {
-  const locked = opts.lockedOverride === true ? true : !questGateCleared(r);
+export function renderCodexEntryHtml(r: Recipe): string {
+  const locked = !questGateCleared(r);
   const codex = loadCodex()[r.id];
   const decoded = isFullyDecoded(r.id);
   const header = (

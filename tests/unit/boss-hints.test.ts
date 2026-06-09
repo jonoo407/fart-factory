@@ -6,7 +6,6 @@ import {
   loadBossLossCount,
   recordBossLoss,
 } from '../../src/state/boss-hints';
-import { BOSSES } from '../../src/state/bosses';
 
 beforeEach(() => {
   localStorage.clear();
@@ -73,12 +72,7 @@ describe('boss-hints — per-boss loss counter', () => {
     expect(loadBossLossCount('granny-family-reunion')).toBe(2);
     expect(loadBossLossCount('royal-court-escalation')).toBe(1);
   });
-
-  it('every boss in the catalog has at least one audience to draw a hint from', () => {
-    for (const b of BOSSES) {
-      expect(b.audiences.length).toBeGreaterThan(0);
-    }
-  });
+  // (every-boss-has-audiences is asserted in bosses.test.ts — not repeated here.)
 });
 
 describe('boss-hints — corruption safety', () => {

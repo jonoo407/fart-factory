@@ -6,7 +6,7 @@ import {
 } from '../../src/scoring/reward';
 import { getAudience } from '../../src/state/audience';
 import { setGamePlusUnlocked } from '../../src/state/boss-progress';
-import { dailyHotLocation } from '../../src/state/location-progress';
+import { dailyHotLocation, unlockedLocations } from '../../src/state/location-progress';
 import { testCodexSlot } from '../../src/state/codex';
 import { setGold, setResearchNotes, loadGold, unlockFood } from '../../src/state/persistence';
 
@@ -19,6 +19,8 @@ import { setGold, setResearchNotes, loadGold, unlockFood } from '../../src/state
 
 beforeEach(() => {
   localStorage.clear();
+  // Pin the run seed so the hot-spot pick is reproducible across runs.
+  localStorage.setItem('fart_run_seed', '12345');
 });
 
 function decodeForbiddenBlast(): void {
@@ -38,8 +40,11 @@ describe('SEAM: gold multipliers reach the live launch payout', () => {
     const hot = dailyHotLocation()!;
     const granny = getAudience('granny-edna')!; // base gold 24 (easy tier)
     expect(launchBaseGold(granny, hot.id)).toBe(72); // 24 * 3
-    const cold = hot.id === 'hometown' ? 'city' : 'hometown';
-    expect(launchBaseGold(granny, cold)).toBe(24); // 1x off the hot spot
+    // A REAL location id that isn't today's hot spot (the original version used
+    // a region id here, which no location ever has — making the 1x assertion
+    // vacuously true even if the 3x leaked everywhere).
+    const cold = unlockedLocations().find((l) => l.id !== hot.id)!;
+    expect(launchBaseGold(granny, cold.id)).toBe(24); // 1x off the hot spot
   });
 
   it('Hot Spot multiplier is 1x when GamePlus is OFF (no bonus)', () => {

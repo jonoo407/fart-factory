@@ -10,6 +10,7 @@ import { setGold, loadGold, loadPantry, unlockFood } from '../../src/state/persi
 
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
 });
 
 // Shop now seeds from encounter idx, not date. Use specific indices.
@@ -28,8 +29,8 @@ describe('PRICES (per-rarity pricing)', () => {
   });
 });
 
-describe('getShopOffers (daily roll: 3 uncommon + 1 rare + 0-1 epic)', () => {
-  it('is deterministic for the same UTC day', () => {
+describe('getShopOffers (encounter-seeded roll: 3 uncommon + 1 rare + 0-1 epic)', () => {
+  it('is deterministic for the same encounter idx + run seed', () => {
     const a1 = offersAt(ENC_A);
     const a2 = offersAt(ENC_A);
     expect(a1.map((o) => o.foodId)).toEqual(a2.map((o) => o.foodId));

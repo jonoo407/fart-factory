@@ -33,6 +33,23 @@ describe('Boss trophies (T3.2)', () => {
     expect(loadTrophies()).toEqual([]);
   });
 
+  it('filters malformed rows out of a corrupted store (keeps the valid ones)', () => {
+    localStorage.setItem('fart_trophies', JSON.stringify([
+      { bossId: 'granny-family-reunion', defeatedAt: '2026-05-11T10:00:00Z', plateUsed: ['beans'], matchPct: 80 },
+      { bossId: 42 }, // wrong types
+      null,
+      'junk',
+    ]));
+    const list = loadTrophies();
+    expect(list).toHaveLength(1);
+    expect(list[0]!.bossId).toBe('granny-family-reunion');
+  });
+
+  it('returns [] on corrupt JSON', () => {
+    localStorage.setItem('fart_trophies', '{not json');
+    expect(loadTrophies()).toEqual([]);
+  });
+
   it('survives malformed storage', () => {
     localStorage.setItem('fart_trophies', '{not array');
     expect(loadTrophies()).toEqual([]);

@@ -2,8 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   loadStreak,
   recordLaunchForStreak,
-  streakGoldMultiplier,
-  STREAK_THRESHOLD,
 } from '../../src/scoring/streak';
 
 beforeEach(() => {
@@ -36,24 +34,7 @@ describe('Streak counter (T2.2)', () => {
   });
 });
 
-describe('Streak gold multipliers', () => {
-  it('returns 1 for streak < STREAK_THRESHOLD (no bonus)', () => {
-    expect(streakGoldMultiplier(0)).toBe(1);
-    expect(streakGoldMultiplier(STREAK_THRESHOLD - 1)).toBe(1);
-  });
-
-  it('returns 1.5 for streak >= STREAK_THRESHOLD', () => {
-    expect(streakGoldMultiplier(STREAK_THRESHOLD)).toBe(1.5);
-    expect(streakGoldMultiplier(STREAK_THRESHOLD + 1)).toBe(1.5);
-  });
-
-  it('returns 2.0 for streak >= 5', () => {
-    expect(streakGoldMultiplier(5)).toBe(2.0);
-    expect(streakGoldMultiplier(8)).toBe(2.0);
-  });
-
-  it('returns 3.0 for streak >= 10', () => {
-    expect(streakGoldMultiplier(10)).toBe(3.0);
-    expect(streakGoldMultiplier(100)).toBe(3.0);
-  });
-});
+// (streakGoldMultiplier was an orphaned remnant of the pre-v9 gold stack —
+// zero production callers; the anti-grind encounter payout replaced it.
+// Deleted along with its tests. The counter above is live: it feeds
+// hidden-combo detection and the streak UI.)

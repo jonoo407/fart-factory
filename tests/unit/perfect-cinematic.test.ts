@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { playPerfectCinematic } from '../../src/ui/perfect-cinematic';
 
 vi.mock('../../src/audio/procedural', () => ({
@@ -10,6 +10,13 @@ beforeEach(() => {
     <button id="storyLaunchBtn"></button>
     <div id="gasOverlay"></div>
   `;
+});
+
+afterEach(() => {
+  // The matchMedia spy must not leak into the next test — with it leaked, the
+  // hold-timer tests would silently pass via the reduced-motion instant path.
+  vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 describe('playPerfectCinematic', () => {
@@ -36,9 +43,16 @@ describe('playPerfectCinematic', () => {
       removeEventListener: () => {},
       dispatchEvent: () => false,
     } as MediaQueryList));
-    const start = Date.now();
-    await playPerfectCinematic();
-    expect(Date.now() - start).toBeLessThan(50);
+    // With fake timers and ZERO time advanced, the promise must already be
+    // settled — proving no hold timer was scheduled (deterministic, unlike the
+    // old wall-clock <50ms assertion).
+    vi.useFakeTimers();
+    let resolved = false;
+    void playPerfectCinematic().then(() => {
+      resolved = true;
+    });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(resolved).toBe(true);
   });
 
   it('does not throw if launch button is missing', async () => {

@@ -9,16 +9,17 @@ import {
   isLocationUnlocked,
   unlockedLocations,
   loadUnlockedLocations,
-  unlockLocation,
   dailyHotLocation,
   audiencePoolForLocation,
 } from '../../src/state/location-progress';
 import { AUDIENCES } from '../../src/state/audience';
 import { markBossDefeated } from '../../src/state/boss-progress';
-import { markRecipeDiscovered } from '../../src/state/persistence';
+import { markRecipeDiscovered, bumpBestMatch } from '../../src/state/persistence';
 
 beforeEach(() => {
   localStorage.clear();
+  // Pin the run seed so encounter-seeded picks are reproducible across runs.
+  localStorage.setItem('fart_run_seed', '12345');
 });
 
 describe('AREAS catalog grows to 20 locations across 5 regions (Phase Q item 81)', () => {
@@ -76,11 +77,19 @@ describe('Location unlock predicates (Phase Q item 82)', () => {
   it('City locations require pleasing 5 different audiences', () => {
     const cityLoc = AREAS.find((a) => a.region === 'city')!;
     expect(isLocationUnlocked(cityLoc)).toBe(false);
-    // Simulate 5 audience wins by directly setting best-match keys.
-    for (let i = 0; i < 5; i++) {
-      localStorage.setItem(`fart_best_audience-${i}`, '60');
+    // Win (≥50%) against 5 real audiences through the production write path.
+    for (const aud of AUDIENCES.slice(0, 5)) {
+      bumpBestMatch(aud.id, 60);
     }
     expect(isLocationUnlocked(cityLoc)).toBe(true);
+  });
+
+  it('sub-50% best matches do not count toward the City unlock', () => {
+    const cityLoc = AREAS.find((a) => a.region === 'city')!;
+    for (const aud of AUDIENCES.slice(0, 5)) {
+      bumpBestMatch(aud.id, 49);
+    }
+    expect(isLocationUnlocked(cityLoc)).toBe(false);
   });
 
   it('Wilderness locations require 10 recipes discovered', () => {
@@ -105,19 +114,16 @@ describe('Location unlock predicates (Phase Q item 82)', () => {
   });
 });
 
-describe('Persisted explicit-unlock list (story event unlocks)', () => {
+describe('Legacy explicit-unlock list (old saves)', () => {
+  // Nothing writes this key since the v9 world-map removal, but old saves may
+  // carry one — the read path must keep honoring it.
   it('defaults to empty', () => {
     expect(loadUnlockedLocations()).toEqual([]);
   });
-  it('unlockLocation appends and is idempotent', () => {
-    unlockLocation('stadium');
-    unlockLocation('stadium');
-    expect(loadUnlockedLocations()).toEqual(['stadium']);
-  });
-  it('explicit-unlocked locations report unlocked even if region predicate fails', () => {
+  it('a stored legacy unlock reports unlocked even if the region predicate fails', () => {
     const cityLoc = AREAS.find((a) => a.region === 'city')!;
     expect(isLocationUnlocked(cityLoc)).toBe(false);
-    unlockLocation(cityLoc.id);
+    localStorage.setItem('fart_locations_unlocked', JSON.stringify([cityLoc.id]));
     expect(isLocationUnlocked(cityLoc)).toBe(true);
   });
 });

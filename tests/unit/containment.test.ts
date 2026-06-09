@@ -1,11 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { AREAS, getArea } from '../../src/state/containment';
 
+// (Catalog size/region-shape invariants live in locations.test.ts; this file
+// covers the area MODIFIER contract.)
 describe('AREAS catalog', () => {
-  it('contains at least 6 areas', () => {
-    expect(AREAS.length).toBeGreaterThanOrEqual(6);
-  });
-
   it('every area has unique id + non-empty name + emoji', () => {
     const ids = AREAS.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);

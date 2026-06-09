@@ -1,27 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { dismissReaction } from './_helpers';
-
-async function loadStoryMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_last_match');
-    localStorage.removeItem('fart_pantry');
-    localStorage.removeItem('fart_recipes_seen');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
-}
+import { loadStory, dismissReaction } from './_helpers';
 
 test('Notebook button shows discovered/total count', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   // 0 / (total) at start (only pre-known are visible but discovered=0 since
   // markRecipeDiscovered hasn't been called yet — pre-known just means
   // not-hidden, doesn't auto-add to fart_recipes_seen).
@@ -30,16 +11,16 @@ test('Notebook button shows discovered/total count', async ({ page }) => {
 });
 
 test('Notebook button counter increments after discovery', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
-  await page.waitForTimeout(50);
+  await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
   await expect(page.locator('#notebookBtn')).toContainText('1/');
 });
 
 test('Notebook modal opens and shows recipe cards', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   await page.click('#notebookBtn');
   await expect(page.locator('#notebookModal')).toBeVisible();
   // Many recipe cards rendered (all of them — discovered + undiscovered).
@@ -48,19 +29,19 @@ test('Notebook modal opens and shows recipe cards', async ({ page }) => {
 });
 
 test('Undiscovered hidden recipes show as silhouette (no name)', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   await page.click('#notebookBtn');
   // At least one card should be locked (most are hidden=true).
   await expect(page.locator('.notebook-recipe-locked').first()).toBeVisible();
 });
 
 test('Discovered recipe has a Cook button that auto-fills the plate', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   // Discover Swamp Beast (beans + cheese).
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
-  await page.waitForTimeout(50);
+  await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
   await dismissReaction(page); // close the takeover covering the nav
   // Open notebook and click Cook on the discovered recipe.
   await page.click('#notebookBtn');
@@ -74,7 +55,7 @@ test('Discovered recipe has a Cook button that auto-fills the plate', async ({ p
 });
 
 test('Notebook closes via close button', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   await page.click('#notebookBtn');
   await expect(page.locator('#notebookModal')).toBeVisible();
   await page.click('#notebookCloseBtn');

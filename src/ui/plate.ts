@@ -100,7 +100,6 @@ import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
 import { playFart } from '../audio/procedural';
-import { normalizeAxes } from '../audio/fart-stems';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
 
@@ -703,7 +702,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   if (isArenaActive()) {
     const [aL, aW, aV, aS, aT, aM] = recipeToSliderInputs(propsAfterArea);
     triggerHaptic(HAPTICS.launch);
-    playFart(aL, aW, aV, aS, aT, aM, undefined, audioProps);
+    playFart(aL, aW, aV, aS, aT, aM, audioProps);
     spawnGas(aS, aV);
     commitBellySpend();
     // Read declared target (Boss 5 only) from the arena's select.
@@ -757,9 +756,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
 
   triggerHaptic(HAPTICS.launch);
   // The fart bank: pass the RAW plate props (audioProps) so playFart picks the
-  // matching grid clip from the true plate magnitude (normalized axes kept for
-  // the legacy fallbacks).
-  playFart(length, wetness, volume, stink, temp, musical, normalizeAxes(propsAfterArea), audioProps);
+  // matching grid clip from the true plate magnitude.
+  playFart(length, wetness, volume, stink, temp, musical, audioProps);
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.

@@ -14,6 +14,7 @@ import { wireBellyMeterTap } from '../../src/ui/plate';
 
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
   playFart.mockClear();
   document.body.innerHTML = '<div class="belly-track"></div>';
 });

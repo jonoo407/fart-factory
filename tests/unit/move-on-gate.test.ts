@@ -15,6 +15,11 @@ import { audienceForEncounter } from '../../src/state/audience';
 // it must reflect whether the current crowd has been passed.
 beforeEach(() => {
   localStorage.clear();
+  // Pin the run seed: with it unpinned, currentAudience() rolls the 4%
+  // unicorn encounter off a Math.random() run seed — making this suite fail
+  // roughly 1 run in 25 (the gate checks the unicorn's id, not the audience
+  // the test recorded a pass for). Seed 12345 is unicorn-free at idx 0.
+  localStorage.setItem('fart_run_seed', '12345');
   document.body.innerHTML = '<button id="moveOnBtn"></button>';
 });
 

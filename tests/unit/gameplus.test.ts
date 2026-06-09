@@ -3,10 +3,11 @@ import { audienceForEncounter, AUDIENCES } from '../../src/state/audience';
 import { setGamePlusUnlocked } from '../../src/state/boss-progress';
 import { hotSpotGoldMultiplier } from '../../src/scoring/gameplus';
 import { dailyHotLocation } from '../../src/state/location-progress';
-import { goldForMatch } from '../../src/scoring/reward';
 
 beforeEach(() => {
   localStorage.clear();
+  // Pin the run seed so the hot-spot pick is reproducible across runs.
+  localStorage.setItem('fart_run_seed', '12345');
 });
 
 describe('GamePlus effects (P12)', () => {
@@ -49,12 +50,5 @@ describe('GamePlus effects (P12)', () => {
     setGamePlusUnlocked(false);
     const hot = dailyHotLocation();
     expect(hotSpotGoldMultiplier(hot!.id)).toBe(1);
-  });
-});
-
-describe('goldForMatch (existing) integration with GamePlus', () => {
-  it('baseline reward unchanged when GamePlus is OFF', () => {
-    setGamePlusUnlocked(false);
-    expect(goldForMatch(80)).toBe(8);
   });
 });

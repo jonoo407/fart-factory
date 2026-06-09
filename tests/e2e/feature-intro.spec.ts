@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 interface FeatureIntroOpts {
   id: string;
@@ -6,16 +7,6 @@ interface FeatureIntroOpts {
   title: string;
   body: string;
   cta?: string;
-}
-
-async function loadStory(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
 }
 
 async function callIntro(page: Page, opts: FeatureIntroOpts): Promise<void> {

@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
-  goldForMatch,
   awardGoldForEncounter,
   baseGoldForAudience,
 } from '../../src/scoring/reward';
@@ -11,33 +10,10 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-describe('goldForMatch (Phase G item 48 — per-launch award rule)', () => {
-  it('awards 0 gold below the 50% threshold', () => {
-    expect(goldForMatch(0)).toBe(0);
-    expect(goldForMatch(25)).toBe(0);
-    expect(goldForMatch(49)).toBe(0);
-  });
-
-  it('awards floor(pct/10) at and above the 50% threshold', () => {
-    expect(goldForMatch(50)).toBe(5);
-    expect(goldForMatch(59)).toBe(5);
-    expect(goldForMatch(60)).toBe(6);
-    expect(goldForMatch(73)).toBe(7);
-    expect(goldForMatch(99)).toBe(9);
-    expect(goldForMatch(100)).toBe(10);
-  });
-
-  it('returns 0 for negative / NaN / >100 inputs (defensive)', () => {
-    expect(goldForMatch(-5)).toBe(0);
-    expect(goldForMatch(NaN)).toBe(0);
-    expect(goldForMatch(150)).toBe(10); // clamped to 100 → 10 gold
-  });
-});
-
-// (awardGoldForLaunch was an orphaned parallel gold path — the only consumer of
-// the Hot Spot + legendary multipliers, with zero production callers. Deleted in
-// favour of the single live path: launchBaseGold -> awardGoldForEncounter, with
-// the multiplier seam covered by gold-multipliers-seam.test.ts.)
+// (goldForMatch and awardGoldForLaunch were orphaned parallel gold paths with
+// zero production callers. Both deleted in favour of the single live path:
+// launchBaseGold -> awardGoldForEncounter, with the multiplier seam covered by
+// gold-multipliers-seam.test.ts.)
 
 describe('awardGoldForEncounter (anti-grind, improvement-only — 01 §4.3)', () => {
   it('pays the full gold on first clear and ratchets the ledger', () => {
