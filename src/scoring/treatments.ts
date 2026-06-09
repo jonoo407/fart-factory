@@ -113,8 +113,10 @@ export interface PreppedAggregate {
 /**
  * Sum (per-axis) the properties of all prepped slots after treatments apply.
  * Blend slots merge with their `blendTargetFoodId` into a single
- * averaged contribution. The same sum-then-clamp pattern as
- * computeFartFromPlate in fart-recipe.ts.
+ * averaged contribution. The summed axes are NOT capped at 5 — these are
+ * plate sums measured against AXIS_CAP=8 (see applyMasteryBonuses);
+ * capping the sum re-pinned every treated plate to 5 per axis and made
+ * high cravings unfillable whenever a treatment was equipped.
  */
 export function computeFartFromPreppedPlate(slots: PreppedSlot[]): PreppedAggregate {
   const props: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
@@ -132,7 +134,7 @@ export function computeFartFromPreppedPlate(slots: PreppedSlot[]): PreppedAggreg
       slotProps = applyTreatment(food.properties, slot.treatment);
     }
     for (const k of Object.keys(props) as (keyof FoodProperties)[]) {
-      props[k] = clampAxis(props[k] + slotProps[k]);
+      props[k] = props[k] + slotProps[k];
     }
     const t = getTreatment(slot.treatment);
     totalBelly += foodBellySize(food) + (t?.bellyCostDelta ?? 0);

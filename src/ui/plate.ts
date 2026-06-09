@@ -689,9 +689,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // so what you previewed is exactly what you launch.
   const { props: propsAfterArea, resolved } = resolveLaunchProps(ids);
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
-  // The fart bank reads the RAW plate magnitude (unclamped sum), NOT the
-  // score-clamped propsAfterArea. The scoring pipeline caps every axis at 5
-  // (applyMasteryBonuses), which would pin length ≤5 → every fart "short". The
+  // The fart bank reads the RAW plate magnitude (unclamped sum), NOT
+  // propsAfterArea — the scored vector folds in venue area modifiers (the
+  // Backyard alone halves wet/stink), which would distort the readout. The
   // fart is a readout of what you actually plated, so it uses the true sums.
   const audioProps = recipe.props;
   const areaId = loadLastArea();

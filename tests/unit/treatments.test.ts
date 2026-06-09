@@ -121,6 +121,23 @@ describe('computeFartFromPreppedPlate (Phase T item 93)', () => {
     const result = computeFartFromPreppedPlate(slot);
     expect(result.totalBellyCost).toBe(beans.bellyCost + getTreatment('roast')!.bellyCostDelta);
   });
+
+  it('summed plate axes are NOT capped at 5 (v9 — saturation is ÷AXIS_CAP\'s job)', () => {
+    // Per-food after roast (+1 stink): beans 3→4, cheese 3→4, onion 4→5.
+    // The aggregate must be the true sum 13, like computeFartFromPlate and
+    // applyMasteryBonuses — capping the running sum at 5 pinned every
+    // treated plate to 5 per axis, making high cravings (target 4-5 ⇒
+    // normalized 0.8-1.0 vs a max got of 5/8) unfillable with a treatment on.
+    const slots: PreppedSlot[] = [
+      { foodId: 'beans', treatment: 'roast' },
+      { foodId: 'cheese', treatment: 'roast' },
+      { foodId: 'onion', treatment: 'roast' },
+    ];
+    const r = computeFartFromPreppedPlate(slots);
+    expect(r.props.stink).toBe(13);
+    // length untouched by roast: 3 + 3 + 2 = 8.
+    expect(r.props.length).toBe(8);
+  });
 });
 
 describe('Treatment type narrowing', () => {
