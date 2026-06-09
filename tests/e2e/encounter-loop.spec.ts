@@ -29,7 +29,7 @@ test('Picking an activity closes intermission, advances encounter, refills belly
   await expect(page.locator('#intermissionOverlay')).toBeHidden();
   const idx = await page.evaluate(() => localStorage.getItem('fart_encounter_idx'));
   expect(idx).toBe('1');
-  await expect(page.locator('#bellyValue')).toHaveText('30');
+  await expect(page.locator('#bellyValue')).toHaveText('0'); // fresh crowd → empty stomach
 });
 
 test('Active buff strip appears after picking an activity with a buff', async ({ page }) => {

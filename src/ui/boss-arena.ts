@@ -16,6 +16,7 @@ import {
   markBossUnlockToastSeen,
 } from '../state/boss-progress';
 import { loadBossLossCount, revealedCravingsForBoss } from '../state/boss-hints';
+import { isOnCooldown, loadBossCooldown } from '../state/boss-cadence';
 import {
   createBossRunState,
   evaluateBossRound,
@@ -54,8 +55,11 @@ export function renderBossList(): void {
   grid.innerHTML = BOSSES.map((b) => {
     const unlocked = isBossUnlocked(b);
     const isDefeated = defeated.has(b.id);
-    const ariaDisabled = unlocked ? 'false' : 'true';
-    const buttonText = isDefeated ? '🔁 Re-fight' : (unlocked ? '⚔ Fight' : '🔒 Locked');
+    const onCd = isOnCooldown(b.id);
+    const ariaDisabled = unlocked && !onCd ? 'false' : 'true';
+    const buttonText = onCd
+      ? `⏳ Cooling off (${loadBossCooldown(b.id)})`
+      : isDefeated ? '🔁 Re-fight' : (unlocked ? '⚔ Fight' : '🔒 Locked');
     const subtitle = unlocked
       ? `<span class="boss-card-subtitle">Act ${b.act} · ${b.skillKind}</span>`
       : `<span class="boss-card-subtitle boss-card-locked-hint">${b.unlockReq.description}</span>`;
@@ -93,6 +97,9 @@ export function renderBossList(): void {
 export function openArena(bossId: string): void {
   const boss = getBoss(bossId);
   if (!boss || !isBossUnlocked(boss)) return;
+  // Enforce the post-loss cool-off ("cool off for 3 performances") — was only
+  // advisory text; the live re-fight path never checked it.
+  if (isOnCooldown(boss.id)) return;
   currentBoss = boss;
   currentState = createBossRunState(boss);
   const overlay = $('arenaOverlay');

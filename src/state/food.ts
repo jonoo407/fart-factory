@@ -98,6 +98,22 @@ export function getFood(id: string): Food | undefined {
   return FOODS.find((f) => f.id === id);
 }
 
+/**
+ * Belly room a food takes up — scaled by rarity so cooler (higher-rarity, better-
+ * stat) foods fill the stomach faster. The canonical "size" used by the plate +
+ * pantry (supersedes the legacy per-food `bellyCost` field for sizing).
+ */
+const RARITY_BELLY: Record<Rarity, number> = {
+  common: 2,
+  uncommon: 3,
+  rare: 4,
+  epic: 5,
+  legendary: 6,
+};
+export function foodBellySize(food: Pick<Food, 'rarity'>): number {
+  return RARITY_BELLY[food.rarity];
+}
+
 export function foodsByRarity(): Record<Rarity, Food[]> {
   const out: Record<Rarity, Food[]> = {
     common: [], uncommon: [], rare: [], epic: [], legendary: [],

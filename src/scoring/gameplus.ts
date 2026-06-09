@@ -28,3 +28,8 @@ export function hotSpotGoldMultiplier(locationId: string): number {
   if (!hot || hot.id !== locationId) return 1;
   return 3;
 }
+
+/** True when launching at `locationId` earns the GamePlus Hot Spot 3x gold. */
+export function isHotSpotActive(locationId: string): boolean {
+  return hotSpotGoldMultiplier(locationId) > 1;
+}

@@ -525,6 +525,18 @@ body {
 @keyframes belly-danger { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 .stuffed-splash .discovery-splash-banner { color: #ef4444; }
 .belly-value { font-size: 0.95em; color: #e6f0ff; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
+.hot-spot-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.82em;
+  font-weight: 800;
+  color: #7a2e00;
+  background: linear-gradient(90deg, #ffd54a, #ff8a3d);
+  box-shadow: 0 0 0 1.5px #ff8a3d44;
+  white-space: nowrap;
+}
 /* PLAN v9 UI-overhaul Phase 2 — Move On is a SECONDARY (ghost) sticker in its
    own row, separate from the belly capacity readout and visually subordinate to
    the green BLAST CTA. */

@@ -4,7 +4,7 @@
  * defined in index.html (#pantryGrid, #plate, #bellyFill, #plateSlotN).
  */
 
-import { FOODS, type Food, getFood, type FoodProperties } from '../state/food';
+import { FOODS, type Food, getFood, foodBellySize, type FoodProperties } from '../state/food';
 import { buildPantryGridHtml } from './pantry-grid';
 import {
   loadPantry,
@@ -49,7 +49,7 @@ import {
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
 import { recordGoodLaunch, shouldAutoUnlockKitchen } from '../scoring/kitchen-unlock';
 import { setKitchenMode } from './kitchen';
-import { applyActiveBuffs, consumeBuffs, cancelOneRestrictionFromBuffs } from '../scoring/buffs';
+import { applyActiveBuffs, consumeBuffs, cancelOneRestrictionFromBuffs, goldMultiplierFromBuffs } from '../scoring/buffs';
 import { applyLegendaryProps } from '../scoring/legendary-buffs';
 import { pulseFartProfile } from './fart-profile';
 import { renderPlatePreviewHtml } from './plate-preview';
@@ -78,6 +78,7 @@ import {
 } from '../state/encounter-progress';
 import { mountChargeMeter } from './charge-meter';
 import { createCooldownGate } from './cooldown-gate';
+import { isHotSpotActive } from '../scoring/gameplus';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
 import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
@@ -155,18 +156,18 @@ export function addFoodToPlate(foodId: string): { ok: boolean; reason?: string; 
   if (!food) return { ok: false, reason: 'unknown-food' };
   const emptyIdx = plate.findIndex((s) => s === null);
   if (emptyIdx === -1) return { ok: false, reason: 'plate-full' };
-  if (food.bellyCost > remainingBelly()) return { ok: false, reason: 'insufficient-belly' };
+  if (foodBellySize(food) > remainingBelly()) return { ok: false, reason: 'insufficient-belly' };
   plate[emptyIdx] = foodId;
-  bellySpentThisSession += food.bellyCost;
+  bellySpentThisSession += foodBellySize(food);
   return { ok: true, slotIdx: emptyIdx };
 }
 
-/** Removes the food at the given slot. Refunds belly cost for this session. */
+/** Removes the food at the given slot. Refunds belly room for this session. */
 export function removeFoodFromPlate(slotIdx: number): boolean {
   const id = plate[slotIdx];
   if (!id) return false;
   const food = getFood(id);
-  if (food) bellySpentThisSession = Math.max(0, bellySpentThisSession - food.bellyCost);
+  if (food) bellySpentThisSession = Math.max(0, bellySpentThisSession - foodBellySize(food));
   plate[slotIdx] = null;
   return true;
 }
@@ -305,7 +306,7 @@ export function renderRecipeRibbon(): void {
  * sum (no synergies/treatments — those reveal at launch). Marks
  * UNCERTAIN whenever any plate food is below Apprentice mastery.
  */
-function renderPlatePreview(): void {
+export function renderPlatePreview(): void {
   const el = $('platePreview');
   if (!el) return;
   const ids = plateIngredientIds();
@@ -314,17 +315,12 @@ function renderPlatePreview(): void {
     el.innerHTML = '';
     return;
   }
-  const sum: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
-  let anyUnmastered = false;
-  for (const id of ids) {
-    const food = getFood(id);
-    if (!food) continue;
-    if (masteryLevel(loadFoodMastery(id)) === 'novice') anyUnmastered = true;
-    for (const a of Object.keys(sum) as Array<keyof FoodProperties>) {
-      sum[a] = Math.min(5, sum[a] + food.properties[a]);
-    }
-  }
-  el.innerHTML = renderPlatePreviewHtml(sum, loadDiscoveredAxes(), anyUnmastered);
+  // Predict the ACTUAL launched fart (same resolver as onStoryLaunch): equipped
+  // treatment + buffs + mastery + legendary + area. UNCERTAIN until every plated
+  // food is at least Apprentice mastery.
+  const anyUnmastered = ids.some((id) => masteryLevel(loadFoodMastery(id)) === 'novice');
+  const { props } = resolveLaunchProps(ids);
+  el.innerHTML = renderPlatePreviewHtml(props, loadDiscoveredAxes(), anyUnmastered);
   el.removeAttribute('hidden');
 }
 
@@ -333,16 +329,16 @@ export function renderBellyMeter(): void {
   const value = $('bellyValue');
   const cap = $('bellyCap');
   const r = remainingBelly();
-  if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
-  if (value) value.textContent = String(r);
+  const used = BELLY_CAPACITY - r; // how FULL the stomach is (fills as you eat)
+  if (fill) fill.style.width = `${(used / BELLY_CAPACITY) * 100}%`;
+  if (value) value.textContent = String(used);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
-  // Keep the role="meter" accessible value in sync — it was static in the HTML
-  // so screen readers always announced the full capacity even as belly drained.
+  // Keep the role="meter" accessible value in sync — it shows fullness now.
   const track = document.querySelector<HTMLElement>('.belly-track');
   if (track) {
-    track.setAttribute('aria-valuenow', String(r));
+    track.setAttribute('aria-valuenow', String(used));
     track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
-    // Danger zone: one (or no) attempt left before you're stuffed.
+    // Danger zone: nearly stuffed — one (or no) attempt's worth of room left.
     track.classList.toggle('belly-low', r < MIN_ATTEMPT_BELLY + 4);
   }
 }
@@ -610,7 +606,11 @@ function renderAreaDisplay(): void {
   const el = $('areaCurrentName');
   if (!el) return;
   const cur = getArea(loadLastArea()) ?? AREAS[0]!;
-  el.textContent = `${cur.emoji} ${cur.name}`;
+  // Surface the GamePlus Hot Spot so its 3x gold is actually visible.
+  const badge = isHotSpotActive(cur.id)
+    ? ' <span class="hot-spot-badge" title="Launch here for triple gold">🔥 Hot Spot · 3× gold</span>'
+    : '';
+  el.innerHTML = `${cur.emoji} ${cur.name}${badge}`;
   el.setAttribute('data-area', cur.id);
 }
 
@@ -639,24 +639,37 @@ function currentAudience(): ReturnType<typeof getDailyAudience> {
 const LAUNCH_COOLDOWN_MS = 1200;
 const launchGate = createCooldownGate(LAUNCH_COOLDOWN_MS);
 
+/**
+ * The deterministic launched-fart properties: equipped treatment + active buffs
+ * + mastery + legendary passive + current-area modifiers, in the exact order the
+ * launch applies them. SHARED by onStoryLaunch and the 🔮 PREDICTION preview so
+ * the two can never drift (the preview used to show a raw sum and silently
+ * disagreed with the actual fart on every launch — the area alone halves
+ * wet/stink and boosts loud at Backyard).
+ */
+export function resolveLaunchProps(ids: string[]): {
+  props: FoodProperties;
+  resolved: ReturnType<typeof resolveEquippedLaunch>;
+} {
+  const resolved = resolveEquippedLaunch(ids, loadEquippedTreatment());
+  const area = getArea(loadLastArea()) ?? AREAS[0]!;
+  const props = applyAreaModifiers(
+    applyLegendaryProps(applyMasteryBonuses(applyActiveBuffs(resolved.props), ids)),
+    area,
+  );
+  return { props, resolved };
+}
+
 async function onStoryLaunch(quality = 1): Promise<void> {
   if (!launchGate.open()) return;
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
-  // P6: resolve launch through the single-equip path — the one equipped
-  // Kitchen treatment (if any) applies to every plated food; otherwise raw.
-  const resolved = resolveEquippedLaunch(ids, loadEquippedTreatment());
+  // P6: launch resolution shared with the PREDICTION preview (resolveLaunchProps)
+  // so what you previewed is exactly what you launch.
+  const { props: propsAfterArea, resolved } = resolveLaunchProps(ids);
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
-  // PLAN_v5 Phase 6: apply active buffs BEFORE area modifiers, so the
-  // buff deltas are propagated through the area multipliers naturally.
-  const propsWithBuffs = applyActiveBuffs(resolved.props);
-  // T2.3: apply per-food mastery bonuses (Master+ foods get +1 on their highest axis).
-  const propsWithMastery = applyMasteryBonuses(propsWithBuffs, ids);
-  // V8 T7.d: apply permanent legendary-codex passives (e.g. Cosmic Symphony → +1 musical).
-  const propsWithLegendary = applyLegendaryProps(propsWithMastery);
-  const propsAfterArea = applyAreaModifiers(propsWithLegendary, area);
 
   // Boss arena fork: if an arena is active, route the launch there.
   // Audio + visual still fire (we want full feedback). The arena handles
@@ -750,7 +763,10 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     if (passedThisLaunch) {
       // launchBaseGold folds in the GamePlus Hot Spot 3x; awardGoldForEncounter
       // folds in the legendary +10% — both reach the live payout now.
-      goldPaid = awardGoldForEncounter(aud.id, launchBaseGold(aud, areaId), match.pct);
+      // Fold in the Watch Comedy "+20% gold" intermission buff (was inert —
+      // promised in the UI but never reached the payout).
+      const base = Math.round(launchBaseGold(aud, areaId) * goldMultiplierFromBuffs());
+      goldPaid = awardGoldForEncounter(aud.id, base, match.pct);
       bumpStars(aud.id, starsForPct(match.pct));
     }
     awardResearchForLaunch(match.pct);
@@ -817,6 +833,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     recordGoodLaunch(match.pct); // P9: track good launches for Kitchen auto-unlock
     if (shouldAutoUnlockKitchen()) {
       setKitchenMode(true);
+      // Refresh the dock tab now — it was greyed/🔒 and stayed that way until
+      // reload even though the tap already worked.
+      window.dispatchEvent(new CustomEvent('fart:kitchen-unlocked'));
       showKitchenUnlockToast();
       // PR3: first time the kitchen unlocks, queue an explainer modal.
       showFeatureIntro({
@@ -1150,6 +1169,9 @@ export function initStoryPantry(): void {
   renderAreaDisplay();
   wirePlateSlots();
   wireStoryLaunchButton();
+  // Equipping/unequipping a Kitchen treatment changes the launched fart — keep
+  // the PREDICTION preview in sync (it resolves through the same launch path).
+  window.addEventListener('fart:treatment-changed', () => renderPlate());
   wireAreaChangeButton();
   wireMoveOnButton();
   wirePantryShowLockedToggle();
