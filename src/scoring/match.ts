@@ -60,19 +60,15 @@ export function closeness(target: number, got: number): number {
 }
 
 /**
- * Per-axis credit (0-1). "Closest should be better": for a WANTED axis, giving
- * the target level OR MORE earns full credit (you satisfied their craving —
- * overshooting it never hurts), while falling short is scored by how close you
- * got. A HATED ("want none") axis keeps less-is-better: any amount you bring
- * drops the credit. This replaces the old symmetric closeness, which penalized
- * "they want a lot, you brought a lot" as if it were a miss.
+ * Per-axis credit (0-1). SYMMETRIC target-matching: a craving is a TARGET, not a
+ * floor. Giving the audience MORE than they want misses just like giving less —
+ * both directions fall off via the same |target-got| closeness curve. (A HATED
+ * "want none" axis has target ≈ 0, so the same curve is naturally less-is-better.)
+ * This replaces the old "meet-or-exceed = full credit" rule: overshooting a
+ * craved axis now costs you, so the skill is matching the level, not maxing it.
  */
-export function axisCredit(target: number, got: number, hate: boolean): number {
-  // Hated axes are unchanged — less-is-better around their (near-zero) target.
-  if (hate) return closeness(target, got);
-  // Wanted axes: hitting OR exceeding the target is full credit; short of it,
-  // score by closeness so a closer plate beats a farther one.
-  return got >= target ? 1 : closeness(target, got);
+export function axisCredit(target: number, got: number, _hate: boolean): number {
+  return closeness(target, got);
 }
 
 /**

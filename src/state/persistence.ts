@@ -73,6 +73,20 @@ export function savePantry(ids: string[]): void {
   safeSave(KEY_PANTRY, ids);
 }
 
+/**
+ * Ensure every `startsUnlocked` food is present in the saved pantry, so basic
+ * foods added in an update show up for EXISTING saves too (not just fresh
+ * installs). No-op when nothing is missing — and on a fresh install loadPantry
+ * already returns the full starter set, so this never writes a save prematurely.
+ * Call once at app startup.
+ */
+export function reconcileStarterFoods(): void {
+  const cur = loadPantry();
+  const have = new Set(cur);
+  const missing = FOODS.filter((f) => f.startsUnlocked && !have.has(f.id)).map((f) => f.id);
+  if (missing.length > 0) savePantry([...cur, ...missing]);
+}
+
 export function unlockFood(id: string): string[] {
   const cur = loadPantry();
   if (cur.includes(id)) return cur;
@@ -176,20 +190,55 @@ export function setLastMatch(pct: number | null): void {
 import { currentEncounterIdx } from './run-state';
 
 const KEY_BELLY_PREFIX = 'fart_belly_e_';
+const KEY_BELLY_BONUS_PREFIX = 'fart_belly_bonus_e_';
 // Stomach capacity per crowd. Foods fill it by rarity-scaled size (food.ts
 // foodBellySize); a 4-slot plate of cool foods can exceed it, so you can't
 // always pile big foods. Tunable feel knob.
 const BELLY_MAX = 20;
+// The most bonus capacity an intermission activity can grant a single crowd —
+// a sanity clamp on stored values (a 4-legendary plate costs 24, so the upper
+// belly activities meaningfully unlock bigger plates without going silly).
+const BELLY_BONUS_MAX = 12;
 
 function bellyKey(idx: number = currentEncounterIdx()): string {
   return `${KEY_BELLY_PREFIX}${idx}`;
 }
 
+function bellyBonusKey(idx: number = currentEncounterIdx()): string {
+  return `${KEY_BELLY_BONUS_PREFIX}${idx}`;
+}
+
+/**
+ * Bonus stomach capacity granted to a specific encounter by an intermission
+ * belly activity (0 default). A full belly is bad (you eat less), so the
+ * benefit of a belly rub / nap / burrito is MORE room next crowd — stored
+ * against the upcoming encounter idx so it survives the per-encounter reset.
+ */
+export function loadBellyBonus(idx?: number): number {
+  return safeLoad<number>(
+    bellyBonusKey(idx),
+    0,
+    (v): v is number => typeof v === 'number' && v >= 0 && v <= BELLY_BONUS_MAX,
+  );
+}
+
+/** Grant bonus capacity to an encounter (clamped to a sane range). */
+export function grantBellyBonus(amount: number, idx?: number): void {
+  const next = Math.max(0, Math.min(BELLY_BONUS_MAX, Math.round(amount)));
+  safeSave(bellyBonusKey(idx), next);
+}
+
+/** Total stomach capacity for an encounter = base max + any granted bonus. */
+export function bellyCapacity(idx?: number): number {
+  return BELLY_MAX + loadBellyBonus(idx);
+}
+
 export function loadBelly(idx?: number): number {
+  const cap = bellyCapacity(idx);
   return safeLoad<number>(
     bellyKey(idx),
-    BELLY_MAX,
-    (v): v is number => typeof v === 'number' && v >= 0 && v <= BELLY_MAX,
+    cap,
+    (v): v is number => typeof v === 'number' && v >= 0 && v <= cap,
   );
 }
 
@@ -201,11 +250,12 @@ export function spendBelly(cost: number, idx?: number): { ok: boolean; remaining
   return { ok: true, remaining: next };
 }
 
-/** Force-refill belly for the current encounter (e.g. Power Nap activity). */
+/** Force-refill belly for an encounter to its (possibly boosted) capacity. */
 export function refillBelly(idx?: number): void {
-  safeSave(bellyKey(idx), BELLY_MAX);
+  safeSave(bellyKey(idx), bellyCapacity(idx));
 }
 
+/** Base (unboosted) stomach capacity. The live cap is bellyCapacity(). */
 export const BELLY_CAPACITY = BELLY_MAX;
 
 // ----- Best-match high-water marks (Phase J quest steps) -----

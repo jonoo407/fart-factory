@@ -40,6 +40,21 @@ describe('ACTIVITIES catalog (Phase 4)', () => {
   });
 });
 
+describe('belly activities grant bonus capacity (cleanup #1)', () => {
+  it('the belly activities use the belly-bonus effect with a positive amount', () => {
+    for (const id of ['belly-massage', 'bean-burrito', 'long-shower', 'power-nap']) {
+      const a = getActivity(id)!;
+      expect(a.immediate?.kind).toBe('belly-bonus');
+      expect((a.immediate as { amount: number }).amount).toBeGreaterThan(0);
+    }
+  });
+
+  it('power nap still skips the next intermission', () => {
+    const nap = getActivity('power-nap')!;
+    expect((nap.immediate as { skipNextIntermission?: boolean }).skipNextIntermission).toBe(true);
+  });
+});
+
 describe('rollIntermission (deterministic 3-of-N pick)', () => {
   it('returns exactly 3 distinct activities', () => {
     const offers = rollIntermission(0);

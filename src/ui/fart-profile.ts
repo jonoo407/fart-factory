@@ -14,6 +14,7 @@
 import type { FoodProperties } from '../state/food';
 import type { AxisName } from '../state/axis-discovery';
 import { nameFart } from '../scoring/fart-namer';
+import { AXIS_CAP } from '../scoring/tuning';
 
 const AXIS_ORDER: AxisName[] = ['wet', 'dry', 'stink', 'loud', 'musical', 'length', 'temp'];
 
@@ -38,20 +39,26 @@ function escapeHtml(s: string): string {
 }
 
 /**
- * Render a stack of axis bars — used both by the Fart Profile and the
- * Plate Preview. Only axes in `discoveredAxes` get a row.
+ * Render a stack of axis bars — used by the Fart Profile, the Plate Preview AND
+ * the per-food Field Guide. Only axes in `discoveredAxes` get a row.
+ *
+ * `scaleMax` is the bar's full-scale denominator: per-FOOD callers pass 5 (a
+ * food's authored axes are 0-5); PLATE/FART-total callers pass AXIS_CAP=8 (the
+ * summed plate reaches ~0-20 and is scored against AXIS_CAP). The PRINTED value
+ * is always the TRUE rounded magnitude — only the bar fill is scaled/clamped.
  */
 export function renderAxisBarsHtml(
   props: FoodProperties,
   discoveredAxes: readonly AxisName[],
+  scaleMax = 5,
 ): string {
   const discoveredSet = new Set(discoveredAxes);
   return AXIS_ORDER
     .filter((a) => discoveredSet.has(a))
     .map((axis) => {
-      const raw = Math.max(0, Math.min(5, props[axis]));
+      const raw = Math.max(0, props[axis]);
       const value = Math.round(raw);
-      const pct = (raw / 5) * 100;
+      const pct = Math.min(100, (raw / scaleMax) * 100);
       return (
         `<div class="fart-profile-row" data-axis="${axis}" data-value="${value}">` +
           `<span class="fart-profile-axis-label">${axisEmoji(axis)} ${axis}</span>` +
@@ -97,7 +104,7 @@ export function renderFartProfileHtml(
         `<span class="fart-profile-eyebrow">YOUR FART</span>` +
         `<span class="fart-profile-name">${name}</span>` +
       `</div>` +
-      `<div class="fart-profile-bars">${renderAxisBarsHtml(props, discoveredAxes)}</div>` +
+      `<div class="fart-profile-bars">${renderAxisBarsHtml(props, discoveredAxes, AXIS_CAP)}</div>` +
     `</div>`
   );
 }

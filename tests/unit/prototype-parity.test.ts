@@ -6,12 +6,12 @@ import { closeness } from '../../src/scoring/match';
  * PLAN v9 D2 — golden-number suite. Locks the SHIPPED scoring math
  * (computeBase + closeness + grade/stars) against worked examples.
  *
- * NOTE (closest-is-better): the scorer intentionally DIVERGES from the
- * prototype on overshoot — meeting OR exceeding a wanted axis is now full
- * credit (a generous plate is never punished). Examples that overshoot a
- * craved axis (Lullaby's musical ×1.7, Inferno's stink) therefore score
- * HIGHER than the prototype's symmetric-closeness numbers. Undershoot and
- * hate examples (1×/2× broccoli, Fizz, beans+pepper) are unaffected.
+ * NOTE (symmetric target-matching): a craving is a TARGET, not a floor —
+ * overshooting a wanted axis is penalized by the same closeness curve as
+ * undershooting (giving MORE than they want misses too). Examples that overshoot
+ * a craved axis (Lullaby's musical ×1.7, Inferno's stink) therefore score by how
+ * far past the target they land. Undershoot and hate examples (1×/2× broccoli,
+ * Fizz, beans+pepper) are unaffected.
  */
 describe('closeness curve (pow 0.85 * 1.5)', () => {
   it('is 1 on a perfect hit and 0 when fully saturated against a 0 target', () => {
@@ -41,18 +41,18 @@ describe('prototype parity — worked examples (exact pct/grade/stars)', () => {
     expect(r.stars).toBe(1);
   });
 
-  it('Lullaby (kombucha+broccoli, musical ×1.7 saturates) vs Granny (tap) → 88 / A / 3★', () => {
-    // musical 5 × 1.7 = 8.5 → got 1.0, over Granny's 0.85 want → full credit (was a 0.85-band miss).
+  it('Lullaby (kombucha+broccoli, musical ×1.7 saturates) vs Granny (tap) → 69 / B / 2★', () => {
+    // musical 5 × 1.7 = 8.5 → got 1.0, OVER Granny's 0.85 want → penalized as an overshoot.
     const r = protoLaunch(['kombucha', 'broccoli'], 'granny', 'lullaby');
-    expect(r.pct).toBe(88);
-    expect(r.grade).toBe('A');
-    expect(r.stars).toBe(3);
+    expect(r.pct).toBe(69);
+    expect(r.grade).toBe('B');
+    expect(r.stars).toBe(2);
   });
 
-  it('…the same Lullaby with a PERFECT charge ×1.25 → 100 / S / 3★', () => {
+  it('…the same Lullaby with a PERFECT charge ×1.25 → 87 / A / 3★', () => {
     const r = protoLaunch(['kombucha', 'broccoli'], 'granny', 'lullaby', 1.25);
-    expect(r.pct).toBe(100);
-    expect(r.grade).toBe('S');
+    expect(r.pct).toBe(87);
+    expect(r.grade).toBe('A');
     expect(r.stars).toBe(3);
   });
 
@@ -71,10 +71,10 @@ describe('prototype parity — worked examples (exact pct/grade/stars)', () => {
     expect(weak.grade).toBe('F');
   });
 
-  it('Inferno (heat ×1.8) vs Frat (tap) → 77 / B / 2★', () => {
-    // Frat craves stink 0.8; Inferno brings stink 7 → got 0.875, over → full credit (was a slight miss).
+  it('Inferno (heat ×1.8) vs Frat (tap) → 73 / B / 2★', () => {
+    // Frat craves stink 0.8; Inferno brings stink 7 → got 0.875, slightly OVER → small overshoot penalty.
     const r = protoLaunch(['pepper', 'garlic', 'beans'], 'frat', 'inferno');
-    expect(r.pct).toBe(77);
+    expect(r.pct).toBe(73);
     expect(r.grade).toBe('B');
     expect(r.stars).toBe(2);
   });

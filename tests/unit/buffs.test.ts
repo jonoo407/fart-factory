@@ -29,12 +29,15 @@ describe('applyActiveBuffs (Phase 4)', () => {
     expect(result.temp).toBe(2); // 0 + 2 from hot-pepper-chew
   });
 
-  it('clamps to 0-5 range on overflow', () => {
+  it('adds the buff delta to a summed plate axis without capping at 5', () => {
+    // These are SUMMED plate axes (a multi-food plate legitimately exceeds 5).
+    // Capping the sum at 5 here made cravings unfillable; saturation is the
+    // normalizer's job (÷AXIS_CAP). hot-pepper-chew = +2 temp, +1 stink.
     setActiveBuff('hot-pepper-chew');
     const props = { ...zero, stink: 5, temp: 5 };
     const result = applyActiveBuffs(props);
-    expect(result.stink).toBe(5);
-    expect(result.temp).toBe(5);
+    expect(result.stink).toBe(6);
+    expect(result.temp).toBe(7);
   });
 
   it('consumeBuffs clears active buffs', () => {

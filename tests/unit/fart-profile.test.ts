@@ -79,3 +79,21 @@ describe('renderFartProfileHtml (V8 T1.c)', () => {
     expect(html).not.toMatch(/data-axis=/);
   });
 });
+
+// The plate/fart props are SUMMED (a 4-food plate reaches ~0-20), no longer
+// clamped to 5. The fart card must show the TRUE magnitude and fill its bars on
+// the AXIS_CAP=8 scale the scorer uses — not pin everything to 5/100%.
+describe('renderFartProfileHtml — true magnitude on the AXIS_CAP scale', () => {
+  const allAxes: AxisName[] = ['wet', 'dry', 'stink', 'loud', 'musical', 'length', 'temp'];
+
+  it('prints a high plate axis as its TRUE value, not capped at 5', () => {
+    const html = renderFartProfileHtml(props(0, 0, 0, 0, 0, 14, 0), allAxes);
+    expect(html).toMatch(/data-axis="length"[^>]*data-value="14"/);
+  });
+
+  it('fills the bar on an AXIS_CAP=8 scale (4 → 50%, ≥8 saturates at 100%)', () => {
+    const html = renderFartProfileHtml(props(4, 0, 0, 0, 0, 12, 0), allAxes);
+    expect(html).toMatch(/data-axis="wet"[\s\S]*?width:50%/);     // 4/8
+    expect(html).toMatch(/data-axis="length"[\s\S]*?width:100%/); // 12/8 → clamped
+  });
+});

@@ -259,6 +259,42 @@ export async function playFartStems(
   return played;
 }
 
+// ---- Fart bank grid player (the rebuilt launch fart) ----
+// Plays a single pre-baked clip from public/sfx-grid/<clipId>.mp3, chosen by
+// src/audio/fart-select.ts. Replaces the old layered stem assembly. Own decode
+// cache (keyed by clip id); honors mute + the Farts channel volume.
+const gridBufferCache = new Map<string, AudioBuffer>();
+
+export async function playGridClip(
+  ctx: AudioContext,
+  clipId: string,
+  startAtSeconds: number,
+  gainValue: number,
+): Promise<boolean> {
+  if (loadMuted() || !isChannelAudible('farts')) return false;
+  let buf = gridBufferCache.get(clipId);
+  if (!buf) {
+    try {
+      const url = `${import.meta.env.BASE_URL}sfx-grid/${clipId}.mp3`;
+      const res = await fetch(url);
+      if (!res.ok) return false;
+      const arr = await res.arrayBuffer();
+      buf = await ctx.decodeAudioData(arr);
+      gridBufferCache.set(clipId, buf);
+    } catch {
+      return false;
+    }
+  }
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const g = ctx.createGain();
+  g.gain.value = Math.min(0.95, gainValue * (effectiveVolume('farts') / 100));
+  src.connect(g);
+  g.connect(ctx.destination);
+  src.start(startAtSeconds);
+  return true;
+}
+
 // Test/debug accessors.
 export function _resetLastSelected(): void {
   lastSelectedId = null;

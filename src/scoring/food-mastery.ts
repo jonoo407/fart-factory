@@ -89,7 +89,12 @@ export function applyMasteryBonuses(props: FoodProperties, foodIds: string[]): F
     const lvl = masteryLevel(loadFoodMastery(id));
     const bonus = masteryBonusForFood(id, lvl);
     for (const k of Object.keys(out) as Array<keyof FoodProperties>) {
-      out[k] = Math.min(5, out[k] + bonus[k]);
+      // ADD the mastery bonus. Do NOT clamp to 5 — these are SUMMED plate axes
+      // (a 4-food plate legitimately reaches ~20), and the scorer measures
+      // against AXIS_CAP=8. Capping the sum at 5 made every craving unfillable
+      // (5/8 = 0.62 max) and every fart "short" (length pinned ≤5). Saturation
+      // is the normalizer's job (÷AXIS_CAP, clamped to 1), not this function's.
+      out[k] = out[k] + bonus[k];
     }
   }
   return out;

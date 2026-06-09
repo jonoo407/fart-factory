@@ -9,17 +9,24 @@ const props = (o: Partial<FoodProperties>): FoodProperties => ({
 const aud = (cravings: Partial<FoodProperties>, restrictions: string[] = []): Audience =>
   ({ id: 't', name: 'T', emoji: '🧪', cravings: props(cravings), restrictions } as unknown as Audience);
 
-// User directive: "closest should be better." Giving MORE of a craved axis must
-// never hurt — meeting or exceeding a want is full credit; falling short is
-// scored by how close you got. Hated ("want none") axes keep less-is-better.
+// User directive: a craving is a TARGET, not a floor. Closeness counts BOTH
+// ways — giving the audience MORE than they want misses just like giving less.
+// Hated ("want none") axes keep less-is-better (target ≈ 0).
 
-describe('axisCredit — closest-or-better', () => {
+describe('axisCredit — symmetric target-matching', () => {
   it('gives full credit for meeting the target exactly', () => {
     expect(axisCredit(0.8, 0.8, false)).toBe(1);
   });
 
-  it('gives full credit for OVERSHOOTING a wanted axis (the bug: was penalized)', () => {
-    expect(axisCredit(0.8, 1.0, false)).toBe(1);
+  it('PENALIZES overshooting a wanted axis (closeness, not full credit)', () => {
+    const c = axisCredit(0.8, 1.0, false);
+    expect(c).toBeCloseTo(closeness(0.8, 1.0), 6);
+    expect(c).toBeLessThan(1);
+  });
+
+  it('penalizes overshoot and undershoot equally (symmetric around the target)', () => {
+    // both 0.2 off the target, opposite sides → identical credit
+    expect(axisCredit(0.8, 1.0, false)).toBeCloseTo(axisCredit(0.8, 0.6, false), 6);
   });
 
   it('scores an undershoot by closeness (closer = higher, < 1)', () => {
@@ -28,8 +35,9 @@ describe('axisCredit — closest-or-better', () => {
     expect(c).toBeLessThan(1);
   });
 
-  it('a closer undershoot scores higher than a farther one', () => {
-    expect(axisCredit(0.8, 0.6, false)).toBeGreaterThan(axisCredit(0.8, 0.2, false));
+  it('a closer plate scores higher than a farther one, in EITHER direction', () => {
+    expect(axisCredit(0.8, 0.6, false)).toBeGreaterThan(axisCredit(0.8, 0.2, false)); // undershoot
+    expect(axisCredit(0.5, 0.7, false)).toBeGreaterThan(axisCredit(0.5, 1.0, false)); // overshoot
   });
 
   it('keeps less-is-better for a hated axis', () => {
@@ -38,15 +46,21 @@ describe('axisCredit — closest-or-better', () => {
   });
 });
 
-describe('match % rewards generous plates on craved axes', () => {
-  it('overshooting the only craved axis scores 100, not a penalty', () => {
-    // craving stink=4 -> target 0.8; plate stink=8 -> got 1.0 (overshoot)
-    expect(computeMatchPct(props({ stink: 8 }), props({ stink: 4 }))).toBe(100);
+describe('match % penalizes overshooting a craved axis', () => {
+  it('overshooting the only craved axis drops below 100', () => {
+    // craving stink=4 → target 0.8; plate stink=8 → got 1.0 (overshoot)
+    // → closeness(0.8, 1.0) = 0.618 → 62
+    expect(computeMatchPct(props({ stink: 8 }), props({ stink: 4 }))).toBe(62);
   });
 
-  it('the judge card marks an overshot want as a hit', () => {
+  it('hitting the craved level exactly scores 100', () => {
+    // craving stink=4 → target 0.8; plate stink = 0.8*AXIS_CAP(8) = 6.4 → got 0.8 (exact)
+    expect(computeMatchPct(props({ stink: 6.4 }), props({ stink: 4 }))).toBe(100);
+  });
+
+  it('the judge card marks an overshot want as near, not a clean hit', () => {
     const fb = computeAxisFeedback(props({ stink: 8 }), aud({ stink: 4 }));
     const stink = fb.find((f) => f.axis === 'stink')!;
-    expect(stink.status).toBe('hit');
+    expect(stink.status).toBe('near'); // closeness 0.618 ∈ [0.55, 0.8)
   });
 });

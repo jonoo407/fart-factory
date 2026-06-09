@@ -7,7 +7,7 @@
  *
  * 12 activities total. Mix:
  *   - Property buffs (most): +wet/dry/stink/loud/musical/length/temp on next launch
- *   - Belly buffs (immediate): more capacity right now
+ *   - Belly buffs: +stomach room for the NEXT crowd (a full belly is bad — eat more)
  *   - Reward buffs: +gold next launch
  *   - Restriction-canceller: Long Shower
  *   - Mode shifter: Meditation (Easy Mode for one launch)
@@ -37,8 +37,10 @@ export interface CancelRestrictionBuff {
 export type Buff = PropertyBuff | GoldMultiplierBuff | CancelRestrictionBuff;
 
 export type ImmediateEffect =
-  | { kind: 'refill-belly'; amount: number } // +N to belly right now
-  | { kind: 'full-belly'; skipNextIntermission: boolean } // Power Nap
+  // +N stomach capacity for the UPCOMING crowd (eat more / bigger plates). A full
+  // belly is bad, so the benefit is extra room — granted to the next encounter so
+  // it survives the per-encounter belly reset. Power Nap also skips the next break.
+  | { kind: 'belly-bonus'; amount: number; skipNextIntermission?: boolean }
   | { kind: 'grant-food' }; // PLAN v9 — Forage: unlock 1 random new food (04 §9)
 
 export interface Activity {
@@ -55,8 +57,8 @@ export const ACTIVITIES: readonly Activity[] = [
     id: 'bean-burrito',
     name: 'Bean Burrito',
     emoji: '🌯',
-    description: 'Eat a giant burrito. +6 belly right now.',
-    immediate: { kind: 'refill-belly', amount: 6 },
+    description: 'Carbo-load to stretch your gut. Next crowd: +6 belly room — eat more.',
+    immediate: { kind: 'belly-bonus', amount: 6 },
   },
   {
     id: 'hot-pepper-chew',
@@ -83,9 +85,9 @@ export const ACTIVITIES: readonly Activity[] = [
     id: 'long-shower',
     name: 'Long Shower',
     emoji: '🚿',
-    description: 'Wash up. Refill belly + cancel one restriction next launch.',
+    description: 'Freshen up and relax. Next crowd: +10 belly room, plus cancel one restriction.',
     buff: { kind: 'cancel-restriction' },
-    immediate: { kind: 'refill-belly', amount: 10 },
+    immediate: { kind: 'belly-bonus', amount: 10 },
   },
   {
     id: 'musical-scales',
@@ -103,10 +105,10 @@ export const ACTIVITIES: readonly Activity[] = [
   },
   {
     id: 'belly-massage',
-    name: 'Belly Massage',
+    name: 'Belly Rub',
     emoji: '🤲',
-    description: 'Knead your tummy. +3 belly right now.',
-    immediate: { kind: 'refill-belly', amount: 3 },
+    description: 'Knead your tummy to settle it. Next crowd: +3 belly room — eat more.',
+    immediate: { kind: 'belly-bonus', amount: 3 },
   },
   {
     id: 'watch-comedy',
@@ -119,8 +121,8 @@ export const ACTIVITIES: readonly Activity[] = [
     id: 'power-nap',
     name: 'Power Nap',
     emoji: '💤',
-    description: 'Take a power nap. Full belly refill, but skip next intermission.',
-    immediate: { kind: 'full-belly', skipNextIntermission: true },
+    description: 'Nap and digest. Next crowd: +8 belly room — but you skip the next intermission.',
+    immediate: { kind: 'belly-bonus', amount: 8, skipNextIntermission: true },
   },
   {
     id: 'fizzy-drink',
