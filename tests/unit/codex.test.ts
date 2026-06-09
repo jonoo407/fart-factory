@@ -9,7 +9,7 @@ import {
   type CodexTestResult,
 } from '../../src/state/codex';
 import { setGold, loadGold, setResearchNotes, loadResearchNotes, savePantry, unlockFood, loadPantry } from '../../src/state/persistence';
-import { discoverAxesFromFart, resetAxisDiscovery } from '../../src/state/axis-discovery';
+import { discoverAxesFromFart } from '../../src/state/axis-discovery';
 
 /**
  * V8 T7.c — Legendary Codex.
@@ -30,7 +30,6 @@ const FORBIDDEN_BLAST_ID = 'forbidden-blast';
 
 beforeEach(() => {
   localStorage.clear();
-  resetAxisDiscovery();
   // Give the player enough resources to test plenty of slots.
   setGold(500);
   setResearchNotes(100);

@@ -10,6 +10,23 @@ import { tierLabel as criticalLabel, type CriticalTier } from '../scoring/critic
 import { getRecipe } from '../state/recipes';
 import type { AxisName } from '../state/axis-discovery';
 
+// Per-node pending hide timers. Splash nodes (esp. the SHARED #discoverySplash,
+// written by combos / loot / recipe / wow / stuffed) used to each schedule an
+// un-cancelled hide, so an older timer could dismiss a newer splash early.
+const hideTimers = new Map<Element, ReturnType<typeof setTimeout>>();
+
+/** Hide `el` after `ms`, cancelling any prior pending hide for the same node. */
+export function scheduleHide(el: HTMLElement, showClass: string, ms: number): void {
+  const prev = hideTimers.get(el);
+  if (prev !== undefined) clearTimeout(prev);
+  const id = setTimeout(() => {
+    el.setAttribute('hidden', '');
+    el.classList.remove(showClass);
+    hideTimers.delete(el);
+  }, ms);
+  hideTimers.set(el, id);
+}
+
 export function showKitchenUnlockToast(): void {
   const toast = document.getElementById('bossUnlockToast');
   if (!toast) return;
@@ -61,10 +78,7 @@ export function showHiddenComboSplash(
   splash.classList.remove('discovery-splash-show');
   void splash.offsetWidth;
   splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3500);
+  scheduleHide(splash, 'discovery-splash-show', 3500);
 }
 
 export function showUltimateOverlay(count: number): void {
@@ -80,10 +94,7 @@ export function showUltimateOverlay(count: number): void {
   overlay.classList.remove('ultimate-overlay-show');
   void overlay.offsetWidth;
   overlay.classList.add('ultimate-overlay-show');
-  setTimeout(() => {
-    overlay.setAttribute('hidden', '');
-    overlay.classList.remove('ultimate-overlay-show');
-  }, 2500);
+  scheduleHide(overlay, 'ultimate-overlay-show', 2500);
 }
 
 export function showLootDropSplash(
@@ -102,10 +113,7 @@ export function showLootDropSplash(
   splash.classList.remove('discovery-splash-show');
   void splash.offsetWidth;
   splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3200);
+  scheduleHide(splash, 'discovery-splash-show', 3200);
 }
 
 export function showCriticalSplash(tier: CriticalTier): void {
@@ -118,10 +126,7 @@ export function showCriticalSplash(tier: CriticalTier): void {
   splash.classList.remove('critical-splash-show');
   void splash.offsetWidth;
   splash.classList.add('critical-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('critical-splash-show');
-  }, 1800);
+  scheduleHide(splash, 'critical-splash-show', 1800);
 }
 
 export function showAxisDiscoverySplash(axes: readonly AxisName[]): void {
@@ -143,10 +148,7 @@ export function showAxisDiscoverySplash(axes: readonly AxisName[]): void {
   splash.classList.remove('axis-discovery-show');
   void splash.offsetWidth;
   splash.classList.add('axis-discovery-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('axis-discovery-show');
-  }, 3000);
+  scheduleHide(splash, 'axis-discovery-show', 3000);
 }
 
 export function showDiscoverySplash(recipeId: string): void {
@@ -165,10 +167,33 @@ export function showDiscoverySplash(recipeId: string): void {
   splash.classList.remove('discovery-splash-show');
   void splash.offsetWidth;
   splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3200);
+  scheduleHide(splash, 'discovery-splash-show', 3200);
+}
+
+/**
+ * T4.2 — the Mystery Unicorn's comedy beat. With a gift it celebrates the
+ * guaranteed-legendary reward; without one (a flop, or you own every legendary)
+ * it gives the absurdist consolation. Always fires on a unicorn launch.
+ */
+export function showUnicornSplash(gift: { name: string; emoji: string } | null): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  const inner = gift
+    ? `<div class="discovery-splash-banner">🦄 THE UNICORN IS PLEASED 🦄</div>
+       <div class="discovery-splash-emoji">${gift.emoji}</div>
+       <div class="discovery-splash-name">${gift.name}</div>
+       <div class="discovery-splash-desc">It nudges a LEGENDARY ingredient toward you, then resumes chewing its daisy.</div>
+       <div class="discovery-splash-hint">📦 Added to your pantry</div>`
+    : `<div class="discovery-splash-banner">🦄 THE UNICORN DEPARTS 🦄</div>
+       <div class="discovery-splash-emoji">🦄</div>
+       <div class="discovery-splash-name">It was unmoved. Or deeply moved. Hard to say.</div>
+       <div class="discovery-splash-desc">It wanders back out, still chewing the daisy.</div>`;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-legendary">${inner}</div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.remove('discovery-splash-show');
+  void splash.offsetWidth;
+  splash.classList.add('discovery-splash-show');
+  scheduleHide(splash, 'discovery-splash-show', 3500);
 }
 
 export function flashLegendaryFanfare(): void {
