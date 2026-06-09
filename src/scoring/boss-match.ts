@@ -21,6 +21,13 @@ export interface BossLaunchInput {
   propsAfterArea: FoodProperties;
   /** For Boss 5 (resource-allocation): which audience idx is the player aiming at? null if not applicable. */
   targetAudienceIdx: number | null;
+  /**
+   * Charge multiplier from the BLAST meter (1.25 perfect / 1.1 good /
+   * 0.85 weak / 1.0 tap — scoring/charge.ts). Required so the arena fork
+   * can't silently drop it again: the meter used to sweep in boss fights
+   * while this value was thrown away.
+   */
+  quality: number;
 }
 
 export interface PerAudienceResult {
@@ -118,6 +125,7 @@ export function evaluateBossRound(
           launch.ingredientIds,
           aud.cravings,
           aud.restrictions,
+          launch.quality,
         );
         const passed = m.pct >= PASS_THRESHOLD;
         if (passed) next.audiencesPassed.add(aid);
@@ -144,6 +152,7 @@ export function evaluateBossRound(
         launch.ingredientIds,
         aud.cravings,
         mergedRestrictions,
+        launch.quality,
       );
       const passed = m.pct >= PASS_THRESHOLD;
       next.results.push({
@@ -158,7 +167,7 @@ export function evaluateBossRound(
     case 'prioritization': {
       const per: PerAudienceResult[] = boss.audiences.map((aid) => {
         const aud = audById(aid);
-        const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions);
+        const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions, launch.quality);
         const passed = m.pct >= PASS_THRESHOLD;
         if (passed) next.audiencesPassed.add(aid);
         return { audienceId: aid, pct: m.pct, passed, violations: m.violations };
@@ -173,7 +182,7 @@ export function evaluateBossRound(
 
     case 'deduction': {
       const aud = audById(boss.audiences[0]!);
-      const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions);
+      const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions, launch.quality);
       const passed = m.pct >= DEDUCTION_WIN_THRESHOLD;
       const isProbe = launchIdx === 0;
       next.results.push({
@@ -205,7 +214,7 @@ export function evaluateBossRound(
         break;
       }
       const aud = audById(boss.audiences[targetIdx]!);
-      const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions);
+      const m = evaluateMatch(launch.propsAfterArea, launch.ingredientIds, aud.cravings, aud.restrictions, launch.quality);
       const passed = m.pct >= ALLOCATION_VOTE_THRESHOLD;
       if (passed) next.votes.add(targetIdx);
       else next.votesLost.add(targetIdx);

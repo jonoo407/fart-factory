@@ -58,6 +58,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans', 'cheese'],
         propsAfterArea: perfectFor('granny-edna'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       expect(after.results.length).toBe(1);
@@ -75,6 +76,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: antiPerfectFor('granny-edna'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       expect(isBossWon(boss, after)).toBe(false);
@@ -87,6 +89,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: perfectFor('granny-edna'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       expect(after.roundsRemaining).toBe(0);
@@ -103,6 +106,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['cheese'],
         propsAfterArea: perfectFor('royal-court'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after1 = evaluateBossRound(boss, run, launch);
       expect(after1.roundsRemaining).toBe(2);
@@ -119,6 +123,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['cheese'],
         propsAfterArea: perfectFor('royal-court'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       let s = createBossRunState(boss);
       s = evaluateBossRound(boss, s, oneCheese);
@@ -147,6 +152,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans', 'onion', 'asparagus'], // 3 foods, none dairy
         propsAfterArea: perfectFor('royal-court'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       let s = createBossRunState(boss);
       s = evaluateBossRound(boss, s, legal);
@@ -179,12 +185,14 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['cheese'],
         propsAfterArea: perfectFor('haunted-mansion'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       let s = evaluateBossRound(boss, run, launch1);
       const launch2: BossLaunchInput = {
         ingredientIds: ['hot-pepper'],
         propsAfterArea: perfectFor('silent-monks'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       s = evaluateBossRound(boss, s, launch2);
       // After 2 launches, at least 2 audiences should have passed.
@@ -206,6 +214,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['hot-pepper'],
         propsAfterArea: perfectFor('volcano-cult'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       const r = after.results[0]!;
@@ -219,6 +228,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: antiPerfectFor(boss.audiences[0]!),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after1 = evaluateBossRound(boss, run, probe);
       expect(isBossWon(boss, after1)).toBe(false);
@@ -229,6 +239,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['hot-pepper', 'ghost-pepper'],
         propsAfterArea: perfectFor('volcano-cult'),
         targetAudienceIdx: null,
+        quality: 1,
       };
       const after2 = evaluateBossRound(boss, after1, real);
       expect(after2.results[1]!.audienceResults[0]!.pct).toBeGreaterThanOrEqual(60);
@@ -249,6 +260,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: perfectFor(boss.audiences[0]!),
         targetAudienceIdx: null, // No target declared
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       // The first result is logged but no vote earned (no target declared).
@@ -263,6 +275,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
           ingredientIds: ['beans'],
           propsAfterArea: perfectFor(boss.audiences[i]!),
           targetAudienceIdx: i,
+          quality: 1,
         };
         s = evaluateBossRound(boss, s, launch);
       }
@@ -276,6 +289,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: antiPerfectFor(boss.audiences[0]!),
         targetAudienceIdx: 0,
+        quality: 1,
       };
       const after = evaluateBossRound(boss, run, launch);
       // Vote 0 is now "lost" (declared target but failed).
@@ -288,6 +302,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: antiPerfectFor(boss.audiences[0]!),
         targetAudienceIdx: 0,
+        quality: 1,
       });
       expect(s.votesLost.has(0)).toBe(true);
       const before = s.roundsRemaining;
@@ -296,10 +311,38 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: perfectFor(boss.audiences[0]!),
         targetAudienceIdx: 0,
+        quality: 1,
       });
       expect(s.roundsRemaining).toBe(before - 1); // round consumed
       expect(s.votes.size).toBe(0); // no vote earned
       expect(s.results[1]!.audienceResults).toEqual([]); // logged as wasted
+    });
+  });
+
+  describe('charge quality reaches boss scoring (arena forwards the live meter result)', () => {
+    const boss = BOSSES.find((b) => b.id === 'volcano-cult-ritual')!;
+    // A mid-strength plate (60% of saturation) so the multiplier is visible:
+    // not pinned at 100 and not floored at 0.
+    const partial = (() => {
+      const p = perfectFor('volcano-cult');
+      const out = { ...p };
+      for (const axis of Object.keys(out) as (keyof FoodProperties)[]) out[axis] = p[axis] * 0.6;
+      return out;
+    })();
+
+    it('perfect charge scores higher than a tap; a weak release scores lower', () => {
+      const mk = (quality: number) =>
+        evaluateBossRound(boss, createBossRunState(boss), {
+          ingredientIds: ['hot-pepper'],
+          propsAfterArea: partial,
+          targetAudienceIdx: null,
+          quality,
+        }).results[0]!.audienceResults[0]!.pct;
+      const tap = mk(1.0);
+      const perfect = mk(1.25);
+      const weak = mk(0.85);
+      expect(perfect).toBeGreaterThan(tap);
+      expect(weak).toBeLessThan(tap);
     });
   });
 
@@ -312,6 +355,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans'],
         propsAfterArea: antiPerfectFor('granny-edna'),
         targetAudienceIdx: null,
+        quality: 1,
       });
       expect(after.roundsRemaining).toBe(0);
       expect(isBossWon(boss, after)).toBe(false);
@@ -334,6 +378,7 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
         ingredientIds: ['beans', 'onion'],
         propsAfterArea: union,
         targetAudienceIdx: null,
+        quality: 1,
       });
       if (isBossWon(boss, after)) {
         expect(isBossLost(boss, after)).toBe(false);

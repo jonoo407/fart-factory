@@ -72,6 +72,7 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
       ingredientIds: ['cheese', 'asparagus'],
       propsAfterArea: avgProfile(boss.audiences),
       targetAudienceIdx: null,
+      quality: 1,
     });
     expect(isBossWon(boss, s)).toBe(true);
   });
@@ -91,18 +92,21 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
       ingredientIds: ['asparagus'],
       propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
       targetAudienceIdx: null,
+      quality: 1,
     });
     // Round 2 — 2 foods, still close.
     s = evaluateBossRound(boss, s, {
       ingredientIds: ['asparagus', 'cheese'],
       propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
       targetAudienceIdx: null,
+      quality: 1,
     });
     // Round 3 — 3 foods, NO dairy (so cheese must be replaced).
     s = evaluateBossRound(boss, s, {
       ingredientIds: ['asparagus', 'kombucha', 'beans'],
       propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
       targetAudienceIdx: null,
+      quality: 1,
     });
     expect(s.results.length).toBe(3);
     // All 3 rounds must have passed (≥50% match with restrictions met).
@@ -118,6 +122,7 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
         ingredientIds: ['asparagus', 'cheese', 'beans'],
         propsAfterArea: { wet: 0, dry: 3, stink: 1, loud: 1, musical: 5, length: 4, temp: 2 },
         targetAudienceIdx: null,
+        quality: 1,
       });
     }
     // Round 3 fails because of no-dairy violation (-25% per violation).
@@ -131,11 +136,13 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
       ingredientIds: ['cheese'],
       propsAfterArea: perfectFor(boss.audiences[0]!),
       targetAudienceIdx: null,
+      quality: 1,
     });
     s = evaluateBossRound(boss, s, {
       ingredientIds: ['hot-pepper'],
       propsAfterArea: perfectFor(boss.audiences[1]!),
       targetAudienceIdx: null,
+      quality: 1,
     });
     expect(isBossWon(boss, s)).toBe(true);
   });
@@ -148,12 +155,14 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
       ingredientIds: ['beans'],
       propsAfterArea: { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 },
       targetAudienceIdx: null,
+      quality: 1,
     });
     // Real launch.
     s = evaluateBossRound(boss, s, {
       ingredientIds: ['hot-pepper', 'ghost-pepper'],
       propsAfterArea: perfectFor(boss.audiences[0]!),
       targetAudienceIdx: null,
+      quality: 1,
     });
     expect(isBossWon(boss, s)).toBe(true);
   });
@@ -166,6 +175,7 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
         ingredientIds: ['beans'],
         propsAfterArea: perfectFor(boss.audiences[i]!),
         targetAudienceIdx: i,
+        quality: 1,
       });
     }
     // Even though the player NEEDS only 3 of 4, smoke that 4 perfect
@@ -183,6 +193,7 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
           ingredientIds: [],
           propsAfterArea: zeroProps,
           targetAudienceIdx: null,
+          quality: 1,
         });
       }
       // After all rounds, won/lost must be mutually exclusive and exhaustive:

@@ -712,6 +712,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       ingredientIds: ids,
       propsAfterArea,
       targetAudienceIdx: targetIdx !== null && !Number.isNaN(targetIdx) ? targetIdx : null,
+      // The charge meter sweeps in the arena too — forward its multiplier so
+      // the timing skill it advertises actually affects boss scoring.
+      quality,
     });
     clearPlate();
     renderPlate();
