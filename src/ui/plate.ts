@@ -317,6 +317,13 @@ export function renderBellyMeter(): void {
   if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
   if (value) value.textContent = String(r);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
+  // Keep the role="meter" accessible value in sync — it was static in the HTML
+  // so screen readers always announced the full capacity even as belly drained.
+  const track = document.querySelector<HTMLElement>('.belly-track');
+  if (track) {
+    track.setAttribute('aria-valuenow', String(r));
+    track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
+  }
 }
 
 /** PR9: repaint the Move On button to advertise the encore bonus once
