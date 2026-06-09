@@ -18,7 +18,7 @@ import { getRecipe } from '../state/recipes';
 import { renderFartProfileHtml } from './fart-profile';
 import { axisEmoji } from './axis-emoji';
 import type { RecipeResult } from '../scoring/fart-recipe';
-import type { MatchResult, AxisBreakdown } from '../scoring/match';
+import type { MatchResult, AxisFeedback } from '../scoring/match';
 import type { DiscoveryResult } from '../scoring/discovery';
 import type { FoodProperties } from '../state/food';
 import type { Area } from '../state/containment';
@@ -135,13 +135,27 @@ function matchEmoji(pct: number): string {
   return '💀';
 }
 
-function renderBreakdown(breakdown: AxisBreakdown[]): string {
-  const sorted = [...breakdown].sort((a, b) => b.cost - a.cost);
-  return sorted.map((row) => {
-    if (row.matched) {
-      return `<div class="breakdown-row breakdown-matched">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} ✓</div>`;
-    }
-    return `<div class="breakdown-row breakdown-miss">${axisEmoji(row.axis)} ${row.axis}: <strong>${row.actual}</strong> / wanted ${row.target} <span class="breakdown-cost">-${row.cost}</span></div>`;
+function wantLabel(f: AxisFeedback): string {
+  if (f.hate) return 'wanted NONE';
+  return f.wantHigh ? 'wanted LOTS' : 'wanted a little';
+}
+
+/**
+ * Per-axis "why N%?" rows. Sourced from the SAME normalized closeness model as
+ * the headline % (computeAxisFeedback), not the abandoned raw-scale breakdown —
+ * so a satisfied axis never renders as a ✗ miss. Shows the qualitative want
+ * (LOTS / a little / NONE) + a hit/near/miss verdict; no raw plate numbers
+ * (avoids the "actual 4 / wanted 2 but ✓?!" confusion + is spoiler-free).
+ */
+export function renderBreakdown(feedback: AxisFeedback[]): string {
+  const rank: Record<AxisFeedback['status'], number> = { miss: 0, near: 1, hit: 2 };
+  const sorted = [...feedback].sort((a, b) => rank[a.status] - rank[b.status]);
+  return sorted.map((f) => {
+    const cls =
+      f.status === 'hit' ? 'breakdown-matched' : f.status === 'near' ? 'breakdown-near' : 'breakdown-miss';
+    const icon = f.status === 'hit' ? '✓' : f.status === 'near' ? '〜' : '✗';
+    const verdict = f.status === 'hit' ? 'nailed it' : f.status === 'near' ? 'close' : 'off';
+    return `<div class="breakdown-row ${cls}">${axisEmoji(f.axis)} ${f.axis}: ${wantLabel(f)} — ${verdict} ${icon}</div>`;
   }).join('');
 }
 
@@ -152,7 +166,7 @@ export function renderStoryResult(
   plateLen: number,
   discovery: DiscoveryResult | null,
   audience: Audience,
-  breakdown?: AxisBreakdown[],
+  feedback?: AxisFeedback[],
   fartProps?: FoodProperties,
 ): void {
   const wrap = $('storyResult');
@@ -193,8 +207,8 @@ export function renderStoryResult(
   const linesHtml = lines.length
     ? lines.map((l) => `<div class="story-result-effect">${l}</div>`).join('')
     : '<div class="story-result-effect" style="opacity:0.6">(no synergies or conflicts)</div>';
-  const breakdownHtml = breakdown
-    ? `<details class="breakdown-details" open><summary>📊 Match breakdown — why ${m.pct}%?</summary><div class="breakdown-grid">${renderBreakdown(breakdown)}</div></details>`
+  const breakdownHtml = feedback
+    ? `<details class="breakdown-details" open><summary>📊 Match breakdown — why ${m.pct}%?</summary><div class="breakdown-grid">${renderBreakdown(feedback)}</div></details>`
     : '';
   effects.innerHTML = linesHtml + breakdownHtml;
 }

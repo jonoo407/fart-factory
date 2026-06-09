@@ -24,7 +24,7 @@ import {
   markHiddenComboFound,
 } from '../state/persistence';
 import { resolveEquippedLaunch } from '../scoring/launch-resolver';
-import { evaluateMatch, computeMatchBreakdown, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
+import { evaluateMatch, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForEncounter, baseGoldForAudience } from '../scoring/reward';
 import { PASS_PCT } from '../scoring/tuning';
@@ -86,7 +86,7 @@ import { renderCravingChipsHtml, diffPips } from './crowd-ticket';
 import { renderTopBar } from './top-bar';
 import { audienceReaction, reactionTextForAudience } from '../scoring/audience-reactions';
 import { getRecipe } from '../state/recipes';
-import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown } from '../state/persistence';
+import { bumpStars, refillBelly, loadLastMatch, loadIntroShown, markIntroShown, loadDiscoveredRecipes } from '../state/persistence';
 import { recordConquest } from '../state/conquests';
 import type { Audience } from '../state/audience';
 import { recordLaunchEvent } from '../state/daily-quest';
@@ -259,12 +259,16 @@ export function renderPlate(): void {
  * synergy is felt BEFORE blasting. Uses the real exact-set matchRecipe (D3:
  * extra foods suppress the recipe).
  */
-function renderRecipeRibbon(): void {
+export function renderRecipeRibbon(): void {
   const el = $('recipeRibbon');
   if (!el) return;
   const id = matchRecipe(plateIngredientIds());
   const recipe = id ? getRecipe(id) : null;
-  if (!recipe) {
+  // Discovery gate: the ribbon names a combo only once the player has actually
+  // discovered it (same rule the notebook uses — undiscovered recipes show as
+  // '???'). Without this, plating an undiscovered hidden recipe spoiled its
+  // name in the ribbon before the player ever launched it.
+  if (!recipe || !id || !new Set(loadDiscoveredRecipes()).has(id)) {
     el.setAttribute('hidden', '');
     el.innerHTML = '';
     return;
@@ -313,6 +317,13 @@ export function renderBellyMeter(): void {
   if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
   if (value) value.textContent = String(r);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
+  // Keep the role="meter" accessible value in sync — it was static in the HTML
+  // so screen readers always announced the full capacity even as belly drained.
+  const track = document.querySelector<HTMLElement>('.belly-track');
+  if (track) {
+    track.setAttribute('aria-valuenow', String(r));
+    track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
+  }
 }
 
 /** PR9: repaint the Move On button to advertise the encore bonus once
@@ -671,7 +682,10 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   const passedThisLaunch = match.pct >= PASS_PCT;
   let goldPaid = 0;
   const learnedToasts: string[] = [];
-  const breakdown = computeMatchBreakdown(propsAfterArea, aud.cravings);
+  // The "why N%?" breakdown is sourced from the same normalized feedback model
+  // as the headline % (not the legacy raw-scale computeMatchBreakdown) so its
+  // ✓/✗ can't contradict the score.
+  const axisFeedback = computeAxisFeedback(propsAfterArea, aud);
   const discovery = ingredientCount > 0 ? discoverFromPlate(ids) : null;
 
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
@@ -814,7 +828,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   if (discovery && discovery.freshlyDiscovered) {
     showDiscoverySplash(discovery.recipeId);
   }
-  renderStoryResult(recipe, match, area, ingredientCount, discovery, aud, breakdown, propsAfterArea);
+  renderStoryResult(recipe, match, area, ingredientCount, discovery, aud, axisFeedback, propsAfterArea);
   // V8 T3 — pulse the Fart Profile bars in step with the audio playback.
   if (ingredientCount > 0) {
     pulseFartProfile($('fartProfile'));
