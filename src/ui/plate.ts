@@ -26,7 +26,7 @@ import {
 import { resolveEquippedLaunch } from '../scoring/launch-resolver';
 import { evaluateMatch, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
-import { awardGoldForEncounter, baseGoldForAudience } from '../scoring/reward';
+import { awardGoldForEncounter, launchBaseGold, legendaryGold } from '../scoring/reward';
 import { PASS_PCT } from '../scoring/tuning';
 import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak } from '../scoring/streak';
@@ -725,8 +725,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // T3.1: ULTIMATE LAUNCH — ≥2 legendary foods triggers a full cinematic.
   if (legendaryCount >= 2 && ingredientCount > 0) {
     showUltimateOverlay(legendaryCount);
-    // Ultimate bonus: +10 gold + +5 notes.
-    addGold(10);
+    // Ultimate bonus: +10 gold + +5 notes (legendary +10% applies to all match gold).
+    addGold(legendaryGold(10));
     addResearchNotes(5);
   }
 
@@ -742,7 +742,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     // per crowd to drive the venue ladder.
     recordLaunchForStreak(match.pct);
     if (passedThisLaunch) {
-      goldPaid = awardGoldForEncounter(aud.id, baseGoldForAudience(aud), match.pct);
+      // launchBaseGold folds in the GamePlus Hot Spot 3x; awardGoldForEncounter
+      // folds in the legendary +10% — both reach the live payout now.
+      goldPaid = awardGoldForEncounter(aud.id, launchBaseGold(aud, areaId), match.pct);
       bumpStars(aud.id, starsForPct(match.pct));
     }
     awardResearchForLaunch(match.pct);
@@ -754,7 +756,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       match.pct,
     );
     if (justWowed) {
-      addGold(WOW_BONUS_GOLD);
+      addGold(legendaryGold(WOW_BONUS_GOLD));
       recordConquest(aud.id, match.pct);
       showWowSplash(aud, match.pct);
     }
@@ -762,7 +764,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     // T1.2: critical bonus — PERFECT/GREAT add gold; DISASTER adds consolation notes.
     const goldBonus = criticalGoldBonus(tier);
     const notesBonus = criticalNotesBonus(tier);
-    if (goldBonus > 0) addGold(goldBonus);
+    if (goldBonus > 0) addGold(legendaryGold(goldBonus));
     if (notesBonus > 0) addResearchNotes(notesBonus);
     // T2.3: record food uses for mastery
     recordFoodUse(ids);
@@ -789,7 +791,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     }
     // T4.1: apply hidden-combo bonus rewards + splash. Persist discovery.
     if (hiddenCombo) {
-      if (hiddenCombo.bonusGold > 0) addGold(hiddenCombo.bonusGold);
+      if (hiddenCombo.bonusGold > 0) addGold(legendaryGold(hiddenCombo.bonusGold));
       if (hiddenCombo.bonusNotes > 0) addResearchNotes(hiddenCombo.bonusNotes);
       markHiddenComboFound(hiddenCombo.id);
       showHiddenComboSplash(hiddenCombo);

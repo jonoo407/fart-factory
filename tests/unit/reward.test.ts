@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   goldForMatch,
-  awardGoldForLaunch,
   awardGoldForEncounter,
   baseGoldForAudience,
 } from '../../src/scoring/reward';
@@ -35,24 +34,10 @@ describe('goldForMatch (Phase G item 48 — per-launch award rule)', () => {
   });
 });
 
-describe('awardGoldForLaunch (persistence wire-up)', () => {
-  it('adds gold and returns the new balance', () => {
-    const after = awardGoldForLaunch(73);
-    expect(after).toBe(7);
-    expect(loadGold()).toBe(7);
-  });
-
-  it('accumulates across launches', () => {
-    awardGoldForLaunch(60); // +6
-    awardGoldForLaunch(85); // +8
-    expect(loadGold()).toBe(14);
-  });
-
-  it('adds 0 when below threshold (no error)', () => {
-    awardGoldForLaunch(30);
-    expect(loadGold()).toBe(0);
-  });
-});
+// (awardGoldForLaunch was an orphaned parallel gold path — the only consumer of
+// the Hot Spot + legendary multipliers, with zero production callers. Deleted in
+// favour of the single live path: launchBaseGold -> awardGoldForEncounter, with
+// the multiplier seam covered by gold-multipliers-seam.test.ts.)
 
 describe('awardGoldForEncounter (anti-grind, improvement-only — 01 §4.3)', () => {
   it('pays the full gold on first clear and ratchets the ledger', () => {

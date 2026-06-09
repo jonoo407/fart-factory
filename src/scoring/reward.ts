@@ -27,21 +27,29 @@ export function goldForMatch(pct: number): number {
   return Math.floor(clamped / 10);
 }
 
-/**
- * @param pct        match%
- * @param locationId Hot Spot GamePlus multiplier when matching.
- * @param extraMult  additional multiplier (e.g., Watch Comedy buff).
- */
-export function awardGoldForLaunch(pct: number, locationId?: string, extraMult = 1): number {
-  const base = goldForMatch(pct);
-  const hotMult = locationId ? hotSpotGoldMultiplier(locationId) : 1;
-  const legendaryMult = legendaryGoldMultiplier();
-  return addGold(Math.floor(base * hotMult * extraMult * legendaryMult));
-}
-
 /** Base gold paid at a 100% match (D4): the audience's override, else the tier table. */
 export function baseGoldForAudience(aud: Audience): number {
   return aud.baseGold ?? GOLD_BY_TIER[aud.difficultyTier];
+}
+
+/**
+ * Base gold for a launch at `locationId`, with the GamePlus Daily Hot Spot
+ * multiplier (3x) folded in. This is the LIVE entry point the launch path
+ * calls — the Hot Spot 3x used to live in a now-orphaned function and never
+ * reached a real payout, so route it through here.
+ */
+export function launchBaseGold(aud: Audience, locationId: string): number {
+  return Math.round(baseGoldForAudience(aud) * hotSpotGoldMultiplier(locationId));
+}
+
+/**
+ * Apply the legendary "forbidden-gold" passive (+10% gold from every match) to a
+ * bonus gold amount (wow / critical / hidden-combo / ultimate). The main match
+ * payout applies it inside awardGoldForEncounter; this covers the bonus sources
+ * so the "+10% from EVERY match" promise holds across all launch gold.
+ */
+export function legendaryGold(amount: number): number {
+  return Math.round(amount * legendaryGoldMultiplier());
 }
 
 /**
@@ -54,7 +62,9 @@ export function baseGoldForAudience(aud: Audience): number {
  */
 export function awardGoldForEncounter(audienceId: string, baseGold: number, pct: number): number {
   const clampedPct = Math.max(0, Math.min(100, pct));
-  const full = Math.round(baseGold * (clampedPct / 100));
+  // Legendary forbidden-gold passive (+10% from every match) folds into the
+  // live payout here so it actually reaches credited gold.
+  const full = Math.round(baseGold * (clampedPct / 100) * legendaryGoldMultiplier());
   const prev = loadEarnedGold(audienceId);
   const payout = Math.max(0, full - prev);
   if (payout > 0) {
