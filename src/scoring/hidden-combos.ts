@@ -250,8 +250,11 @@ export function detectHiddenCombo(ids: string[], ctx: ComboContext = {}): Hidden
     };
   }
 
-  // DRY-BONE — 4+ foods, each dry ≥ 4.
-  if (ids.length >= 4 && ids.every((id) => (getFood(id)?.properties.dry ?? 0) >= 4)) {
+  // DRY-BONE — 4+ foods, each dry ≥ 2. The original threshold (≥ 4) was
+  // undiscoverable: no food in the catalog has dry > 3, and a 4×pan-pipe-pea
+  // plate (the only all-dry-3 option) is intercepted by BENDER above. dry ≥ 2
+  // keeps it rare (a deliberate all-dry varied plate) but actually findable.
+  if (ids.length >= 4 && ids.every((id) => (getFood(id)?.properties.dry ?? 0) >= 2)) {
     return {
       id: 'dry-bone',
       name: '🦴 DRY-BONE PLATE',

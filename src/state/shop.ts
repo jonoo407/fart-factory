@@ -3,7 +3,8 @@
  * items 49-51.
  *
  * Rules:
- *   - Daily roll: 3 uncommon + 1 rare + 0-1 epic, deterministic per UTC day.
+ *   - Roll: 3 uncommon + 1 rare + 0-1 epic, deterministic per encounter idx
+ *     + run seed (was per-UTC-day before the encounter-anchored redesign).
  *   - Legendary is NOT in the shop (quest-unlocked — see Phase J).
  *   - Already-unlocked foods are filtered out so a player who buys an item
  *     on day N doesn't see it on day N+1 (their next roll has substitutes

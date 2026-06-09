@@ -116,6 +116,20 @@ describe('detectHiddenCombo — PR4 expanded patterns', () => {
     expect(c?.id).toBe('swamp-overload');
   });
 
+  it('DRY-BONE fires for a varied 4-food all-dry plate — must be reachable with real content', () => {
+    // The catalog's maximum dry is 3, so the original threshold (dry ≥ 4 on
+    // all four) was mathematically undiscoverable; and 4×pan-pipe-pea (the
+    // only all-dry-3 plate) is intercepted by BENDER. Threshold is now ≥ 2.
+    const c = detectHiddenCombo(['onion', 'egg', 'garlic', 'crumb']);
+    expect(c?.id).toBe('dry-bone');
+  });
+
+  it('ALIGNED-AXES fires for 3 foods sharing a dominant axis', () => {
+    // 3x garlic — dominant axis stink for each; no earlier combo matches.
+    const c = detectHiddenCombo(['garlic', 'garlic', 'garlic']);
+    expect(c?.id).toBe('aligned-axes');
+  });
+
   it('STREAK-FINISHER fires when entering with streak ≥ 5', () => {
     const c = detectHiddenCombo(['beans', 'cheese'], { streak: 7 });
     expect(c?.id).toBe('streak-finisher');
@@ -127,29 +141,5 @@ describe('detectHiddenCombo — PR4 expanded patterns', () => {
 
   it('returns null for empty plate', () => {
     expect(detectHiddenCombo([])).toBeNull();
-  });
-
-  it('HIDDEN_COMBO_CATALOG covers every combo id the detector can return', () => {
-    // Cross-check: every catalog id should be returnable; collect detector ids
-    // from a few representative invocations.
-    const testCases = [
-      { ids: ['cheese', 'cheese', 'aged-stilton', 'casu-marzu'], ctx: { audienceId: 'granny-edna' as const } },
-      { ids: ['hot-pepper', 'ghost-pepper', 'volcano-chili'], ctx: { areaId: 'volcano-rim' } },
-      { ids: ['egg', 'egg', 'egg'], ctx: { areaId: 'library' } },
-      { ids: ['forbidden-burrito'], ctx: { areaId: 'space' } },
-      { ids: ['cheese', 'cheese', 'aged-stilton', 'casu-marzu'], ctx: {} },
-      { ids: ['beans', 'beans', 'beans', 'beans'], ctx: {} },
-      { ids: ['forbidden-burrito', 'mystery-casserole', 'sky-bean'], ctx: {} },
-      { ids: ['beans', 'cheese', 'onion'], ctx: { getMasteryUses: () => 30 } },
-      { ids: ['beans', 'kimchi', 'durian', 'natto'], ctx: {} },
-      { ids: ['hot-pepper', 'ghost-pepper', 'volcano-chili', 'durian'], ctx: {} },
-      { ids: ['sardines', 'pickle', 'kombucha', 'pickled-egg'], ctx: {} },
-      { ids: ['beans', 'cheese'], ctx: { streak: 7 } },
-    ];
-    const catalogIds = new Set(HIDDEN_COMBO_CATALOG.map((c) => c.id));
-    for (const tc of testCases) {
-      const c = detectHiddenCombo(tc.ids, tc.ctx);
-      if (c) expect(catalogIds.has(c.id)).toBe(true);
-    }
   });
 });

@@ -10,10 +10,8 @@
  *   - "no-X" hate penalty: base *= 1 - 0.65*worstHateAxisValue
  *   - charge multiplier folds in as final *= quality
  *
- * Signatures are preserved so callers (ui/result-panel.ts, ui/plate.ts) and
- * tests/unit/match-breakdown.test.ts keep compiling. `computeMatchBreakdown`
- * and `checkRestrictions` are intentionally UNCHANGED; the judge card consumes
- * the new `computeAxisFeedback` instead.
+ * The judge card consumes `computeAxisFeedback`; `checkRestrictions` is
+ * intentionally unchanged from the legacy scorer.
  */
 
 import type { FoodProperties } from '../state/food';
@@ -29,16 +27,6 @@ export interface MatchResult {
   pct: number;
   /** Restriction violations applied (each subtracts a flat penalty). */
   violations: string[];
-}
-
-export interface AxisBreakdown {
-  axis: keyof FoodProperties;
-  actual: number;
-  target: number;
-  /** max(0, |actual-target| - 1) — same per-axis term as the legacy scorer. */
-  cost: number;
-  /** true when within ±1 of target (cost === 0). */
-  matched: boolean;
 }
 
 export type Grade = 'S' | 'A' | 'B' | 'C' | 'F';
@@ -139,19 +127,6 @@ function judgedFromTarget(actual: FoodProperties, target: FoodProperties): Judge
     }
   }
   return out;
-}
-
-/**
- * Per-axis breakdown of why the player got their score (UNCHANGED legacy
- * shape — result-panel.ts + match-breakdown.test.ts depend on it).
- */
-export function computeMatchBreakdown(actual: FoodProperties, target: FoodProperties): AxisBreakdown[] {
-  return AXES.map((axis) => {
-    const a = actual[axis];
-    const t = target[axis];
-    const cost = Math.max(0, Math.abs(a - t) - 1);
-    return { axis, actual: a, target: t, cost, matched: cost === 0 };
-  });
 }
 
 /**

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   evaluateBossRound,
   isBossWon,
+  isBossLost,
   type BossLaunchInput,
   createBossRunState,
 } from '../../src/scoring/boss-match';
@@ -111,21 +112,52 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
       expect(after3.roundsRemaining).toBe(0);
     });
 
-    it('win = all 3 rounds passed (≥50% each)', () => {
-      const run = createBossRunState(boss);
-      const goodLaunch: BossLaunchInput = {
-        ingredientIds: ['cheese', 'asparagus'],
+    it('round 2 adds min-foods:2 and round 3 adds min-foods:3 + no-dairy (violations fire)', () => {
+      // A 1-food cheese plate sails through round 1 (no added restrictions),
+      // then trips every escalation rule as it tightens.
+      const oneCheese: BossLaunchInput = {
+        ingredientIds: ['cheese'],
         propsAfterArea: perfectFor('royal-court'),
         targetAudienceIdx: null,
       };
-      let s = run;
-      s = evaluateBossRound(boss, s, goodLaunch);
-      s = evaluateBossRound(boss, s, goodLaunch);
-      s = evaluateBossRound(boss, s, goodLaunch);
-      // After 3 perfect rounds (assuming the synthetic restrictions don't
-      // disqualify), should be won. The exact match% depends on cravings
-      // shape; this asserts the structure works end-to-end.
-      expect(s.results.length).toBe(3);
+      let s = createBossRunState(boss);
+      s = evaluateBossRound(boss, s, oneCheese);
+      expect(s.results[0]!.audienceResults[0]!.violations).toEqual([]);
+      s = evaluateBossRound(boss, s, oneCheese);
+      expect(s.results[1]!.audienceResults[0]!.violations).toContain('min-foods:2');
+      s = evaluateBossRound(boss, s, oneCheese);
+      expect(s.results[2]!.audienceResults[0]!.violations).toContain('min-foods:3');
+      expect(s.results[2]!.audienceResults[0]!.violations).toContain('no-dairy');
+      // Each violation is a flat -25 points (match.ts). Same plate every round,
+      // so round 3's pct is exactly round 1's minus 50. NOTE the knife-edge this
+      // pins: a 100%-base plate still lands at exactly 50 with two violations
+      // — which PASSES (>= 50). The escalation rules are soft caps against a
+      // theoretically perfect plate; only sub-100 bases are truly forced into
+      // 3-food dairy-free plates.
+      const r1 = s.results[0]!.audienceResults[0]!.pct;
+      const r3 = s.results[2]!.audienceResults[0]!.pct;
+      expect(r3).toBe(Math.max(0, r1 - 50));
+    });
+
+    it('win = all 3 rounds passed: a 3-food dairy-free plate can beat the full escalation', () => {
+      // This is the proof the escalation boss is WINNABLE under its own rules
+      // (the old version launched a 2-food cheese plate that could never pass
+      // round 3, then asserted only results.length === 3 — green forever).
+      const legal: BossLaunchInput = {
+        ingredientIds: ['beans', 'onion', 'asparagus'], // 3 foods, none dairy
+        propsAfterArea: perfectFor('royal-court'),
+        targetAudienceIdx: null,
+      };
+      let s = createBossRunState(boss);
+      s = evaluateBossRound(boss, s, legal);
+      s = evaluateBossRound(boss, s, legal);
+      s = evaluateBossRound(boss, s, legal);
+      for (const r of s.results) {
+        expect(r.audienceResults[0]!.violations).toEqual([]);
+        expect(r.audienceResults[0]!.passed).toBe(true);
+      }
+      expect(isBossWon(boss, s)).toBe(true);
+      expect(isBossLost(boss, s)).toBe(false);
     });
   });
 
@@ -190,18 +222,17 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
       };
       const after1 = evaluateBossRound(boss, run, probe);
       expect(isBossWon(boss, after1)).toBe(false);
-      // Second launch: perfect plate.
+      // Second launch: perfect plate. perfectFor saturates every craved axis,
+      // so the pct is deterministically ≥ 60 — assert unconditionally (the old
+      // `if (pct >= 60)` wrapper silently asserted nothing on under-score).
       const real: BossLaunchInput = {
         ingredientIds: ['hot-pepper', 'ghost-pepper'],
         propsAfterArea: perfectFor('volcano-cult'),
         targetAudienceIdx: null,
       };
       const after2 = evaluateBossRound(boss, after1, real);
-      // Should win if pct ≥ 60.
-      const r2 = after2.results[1]!;
-      if (r2.audienceResults[0]!.pct >= 60) {
-        expect(isBossWon(boss, after2)).toBe(true);
-      }
+      expect(after2.results[1]!.audienceResults[0]!.pct).toBeGreaterThanOrEqual(60);
+      expect(isBossWon(boss, after2)).toBe(true);
     });
   });
 
@@ -249,7 +280,68 @@ describe('Boss-match scoring engine (Phase N item 73)', () => {
       const after = evaluateBossRound(boss, run, launch);
       // Vote 0 is now "lost" (declared target but failed).
       expect(after.votesLost.has(0)).toBe(true);
-      // Can't re-target this councilor.
+    });
+
+    it('re-targeting an already-lost councilor consumes the round with no vote change', () => {
+      let s = createBossRunState(boss);
+      s = evaluateBossRound(boss, s, {
+        ingredientIds: ['beans'],
+        propsAfterArea: antiPerfectFor(boss.audiences[0]!),
+        targetAudienceIdx: 0,
+      });
+      expect(s.votesLost.has(0)).toBe(true);
+      const before = s.roundsRemaining;
+      // Re-target councilor 0 with a PERFECT plate — still wasted.
+      s = evaluateBossRound(boss, s, {
+        ingredientIds: ['beans'],
+        propsAfterArea: perfectFor(boss.audiences[0]!),
+        targetAudienceIdx: 0,
+      });
+      expect(s.roundsRemaining).toBe(before - 1); // round consumed
+      expect(s.votes.size).toBe(0); // no vote earned
+      expect(s.results[1]!.audienceResults).toEqual([]); // logged as wasted
+    });
+  });
+
+  describe('isBossLost (rounds exhausted without a win)', () => {
+    it('not lost while rounds remain, lost once they run out without a win', () => {
+      const boss = BOSSES.find((b) => b.id === 'granny-family-reunion')!;
+      const fresh = createBossRunState(boss);
+      expect(isBossLost(boss, fresh)).toBe(false); // rounds remain
+      const after = evaluateBossRound(boss, fresh, {
+        ingredientIds: ['beans'],
+        propsAfterArea: antiPerfectFor('granny-edna'),
+        targetAudienceIdx: null,
+      });
+      expect(after.roundsRemaining).toBe(0);
+      expect(isBossWon(boss, after)).toBe(false);
+      expect(isBossLost(boss, after)).toBe(true);
+    });
+
+    it('a winning final round is NOT a loss', () => {
+      const boss = BOSSES.find((b) => b.id === 'granny-family-reunion')!;
+      const fresh = createBossRunState(boss);
+      // Saturate the union of all three families' cravings on non-hated axes —
+      // granny-family-reunion is the intersection puzzle.
+      const union: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
+      for (const aid of boss.audiences) {
+        const p = perfectFor(aid);
+        for (const axis of Object.keys(union) as (keyof FoodProperties)[]) {
+          union[axis] = Math.max(union[axis], p[axis]);
+        }
+      }
+      const after = evaluateBossRound(boss, fresh, {
+        ingredientIds: ['beans', 'onion'],
+        propsAfterArea: union,
+        targetAudienceIdx: null,
+      });
+      if (isBossWon(boss, after)) {
+        expect(isBossLost(boss, after)).toBe(false);
+      } else {
+        // The union plate may overshoot a low craving for one family; the
+        // contract under test is won/lost mutual exclusion either way.
+        expect(isBossLost(boss, after)).toBe(true);
+      }
     });
   });
 });

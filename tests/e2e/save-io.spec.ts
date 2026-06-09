@@ -1,14 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function loadStory(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
-}
+import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 test('Save section renders inside the notebook with export + import buttons', async ({ page }) => {
   await loadStory(page);
@@ -54,9 +45,13 @@ test('Import replaces existing state and reloads', async ({ page }) => {
     mimeType: 'application/json',
     buffer: Buffer.from(blob),
   });
-  // Reload happens after a short delay; wait for it then re-check.
-  await page.waitForLoadState('load');
-  await page.waitForTimeout(1200);
-  const gold = await page.evaluate(() => localStorage.getItem('fart_gold'));
-  expect(gold).toBe('777');
+  // The import writes the keys then reloads after a short delay — poll for the
+  // imported state instead of sleeping a fixed amount. The catch() absorbs the
+  // "execution context destroyed" race while the reload is in flight.
+  await expect
+    .poll(
+      () => page.evaluate(() => localStorage.getItem('fart_gold')).catch(() => null),
+      { timeout: 5000 },
+    )
+    .toBe('777');
 });

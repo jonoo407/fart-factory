@@ -3,12 +3,9 @@ import {
   loadManifest,
   pickSampleId,
   playSample,
-  hasStemBase,
-  playFartStems,
   playGridClip,
   type SliderConfig,
 } from './sample-player';
-import type { AxisLevels } from './fart-stems';
 import { resolveFart } from './fart-select';
 import type { FoodProperties } from '../state/food';
 
@@ -126,7 +123,6 @@ export function playFart(
   stinkiness: number,
   temp: number,
   musical: number,
-  ax?: AxisLevels,
   rawProps?: FoodProperties,
 ): number {
   if (!isChannelAudible('farts')) return 0;
@@ -136,8 +132,8 @@ export function playFart(
   // THE fart bank (rebuilt). When the caller supplies the plate's raw props,
   // pick ONE pre-baked grid clip that matches the recipe (no live layering) and
   // play it after the procedural anticipation cue. This is the primary launch
-  // path; the stem/sample/procedural branches below are fallbacks for callers
-  // that don't pass props (e.g. the arena fork, the belly-tap easter egg).
+  // path; the sample/procedural branches below are fallbacks for callers
+  // that don't pass props (the belly-tap easter egg).
   if (rawProps) {
     const cueDur = 0.15;
     const cueGap = 0.05;
@@ -153,28 +149,6 @@ export function playFart(
       mainDurationMs: Math.round(durationSeconds * 1000),
     };
     return cueDur + cueGap + durationSeconds;
-  }
-
-  // PLAN v9 P6 — the READOUT path. When the caller supplies the normalized axes
-  // AND the stem bank is present, assemble the fart from layered stems (the
-  // base rip + melody/sizzle/haze) so the sound encodes the recipe. Keeps the
-  // procedural anticipation cue. Decision is synchronous (manifest lookup);
-  // the layered playback is fire-and-forget.
-  if (manifestReady && ax && hasStemBase(manifestReady, ax)) {
-    const cueDur = 0.15;
-    const cueGap = 0.05;
-    const cueStart = ctx.currentTime;
-    const mainStartAt = cueStart + cueDur + cueGap;
-    schedulCue(ctx, cueStart, cueDur, temp, volume);
-    void playFartStems(ctx, manifestReady, ax, mainStartAt);
-    const mainDurationMs = 2000; // stems run up to ~2s
-    lastSchedule = {
-      cuePresent: true,
-      cueDurationMs: Math.round(cueDur * 1000),
-      mainStartOffsetMs: Math.round((cueDur + cueGap) * 1000),
-      mainDurationMs,
-    };
-    return cueDur + cueGap + mainDurationMs / 1000;
   }
 
   // Sample-bank path: if the manifest is loaded, schedule the cue

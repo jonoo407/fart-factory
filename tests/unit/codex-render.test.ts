@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { renderCodexEntryHtml } from '../../src/ui/codex';
 import { getRecipe } from '../../src/state/recipes';
-import { testCodexSlot } from '../../src/state/codex';
+import { testCodexSlot, TEST_GOLD_COST, TEST_NOTES_COST } from '../../src/state/codex';
 import { setGold, setResearchNotes, unlockFood } from '../../src/state/persistence';
 
 beforeEach(() => {
@@ -54,18 +54,22 @@ describe('renderCodexEntryHtml (V8 T7.d)', () => {
     expect(html).toContain(r.legendaryBuff!.label);
   });
 
-  it('renders the per-test cost label so the player knows what to spend', () => {
+  it('renders the per-test cost label derived from the real cost constants', () => {
     const r = getRecipe('forbidden-blast')!;
     const html = renderCodexEntryHtml(r);
-    expect(html).toMatch(/5\s*gold/i);
-    expect(html).toMatch(/1\s*note/i);
+    expect(html).toMatch(new RegExp(`${TEST_GOLD_COST}\\s*gold`, 'i'));
+    expect(html).toMatch(new RegExp(`${TEST_NOTES_COST}\\s*note`, 'i'));
   });
 
   it('locked recipes show their legendary quest steps instead of the slot grid', () => {
+    // REAL locked state: a fresh save's pantry (commons only) holds none of
+    // forbidden-blast's ingredients, so questGateCleared(r) is false. (The
+    // old version forced it via a test-only lockedOverride param in the prod
+    // signature — that backdoor is gone.)
+    localStorage.clear();
     const r = getRecipe('forbidden-blast')!;
-    // No pantry → locked. (We unlocked the ingredients in beforeEach;
-    // here we manually request the locked rendering.)
-    const html = renderCodexEntryHtml(r, { lockedOverride: true });
+    const html = renderCodexEntryHtml(r);
+    expect(html).toContain('LOCKED');
     expect(html).toContain('quest');
     for (const step of r.legendaryUnlock!.steps) {
       expect(html).toContain(step);

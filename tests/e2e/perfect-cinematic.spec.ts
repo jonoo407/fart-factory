@@ -1,14 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function loadStory(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
-}
+import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 test('confetti container exists and is initially empty', async ({ page }) => {
   await loadStory(page);
@@ -31,20 +22,15 @@ test('PERFECT cinematic disables the launch button + spawns confetti', async ({ 
   });
   await expect(page.locator('#storyLaunchBtn')).toBeDisabled();
   await expect(page.locator('.confetti-piece').first()).toBeVisible({ timeout: 500 });
-  await page.waitForTimeout(1400);
-  await expect(page.locator('#storyLaunchBtn')).toBeEnabled();
+  // The cinematic re-enables the button when it finishes (~1.4s) — poll the
+  // enabled state instead of sleeping a fixed amount.
+  await expect(page.locator('#storyLaunchBtn')).toBeEnabled({ timeout: 5000 });
 });
 
 test('PERFECT cinematic is a no-op under prefers-reduced-motion (no confetti)', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await context.newPage();
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
+  await loadStory(page);
   await page.evaluate(async () => {
     const w = window as unknown as { __playPerfectCinematic?: () => Promise<void> };
     await w.__playPerfectCinematic?.();

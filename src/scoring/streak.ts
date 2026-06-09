@@ -1,8 +1,9 @@
 /**
  * Streak counter — consecutive launches ≥75%. Per PLAN_v7 T2.2.
  *
- * Resets to 0 on launches below the threshold. Multiplies gold reward
- * once the streak is long enough.
+ * Resets to 0 on launches below the threshold. Feeds hidden-combo
+ * detection and the streak UI. (The old streak→gold multiplier was
+ * replaced by the anti-grind encounter payout in v9.)
  */
 
 const KEY = 'fart_streak_count';
@@ -37,13 +38,6 @@ export function recordLaunchForStreak(pct: number): number {
   }
   saveStreak(0);
   return 0;
-}
-
-export function streakGoldMultiplier(streak: number): number {
-  if (streak >= 10) return 3.0;
-  if (streak >= 5) return 2.0;
-  if (streak >= STREAK_THRESHOLD) return 1.5;
-  return 1;
 }
 
 export function resetStreak(): void {

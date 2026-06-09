@@ -1,14 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
-
-async function loadStory(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
-}
+import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 test('daily-quest strip renders with 3 steps + a pending-reward chip on first load', async ({ page }) => {
   await loadStory(page);
@@ -52,10 +43,31 @@ test('claim button replaces pending chip once every step is done; awards gold + 
   await expect(page.locator('.daily-quest-claim[disabled]')).toBeVisible();
 });
 
-test('quest persists across reload', async ({ page }) => {
+test('MUTATED quest progress persists across reload', async ({ page }) => {
+  // The quest steps themselves are deterministically date-seeded, so simply
+  // comparing labels before/after a reload would pass even WITHOUT any
+  // persistence (the same date regenerates the same quest). Instead, mutate
+  // the stored progress — something regeneration would reset to 0 — and
+  // assert the mutation survives the reload.
   await loadStory(page);
-  const before = await page.locator('.daily-quest-step .daily-quest-label').allTextContents();
+  await expect(page.locator('.daily-quest-step')).toHaveCount(3);
+  const mutated = await page.evaluate(() => {
+    const key = Object.keys(localStorage).find((k) => k.startsWith('fart_daily_quest_'));
+    if (!key) return null;
+    const quest = JSON.parse(localStorage.getItem(key)!);
+    quest.steps[0].progress = quest.steps[0].target; // mark step 1 as done
+    localStorage.setItem(key, JSON.stringify(quest));
+    return { target: quest.steps[0].target as number };
+  });
+  expect(mutated).not.toBeNull();
   await page.reload();
-  const after = await page.locator('.daily-quest-step .daily-quest-label').allTextContents();
-  expect(after).toEqual(before);
+  // Step 1 renders DONE from the persisted (mutated) quest — a freshly
+  // regenerated quest would show 0 progress and no done state.
+  const firstStep = page.locator('.daily-quest-step').first();
+  await expect(firstStep).toHaveClass(/daily-quest-step-done/);
+  await expect(firstStep.locator('.daily-quest-progress')).toHaveText(
+    `${mutated!.target}/${mutated!.target}`,
+  );
+  // The remaining steps are still pending (no blanket done state).
+  await expect(page.locator('.daily-quest-step-done')).toHaveCount(1);
 });

@@ -6,9 +6,8 @@ import {
   isFullyDecoded,
   TEST_GOLD_COST,
   TEST_NOTES_COST,
-  type CodexTestResult,
 } from '../../src/state/codex';
-import { setGold, loadGold, setResearchNotes, loadResearchNotes, savePantry, unlockFood, loadPantry } from '../../src/state/persistence';
+import { setGold, loadGold, setResearchNotes, loadResearchNotes, savePantry, unlockFood } from '../../src/state/persistence';
 import { discoverAxesFromFart } from '../../src/state/axis-discovery';
 
 /**
@@ -168,14 +167,5 @@ describe('persistence', () => {
   it('survives corrupt JSON', () => {
     localStorage.setItem('fart_legendary_codex', '{not json');
     expect(loadCodex()).toEqual({});
-  });
-
-  it('CodexTestResult is exported', () => {
-    const _x: CodexTestResult = { hit: true };
-    expect(_x).toBeDefined();
-  });
-
-  it('pantry helper exists (sanity)', () => {
-    expect(loadPantry().length).toBeGreaterThan(0);
   });
 });

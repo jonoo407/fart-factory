@@ -185,11 +185,13 @@ describe('Boss balance smoke — every boss can be defeated by perfect play', ()
           targetAudienceIdx: null,
         });
       }
-      // After all rounds, isBossLost may or may not be true depending on
-      // whether the zero-plate accidentally pleased the audience (some
-      // gentle audiences are close to zero). At minimum, no crash.
+      // After all rounds, won/lost must be mutually exclusive and exhaustive:
+      // rounds are spent, so exactly one of the two holds. (The old version
+      // discarded the isBossLost result with `void` — asserting nothing.)
       expect(s.roundsRemaining).toBe(0);
-      void isBossLost(boss, s);
+      expect(isBossLost(boss, s)).toBe(!isBossWon(boss, s));
+      // And a zero plate must never actually win a boss fight.
+      expect(isBossWon(boss, s)).toBe(false);
     }
   });
 });

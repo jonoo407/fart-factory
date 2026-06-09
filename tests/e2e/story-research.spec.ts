@@ -1,28 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 async function loadStoryMode(page: import('@playwright/test').Page, opts?: { notes?: number }) {
-  await page.goto('/');
-  await page.evaluate((p) => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_last_match');
-    localStorage.removeItem('fart_pantry');
-    localStorage.removeItem('fart_gold');
-    localStorage.removeItem('fart_recipes_seen');
-    if (p.notes !== undefined) {
-      localStorage.setItem('fart_research', String(p.notes));
-    } else {
-      localStorage.removeItem('fart_research');
-    }
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  }, { notes: opts?.notes ?? null });
-  await page.reload();
+  await loadStory(page, { notes: opts?.notes });
 }
 
 test('Research notes counter starts at 0; research is reachable from the Lab Book', async ({ page }) => {

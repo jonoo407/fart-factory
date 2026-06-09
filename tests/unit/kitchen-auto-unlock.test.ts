@@ -38,10 +38,15 @@ describe('Kitchen Mode auto-unlock (P9)', () => {
     expect(shouldAutoUnlockKitchen()).toBe(false);
   });
 
-  it('toast flag is once-only (separate from auto-unlock)', () => {
+  it('auto-unlock fires once: after the app flips Kitchen Mode on, it never re-fires', () => {
     expect(loadKitchenMode()).toBe(false);
-    // Simulate the unlock event flow.
     for (let i = 0; i < KITCHEN_AUTO_UNLOCK_THRESHOLD; i++) recordGoodLaunch(60);
     expect(shouldAutoUnlockKitchen()).toBe(true);
+    // The app consumes the unlock by enabling Kitchen Mode (onStoryLaunch flow).
+    setKitchenMode(true);
+    expect(shouldAutoUnlockKitchen()).toBe(false);
+    // More good launches don't re-arm it.
+    recordGoodLaunch(90);
+    expect(shouldAutoUnlockKitchen()).toBe(false);
   });
 });

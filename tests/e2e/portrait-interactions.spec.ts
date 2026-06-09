@@ -1,15 +1,13 @@
 import { test, expect, type Page } from '@playwright/test';
+import { loadStory as loadStoryBase } from './_helpers';
 
 async function loadStory(page: Page): Promise<void> {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.clear();
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-  });
-  await page.reload();
+  await loadStoryBase(page);
   await page.waitForSelector('#audiencePortraitEmoji');
 }
+
+// NB: the mouse down/up timings in this spec are REAL interaction timings
+// (the 600ms long-press threshold) — they are intentionally kept as sleeps.
 
 test('audience portrait is keyboard-accessible (role=button, tabindex)', async ({ page }) => {
   await loadStory(page);

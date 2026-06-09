@@ -10,6 +10,7 @@ import {
   unlockFood,
   loadPantry,
   bumpBestMatch,
+  loadBestMatch,
   setBestMatchOverall,
 } from '../../src/state/persistence';
 import { FOODS } from '../../src/state/food';
@@ -105,11 +106,10 @@ describe('attemptClaimLegendary', () => {
 
 describe('Best-match persistence (foundation for win-condition quest steps)', () => {
   it('bumpBestMatch only ratchets up, never down', () => {
-    bumpBestMatch('granny-edna', 60);
-    bumpBestMatch('granny-edna', 50);
-    bumpBestMatch('granny-edna', 75);
-    // Stored max = 75.
-    expect(loadPantry).toBeDefined(); // sanity
+    expect(bumpBestMatch('granny-edna', 60)).toBe(60);
+    expect(bumpBestMatch('granny-edna', 50)).toBe(60); // lower → ignored
+    expect(bumpBestMatch('granny-edna', 75)).toBe(75);
+    expect(loadBestMatch('granny-edna')).toBe(75);
   });
 
   it('setBestMatchOverall round-trips', () => {

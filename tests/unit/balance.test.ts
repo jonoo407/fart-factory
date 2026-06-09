@@ -2,14 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { FOODS, type FoodProperties } from '../../src/state/food';
 import { AUDIENCES } from '../../src/state/audience';
 import { evaluateMatch } from '../../src/scoring/match';
+import { getArea } from '../../src/state/containment';
 
 /**
  * PLAN v9 P7 — balance guard. Under the new (harder) scorer every audience must
  * still be winnable: there must exist a plate of ≤4 foods that passes (≥50%)
  * with a perfect charge. A greedy search is a conservative lower bound (it
- * ignores recipe synergies, treatments and area modifiers, all of which only
- * help), so if greedy passes, the audience is comfortably beatable.
+ * ignores recipe synergies and treatments, which only help) — BUT it must score
+ * through the DEFAULT AREA's modifiers, because the live launch always applies
+ * them and the Backyard HALVES wet and stink (the old guard skipped modifiers
+ * on the false premise that they "only help", so it could certify an audience
+ * as winnable that the real pipeline can't pass).
  */
+const DEFAULT_AREA = getArea('outside')!; // the area every launch uses since v9
+
 function plateProps(ids: string[]): FoodProperties {
   const sum: FoodProperties = { wet: 0, dry: 0, stink: 0, loud: 0, musical: 0, length: 0, temp: 0 };
   for (const id of ids) {
@@ -17,6 +23,8 @@ function plateProps(ids: string[]): FoodProperties {
     if (!f) continue;
     for (const k of Object.keys(sum) as (keyof FoodProperties)[]) sum[k] += f.properties[k];
   }
+  const m = DEFAULT_AREA.modifiers;
+  for (const k of Object.keys(sum) as (keyof FoodProperties)[]) sum[k] *= m[k];
   return sum;
 }
 

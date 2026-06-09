@@ -63,14 +63,9 @@ describe('audienceForEncounter (encounter-anchored selection)', () => {
     }
   });
 
-  it('GamePlus flag doubles the rotation rate', () => {
-    localStorage.setItem('fart_gameplus', 'true');
-    // Encounters 0 and 1 in GamePlus should skip ahead vs. baseline.
-    const e0 = audienceForEncounter(0).id;
-    const e1 = audienceForEncounter(1).id;
-    // The rotation distance between consecutive encounters is now 2.
-    expect(e0).not.toBe(e1); // (also true without GamePlus, but the underlying math is different)
-  });
+  // (GamePlus step-2 rotation is asserted properly — exact catalog position —
+  // in gameplus.test.ts; the weak e0 !== e1 version that lived here couldn't
+  // fail and was removed.)
 });
 
 describe('getDailyAudience legacy wrapper', () => {

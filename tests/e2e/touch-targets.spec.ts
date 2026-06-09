@@ -1,14 +1,12 @@
 import { test, expect } from '@playwright/test';
-
-async function loadApp(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => localStorage.setItem('fart_onboarding_seen', 'true'));
-  await page.reload();
-}
+import { loadStory } from './_helpers';
 
 test('every visible interactive element is at least 44×44 CSS px on mobile', async ({ page }) => {
-  test.skip(test.info().project.name !== 'mobile', 'mobile-viewport-only check (375×667)');
-  await loadApp(page);
+  // Runs on the mobile project only (project pinning in playwright.config.ts),
+  // so no runtime viewport skip is needed.
+  // grannyIntroSeen: false matches the historical surface — the first-encounter
+  // grant modal's buttons are part of the audited set.
+  await loadStory(page, { grannyIntroSeen: false });
 
   const interactiveSel = 'button, [role="button"], input[type="range"], a[href]';
   const results = await page.locator(interactiveSel).evaluateAll((els) =>

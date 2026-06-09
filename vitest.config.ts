@@ -22,14 +22,11 @@ export default defineConfig({
         // UI modules — DOM-bound, covered by Playwright e2e instead.
         'src/ui/boss-arena.ts',
         'src/ui/kitchen.ts',
-        'src/ui/map-screen.ts',
         'src/ui/notebook.ts',
         'src/ui/onboarding.ts',
         'src/ui/plate.ts',
         'src/ui/research.ts',
         'src/ui/shop.ts',
-        'src/ui/toast.ts',
-        'src/sanity.ts',
       ],
       thresholds: {
         lines: 80,

@@ -17,8 +17,9 @@ import type { FoodProperties } from '../../src/state/food';
  *   epic:      sum 4  (two axes at +2)
  *   legendary: sum 6  (three axes at +2)
  *
- * Each axis bonus is in [1, 2] (no negatives). Bonuses are applied
- * clamped to 5 by `computeFartFromPlate` (tested separately).
+ * Each axis bonus is in [1, 2] (no negatives). Since v9, bonuses are applied
+ * UNCLAMPED by `computeFartFromPlate` (the old 5-cap was removed; plate axes
+ * are raw sums — tested separately).
  *
  * Legendary recipes additionally carry a `legendaryBuff` declaration
  * that the codex's full-decode unlocks as a permanent passive.
@@ -29,8 +30,10 @@ function bonusSum(b: Partial<FoodProperties>): number {
 }
 
 describe('Named Farts catalog (V8 T7.a)', () => {
-  it('catalog still has 30 recipes', () => {
-    expect(RECIPES.length).toBe(30);
+  it('catalog has at least the original 30 recipes', () => {
+    // >= rather than === so adding content doesn't break the suite; the
+    // rarity-sum invariants below are the real contract.
+    expect(RECIPES.length).toBeGreaterThanOrEqual(30);
   });
 
   it('every recipe has a `bonus` field', () => {

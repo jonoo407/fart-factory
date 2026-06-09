@@ -11,6 +11,7 @@ import { renderRecipeRibbon, addFoodToPlate, _resetPlateAndBelly } from '../../s
 // beans + cheese = "Swamp Beast" (recipes.ts). Both are starter foods.
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
   localStorage.setItem('fart_pantry', JSON.stringify(['beans', 'cheese', 'onion', 'egg', 'garlic', 'cabbage']));
   document.body.innerHTML = '<div id="recipeRibbon" hidden></div>';
   _resetPlateAndBelly();

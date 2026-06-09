@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { dismissReaction } from './_helpers';
+import { loadStory, dismissReaction } from './_helpers';
 
 /**
  * Phase M #68 end-to-end gameplay smoke test (v3 flow). Per PLAN.md.
@@ -23,28 +23,12 @@ import { dismissReaction } from './_helpers';
  */
 
 test('Full v3 gameplay flow — fresh save → launch → notebook → shop → Hard Mode → reload', async ({ page }) => {
-  // Setup: fresh visit + force Story Mode (Phase M item 68 — also tests
-  // that flipping `loadMode` default to 'story' lands correctly).
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_pantry');
-    localStorage.removeItem('fart_gold');
-    localStorage.removeItem('fart_research');
-    localStorage.removeItem('fart_recipes_seen');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_last_match');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
+  await loadStory(page);
 
-  // 1. Audience + area + pantry visible.
+  // 1. Audience + area + pantry visible (portrait emoji rendered — folded in
+  //    from the retired story-flow.spec).
   await expect(page.locator('#audienceName')).not.toHaveText('—');
+  await expect(page.locator('#audiencePortraitEmoji')).not.toBeEmpty();
   // PLAN v9 UI-overhaul Phase 2: world map removed; the dock Venue tab is the
   // progression surface.
   await expect(page.locator('#venueBtn')).toBeVisible();
@@ -57,10 +41,10 @@ test('Full v3 gameplay flow — fresh save → launch → notebook → shop → 
   await expect(page.locator('#plateSlot1.plate-slot-filled')).toBeVisible();
   await expect(page.locator('#plateSlot2.plate-slot-filled')).toBeVisible();
 
-  // 3. Launch.
+  // 3. Launch. (The \d+% strictness is folded in from the retired story-flow.spec.)
   await page.click('#storyLaunchBtn');
   await expect(page.locator('#storyResult')).toBeVisible();
-  await expect(page.locator('#storyResultTitle')).toContainText(/%/);
+  await expect(page.locator('#storyResultTitle')).toContainText(/\d+%/);
   // Audience reaction strip renders.
   await expect(page.locator('#audienceReaction')).toBeVisible();
   // The reaction takeover covers the play screen — close it before navigating.
@@ -91,8 +75,6 @@ test('Full v3 gameplay flow — fresh save → launch → notebook → shop → 
   expect(flavor.length).toBeGreaterThan(10);
 
   // 8. Reload — state persists.
-  await page.reload();
-  await page.evaluate(() => localStorage.setItem('fart_onboarding_seen', 'true'));
   await page.reload();
   // Notebook counter > 0 (Swamp Beast was discovered).
   const counterText = await page.locator('#notebookCounter').textContent();

@@ -1,26 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 async function loadStoryMode(page: import('@playwright/test').Page, opts?: { gold?: number }) {
-  await page.goto('/');
-  await page.evaluate((p) => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_last_match');
-    localStorage.removeItem('fart_pantry');
-    if (p.gold !== undefined) {
-      localStorage.setItem('fart_gold', String(p.gold));
-    } else {
-      localStorage.removeItem('fart_gold');
-    }
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  }, { gold: opts?.gold ?? null });
-  await page.reload();
+  await loadStory(page, { gold: opts?.gold });
 }
 
 test('Shop modal opens on Shop button click and shows offerings', async ({ page }) => {

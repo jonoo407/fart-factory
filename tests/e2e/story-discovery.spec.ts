@@ -1,57 +1,66 @@
 import { test, expect } from '@playwright/test';
-import { dismissReaction } from './_helpers';
+import { loadStory, dismissReaction } from './_helpers';
 
-async function loadStoryMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_last_match');
-    localStorage.removeItem('fart_pantry');
-    localStorage.removeItem('fart_recipes_seen');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
-}
+/**
+ * Recipe discovery — merged spec (former story-discovery + discovery-splash,
+ * which drove the identical beans+cheese launch/relaunch flow). Each launch
+ * asserts BOTH discovery surfaces: the #discoverySplash center-screen overlay
+ * AND the .story-result-discovery-new result line.
+ */
 
-test('Launching a known-recipe combo shows the "NEW RECIPE" discovery toast', async ({ page }) => {
-  await loadStoryMode(page);
-  // Swamp Beast = beans + cheese.
+test('First launch of a new combo shows the NEW RECIPE result line AND the discovery splash (P6)', async ({ page }) => {
+  await loadStory(page);
+  // Swamp Beast = beans + cheese — a starter recipe.
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
+  // Result line in the breakdown panel…
   await expect(page.locator('.story-result-discovery-new')).toBeVisible();
   await expect(page.locator('.story-result-discovery-new')).toContainText('Swamp Beast');
+  // …and the center-screen splash banner.
+  await expect(page.locator('#discoverySplash')).toBeVisible();
+  await expect(page.locator('#discoverySplash')).toContainText(/Swamp Beast/);
 });
 
-test('Re-launching a known recipe shows muted "Recipe:" line, not NEW', async ({ page }) => {
-  await loadStoryMode(page);
-  // First launch — discover.
+test('Discovery splash auto-dismisses after timeout', async ({ page }) => {
+  await loadStory(page);
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
-  await page.waitForTimeout(50);
-  await dismissReaction(page); // close the takeover to re-plate
-  // Second launch — should NOT show NEW.
+  await expect(page.locator('#discoverySplash')).toBeVisible();
+  // 3.2s timeout (allow some buffer).
+  await expect(page.locator('#discoverySplash')).toBeHidden({ timeout: 4000 });
+});
+
+test('Re-launching a known recipe shows the muted "Recipe:" line — no NEW line, no splash', async ({ page }) => {
+  await loadStory(page);
+  // First launch — discover Swamp Beast.
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
-  // The NEW class should not appear; the normal recipe line should.
+  await expect(page.locator('#discoverySplash')).toBeVisible();
+  // Wait for the splash to dismiss (3.2s — also comfortably clears the 1.2s
+  // launch cooldown gate before the second BLAST).
+  await expect(page.locator('#discoverySplash')).toBeHidden({ timeout: 4000 });
+  // Close the reaction takeover so the pantry is reachable again.
+  await dismissReaction(page);
+  // Second launch — should NOT trigger NEW line nor a new splash.
+  await page.locator('[data-food="beans"]').click();
+  await page.locator('[data-food="cheese"]').click();
+  await page.click('#storyLaunchBtn');
+  await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
   await expect(page.locator('.story-result-discovery-new')).toHaveCount(0);
   await expect(page.locator('.story-result-discovery')).toContainText('Swamp Beast');
+  await expect(page.locator('#discoverySplash')).toBeHidden();
 });
 
 test('Discovered recipes persist in localStorage', async ({ page }) => {
-  await loadStoryMode(page);
+  await loadStory(page);
   await page.locator('[data-food="beans"]').click();
   await page.locator('[data-food="cheese"]').click();
   await page.click('#storyLaunchBtn');
+  // Wait for the launch to fully process before reading the persisted state.
+  await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
   const seen = await page.evaluate(() => localStorage.getItem('fart_recipes_seen'));
   expect(seen).toBeTruthy();
   expect(seen).toContain('swamp-beast');

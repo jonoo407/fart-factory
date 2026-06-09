@@ -48,9 +48,13 @@ describe('fart selector — coverage (no dead sounds)', () => {
     expect(ORPHAN_HOMES).toEqual({});
   });
 
-  it('every clip is reachable from EARLY GAME — the 4 hometown areas, with area modifiers applied', () => {
-    // The runtime selector sees AREA-MODIFIED props (each area multiplies the
-    // axes). A new player only has the hometown areas, so they must cover all 96.
+  it('every clip is reachable even under area-modified props (robustness superset)', () => {
+    // NOTE: the live selector input is the RAW plate sum — plate.ts feeds
+    // `audioProps = recipe.props` (deliberately NOT propsAfterArea) into
+    // playFart. This test is a robustness superset: even if a future change
+    // routed area-modified props into the selector, hometown-area players
+    // could still reach all 96 cells. The raw-props contract itself is pinned
+    // in playfart-dispatch.test.ts.
     const applyArea = (p: FoodProperties, m: AreaModifiers): FoodProperties => ({
       wet: p.wet * m.wet, dry: p.dry * m.dry, stink: p.stink * m.stink, loud: p.loud * m.loud,
       musical: p.musical * m.musical, length: p.length * m.length, temp: p.temp * m.temp,

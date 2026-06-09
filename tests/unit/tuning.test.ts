@@ -3,47 +3,72 @@ import * as T from '../../src/scoring/tuning';
 
 /**
  * PLAN v9 D1/§1 — every scoring/charge/gate/judge-card module imports these,
- * so the live-balance pass is one file. This contract test pins the values.
+ * so the live-balance pass is one file.
+ *
+ * This contract test pins the RELATIONSHIPS between knobs, not their exact
+ * values. (The old version restated every constant verbatim, so any intended
+ * balance pass had to edit the test in lockstep — meaning it could never catch
+ * an unintended change, only re-state an intended one. The invariants below
+ * hold across balance passes and DO catch real mistakes: inverted zones,
+ * blends that don't sum to 1, non-monotone payout tiers…)
  */
-describe('scoring tuning constants', () => {
-  it('axis normalization: actual /AXIS_CAP=8, target /5, belly /10 (parity only)', () => {
-    expect(T.AXIS_CAP).toBe(8);
-    expect(T.TARGET_DIV).toBe(5);
-    expect(T.BELLY_MAX).toBe(10);
+describe('scoring tuning invariants', () => {
+  it('axis normalization saturates: plate cap exceeds craving divisor (C×(AXIS_CAP/TARGET_DIV) reachable)', () => {
+    expect(T.AXIS_CAP).toBeGreaterThan(0);
+    expect(T.TARGET_DIV).toBeGreaterThan(0);
+    // The v9 model: a craving C is satisfied at C * AXIS_CAP/TARGET_DIV plate
+    // sum — that only works as a skill curve if the ratio is > 1.
+    expect(T.AXIS_CAP / T.TARGET_DIV).toBeGreaterThan(1);
+    expect(T.BELLY_MAX).toBeGreaterThan(0);
   });
 
-  it('closeness curve pow 0.85 * 1.5', () => {
-    expect(T.CURVE.pow).toBe(0.85);
-    expect(T.CURVE.mult).toBe(1.5);
+  it('closeness curve is a decreasing penalty (pow in (0,1], positive mult)', () => {
+    expect(T.CURVE.pow).toBeGreaterThan(0);
+    expect(T.CURVE.pow).toBeLessThanOrEqual(1);
+    expect(T.CURVE.mult).toBeGreaterThan(0);
   });
 
-  it('weakest-link blend 0.55 avg / 0.45 min sums to 1', () => {
-    expect(T.BLEND.avg).toBe(0.55);
-    expect(T.BLEND.min).toBe(0.45);
+  it('weakest-link blend sums to 1 and both terms count', () => {
     expect(T.BLEND.avg + T.BLEND.min).toBeCloseTo(1, 10);
+    expect(T.BLEND.avg).toBeGreaterThan(0);
+    expect(T.BLEND.min).toBeGreaterThan(0);
   });
 
-  it('hate penalty coefficient 0.65', () => {
-    expect(T.HATE_COEFF).toBe(0.65);
+  it('hate penalty coefficient is a real penalty in (0, 1]', () => {
+    expect(T.HATE_COEFF).toBeGreaterThan(0);
+    expect(T.HATE_COEFF).toBeLessThanOrEqual(1);
   });
 
-  it('charge multipliers 1.25 / 1.10 / 0.85 / 1.0', () => {
-    expect(T.CHARGE).toEqual({ perfect: 1.25, good: 1.1, weak: 0.85, ok: 1.0, tap: 1.0 });
+  it('charge multipliers reward skill: weak < tap = ok ≤ good < perfect, weak punishes, perfect rewards', () => {
+    expect(T.CHARGE.weak).toBeLessThan(1);
+    expect(T.CHARGE.tap).toBe(1.0); // a safe tap must never punish (kid-friendly floor)
+    expect(T.CHARGE.ok).toBe(T.CHARGE.tap);
+    expect(T.CHARGE.good).toBeGreaterThanOrEqual(T.CHARGE.ok);
+    expect(T.CHARGE.perfect).toBeGreaterThan(T.CHARGE.good);
   });
 
-  it('charge zones: sweet 74-92, good 62-98, weak <28, tap <200ms', () => {
-    expect(T.CHARGE_ZONES.sweetLo).toBe(74);
-    expect(T.CHARGE_ZONES.sweetHi).toBe(92);
-    expect(T.CHARGE_ZONES.goodLo).toBe(62);
-    expect(T.CHARGE_ZONES.goodHi).toBe(98);
-    expect(T.CHARGE_ZONES.weakBelow).toBe(28);
-    expect(T.CHARGE_ZONES.tapMs).toBe(200);
+  it('charge zones nest: weakBelow < goodLo < sweetLo < sweetHi < goodHi ≤ 100', () => {
+    const z = T.CHARGE_ZONES;
+    expect(z.weakBelow).toBeGreaterThan(0);
+    expect(z.weakBelow).toBeLessThan(z.goodLo);
+    expect(z.goodLo).toBeLessThan(z.sweetLo);
+    expect(z.sweetLo).toBeLessThan(z.sweetHi);
+    expect(z.sweetHi).toBeLessThan(z.goodHi);
+    expect(z.goodHi).toBeLessThanOrEqual(100);
+    expect(z.tapMs).toBeGreaterThan(0);
   });
 
-  it('grade / star / pass thresholds exact (01 §3.6)', () => {
-    expect(T.PASS_PCT).toBe(50);
-    expect(T.GRADE_CUTS).toEqual({ S: 90, A: 80, B: 68, C: 50 });
-    expect(T.STAR_CUTS).toEqual({ three: 80, two: 68, one: 50 });
+  it('grade cuts are strictly ordered and the pass line is the C grade', () => {
+    expect(T.GRADE_CUTS.S).toBeGreaterThan(T.GRADE_CUTS.A);
+    expect(T.GRADE_CUTS.A).toBeGreaterThan(T.GRADE_CUTS.B);
+    expect(T.GRADE_CUTS.B).toBeGreaterThan(T.GRADE_CUTS.C);
+    expect(T.PASS_PCT).toBe(T.GRADE_CUTS.C); // passing == earning at least a C
+  });
+
+  it('star cuts align with the A/B/C grade cuts (stars and grades agree)', () => {
+    expect(T.STAR_CUTS.three).toBe(T.GRADE_CUTS.A);
+    expect(T.STAR_CUTS.two).toBe(T.GRADE_CUTS.B);
+    expect(T.STAR_CUTS.one).toBe(T.GRADE_CUTS.C);
   });
 
   it('gold by difficulty tier (D4) — monotone, covers all four tiers', () => {

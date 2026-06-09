@@ -14,6 +14,7 @@ import { getFood } from '../../src/state/food';
 // Backyard ('outside'), which halves wet/stink and boosts loud x1.5.
 beforeEach(() => {
   localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
   localStorage.setItem('fart_pantry', JSON.stringify(['beans', 'cheese', 'onion', 'egg', 'garlic', 'cabbage']));
 });
 

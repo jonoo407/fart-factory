@@ -73,6 +73,11 @@ describe('checkRestrictions', () => {
     const v = checkRestrictions(p(), ['beans', 'cheese'], ['need-cursed-or-rare']);
     expect(v).toContain('need-cursed-or-rare');
   });
+  it('max-stink:2 violated with stink=3, passes at exactly 2', () => {
+    // The one restriction branch that had no test anywhere.
+    expect(checkRestrictions(p(0, 0, 3), [], ['max-stink:2'])).toContain('max-stink:2');
+    expect(checkRestrictions(p(0, 0, 2), [], ['max-stink:2'])).toEqual([]);
+  });
 });
 
 describe('evaluateMatch', () => {
@@ -105,5 +110,11 @@ describe('evaluateMatch', () => {
     const weak = evaluateMatch(partial, ['beans'], target, [], 0.85).pct;
     expect(perfect).toBeGreaterThanOrEqual(tap);
     expect(weak).toBeLessThanOrEqual(tap);
+  });
+
+  it('an audience that craves nothing judges every plate at 0 (no judged axes)', () => {
+    const apathy = p(); // all-zero cravings
+    expect(evaluateMatch(p(), [], apathy, []).pct).toBe(0);
+    expect(evaluateMatch(saturating, ['beans'], apathy, []).pct).toBe(0);
   });
 });

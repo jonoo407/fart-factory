@@ -159,13 +159,12 @@ export function markHiddenComboFound(id: string): { added: boolean; list: string
   return { added: true, list: next };
 }
 
-// ----- Last-selected area + last-match (for trend) -----
+// ----- Current area + last-match (for trend) -----
 
+// The area is fixed at 'outside' since the v9 UI removed the location picker;
+// loadLastArea still honors a stored value from older saves.
 export function loadLastArea(): string {
   return safeLoad<string>(KEY_LAST_AREA, 'outside', (v): v is string => typeof v === 'string');
-}
-export function setLastArea(id: string): void {
-  safeSave(KEY_LAST_AREA, id);
 }
 
 export function loadLastMatch(): number | null {

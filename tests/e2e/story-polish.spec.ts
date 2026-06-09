@@ -1,20 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { loadStory } from './_helpers';
 
 async function loadStoryMode(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.removeItem('fart_mute');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_hard_mode');
-    localStorage.removeItem('fart_pantry');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
+  await loadStory(page);
 }
 
 test('Plate slot gets the plate-pop animation class after adding a food (item 67)', async ({ page }) => {
@@ -46,16 +34,9 @@ test('Audience portrait switches to reaction-face class after a launch (item 65)
 
 test('Legendary food cards have rarity-legendary class for the glow (item 64)', async ({ page }) => {
   // Force unlock a legendary food.
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.setItem('fart_pantry', JSON.stringify([
-      'beans', 'cheese', 'onion', 'egg', 'garlic', 'cabbage', 'forbidden-burrito',
-    ]));
+  await loadStory(page, {
+    pantry: ['beans', 'cheese', 'onion', 'egg', 'garlic', 'cabbage', 'forbidden-burrito'],
   });
-  await page.reload();
   const legendaryCard = page.locator('.food-card[data-food="forbidden-burrito"]');
   await expect(legendaryCard).toHaveClass(/rarity-legendary/);
 });

@@ -1,25 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { dismissReaction } from './_helpers';
-
-async function loadFresh(page: import('@playwright/test').Page) {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    localStorage.removeItem('fart_pantry');
-    localStorage.removeItem('fart_launch_count');
-    localStorage.removeItem('fart_best_overall');
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith('fart_belly_')) localStorage.removeItem(k);
-    }
-  });
-  await page.reload();
-}
+import { loadStory, dismissReaction, waitLaunchCooldown } from './_helpers';
 
 test('First-launch hint banner is visible for a brand-new player (P7)', async ({ page }) => {
-  await loadFresh(page);
+  await loadStory(page);
   await expect(page.locator('#firstLaunchHint')).toBeVisible();
   await expect(page.locator('#firstLaunchHint')).toContainText(/Try these/i);
   // At least 2 recommendation chips.
@@ -28,24 +11,21 @@ test('First-launch hint banner is visible for a brand-new player (P7)', async ({
 });
 
 test('Hint disappears after 3 launches', async ({ page }) => {
-  await loadFresh(page);
+  await loadStory(page);
   for (let i = 0; i < 3; i++) {
     await page.locator('[data-food="beans"]').click();
     await page.click('#storyLaunchBtn');
+    await page.locator('#reactionOverlay').waitFor({ state: 'visible' });
     await dismissReaction(page); // the reaction takeover covers the pantry — close it to re-plate
+    // A BLAST inside the 1.2s launch-cooldown window is silently dropped
+    // (plate.ts LAUNCH_COOLDOWN_MS) — space the launches so all 3 count.
+    await waitLaunchCooldown(page);
   }
   await expect(page.locator('#firstLaunchHint')).toBeHidden();
 });
 
 test('Hint disappears once player scores ≥60%', async ({ page }) => {
-  await page.goto('/');
-  await page.evaluate(() => {
-    localStorage.setItem('fart_onboarding_seen', 'true');
-    localStorage.setItem('fart_intro_granny-edna', 'true');
-    localStorage.setItem('fart_mode', '"story"');
-    // Force best-match high-water mark to 75 (above threshold).
-    localStorage.setItem('fart_best_overall', '75');
-  });
-  await page.reload();
+  // Force best-match high-water mark to 75 (above threshold).
+  await loadStory(page, { extraKeys: { fart_best_overall: '75' } });
   await expect(page.locator('#firstLaunchHint')).toBeHidden();
 });

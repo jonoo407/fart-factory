@@ -97,6 +97,18 @@ describe('attemptResearchUnlock (Phase I item 56 — buy with research notes)', 
     expect(loadPantry()).toContain('kimchi');
     expect(loadResearchNotes()).toBe(100 - RESEARCH_COSTS.uncommon!);
   });
+
+  it('exact-cost boundary: notes == cost succeeds (to 0 balance); cost-1 fails', () => {
+    const cost = RESEARCH_COSTS.uncommon!;
+    setResearchNotes(cost - 1);
+    const broke = attemptResearchUnlock('kimchi');
+    expect(broke.ok).toBe(false);
+    if (!broke.ok) expect(broke.reason).toBe('insufficient-notes');
+    setResearchNotes(cost);
+    const exact = attemptResearchUnlock('kimchi');
+    expect(exact.ok).toBe(true);
+    expect(loadResearchNotes()).toBe(0);
+  });
 });
 
 describe('researchEligibleFoods (panel listing)', () => {

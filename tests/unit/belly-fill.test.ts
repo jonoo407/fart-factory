@@ -28,6 +28,7 @@ describe('foodBellySize — bigger for cooler foods', () => {
 describe('belly meter shows FULLNESS (fills as you eat)', () => {
   beforeEach(() => {
     localStorage.clear();
+  localStorage.setItem('fart_run_seed', '12345'); // pin: no unicorn roll, reproducible encounter seeds
     document.body.innerHTML =
       '<div class="belly-track" role="meter" aria-valuenow="0"><div class="belly-fill" id="bellyFill"></div></div>' +
       '<span id="bellyValue"></span><span id="bellyCap"></span>';
