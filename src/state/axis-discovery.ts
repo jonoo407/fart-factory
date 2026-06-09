@@ -76,11 +76,3 @@ export function discoverAxesFromFart(
   if (added.length > 0) writeRaw(list);
   return { added, list };
 }
-
-export function resetAxisDiscovery(): void {
-  try {
-    localStorage.removeItem(KEY);
-  } catch {
-    // ignore
-  }
-}

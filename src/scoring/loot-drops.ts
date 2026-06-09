@@ -41,3 +41,16 @@ export function rollLootDrop(chance: number, seed: number): Food | null {
   const idx = rngBetween(seed + 1, 0, pool.length - 1);
   return pool[idx] ?? null;
 }
+
+/**
+ * The Mystery Unicorn's guaranteed-legendary gift: a random not-yet-owned
+ * legendary food (the ONE deliberate exception to the legendary-exclusion rule
+ * above). Returns null if the player already owns every legendary.
+ */
+export function rollLegendaryDrop(seed: number): Food | null {
+  const unlocked = new Set(loadPantry());
+  const eligible = FOODS.filter((f) => f.rarity === 'legendary' && !unlocked.has(f.id));
+  if (eligible.length === 0) return null;
+  const idx = rngBetween(seed, 0, eligible.length - 1);
+  return eligible[idx] ?? null;
+}

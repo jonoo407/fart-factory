@@ -27,8 +27,8 @@ import { resolveEquippedLaunch } from '../scoring/launch-resolver';
 import { evaluateMatch, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForEncounter, launchBaseGold, legendaryGold } from '../scoring/reward';
-import { PASS_PCT } from '../scoring/tuning';
-import { rollLootDrop, dropChanceForLaunch } from '../scoring/loot-drops';
+import { PASS_PCT, CHARGE } from '../scoring/tuning';
+import { rollLootDrop, dropChanceForLaunch, rollLegendaryDrop } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak } from '../scoring/streak';
 import { recordFoodUse, applyMasteryBonuses, loadFoodMastery } from '../scoring/food-mastery';
 import { unlockFood, loadEquippedTreatment } from '../state/persistence';
@@ -66,6 +66,8 @@ import {
   showAxisDiscoverySplash,
   showDiscoverySplash,
   flashLegendaryFanfare,
+  scheduleHide,
+  showUnicornSplash,
 } from './splashes';
 import { renderAudienceReaction, renderStoryResult } from './result-panel';
 import {
@@ -392,10 +394,7 @@ function showWowSplash(aud: Audience, pct: number): void {
   splash.classList.remove('discovery-splash-show');
   void splash.offsetWidth;
   splash.classList.add('discovery-splash-show');
-  setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, 3500);
+  scheduleHide(splash, 'discovery-splash-show', 3500);
 }
 
 /**
@@ -829,6 +828,15 @@ async function onStoryLaunch(quality = 1): Promise<void> {
         showLootDropSplash(drop);
       }
     }
+    // T4.2 — the Mystery Unicorn always gets its comedy beat, and pleasing it
+    // (a pass) gifts a guaranteed legendary — its spec'd payoff, previously unbuilt.
+    if (aud.id === UNICORN_AUDIENCE.id) {
+      const gift = passedThisLaunch
+        ? rollLegendaryDrop(encounterSeed(currentEncounterIdx()) ^ 0x1c044)
+        : null;
+      if (gift) unlockFood(gift.id);
+      showUnicornSplash(gift);
+    }
     // T4.1: apply hidden-combo bonus rewards + splash. Persist discovery.
     if (hiddenCombo) {
       if (hiddenCombo.bonusGold > 0) addGold(legendaryGold(hiddenCombo.bonusGold));
@@ -953,10 +961,7 @@ function showStuffedSplash(aud: Audience): void {
   </div>`;
   splash.removeAttribute('hidden');
   splash.classList.add('discovery-splash-show');
-  window.setTimeout(() => {
-    splash.setAttribute('hidden', '');
-    splash.classList.remove('discovery-splash-show');
-  }, STUFFED_LINGER_MS);
+  scheduleHide(splash, 'discovery-splash-show', STUFFED_LINGER_MS);
 }
 
 const VERDICT_BY_GRADE: Record<string, string> = {
@@ -985,14 +990,27 @@ function adjForValue(v: number): string {
 }
 
 /** PLAN v9 P2 — assemble + show the full-screen reaction takeover (04 §3). */
+/**
+ * The charge line for the reaction breakdown, labeled by ZONE. Previously any
+ * quality > 1 read "Perfect charge", so a good (×1.10) was indistinguishable
+ * from a true sweet-zone perfect (×1.25). Null for a neutral tap/ok (×1.0).
+ */
+export function chargeBreakdownLine(quality: number): { icon: string; label: string; val: string } | null {
+  const val = `×${quality.toFixed(2)}`;
+  if (quality >= CHARGE.perfect - 0.001) return { icon: '💥', label: 'Perfect charge', val };
+  if (quality > 1.001) return { icon: '✨', label: 'Good charge', val };
+  if (quality < 0.999) return { icon: '💨', label: 'Weak charge', val };
+  return null;
+}
+
 function presentReactionOverlay(a: ReactionArgs): void {
   const grade = gradeForPct(a.finalPct);
   const tier = audienceReaction(a.finalPct, loadLastMatch()).tier;
   const breakdownLines: { icon: string; label: string; val: string }[] = [
     { icon: '🎯', label: 'Base match', val: `${a.preChargePct}%` },
   ];
-  if (a.quality > 1.001) breakdownLines.push({ icon: '💥', label: 'Perfect charge', val: `×${a.quality.toFixed(2)}` });
-  else if (a.quality < 0.999) breakdownLines.push({ icon: '💨', label: 'Weak charge', val: `×${a.quality.toFixed(2)}` });
+  const chargeLine = chargeBreakdownLine(a.quality);
+  if (chargeLine) breakdownLines.push(chargeLine);
   for (const v of a.violations) breakdownLines.push({ icon: '🚫', label: `Broke: ${v}`, val: '−25%' });
 
   showReactionOverlay({
@@ -1172,10 +1190,7 @@ export function wireBellyMeterTap(): void {
         </div>`;
         splash.removeAttribute('hidden');
         splash.classList.add('discovery-splash-show');
-        setTimeout(() => {
-          splash.setAttribute('hidden', '');
-          splash.classList.remove('discovery-splash-show');
-        }, 2200);
+        scheduleHide(splash, 'discovery-splash-show', 2200);
       }
     }
   });

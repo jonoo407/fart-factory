@@ -3,7 +3,6 @@ import {
   loadDiscoveredAxes,
   isAxisDiscovered,
   discoverAxesFromFart,
-  resetAxisDiscovery,
   DEFAULT_DISCOVERED,
   type AxisName,
 } from '../../src/state/axis-discovery';
@@ -69,9 +68,9 @@ describe('axis discovery (V8 T1.b — Scheme 1)', () => {
     expect(r2.added).toEqual([]);
   });
 
-  it('resetAxisDiscovery restores defaults', () => {
+  it('clearing the store restores the default discovered axes', () => {
     discoverAxesFromFart(props(0, 5, 5, 0, 5, 0, 5));
-    resetAxisDiscovery();
+    localStorage.removeItem('fart_axes_discovered');
     expect(loadDiscoveredAxes().sort()).toEqual(['loud', 'stink', 'wet']);
   });
 
