@@ -130,8 +130,10 @@ function mulberry32(seed: number): () => number {
 }
 
 /**
- * Today's "Hot Spot" — one of the player's unlocked locations gets +20%
- * gold reward (or 3× in GamePlus). Now anchored to encounter idx, not date.
+ * Today's "Hot Spot" — one of the player's unlocked locations. In GamePlus,
+ * launching here pays 3× gold (hotSpotGoldMultiplier). Outside GamePlus there is
+ * no bonus today (the once-planned +20% non-GamePlus boost was never built).
+ * Anchored to encounter idx, not date.
  */
 export function dailyHotLocation(_d?: Date, idx?: number): Area | null {
   const pool = unlockedLocations();
