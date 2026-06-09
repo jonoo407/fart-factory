@@ -4,7 +4,7 @@
  * defined in index.html (#pantryGrid, #plate, #bellyFill, #plateSlotN).
  */
 
-import { FOODS, type Food, getFood, type FoodProperties } from '../state/food';
+import { FOODS, type Food, getFood, foodBellySize, type FoodProperties } from '../state/food';
 import { buildPantryGridHtml } from './pantry-grid';
 import {
   loadPantry,
@@ -156,18 +156,18 @@ export function addFoodToPlate(foodId: string): { ok: boolean; reason?: string; 
   if (!food) return { ok: false, reason: 'unknown-food' };
   const emptyIdx = plate.findIndex((s) => s === null);
   if (emptyIdx === -1) return { ok: false, reason: 'plate-full' };
-  if (food.bellyCost > remainingBelly()) return { ok: false, reason: 'insufficient-belly' };
+  if (foodBellySize(food) > remainingBelly()) return { ok: false, reason: 'insufficient-belly' };
   plate[emptyIdx] = foodId;
-  bellySpentThisSession += food.bellyCost;
+  bellySpentThisSession += foodBellySize(food);
   return { ok: true, slotIdx: emptyIdx };
 }
 
-/** Removes the food at the given slot. Refunds belly cost for this session. */
+/** Removes the food at the given slot. Refunds belly room for this session. */
 export function removeFoodFromPlate(slotIdx: number): boolean {
   const id = plate[slotIdx];
   if (!id) return false;
   const food = getFood(id);
-  if (food) bellySpentThisSession = Math.max(0, bellySpentThisSession - food.bellyCost);
+  if (food) bellySpentThisSession = Math.max(0, bellySpentThisSession - foodBellySize(food));
   plate[slotIdx] = null;
   return true;
 }
@@ -334,16 +334,16 @@ export function renderBellyMeter(): void {
   const value = $('bellyValue');
   const cap = $('bellyCap');
   const r = remainingBelly();
-  if (fill) fill.style.width = `${(r / BELLY_CAPACITY) * 100}%`;
-  if (value) value.textContent = String(r);
+  const used = BELLY_CAPACITY - r; // how FULL the stomach is (fills as you eat)
+  if (fill) fill.style.width = `${(used / BELLY_CAPACITY) * 100}%`;
+  if (value) value.textContent = String(used);
   if (cap) cap.textContent = String(BELLY_CAPACITY);
-  // Keep the role="meter" accessible value in sync — it was static in the HTML
-  // so screen readers always announced the full capacity even as belly drained.
+  // Keep the role="meter" accessible value in sync — it shows fullness now.
   const track = document.querySelector<HTMLElement>('.belly-track');
   if (track) {
-    track.setAttribute('aria-valuenow', String(r));
+    track.setAttribute('aria-valuenow', String(used));
     track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
-    // Danger zone: one (or no) attempt left before you're stuffed.
+    // Danger zone: nearly stuffed — one (or no) attempt's worth of room left.
     track.classList.toggle('belly-low', r < MIN_ATTEMPT_BELLY + 4);
   }
 }

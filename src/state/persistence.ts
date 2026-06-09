@@ -176,7 +176,10 @@ export function setLastMatch(pct: number | null): void {
 import { currentEncounterIdx } from './run-state';
 
 const KEY_BELLY_PREFIX = 'fart_belly_e_';
-const BELLY_MAX = 30;
+// Stomach capacity per crowd. Foods fill it by rarity-scaled size (food.ts
+// foodBellySize); a 4-slot plate of cool foods can exceed it, so you can't
+// always pile big foods. Tunable feel knob.
+const BELLY_MAX = 20;
 
 function bellyKey(idx: number = currentEncounterIdx()): string {
   return `${KEY_BELLY_PREFIX}${idx}`;

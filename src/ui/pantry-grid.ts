@@ -10,7 +10,7 @@
  * is unit-testable independently of DOM wiring (which lives in plate.ts).
  */
 
-import type { Food, FoodProperties } from '../state/food';
+import { type Food, type FoodProperties, foodBellySize } from '../state/food';
 import { masteryLevel, type MasteryLevel } from '../scoring/food-mastery';
 import { axisEmoji } from './axis-emoji';
 
@@ -71,10 +71,10 @@ export function buildFoodCard(food: Food, opts: BuildFoodCardOpts): string {
   const clickableClass = opts.clickable ? 'food-card-clickable' : '';
   const aria = opts.locked
     ? `aria-label="Locked: ${food.name} (${food.rarity})" disabled`
-    : `aria-label="Add ${food.name} (costs ${food.bellyCost} belly)"`;
+    : `aria-label="Add ${food.name} (fills ${foodBellySize(food)} belly)"`;
   const emoji = opts.locked ? '❓' : food.emoji;
   const name = opts.locked ? '???' : food.name;
-  const cost = opts.locked ? '?' : String(food.bellyCost);
+  const cost = opts.locked ? '?' : String(foodBellySize(food));
   const tag = opts.clickable ? 'button' : 'div';
   const type = tag === 'button' ? 'type="button"' : '';
   let chipHtml = '';

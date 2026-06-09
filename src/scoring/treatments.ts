@@ -9,7 +9,7 @@
  */
 
 import type { FoodProperties } from '../state/food';
-import { getFood } from '../state/food';
+import { getFood, foodBellySize } from '../state/food';
 
 export type TreatmentId = 'raw' | 'roast' | 'ferment' | 'chill' | 'blend';
 
@@ -135,7 +135,7 @@ export function computeFartFromPreppedPlate(slots: PreppedSlot[]): PreppedAggreg
       props[k] = clampAxis(props[k] + slotProps[k]);
     }
     const t = getTreatment(slot.treatment);
-    totalBelly += food.bellyCost + (t?.bellyCostDelta ?? 0);
+    totalBelly += foodBellySize(food) + (t?.bellyCostDelta ?? 0);
     appliedTreatments.push(slot.treatment);
   }
   return { props, totalBellyCost: Math.max(0, totalBelly), appliedTreatments };
