@@ -56,6 +56,7 @@ import { renderPlatePreviewHtml } from './plate-preview';
 import { discoverAxesFromFart, loadDiscoveredAxes } from '../state/axis-discovery';
 import { playPerfectCinematic } from './perfect-cinematic';
 import { showFeatureIntro } from './feature-intro';
+import { shouldShowOnboarding } from './onboarding';
 import {
   showKitchenUnlockToast,
   showHiddenComboSplash,
@@ -435,7 +436,7 @@ function wireMoveOnButton(): void {
  * the current crowd has been passed (best match this encounter ≥ 50%). Until
  * then the Move On button is disabled; the reaction footer offers only retry.
  */
-function renderMoveOnGate(): void {
+export function renderMoveOnGate(): void {
   const btn = $('moveOnBtn') as HTMLButtonElement | null;
   if (!btn) return;
   const aud = currentAudience();
@@ -567,11 +568,16 @@ function maybeGrantOnEncounter(aud: Audience): void {
   if (!food || loadPantry().includes(aud.grant)) return;
   unlockFood(aud.grant);
   renderPantryGrid();
+  // Don't stack a reveal modal on top of the first-launch onboarding — the food
+  // is still granted (and shown in the "Try these" hint); the reveal modal is
+  // for later grants once onboarding is done.
+  if (shouldShowOnboarding()) return;
   showFeatureIntro({
     id: `grant_${aud.id}`,
     emoji: food.emoji,
+    // feature-intro escapes its body, so pass plain text (no HTML markup).
     title: 'A new food appeared!',
-    body: `<b>${food.name}</b> joined your pantry — ${aud.name} will love what it brings.`,
+    body: `${food.name} joined your pantry — ${aud.name} will love what it brings.`,
     cta: 'Plate it up',
   });
 }
@@ -761,6 +767,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       showWowSplash(aud, match.pct);
     }
     paintMoveOnButton(encounterProg.wowed);
+    renderMoveOnGate(); // the launch may have just passed the crowd — unlock Move On
     // T1.2: critical bonus — PERFECT/GREAT add gold; DISASTER adds consolation notes.
     const goldBonus = criticalGoldBonus(tier);
     const notesBonus = criticalNotesBonus(tier);
