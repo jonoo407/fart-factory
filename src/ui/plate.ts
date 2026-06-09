@@ -126,6 +126,24 @@ export function remainingBelly(): number {
 }
 
 /**
+ * Belly needed to make a real attempt at a crowd. Below this you're too stuffed
+ * to keep eating — if you still haven't pleased them, the crowd gives up and
+ * leaves. Tunable pressure knob (capacity is BELLY_CAPACITY).
+ */
+export const MIN_ATTEMPT_BELLY = 8;
+
+export type CrowdOutcome = 'passed' | 'retry' | 'stuffed-fail';
+
+/**
+ * Post-launch branch: pleased them (passed), can still try (retry), or stuffed
+ * with no win so the crowd walks off (stuffed-fail → soft fail, new crowd).
+ */
+export function crowdOutcome(passed: boolean, remaining: number, min = MIN_ATTEMPT_BELLY): CrowdOutcome {
+  if (passed) return 'passed';
+  return remaining < min ? 'stuffed-fail' : 'retry';
+}
+
+/**
  * Adds a food to the first empty plate slot. Refuses if plate full,
  * belly insufficient, or food not unlocked.
  * Returns true on success.
@@ -323,6 +341,8 @@ export function renderBellyMeter(): void {
   if (track) {
     track.setAttribute('aria-valuenow', String(r));
     track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
+    // Danger zone: one (or no) attempt left before you're stuffed.
+    track.classList.toggle('belly-low', r < MIN_ATTEMPT_BELLY + 4);
   }
 }
 
@@ -838,21 +858,60 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   maybeShowBossUnlockToast();
   if (ingredientCount > 0) {
     renderAudienceReaction(match.pct, aud);
-    presentReactionOverlay({
-      aud,
-      finalPct: match.pct,
-      preChargePct,
-      quality,
-      violations: match.violations,
-      goldPaid,
-      passed: passedThisLaunch,
-      propsAfterArea,
-      learned: learnedToasts,
-      newRecipeName:
-        discovery && discovery.freshlyDiscovered ? (getRecipe(discovery.recipeId)?.name ?? null) : null,
-    });
+    // Belly fail loop: if you still haven't pleased this crowd and you're too
+    // stuffed for another real attempt, they give up and leave (soft fail →
+    // fresh crowd). Otherwise show the normal reaction overlay (retry/next).
+    const encounterPassed = getEncounterProgress(aud.id, currentEncounterIdx()).bestPct >= PASS_PCT;
+    if (crowdOutcome(encounterPassed, remainingBelly()) === 'stuffed-fail') {
+      failCurrentCrowd(aud);
+    } else {
+      presentReactionOverlay({
+        aud,
+        finalPct: match.pct,
+        preChargePct,
+        quality,
+        violations: match.violations,
+        goldPaid,
+        passed: passedThisLaunch,
+        propsAfterArea,
+        learned: learnedToasts,
+        newRecipeName:
+          discovery && discovery.freshlyDiscovered ? (getRecipe(discovery.recipeId)?.name ?? null) : null,
+      });
+    }
     setLastMatch(match.pct);
   }
+}
+
+/** How long the "stuffed!" splash lingers before the crowd leaves. */
+const STUFFED_LINGER_MS = 3500;
+
+/**
+ * Soft fail: the player is stuffed and never pleased this crowd, so the crowd
+ * gives up and waddles off. We show a splash, then advance to a brand-new crowd
+ * (no reward — they weren't wowed). Discoveries/notes already persist, so the
+ * player keeps everything they learned.
+ */
+function failCurrentCrowd(aud: Audience): void {
+  showStuffedSplash(aud);
+  window.setTimeout(() => advanceToNextEncounter(), STUFFED_LINGER_MS);
+}
+
+function showStuffedSplash(aud: Audience): void {
+  const splash = document.getElementById('discoverySplash');
+  if (!splash) return;
+  splash.innerHTML = `<div class="discovery-splash-card rarity-common stuffed-splash">
+    <div class="discovery-splash-banner">🤢 TOO STUFFED!</div>
+    <div class="discovery-splash-emoji">${aud.emoji}</div>
+    <div class="discovery-splash-name">${aud.name} gives up and waddles off…</div>
+    <div class="discovery-splash-desc">You ate too much without landing it. A fresh crowd is on the way — you keep everything you discovered.</div>
+  </div>`;
+  splash.removeAttribute('hidden');
+  splash.classList.add('discovery-splash-show');
+  window.setTimeout(() => {
+    splash.setAttribute('hidden', '');
+    splash.classList.remove('discovery-splash-show');
+  }, STUFFED_LINGER_MS);
 }
 
 const VERDICT_BY_GRADE: Record<string, string> = {

@@ -517,6 +517,13 @@ body {
   background: linear-gradient(90deg, #ff9800, #ffc107, #4caf50);
   transition: width 0.3s ease;
 }
+/* Danger zone — one (or no) attempt left before you're stuffed. */
+.belly-track.belly-low .belly-fill {
+  background: linear-gradient(90deg, #ef4444, #f87171) !important;
+  animation: belly-danger 1s ease-in-out infinite;
+}
+@keyframes belly-danger { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.stuffed-splash .discovery-splash-banner { color: #ef4444; }
 .belly-value { font-size: 0.95em; color: #e6f0ff; flex: 0 0 auto; font-variant-numeric: tabular-nums; }
 /* PLAN v9 UI-overhaul Phase 2 — Move On is a SECONDARY (ghost) sticker in its
    own row, separate from the belly capacity readout and visually subordinate to
