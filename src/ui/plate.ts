@@ -78,6 +78,7 @@ import {
 } from '../state/encounter-progress';
 import { mountChargeMeter } from './charge-meter';
 import { createCooldownGate } from './cooldown-gate';
+import { isHotSpotActive } from '../scoring/gameplus';
 import { showReactionOverlay, type FooterAction } from './reaction-overlay';
 import { loadFoodReveals, revealNextAxis } from '../state/food-reveals';
 import { markComboSeen } from '../state/persistence';
@@ -610,7 +611,11 @@ function renderAreaDisplay(): void {
   const el = $('areaCurrentName');
   if (!el) return;
   const cur = getArea(loadLastArea()) ?? AREAS[0]!;
-  el.textContent = `${cur.emoji} ${cur.name}`;
+  // Surface the GamePlus Hot Spot so its 3x gold is actually visible.
+  const badge = isHotSpotActive(cur.id)
+    ? ' <span class="hot-spot-badge" title="Launch here for triple gold">🔥 Hot Spot · 3× gold</span>'
+    : '';
+  el.innerHTML = `${cur.emoji} ${cur.name}${badge}`;
   el.setAttribute('data-area', cur.id);
 }
 
