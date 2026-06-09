@@ -23,5 +23,7 @@ export function legendaryGoldMultiplier(): number {
 
 export function applyLegendaryProps(props: FoodProperties): FoodProperties {
   if (!hasUnlockedBuff('cosmic-musical')) return props;
-  return { ...props, musical: Math.min(5, props.musical + 1) };
+  // No cap at 5 — summed plate axes saturate at normalization (÷AXIS_CAP);
+  // the old min(5, …) made the buff REDUCE a musical sum above 5.
+  return { ...props, musical: props.musical + 1 };
 }

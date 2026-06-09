@@ -68,6 +68,17 @@ describe('synergies', () => {
   });
 });
 
+describe('named-fart bonus (V8 T7.b on v9 unclamped sums)', () => {
+  it('the bonus never reduces an axis that already sums past 5', () => {
+    // beans+cheese: stink 3+3 = 6 → Swamp synergy +2 → 8 → Swamp Beast named
+    // bonus +1 → 9. The old [0,5] clamp turned the "+1 bonus" into a cut
+    // from 8 down to 5.
+    const r = computeFartFromPlate(['beans', 'cheese']);
+    expect(r.triggeredSynergies.some((s) => s.includes('Named Fart'))).toBe(true);
+    expect(r.props.stink).toBe(9);
+  });
+});
+
 describe('conflicts', () => {
   it('catalog has ≥5 conflicts', () => {
     expect(CONFLICTS.length).toBeGreaterThanOrEqual(5);

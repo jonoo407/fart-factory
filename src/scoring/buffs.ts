@@ -45,7 +45,7 @@ export function consumeBuffs(): void {
   }
 }
 
-/** Apply all active PROPERTY buffs additively, clamped to 0-5. */
+/** Apply all active PROPERTY buffs additively, floored at 0 (no 5-cap). */
 export function applyActiveBuffs(props: FoodProperties): FoodProperties {
   const buffs = loadActiveBuffs();
   if (buffs.length === 0) return props;

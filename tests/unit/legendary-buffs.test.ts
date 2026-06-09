@@ -48,11 +48,12 @@ describe('legendary-buffs (V8 T7.d)', () => {
     expect(applyLegendaryProps({ ...zero, musical: 2 })).toEqual({ ...zero, musical: 2 });
   });
 
-  it('cosmic-musical buff adds +1 musical (clamped to 5)', () => {
+  it('cosmic-musical buff adds +1 musical (unclamped — summed plate axes)', () => {
     decodeCosmicSymphony();
     expect(applyLegendaryProps({ ...zero, musical: 2 }).musical).toBe(3);
-    // Clamping at 5
-    expect(applyLegendaryProps({ ...zero, musical: 5 }).musical).toBe(5);
+    // v9: plate sums are not capped at 5 (saturation is ÷AXIS_CAP's job).
+    // The old min(5, …) made the "buff" REDUCE a musical sum above 5.
+    expect(applyLegendaryProps({ ...zero, musical: 6 }).musical).toBe(7);
   });
 
   it('multiple legendary buffs stack cleanly', () => {

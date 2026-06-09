@@ -136,15 +136,16 @@ export function computeFartFromPlate(ingredientIds: string[]): RecipeResult {
     }
   }
   // V8 T7.b — Named Fart bonus. Applied AFTER synergies, BEFORE conflicts.
-  // Each axis bonus is added then clamped to [0, 5] so a stacked match
-  // can't push the property vector beyond the in-game ceiling.
+  // Added with a floor at 0 but NO cap at 5: these are summed plate axes
+  // measured against AXIS_CAP=8, and the old [0,5] clamp turned the bonus
+  // into a CUT whenever the plate already summed past 5.
   const namedFartId = matchRecipe(ingredientIds);
   if (namedFartId) {
     const recipe = getRecipe(namedFartId);
     if (recipe?.bonus) {
       for (const [axis, delta] of Object.entries(recipe.bonus)) {
         const a = axis as keyof FoodProperties;
-        props[a] = Math.max(0, Math.min(5, props[a] + (delta as number)));
+        props[a] = Math.max(0, props[a] + (delta as number));
       }
       triggeredSynergies.push(`Named Fart: ${recipe.name}`);
     }
