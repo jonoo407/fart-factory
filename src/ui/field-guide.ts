@@ -40,7 +40,9 @@ export function renderFieldGuideEntryHtml(
   const discoveredSet = new Set(discoveredAxes);
   const shownAxes = bandAxes.filter((a) => discoveredSet.has(a));
   const barsHtml = shownAxes.length > 0
-    ? renderAxisBarsHtml(food.properties, shownAxes)
+    // Per-FOOD bars stay on the authored 0-5 scale (a food's 5 fills its bar);
+    // only PLATE/FART totals use AXIS_CAP. Pass 5 explicitly so intent is clear.
+    ? renderAxisBarsHtml(food.properties, shownAxes, 5)
     : '';
   const text = escapeHtml(fauxScientificText(food, band));
   const usesText = `${uses} use${uses === 1 ? '' : 's'}`;

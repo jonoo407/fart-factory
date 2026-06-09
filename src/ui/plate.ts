@@ -12,7 +12,7 @@ import {
   setPantryShowLocked,
   loadBelly,
   spendBelly,
-  BELLY_CAPACITY,
+  bellyCapacity,
   loadLastArea,
   setLastMatch,
   loadGold,
@@ -335,7 +335,9 @@ export function renderPlatePreview(): void {
       const food = getFood(id);
       if (!food) continue;
       for (const a of Object.keys(shown) as Array<keyof FoodProperties>) {
-        shown[a] = Math.min(5, shown[a] + food.properties[a]);
+        // True summed magnitude (no 5-cap) so the rough preview agrees in scale
+        // with the fully-known branch above + the actual launched fart.
+        shown[a] = shown[a] + food.properties[a];
       }
     }
   }
@@ -348,15 +350,18 @@ export function renderBellyMeter(): void {
   const value = $('bellyValue');
   const cap = $('bellyCap');
   const r = remainingBelly();
-  const used = BELLY_CAPACITY - r; // how FULL the stomach is (fills as you eat)
-  if (fill) fill.style.width = `${(used / BELLY_CAPACITY) * 100}%`;
+  // Capacity is per-encounter: an intermission belly activity can boost it for
+  // this crowd (eat more), so the meter denominator tracks the live capacity.
+  const capacity = bellyCapacity();
+  const used = capacity - r; // how FULL the stomach is (fills as you eat)
+  if (fill) fill.style.width = `${(used / capacity) * 100}%`;
   if (value) value.textContent = String(used);
-  if (cap) cap.textContent = String(BELLY_CAPACITY);
+  if (cap) cap.textContent = String(capacity);
   // Keep the role="meter" accessible value in sync — it shows fullness now.
   const track = document.querySelector<HTMLElement>('.belly-track');
   if (track) {
     track.setAttribute('aria-valuenow', String(used));
-    track.setAttribute('aria-valuemax', String(BELLY_CAPACITY));
+    track.setAttribute('aria-valuemax', String(capacity));
     // Danger zone: nearly stuffed — one (or no) attempt's worth of room left.
     track.classList.toggle('belly-low', r < MIN_ATTEMPT_BELLY + 4);
   }
@@ -684,6 +689,11 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // so what you previewed is exactly what you launch.
   const { props: propsAfterArea, resolved } = resolveLaunchProps(ids);
   const recipe = resolved.rawRecipe; // synergies/conflicts still come from raw path
+  // The fart bank reads the RAW plate magnitude (unclamped sum), NOT the
+  // score-clamped propsAfterArea. The scoring pipeline caps every axis at 5
+  // (applyMasteryBonuses), which would pin length ≤5 → every fart "short". The
+  // fart is a readout of what you actually plated, so it uses the true sums.
+  const audioProps = recipe.props;
   const areaId = loadLastArea();
   const area = getArea(areaId) ?? AREAS[0]!;
 
@@ -693,7 +703,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   if (isArenaActive()) {
     const [aL, aW, aV, aS, aT, aM] = recipeToSliderInputs(propsAfterArea);
     triggerHaptic(HAPTICS.launch);
-    playFart(aL, aW, aV, aS, aT, aM);
+    playFart(aL, aW, aV, aS, aT, aM, undefined, audioProps);
     spawnGas(aS, aV);
     commitBellySpend();
     // Read declared target (Boss 5 only) from the arena's select.
@@ -746,8 +756,10 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   const [length, wetness, volume, stink, temp, musical] = recipeToSliderInputs(propsAfterArea);
 
   triggerHaptic(HAPTICS.launch);
-  // PLAN v9 P6 — pass the normalized axes so the fart plays as a layered readout.
-  playFart(length, wetness, volume, stink, temp, musical, normalizeAxes(propsAfterArea));
+  // The fart bank: pass the RAW plate props (audioProps) so playFart picks the
+  // matching grid clip from the true plate magnitude (normalized axes kept for
+  // the legacy fallbacks).
+  playFart(length, wetness, volume, stink, temp, musical, normalizeAxes(propsAfterArea), audioProps);
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.

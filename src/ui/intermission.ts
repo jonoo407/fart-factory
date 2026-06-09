@@ -14,9 +14,13 @@ import {
   encounterSeed,
   rngBetween,
 } from '../state/run-state';
-import { refillBelly, loadPantry, unlockFood } from '../state/persistence';
+import { grantBellyBonus, loadPantry, unlockFood, loadLastArea } from '../state/persistence';
 import { FOODS } from '../state/food';
 import { decrementAllCooldowns } from '../state/boss-cadence';
+import { nextAudiencePreview } from './audience-preview';
+import { renderCravingChipsHtml } from './crowd-ticket';
+import { AREAS, getArea } from '../state/containment';
+import { audiencePoolForLocation } from '../state/location-progress';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -48,7 +52,7 @@ function setSkipNextIntermission(): void {
   }
 }
 
-function applyActivityChoice(activity: Activity): void {
+export function applyActivityChoice(activity: Activity): void {
   // Property / gold-mult / restriction-cancel / easy-mode buffs persist
   // to next launch.
   if (activity.buff) {
@@ -56,16 +60,12 @@ function applyActivityChoice(activity: Activity): void {
   }
   // Immediate effects fire right away.
   if (activity.immediate) {
-    if (activity.immediate.kind === 'refill-belly') {
-      // Top up belly by the specified amount, capped at BELLY_MAX.
-      // Implementation: read current belly + amount, then refill (clamp).
-      // We expose this via a custom event so plate.ts can re-render.
-      // The actual add: we use refillBelly to set to max, then deduct
-      // (max - currentAddend). Simpler — just refillBelly to MAX since
-      // the "+6 belly" feels like "rest a bit"; cap is the natural ceiling.
-      refillBelly();
-    } else if (activity.immediate.kind === 'full-belly') {
-      refillBelly();
+    if (activity.immediate.kind === 'belly-bonus') {
+      // A full belly is bad (you eat less), so the benefit is MORE room. Grant
+      // the bonus to the UPCOMING encounter (currentEncounterIdx + 1, the crowd
+      // we advance into when this intermission resolves) — granting to the
+      // current idx would be thrown away by the per-encounter belly reset.
+      grantBellyBonus(activity.immediate.amount, currentEncounterIdx() + 1);
       if (activity.immediate.skipNextIntermission) {
         setSkipNextIntermission();
       }
@@ -108,6 +108,30 @@ function renderChoices(): void {
   });
 }
 
+/**
+ * Cleanup #2 — preview the crowd you're about to face so the break is a real
+ * planning beat. Shows the upcoming audience's portrait + name and the same
+ * "They're craving" chips the Order Ticket uses (label-only, clue density per
+ * difficulty). Mirrors plate.ts's location-aware pool; the surprise Unicorn is
+ * deliberately not previewed.
+ */
+function renderNextAudiencePreview(): void {
+  const el = $('intermissionNext');
+  if (!el) return;
+  const area = getArea(loadLastArea()) ?? AREAS[0]!;
+  const pool = audiencePoolForLocation(area);
+  const { audience } = nextAudiencePreview(currentEncounterIdx(), pool);
+  el.innerHTML = `
+    <div class="intermission-next-label">Up next</div>
+    <div class="intermission-next-aud">
+      <span class="intermission-next-emoji">${audience.emoji}</span>
+      <span class="intermission-next-name">${audience.name}</span>
+    </div>
+    ${renderCravingChipsHtml(audience)}
+  `;
+  el.removeAttribute('hidden');
+}
+
 function finishIntermission(): void {
   // Advance the encounter idx + clear cooldowns.
   incrementEncounter();
@@ -136,6 +160,7 @@ export function openIntermission(onResolved: () => void): void {
     return;
   }
   renderChoices();
+  renderNextAudiencePreview();
   $('intermissionOverlay')?.removeAttribute('hidden');
 }
 

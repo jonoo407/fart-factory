@@ -11,10 +11,6 @@ import { ACTIVITIES, getActivity, type Activity } from '../state/activities';
 
 const KEY = 'fart_active_buffs';
 
-function clampAxis(v: number): number {
-  return Math.max(0, Math.min(5, v));
-}
-
 export function loadActiveBuffs(): Activity[] {
   try {
     const raw = localStorage.getItem(KEY);
@@ -58,7 +54,10 @@ export function applyActiveBuffs(props: FoodProperties): FoodProperties {
     if (!a.buff || a.buff.kind !== 'property') continue;
     for (const [axis, delta] of Object.entries(a.buff.delta)) {
       const k = axis as keyof FoodProperties;
-      out[k] = clampAxis(out[k] + (delta as number));
+      // Add the buff delta; floor at 0 but do NOT cap at 5 — these are summed
+      // plate axes (see applyMasteryBonuses). Capping the sum here would re-pin
+      // a buffed axis to 5. Saturation happens at normalization (÷AXIS_CAP).
+      out[k] = Math.max(0, out[k] + (delta as number));
     }
   }
   return out;

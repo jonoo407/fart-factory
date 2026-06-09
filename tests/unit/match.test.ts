@@ -32,10 +32,11 @@ describe('computeMatchPct (closeness curve, PLAN v9 P1)', () => {
     expect(computeMatchPct(near, target)).toBeGreaterThan(computeMatchPct(far, target));
   });
 
-  it('overshooting a craved axis does NOT drop the score (closest-or-better)', () => {
-    // wet way over its target should be exactly as good as hitting it — no penalty.
-    const over = p(8, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2);
-    expect(computeMatchPct(over, target)).toBe(computeMatchPct(saturating, target));
+  it('overshooting a craved axis DROPS the score (symmetric target-matching)', () => {
+    // wet way over its target is as wrong as undershooting — a craving is a
+    // target, not a floor, so overshoot is penalized by the same closeness curve.
+    const over = p(8, 1.6, 6.4, 3.2, 4.8, 3.2, 3.2); // wet 8 → got 1.0, over the 0.6 target
+    expect(computeMatchPct(over, target)).toBeLessThan(computeMatchPct(saturating, target));
   });
 });
 

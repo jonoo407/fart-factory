@@ -30,6 +30,12 @@ export interface Food {
   rarity: Rarity;
   /** 1-8: belly cost when added to a plate. Common ~2-3, legendary ~5-8. */
   bellyCost: number;
+  /**
+   * Optional override for the belly room this food takes (foodBellySize). Lets
+   * tiny "basic" garnish foods barely fill the belly regardless of rarity. When
+   * omitted, sizing falls back to RARITY_BELLY[rarity].
+   */
+  bellySize?: number;
   properties: FoodProperties;
   /** True for tier-1 common foods that start in every player's pantry. */
   startsUnlocked?: boolean;
@@ -55,6 +61,13 @@ export const FOODS: readonly Food[] = [
   { id: 'egg',         name: 'Egg',            emoji: '🥚', rarity: 'common',    bellyCost: 2, properties: p(1, 2, 4, 0, 0, 2, 1), startsUnlocked: true, description: 'Sulfur central.' },
   { id: 'garlic',      name: 'Garlic',         emoji: '🧄', rarity: 'common',    bellyCost: 2, properties: p(0, 2, 5, 1, 0, 3, 3), startsUnlocked: true, description: 'Sharp and aromatic.' },
   { id: 'cabbage',     name: 'Cabbage',        emoji: '🥬', rarity: 'common',    bellyCost: 3, properties: p(2, 1, 3, 2, 0, 4, 1), startsUnlocked: true, description: 'Slow burn. Wet finish.' },
+
+  // ====== BASIC GARNISHES — tiny single-note foods that barely fill the belly
+  // (bellySize 1). They exist so the bank's "short + extreme" corner clips are
+  // reachable: every other food bundles length with its stats, so you can't make
+  // a tiny plate that's also loud/musical/hot. Stack these to hit those corners.
+  { id: 'crumb',       name: 'Cracker Crumb',  emoji: '🫓', rarity: 'common',    bellyCost: 1, bellySize: 1, properties: p(0, 2, 1, 0, 0, 4, 0), startsUnlocked: true, description: 'A dry little nothing — stack them for a long, quiet rip.' },
+  { id: 'zap-pea',     name: 'Zap Pea',        emoji: '🫛', rarity: 'common',    bellyCost: 1, bellySize: 1, properties: p(2, 1, 0, 3, 3, 1, 4), startsUnlocked: true, description: 'Tiny, loud, hot, and weirdly musical.' },
 
   // ====== UNCOMMON (6) — unlock via gold or research ======
   { id: 'kimchi',      name: 'Kimchi',         emoji: '🥬', rarity: 'uncommon',  bellyCost: 3, properties: p(3, 1, 4, 2, 1, 3, 4), description: 'Fermented thunder.' },
@@ -110,8 +123,8 @@ const RARITY_BELLY: Record<Rarity, number> = {
   epic: 5,
   legendary: 6,
 };
-export function foodBellySize(food: Pick<Food, 'rarity'>): number {
-  return RARITY_BELLY[food.rarity];
+export function foodBellySize(food: Pick<Food, 'rarity' | 'bellySize'>): number {
+  return food.bellySize ?? RARITY_BELLY[food.rarity];
 }
 
 export function foodsByRarity(): Record<Rarity, Food[]> {

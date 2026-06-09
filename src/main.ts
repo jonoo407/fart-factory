@@ -21,6 +21,7 @@ import { playPerfectCinematic } from './ui/perfect-cinematic';
 import { showFeatureIntro, type FeatureIntroOptions } from './ui/feature-intro';
 import { wireVenueLadder } from './ui/venue-ladder';
 import { wireDock } from './ui/dock';
+import { reconcileStarterFoods } from './state/persistence';
 
 function wireVisibilityChange(): void {
   document.addEventListener('visibilitychange', () => {
@@ -33,6 +34,7 @@ function wireVisibilityChange(): void {
 }
 
 function init(): void {
+  reconcileStarterFoods(); // basic foods added in an update reach existing saves
   wireAudioPopover();
   wireVisibilityChange();
   wireAudioUnlock(); // resume/create the AudioContext on first interaction (iOS-safe)

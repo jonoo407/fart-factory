@@ -9,6 +9,7 @@
  * this module is the DOM glue, verified in the browser.
  */
 import { chargeQuality, type ChargeResult } from '../scoring/charge';
+import { startChargeTone, type ChargeTone } from '../audio/charge-tone';
 
 const SWEEP_PER_FRAME = 2.2;
 
@@ -34,6 +35,7 @@ export function mountChargeMeter(
   let value = 0;
   let startT = 0;
   let charging = false;
+  let tone: ChargeTone | null = null;
 
   // PLAN v9 UI-overhaul Phase 3 — the meter idles dimmed and wakes on hold, and
   // the BLAST label swaps to "CHARGING…". Derived from the button's container so
@@ -58,6 +60,9 @@ export function mountChargeMeter(
       dir = 1;
     }
     paint();
+    // The charge tone rides the meter: pitch rises on the way up, falls on the
+    // way back down — so you can hear where the sweep is without looking.
+    tone?.update(value);
     raf = requestAnimationFrame(tick);
   };
 
@@ -73,6 +78,8 @@ export function mountChargeMeter(
     if (bigEl) bigEl.textContent = 'CHARGING…';
     if (subEl) subEl.textContent = 'release in the zone!';
     if (hintEl) hintEl.textContent = 'release in the dashed zone!';
+    tone = startChargeTone();
+    tone.update(value);
     raf = requestAnimationFrame(tick);
   };
 
@@ -87,6 +94,8 @@ export function mountChargeMeter(
     if (!charging) return;
     charging = false;
     cancelAnimationFrame(raf);
+    tone?.stop();
+    tone = null;
     const held = performance.now() - startT;
     const result = chargeQuality(value, held);
     value = 0;
@@ -111,6 +120,8 @@ export function mountChargeMeter(
   return {
     destroy(): void {
       cancelAnimationFrame(raf);
+      tone?.stop();
+      tone = null;
       button.removeEventListener('pointerdown', begin);
       button.removeEventListener('pointerup', end);
       button.removeEventListener('pointerleave', end);

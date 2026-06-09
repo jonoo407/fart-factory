@@ -5,9 +5,12 @@ import {
   playSample,
   hasStemBase,
   playFartStems,
+  playGridClip,
   type SliderConfig,
 } from './sample-player';
 import type { AxisLevels } from './fart-stems';
+import { resolveFart } from './fart-select';
+import type { FoodProperties } from '../state/food';
 
 let audioCtx: AudioContext | null = null;
 let samplePathTried = false;
@@ -124,10 +127,33 @@ export function playFart(
   temp: number,
   musical: number,
   ax?: AxisLevels,
+  rawProps?: FoodProperties,
 ): number {
   if (!isChannelAudible('farts')) return 0;
   const ctx = ensureAudio();
   if (!ctx) return 0;
+
+  // THE fart bank (rebuilt). When the caller supplies the plate's raw props,
+  // pick ONE pre-baked grid clip that matches the recipe (no live layering) and
+  // play it after the procedural anticipation cue. This is the primary launch
+  // path; the stem/sample/procedural branches below are fallbacks for callers
+  // that don't pass props (e.g. the arena fork, the belly-tap easter egg).
+  if (rawProps) {
+    const cueDur = 0.15;
+    const cueGap = 0.05;
+    const cueStart = ctx.currentTime;
+    const mainStartAt = cueStart + cueDur + cueGap;
+    schedulCue(ctx, cueStart, cueDur, temp, volume);
+    const { clipId, gain, durationSeconds } = resolveFart(rawProps);
+    void playGridClip(ctx, clipId, mainStartAt, gain);
+    lastSchedule = {
+      cuePresent: true,
+      cueDurationMs: Math.round(cueDur * 1000),
+      mainStartOffsetMs: Math.round((cueDur + cueGap) * 1000),
+      mainDurationMs: Math.round(durationSeconds * 1000),
+    };
+    return cueDur + cueGap + durationSeconds;
+  }
 
   // PLAN v9 P6 — the READOUT path. When the caller supplies the normalized axes
   // AND the stem bank is present, assemble the fart from layered stems (the

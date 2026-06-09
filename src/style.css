@@ -665,6 +665,33 @@ body {
   font-size: 0.85em;
   opacity: 0.85;
 }
+/* Cleanup #2 — "Up next" preview of the crowd you'll face after the break. */
+.intermission-next {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(168, 85, 247, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.intermission-next[hidden] { display: none; }
+.intermission-next-label {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.7;
+}
+.intermission-next-aud {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+.intermission-next-emoji { font-size: 1.5em; line-height: 1; }
+.intermission-next .craving-label { color: #d8b4fe; }
+.intermission-next .craving-chips { justify-content: center; }
 /* Phase L #66 — brief vertical shrink + bounce on food-add */
 .belly-deplete { animation: belly-pulse 0.42s ease-out; }
 @keyframes belly-pulse {

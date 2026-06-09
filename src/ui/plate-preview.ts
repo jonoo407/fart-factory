@@ -14,6 +14,7 @@
 import type { FoodProperties } from '../state/food';
 import type { AxisName } from '../state/axis-discovery';
 import { renderAxisBarsHtml } from './fart-profile';
+import { AXIS_CAP } from '../scoring/tuning';
 
 export function renderPlatePreviewHtml(
   props: FoodProperties,
@@ -30,7 +31,7 @@ export function renderPlatePreviewHtml(
         `<span class="plate-preview-icon">🔮</span>` +
         `<span class="plate-preview-label">${labelText}</span>` +
       `</div>` +
-      `<div class="plate-preview-bars">${renderAxisBarsHtml(props, discoveredAxes)}</div>` +
+      `<div class="plate-preview-bars">${renderAxisBarsHtml(props, discoveredAxes, AXIS_CAP)}</div>` +
     `</div>`
   );
 }
