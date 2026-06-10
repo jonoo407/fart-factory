@@ -14,7 +14,7 @@
  */
 
 import { AUDIENCES } from '../src/state/audience';
-import { REACTIONS } from '../src/scoring/audience-reactions';
+import { REACTIONS, INTROS } from '../src/scoring/audience-reactions';
 
 export type Mood =
   | 'comedic'
@@ -229,7 +229,9 @@ const VOICE_CAST: Record<string, VoiceCast> = {
   'mystery-guest':    { voice_id: 'JBFqnCBsd6RMkjVDRZzb', voiceLabel: 'George — mysterious' },
 };
 
-const VOICE_TIERS = ['loved', 'evacuated'] as const;
+// 'intro' (sound overhaul): the audience greets the player as it walks in —
+// text from INTROS, same voice as the reaction lines so the character holds.
+const VOICE_TIERS = ['loved', 'evacuated', 'intro'] as const;
 type VoiceTier = (typeof VOICE_TIERS)[number];
 
 export function voiceSeedId(audienceId: string, tier: VoiceTier): string {
@@ -244,7 +246,7 @@ function buildVoiceSeeds(): TtsSeed[] {
     const reactions = REACTIONS[aud.id];
     if (!reactions) continue;
     for (const tier of VOICE_TIERS) {
-      const text = reactions[tier];
+      const text = tier === 'intro' ? INTROS[aud.id] : reactions[tier];
       if (!text) continue;
       out.push({
         kind: 'tts',

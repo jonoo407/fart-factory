@@ -44,6 +44,7 @@ import {
   LEGENDARY_FANFARE_SFX,
   playEventSfx,
   playAudienceSignature,
+  playAudienceArrival,
   playAudienceVoice,
 } from '../audio/event-sfx';
 import { shouldShowHint, recommendFoodsForAudience, incrementLaunchCount } from '../scoring/food-hint';
@@ -99,7 +100,7 @@ import { isArenaActive, submitArenaLaunch, maybeShowBossUnlockToast } from './bo
 import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
-import { playFart } from '../audio/procedural';
+import { playFart, onAudioUnlocked } from '../audio/procedural';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
 
@@ -435,9 +436,10 @@ function advanceToNextEncounter(): void {
       $('storyResult')?.setAttribute('hidden', '');
       $('audienceReaction')?.setAttribute('hidden', '');
       $('discoverySplash')?.setAttribute('hidden', '');
-      // PR10 — the next audience announces itself with its signature cue.
+      // PR10 — the next audience announces itself: signature cue, then its
+      // spoken intro greeting a beat later (sound overhaul).
       const nextAud = currentAudience();
-      void playAudienceSignature(nextAud.id);
+      void playAudienceArrival(nextAud.id);
     });
   });
 }
@@ -1247,6 +1249,11 @@ export function initStoryPantry(): void {
   const aud0 = currentAudience();
   paintMoveOnButton(isWowed(aud0.id, currentEncounterIdx()));
   renderMoveOnGate(); // PLAN v9 P2 — gate advance until the crowd is passed
+  // Sound overhaul — today's audience greets the player on the first gesture
+  // (the context is locked until then; before this, load-in was always silent).
+  onAudioUnlocked(() => {
+    void playAudienceArrival(currentAudience().id);
+  });
 }
 
 // Test-only reset hook.

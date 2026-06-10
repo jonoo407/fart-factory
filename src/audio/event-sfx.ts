@@ -98,7 +98,7 @@ export function streakMilestoneSfx(streak: number): string | null {
 // resolve to silent no-ops via playSample when the id isn't in the
 // manifest — so the runtime ships safely even before assets are generated.
 
-export type AudienceVoiceTier = 'loved' | 'evacuated';
+export type AudienceVoiceTier = 'loved' | 'evacuated' | 'intro';
 
 export function audienceSignatureSfxId(audienceId: string): string {
   return `sig-${audienceId}`;
@@ -119,4 +119,20 @@ export async function playAudienceVoice(
 ): Promise<void> {
   // PLAN v9 P6 — character VO routes through the independent Voices channel.
   await playEventSfx(audienceVoiceSfxId(audienceId, tier), volume, 'voices');
+}
+
+/** Gap between the signature cue and the spoken greeting — arrival reads as
+ *  "who's here" (signature) then "what they say" (intro line). */
+export const INTRO_AFTER_SIGNATURE_MS = 1400;
+
+/**
+ * Sound overhaul — full arrival moment: signature cue now, intro greeting a
+ * beat later. Fired on audience rotation and on the first unlocked gesture
+ * after page load. Both halves are manifest-gated no-ops if assets are absent.
+ */
+export async function playAudienceArrival(audienceId: string): Promise<void> {
+  await playAudienceSignature(audienceId);
+  setTimeout(() => {
+    void playAudienceVoice(audienceId, 'intro');
+  }, INTRO_AFTER_SIGNATURE_MS);
 }
