@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AUDIENCE_REACTION_SFX } from '../../src/audio/event-sfx';
+import { SEEDS } from '../../scripts/sfx-seeds';
 
 beforeEach(() => {
   localStorage.clear();
@@ -10,12 +11,29 @@ describe('Event SFX constants (P3)', () => {
   // the real SEEDS table — the verbatim restatement that lived here was a
   // constant-equals-itself test and was removed.)
 
-  it('AUDIENCE_REACTION_SFX maps each tier to an id or null', () => {
-    expect(AUDIENCE_REACTION_SFX.loved).toBeTruthy();
-    expect(AUDIENCE_REACTION_SFX.liked).toBeTruthy();
-    expect(AUDIENCE_REACTION_SFX.meh).toBeNull();
-    expect(AUDIENCE_REACTION_SFX.disliked).toBeTruthy();
-    expect(AUDIENCE_REACTION_SFX.evacuated).toBeTruthy();
+  it('AUDIENCE_REACTION_SFX maps each tier to a pool of ids (meh stays silent)', () => {
+    expect(AUDIENCE_REACTION_SFX.loved.length).toBeGreaterThanOrEqual(1);
+    expect(AUDIENCE_REACTION_SFX.liked.length).toBeGreaterThanOrEqual(1);
+    expect(AUDIENCE_REACTION_SFX.meh.length).toBe(0);
+    expect(AUDIENCE_REACTION_SFX.disliked.length).toBeGreaterThanOrEqual(1);
+    expect(AUDIENCE_REACTION_SFX.evacuated.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('fail tiers have ≥3 variants so an F does not sound identical every time', () => {
+    expect(AUDIENCE_REACTION_SFX.disliked.length).toBeGreaterThanOrEqual(3);
+    expect(AUDIENCE_REACTION_SFX.evacuated.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it('fail tiers no longer use the 2s haunted-mansion-moan (too long/loud over the fart)', () => {
+    expect(AUDIENCE_REACTION_SFX.disliked).not.toContain('haunted-mansion-moan');
+    expect(AUDIENCE_REACTION_SFX.evacuated).not.toContain('haunted-mansion-moan');
+  });
+
+  it('every pooled reaction id has a real seed (no silent typos)', () => {
+    const seedIds = new Set(SEEDS.map((s) => s.id));
+    for (const pool of Object.values(AUDIENCE_REACTION_SFX)) {
+      for (const id of pool) expect(seedIds.has(id), `unknown sfx id ${id}`).toBe(true);
+    }
   });
 });
 

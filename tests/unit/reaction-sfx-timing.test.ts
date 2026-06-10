@@ -1,19 +1,22 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-// The bug: the post-launch crowd reaction stinger was fired SYNCHRONOUSLY with
-// the fart (startAt=0), so it started ~0.2s before the fart's main hit, ran
-// longer, and was ~3x louder — masking the fart. The fix staggers the stinger
-// (and the voice line) to land AFTER the fart, so the fart is heard first.
+// Two generations of the same bug: the post-launch crowd stinger masking the
+// fart. Gen 1: it fired synchronously with the launch (fixed by a 700ms
+// stagger). Gen 2: the rebuilt fart bank plays clips up to ~4.5s, so the FIXED
+// 700ms stagger again landed the stinger on top of the fart. The fix makes the
+// delay dynamic — fart duration + a comic beat — with 700ms as the floor when
+// the duration is unknown.
 
-const { playEventSfx, playAudienceVoice } = vi.hoisted(() => ({
+const { playEventSfx, playEventSfxOneOf, playAudienceVoice } = vi.hoisted(() => ({
   playEventSfx: vi.fn(async () => {}),
+  playEventSfxOneOf: vi.fn(async () => {}),
   playAudienceVoice: vi.fn(async () => {}),
 }));
 
 // Keep AUDIENCE_REACTION_SFX real; spy only the playback functions.
 vi.mock('../../src/audio/event-sfx', async (importActual) => {
   const actual = await importActual<typeof import('../../src/audio/event-sfx')>();
-  return { ...actual, playEventSfx, playAudienceVoice };
+  return { ...actual, playEventSfx, playEventSfxOneOf, playAudienceVoice };
 });
 
 // Avoid the dynamic canvas/particle import touching jsdom.
@@ -23,9 +26,12 @@ vi.mock('../../src/visuals/reaction-particles', () => ({
 
 import {
   renderAudienceReaction,
+  reactionDelayMs,
   REACTION_SFX_DELAY_MS,
+  REACTION_BREATH_MS,
   VOICE_AFTER_REACTION_MS,
 } from '../../src/ui/result-panel';
+import { AUDIENCE_REACTION_SFX } from '../../src/audio/event-sfx';
 import { AUDIENCES } from '../../src/state/audience';
 
 const granny = AUDIENCES.find((a) => a.id === 'granny-edna')!;
@@ -33,6 +39,7 @@ const granny = AUDIENCES.find((a) => a.id === 'granny-edna')!;
 beforeEach(() => {
   localStorage.clear();
   playEventSfx.mockClear();
+  playEventSfxOneOf.mockClear();
   playAudienceVoice.mockClear();
   vi.useFakeTimers();
 });
@@ -41,33 +48,62 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+describe('reactionDelayMs — the crowd waits for the fart to finish', () => {
+  it('falls back to the 700ms floor when the fart duration is unknown', () => {
+    expect(reactionDelayMs(undefined)).toBe(REACTION_SFX_DELAY_MS);
+    expect(reactionDelayMs(0)).toBe(REACTION_SFX_DELAY_MS);
+  });
+
+  it('waits out a long fart, then adds a comic beat', () => {
+    expect(reactionDelayMs(3000)).toBe(3000 + REACTION_BREATH_MS);
+    expect(reactionDelayMs(4500)).toBe(4500 + REACTION_BREATH_MS);
+  });
+
+  it('never reacts sooner than the floor on a very short fart', () => {
+    expect(reactionDelayMs(100)).toBe(REACTION_SFX_DELAY_MS);
+  });
+});
+
 describe('audience reaction SFX is staggered AFTER the fart (not simultaneous)', () => {
   it('does NOT fire the reaction stinger synchronously with the launch', () => {
-    renderAudienceReaction(10, granny); // 10% -> evacuated -> haunted-mansion-moan
+    renderAudienceReaction(10, granny); // 10% -> evacuated
+    expect(playEventSfxOneOf).not.toHaveBeenCalled();
     expect(playEventSfx).not.toHaveBeenCalled();
   });
 
-  it('fires the stinger only after the reaction delay', () => {
-    renderAudienceReaction(10, granny);
-    expect(playEventSfx).not.toHaveBeenCalled();
-    vi.advanceTimersByTime(REACTION_SFX_DELAY_MS);
-    expect(playEventSfx).toHaveBeenCalledTimes(1);
-    expect(playEventSfx).toHaveBeenCalledWith('haunted-mansion-moan', 5);
+  it('with a known fart duration, holds the stinger until fart end + beat', () => {
+    renderAudienceReaction(10, granny, 3000);
+    vi.advanceTimersByTime(3000 + REACTION_BREATH_MS - 1);
+    expect(playEventSfxOneOf).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(playEventSfxOneOf).toHaveBeenCalledTimes(1);
+  });
+
+  it('an F picks from the evacuated pool at reduced volume (the fart is the showcase)', () => {
+    renderAudienceReaction(10, granny, 1000);
+    vi.advanceTimersByTime(reactionDelayMs(1000));
+    expect(playEventSfxOneOf).toHaveBeenCalledWith(AUDIENCE_REACTION_SFX.evacuated, 4);
+  });
+
+  it('a loved result picks from the loved pool at full stinger volume', () => {
+    renderAudienceReaction(100, granny, 1000);
+    vi.advanceTimersByTime(reactionDelayMs(1000));
+    expect(playEventSfxOneOf).toHaveBeenCalledWith(AUDIENCE_REACTION_SFX.loved, 5);
   });
 
   it('does not voice-line until after the stinger (stinger delay + voice delay)', () => {
-    renderAudienceReaction(100, granny); // 100% -> loved -> applause + voice
-    vi.advanceTimersByTime(REACTION_SFX_DELAY_MS);
-    expect(playEventSfx).toHaveBeenCalledWith('royal-court-applause', 5);
+    renderAudienceReaction(100, granny, 2000); // loved -> stinger + voice
+    vi.advanceTimersByTime(reactionDelayMs(2000));
+    expect(playEventSfxOneOf).toHaveBeenCalledTimes(1);
     expect(playAudienceVoice).not.toHaveBeenCalled();
     vi.advanceTimersByTime(VOICE_AFTER_REACTION_MS);
     expect(playAudienceVoice).toHaveBeenCalledWith('granny-edna', 'loved');
   });
 
   it('meh tier stays silent (no stinger, no voice) even after delays', () => {
-    renderAudienceReaction(60, granny); // 60% -> meh -> null sfx
-    vi.advanceTimersByTime(REACTION_SFX_DELAY_MS + VOICE_AFTER_REACTION_MS);
-    expect(playEventSfx).not.toHaveBeenCalled();
+    renderAudienceReaction(60, granny, 2000); // 60% -> meh -> empty pool
+    vi.advanceTimersByTime(reactionDelayMs(2000) + VOICE_AFTER_REACTION_MS);
+    expect(playEventSfxOneOf).not.toHaveBeenCalled();
     expect(playAudienceVoice).not.toHaveBeenCalled();
   });
 });

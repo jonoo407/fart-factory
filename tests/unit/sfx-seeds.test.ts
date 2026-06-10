@@ -59,6 +59,19 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
     for (const r of required) expect(ids.has(r)).toBe(true);
   });
 
+  it('includes the flop-reaction variant seeds (variety on a failed launch)', () => {
+    const byId = new Map(SFX_SEEDS.map((s) => [s.id, s]));
+    const required = ['flop-groan', 'flop-boo', 'flop-crickets', 'flop-whistle-down'];
+    for (const r of required) {
+      const seed = byId.get(r);
+      expect(seed, `missing seed ${r}`).toBeDefined();
+      expect(seed!.category).toBe('reaction');
+      // The whole point: a quick sting, not the 2s haunted-mansion moan that
+      // talked over the fart. Keep every flop variant short.
+      expect(seed!.duration_seconds, `${r} too long`).toBeLessThanOrEqual(1.5);
+    }
+  });
+
   it('includes food-eating SFX seeds (Phase K item 62)', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
     const required = ['food-munch', 'food-crunch', 'food-slurp', 'food-gulp'];

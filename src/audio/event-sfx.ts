@@ -52,13 +52,23 @@ export async function playEventSfxOneOf(ids: readonly string[], volumeSlider = 5
 // ---------- Named event constants (kept in one place for the wire-up) ----------
 
 export const FOOD_EATING_SFX = ['food-munch', 'food-crunch', 'food-slurp', 'food-gulp'] as const;
-export const AUDIENCE_REACTION_SFX = {
-  loved:     'royal-court-applause',
-  liked:     'toddler-giggle',
-  meh:       null,
-  disliked:  'haunted-mansion-moan',
-  evacuated: 'haunted-mansion-moan',
-} as const;
+/**
+ * Per-tier reaction stinger POOLS — one id is drawn at random per launch
+ * (playEventSfxOneOf) so repeated results don't sound identical. An empty
+ * pool means the tier is deliberately silent (meh). The fail tiers used to
+ * share the single 2s haunted-mansion-moan: same sound every F, and long
+ * enough to talk over the fart it was reacting to.
+ */
+export const AUDIENCE_REACTION_SFX: Record<
+  'loved' | 'liked' | 'meh' | 'disliked' | 'evacuated',
+  readonly string[]
+> = {
+  loved:     ['royal-court-applause', 'frat-howl', 'granny-cackle'],
+  liked:     ['toddler-giggle', 'alien-tourists-gasp'],
+  meh:       [],
+  disliked:  ['flop-groan', 'flop-crickets', 'flop-whistle-down'],
+  evacuated: ['flop-boo', 'flop-groan', 'flop-whistle-down'],
+};
 export const LEGENDARY_FANFARE_SFX = 'legendary-fanfare';
 export const QUEST_CLAIMED_SFX = 'quest-claimed';
 
