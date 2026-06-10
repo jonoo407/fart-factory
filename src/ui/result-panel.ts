@@ -12,7 +12,14 @@ import { audienceReaction } from '../scoring/audience-reactions';
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { loadLastMatch } from '../state/persistence';
 import { loadStreak } from '../scoring/streak';
-import { playEventSfxOneOf, AUDIENCE_REACTION_SFX, playAudienceVoice } from '../audio/event-sfx';
+import {
+  playEventSfx,
+  playEventSfxOneOf,
+  AUDIENCE_REACTION_SFX,
+  playAudienceVoice,
+  streakMilestoneSfx,
+  COIN_SFX,
+} from '../audio/event-sfx';
 import { loadDiscoveredAxes } from '../state/axis-discovery';
 import { getRecipe } from '../state/recipes';
 import { renderFartProfileHtml } from './fart-profile';
@@ -43,6 +50,27 @@ export const VOICE_AFTER_REACTION_MS = 800;
 /** A flop stinger is a punchline, not a headline — quieter than the cheers. */
 const FAIL_STINGER_VOLUME = 4;
 const STINGER_VOLUME = 5;
+/** Meh is a shrug, not a punchline — the quietest reaction in the room. */
+export const MEH_STINGER_VOLUME = 3;
+/** Streak stingers on voiced tiers wait this long past the voice slot so the
+ *  punchline (the voice line, ~3s) lands before the milestone flourish. */
+export const STREAK_AFTER_VOICE_MS = 3200;
+const STREAK_STINGER_VOLUME = 7;
+/** Payout coin chime trails the crowd stinger by a beat — reward, then receipt. */
+export const COIN_AFTER_REACTION_MS = 400;
+const COIN_VOLUME = 3;
+
+/**
+ * Soft coin chime when a launch actually paid gold. Scheduled on the same
+ * fart-duration clock as the crowd stinger so it never lands on the fart.
+ * Called from the launch path (plate.ts) right after awardGoldForEncounter.
+ */
+export function scheduleGoldChime(goldPaid: number, fartDurationMs?: number): void {
+  if (goldPaid <= 0) return;
+  setTimeout(() => {
+    void playEventSfx(COIN_SFX, COIN_VOLUME);
+  }, reactionDelayMs(fartDurationMs) + COIN_AFTER_REACTION_MS);
+}
 
 export function reactionDelayMs(fartDurationMs?: number): number {
   if (!fartDurationMs || fartDurationMs <= 0) return REACTION_SFX_DELAY_MS;
@@ -106,12 +134,12 @@ export function renderAudienceReaction(pct: number, audience: Audience, fartDura
   if (tierEl) tierEl.textContent = tierLabel(r.tier, audience);
   if (trendEl) trendEl.textContent = trendLabel(r.trend);
   applyReactionFace(r.tier);
+  const streak = loadStreak();
   const streakEl = $('audienceReactionStreak');
   if (streakEl) {
-    const s = loadStreak();
-    if (s >= 2) {
+    if (streak >= 2) {
       streakEl.removeAttribute('hidden');
-      streakEl.textContent = s >= 10 ? `🌟 LEGENDARY STREAK ×${s}` : s >= 5 ? `🔥🔥 Streak ×${s}` : `🔥 Streak ×${s}`;
+      streakEl.textContent = streak >= 10 ? `🌟 LEGENDARY STREAK ×${streak}` : streak >= 5 ? `🔥🔥 Streak ×${streak}` : `🔥 Streak ×${streak}`;
     } else {
       streakEl.setAttribute('hidden', '');
     }
@@ -121,10 +149,23 @@ export function renderAudienceReaction(pct: number, audience: Audience, fartDura
   const delay = reactionDelayMs(fartDurationMs);
   const pool = AUDIENCE_REACTION_SFX[r.tier];
   if (pool.length > 0) {
-    const vol = r.tier === 'disliked' || r.tier === 'evacuated' ? FAIL_STINGER_VOLUME : STINGER_VOLUME;
+    const vol =
+      r.tier === 'meh' ? MEH_STINGER_VOLUME
+      : r.tier === 'disliked' || r.tier === 'evacuated' ? FAIL_STINGER_VOLUME
+      : STINGER_VOLUME;
     setTimeout(() => {
       void playEventSfxOneOf(pool, vol);
     }, delay);
+  }
+  // Streak milestone stinger (×5 / ×10). On voiced tiers it waits out the
+  // voice line so the audio order stays fart → crowd → voice → flourish.
+  const milestone = streakMilestoneSfx(streak);
+  if (milestone) {
+    const voiced = r.tier === 'loved' || r.tier === 'evacuated';
+    const milestoneDelay = delay + VOICE_AFTER_REACTION_MS + (voiced ? STREAK_AFTER_VOICE_MS : 0);
+    setTimeout(() => {
+      void playEventSfx(milestone, STREAK_STINGER_VOLUME);
+    }, milestoneDelay);
   }
   void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
     spawnReactionParticles(r.tier);

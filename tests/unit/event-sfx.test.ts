@@ -11,10 +11,10 @@ describe('Event SFX constants (P3)', () => {
   // the real SEEDS table — the verbatim restatement that lived here was a
   // constant-equals-itself test and was removed.)
 
-  it('AUDIENCE_REACTION_SFX maps each tier to a pool of ids (meh stays silent)', () => {
+  it('AUDIENCE_REACTION_SFX maps EVERY tier to a non-empty pool (meh got its shrug)', () => {
     expect(AUDIENCE_REACTION_SFX.loved.length).toBeGreaterThanOrEqual(1);
     expect(AUDIENCE_REACTION_SFX.liked.length).toBeGreaterThanOrEqual(1);
-    expect(AUDIENCE_REACTION_SFX.meh.length).toBe(0);
+    expect(AUDIENCE_REACTION_SFX.meh.length).toBeGreaterThanOrEqual(1);
     expect(AUDIENCE_REACTION_SFX.disliked.length).toBeGreaterThanOrEqual(1);
     expect(AUDIENCE_REACTION_SFX.evacuated.length).toBeGreaterThanOrEqual(1);
   });

@@ -100,10 +100,10 @@ describe('audience reaction SFX is staggered AFTER the fart (not simultaneous)',
     expect(playAudienceVoice).toHaveBeenCalledWith('granny-edna', 'loved');
   });
 
-  it('meh tier stays silent (no stinger, no voice) even after delays', () => {
-    renderAudienceReaction(60, granny, 2000); // 60% -> meh -> empty pool
+  it('meh tier plays the soft shrug pool, never a voice line', () => {
+    renderAudienceReaction(60, granny, 2000); // 60% -> meh
     vi.advanceTimersByTime(reactionDelayMs(2000) + VOICE_AFTER_REACTION_MS);
-    expect(playEventSfxOneOf).not.toHaveBeenCalled();
+    expect(playEventSfxOneOf).toHaveBeenCalledWith(AUDIENCE_REACTION_SFX.meh, 3);
     expect(playAudienceVoice).not.toHaveBeenCalled();
   });
 });

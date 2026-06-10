@@ -12,6 +12,7 @@ import {
 } from '../state/daily-quest';
 import { addGold, addResearchNotes } from '../state/persistence';
 import { renderProgression } from './plate';
+import { playEventSfx, QUEST_CLAIMED_SFX } from '../audio/event-sfx';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -58,6 +59,7 @@ function onClaim(): void {
   }
   addGold(r.gold);
   addResearchNotes(r.notes);
+  void playEventSfx(QUEST_CLAIMED_SFX, 6);
   renderDailyQuest();
   // Refresh the progression strip so the new gold + notes totals show.
   renderProgression();

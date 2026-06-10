@@ -15,6 +15,7 @@ import { loadConquests } from '../state/conquests';
 import { AUDIENCES } from '../state/audience';
 import { FOODS, getFood } from '../state/food';
 import { addFoodToPlate, renderPlate, renderBellyMeter, renderPantryGrid, renderProgression, _resetPlateAndBelly } from './plate';
+import { playEventSfx, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
 import { recipeProgress } from '../scoring/discovery';
 import { LEGENDARY_QUESTS, questProgress, attemptClaimLegendary } from '../state/quests';
 import { renderBossList } from './boss-arena';
@@ -163,6 +164,7 @@ function renderLegendaryQuests(): void {
       if (!id) return;
       const r = attemptClaimLegendary(id);
       if (r.ok) {
+        void playEventSfx(LEGENDARY_FANFARE_SFX, 8);
         // Re-render legendary quests (this card flips to "Unlocked"), pantry,
         // progression strip. The notebook modal stays open so the player sees
         // the fanfare. Phase L will add particles.

@@ -119,6 +119,12 @@ const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'flop-crickets',      name: 'Awkward Crickets',    mood: 'sneaky',      duration_seconds: 1.4, prompt: 'awkward silence with two soft cricket chirps, comedic empty-room beat, family-friendly' },
   { kind: 'sfx', id: 'flop-whistle-down',  name: 'Slide Whistle Down',  mood: 'embarrassed', duration_seconds: 0.8, prompt: 'a single quick descending slide whistle womp, brief cartoon failure sting, family-friendly' },
 
+  // --- meh variants (sound overhaul) ---
+  // The 50-69% shrug. Quieter and shorter than the flops: an audible "we're
+  // unmoved" beat, not a punishment. Played at MEH_STINGER_VOLUME (3).
+  { kind: 'sfx', id: 'meh-cough',   name: 'Polite Cough',     mood: 'embarrassed', duration_seconds: 0.8, prompt: 'one single polite quiet cough in a silent room, small awkward beat, family-friendly' },
+  { kind: 'sfx', id: 'meh-shuffle', name: 'Awkward Shuffle',  mood: 'embarrassed', duration_seconds: 1.0, prompt: 'a small audience shifting in creaky seats with a faint unimpressed hmm, brief awkward pause, family-friendly' },
+
 ], 'reaction');
 
 // ====== Phase K food-eating seeds (item 62) ======
@@ -134,6 +140,12 @@ const FOOD_SFX: SfxSeed[] = withCat([
 const EVENT_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'legendary-fanfare', name: 'Legendary Fanfare', mood: 'enthralled', duration_seconds: 2.6, prompt: 'a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly' },
   { kind: 'sfx', id: 'quest-claimed',     name: 'Quest Claimed',     mood: 'triumphant', duration_seconds: 1.8, prompt: 'a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly' },
+
+  // --- economy + milestone cues (sound overhaul) ---
+  { kind: 'sfx', id: 'coin-clink',    name: 'Coin Clink',     mood: 'triumphant', duration_seconds: 0.6, prompt: 'two or three small gold coins dropping into a pouch with a bright clink, brief, family-friendly cartoon foley' },
+  { kind: 'sfx', id: 'shop-purchase', name: 'Shop Purchase',  mood: 'triumphant', duration_seconds: 0.9, prompt: 'an old-fashioned cash register ka-ching with a small coin jingle, quick satisfying purchase sound, family-friendly' },
+  { kind: 'sfx', id: 'streak-5',      name: 'Streak ×5',      mood: 'enthralled', duration_seconds: 1.4, prompt: 'a small crowd rising oooh into a short cheer with one bright chime, building excitement, family-friendly' },
+  { kind: 'sfx', id: 'streak-10',     name: 'Streak ×10',     mood: 'enthralled', duration_seconds: 2.0, prompt: 'a big crowd eruption with a firework pop and glittering chime cascade, legendary celebration, family-friendly' },
 
 ], 'event');
 

@@ -14,6 +14,7 @@ import { getShopOffers, attemptPurchase } from '../state/shop';
 import { getFood } from '../state/food';
 import { renderPantryGrid, renderProgression } from './plate';
 import { loadGold } from '../state/persistence';
+import { playEventSfx, SHOP_PURCHASE_SFX } from '../audio/event-sfx';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -57,6 +58,7 @@ function renderOffers(): void {
       if (!id) return;
       const r = attemptPurchase(id, price);
       if (r.ok) {
+        void playEventSfx(SHOP_PURCHASE_SFX, 6);
         // Remove this offer card; refresh balance + pantry + progression strip.
         const card = btn.closest<HTMLElement>('.shop-offer');
         if (card) card.remove();

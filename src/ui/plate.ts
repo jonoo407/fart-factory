@@ -69,7 +69,7 @@ import {
   scheduleHide,
   showUnicornSplash,
 } from './splashes';
-import { renderAudienceReaction, renderStoryResult } from './result-panel';
+import { renderAudienceReaction, renderStoryResult, scheduleGoldChime } from './result-panel';
 import {
   recordLaunch as recordEncounterLaunch,
   getOrCreate as getEncounterProgress,
@@ -797,6 +797,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
       // promised in the UI but never reached the payout).
       const base = Math.round(launchBaseGold(aud, areaId) * goldMultiplierFromBuffs());
       goldPaid = awardGoldForEncounter(aud.id, base, match.pct);
+      // Receipt after reward: a soft coin chime once the crowd stinger lands.
+      scheduleGoldChime(goldPaid, fartDurationMs);
       bumpStars(aud.id, starsForPct(match.pct));
     }
     awardResearchForLaunch(match.pct);
