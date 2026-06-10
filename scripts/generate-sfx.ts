@@ -23,16 +23,23 @@
  *   manifest, runtime substitutes procedural synthesis for that id.
  */
 import { createHash } from 'node:crypto';
-import { writeFile, mkdir, readFile, stat } from 'node:fs/promises';
+import { writeFile, mkdir, readFile, stat, rename, unlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { SEEDS, type Seed, type SfxCategory } from './sfx-seeds';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { SEEDS, type Seed, type SfxCategory, type PostFx } from './sfx-seeds';
 
 const SFX_ENDPOINT = 'https://api.elevenlabs.io/v1/sound-generation';
+const MUSIC_ENDPOINT = 'https://api.elevenlabs.io/v1/music';
 const TTS_MODEL_ID = 'eleven_multilingual_v2';
+const MUSIC_MODEL_ID = 'music_v1';
 const VERSION = 'v2';
 const DEFAULT_OUT_DIR = resolve('public/sfx');
+
+/** Crossfade window for seamless music loops (see makeLoopArgs). */
+export const MUSIC_LOOP_XFADE_S = 2.5;
 
 /**
  * Cost backstop: abort a single run after this many *new* (uncached) API
@@ -62,7 +69,7 @@ export interface ManifestEntry {
   /** Set on TTS entries — the ElevenLabs voice id used. */
   voiceId?: string;
   /** Marker so the runtime knows whether to expect SFX vs TTS semantics. */
-  kind?: 'sfx' | 'tts';
+  kind?: 'sfx' | 'tts' | 'music';
   proceduralFallback?: boolean;
 }
 
@@ -73,15 +80,69 @@ export interface Manifest {
 }
 
 function checksumFor(seed: Seed): string {
+  // postFx joins the checksum ONLY when present, so the pre-postFx checksums
+  // of the untouched cast stay valid (no quota burn regenerating them).
   const parts =
     seed.kind === 'sfx'
       ? `${VERSION}|sfx|${seed.prompt}|${seed.duration_seconds}|${seed.mood}`
-      : `${VERSION}|tts|${seed.text}|${seed.voice_id}`;
+      : seed.kind === 'music'
+        ? `${VERSION}|music|${seed.prompt}|${seed.music_length_ms}`
+        : `${VERSION}|tts|${seed.text}|${seed.voice_id}${seed.postFx ? `|${JSON.stringify(seed.postFx)}` : ''}`;
   return createHash('sha256').update(parts).digest('hex').slice(0, 12);
 }
 
 function ttsEndpoint(voiceId: string): string {
   return `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`;
+}
+
+// ---------- ffmpeg post-processing (postFx voices + seamless music loops) ----------
+
+/**
+ * Build the -af filter chain for a TTS postFx: pitch shift via asetrate (which
+ * also speeds playback) compensated back to original speed with atempo, then
+ * any extra filters (echo, vibrato, …) verbatim.
+ */
+export function buildPostFxFilter(fx: PostFx): string {
+  const parts: string[] = [];
+  if (fx.semitones) {
+    const factor = Math.pow(2, fx.semitones / 12);
+    parts.push(
+      `asetrate=44100*${factor.toFixed(6)}`,
+      'aresample=44100',
+      `atempo=${(1 / factor).toFixed(6)}`,
+    );
+  }
+  if (fx.tempo && fx.tempo !== 1) parts.push(`atempo=${fx.tempo.toFixed(6)}`);
+  if (fx.filters) parts.push(...fx.filters);
+  return parts.join(',');
+}
+
+/**
+ * ffmpeg args turning a straight music render into a seamless loop: the head
+ * (first XFADE s) is crossfaded over the tail, then trimmed off the front, so
+ * the loop's end flows into exactly the material its start picks up.
+ */
+function makeLoopArgs(inPath: string, outPath: string, lengthS: number, xfadeS: number): string[] {
+  const bodyEnd = lengthS - xfadeS;
+  const filter = [
+    `[0:a]atrim=${xfadeS}:${bodyEnd},asetpts=PTS-STARTPTS[body]`,
+    `[0:a]atrim=${bodyEnd}:${lengthS},asetpts=PTS-STARTPTS[tail]`,
+    `[0:a]atrim=0:${xfadeS},asetpts=PTS-STARTPTS[head]`,
+    `[tail][head]acrossfade=d=${xfadeS}:c1=tri:c2=tri[x]`,
+    `[body][x]concat=n=2:v=0:a=1`,
+  ].join(';');
+  return ['-y', '-i', inPath, '-filter_complex', filter, '-b:a', '128k', outPath];
+}
+
+function makePostFxArgs(inPath: string, outPath: string, fx: PostFx): string[] {
+  return ['-y', '-i', inPath, '-af', buildPostFxFilter(fx), '-b:a', '128k', outPath];
+}
+
+const execFileAsync = promisify(execFile);
+
+/** Default ffmpeg runner (injectable via GenerateOptions for tests). */
+async function runFfmpegDefault(args: string[]): Promise<void> {
+  await execFileAsync('ffmpeg', args);
 }
 
 /** Approx duration for TTS (we don't have ffprobe). ~12 chars/sec gives
@@ -132,6 +193,23 @@ async function callTts(seed: Seed & { kind: 'tts' }, apiKey: string): Promise<Re
   });
 }
 
+async function callMusic(seed: Seed & { kind: 'music' }, apiKey: string): Promise<Response> {
+  return fetch(MUSIC_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'xi-api-key': apiKey,
+      'Content-Type': 'application/json',
+      Accept: 'audio/mpeg',
+    },
+    body: JSON.stringify({
+      prompt: seed.prompt,
+      music_length_ms: seed.music_length_ms,
+      model_id: MUSIC_MODEL_ID,
+      force_instrumental: true,
+    }),
+  });
+}
+
 export interface GenerateOptions {
   /** Seeds to generate. Defaults to the full SEEDS library. */
   seeds?: readonly Seed[];
@@ -141,6 +219,9 @@ export interface GenerateOptions {
   outDir?: string;
   /** Max new API calls before aborting. Defaults to HARD_CAP. */
   hardCap?: number;
+  /** ffmpeg runner for postFx voices + music loop crossfades. Injectable so
+   *  tests never spawn a real process. Defaults to spawning `ffmpeg`. */
+  runFfmpeg?: (args: string[]) => Promise<void>;
 }
 
 export interface GenerateResult {
@@ -157,6 +238,7 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
   const apiKey = opts.apiKey ?? process.env.ELEVENLABS_API_KEY ?? '';
   const outDir = opts.outDir ?? DEFAULT_OUT_DIR;
   const hardCap = opts.hardCap ?? HARD_CAP;
+  const runFfmpeg = opts.runFfmpeg ?? runFfmpegDefault;
   const manifestPath = resolve(outDir, 'manifest.json');
 
   await mkdir(outDir, { recursive: true });
@@ -197,11 +279,13 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
       const baseEntry: Omit<ManifestEntry, 'bytes'> = {
         id: seed.id,
         name: seed.name,
-        prompt: seed.kind === 'sfx' ? seed.prompt : seed.text,
+        prompt: seed.kind === 'tts' ? seed.text : seed.prompt,
         durationMs:
           seed.kind === 'sfx'
             ? Math.round(seed.duration_seconds * 1000)
-            : estimateTtsDurationMs(seed.text),
+            : seed.kind === 'music'
+              ? Math.round(seed.music_length_ms - MUSIC_LOOP_XFADE_S * 1000)
+              : estimateTtsDurationMs(seed.text),
         mood: seed.mood,
         file,
         checksum,
@@ -212,7 +296,12 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
 
       console.log(`generating: ${seed.id} (${seed.kind})…`);
       try {
-        const res = seed.kind === 'sfx' ? await callSfx(seed, apiKey) : await callTts(seed, apiKey);
+        const res =
+          seed.kind === 'sfx'
+            ? await callSfx(seed, apiKey)
+            : seed.kind === 'music'
+              ? await callMusic(seed, apiKey)
+              : await callTts(seed, apiKey);
         if (!res.ok) {
           const errBody = await res.text();
           console.warn(`  skip ${seed.id}: ${res.status} ${errBody.slice(0, 200)}`);
@@ -221,6 +310,29 @@ export async function generateSfx(opts: GenerateOptions = {}): Promise<GenerateR
         }
         const buf = Buffer.from(await res.arrayBuffer());
         await writeFile(filePath, buf);
+
+        // Post-process in place: pitch/effect chain for cast postFx, seamless
+        // crossfade-loop for music. A failed ffmpeg pass keeps the raw audio
+        // (warn + continue) — never a dead asset.
+        const fxArgs =
+          seed.kind === 'tts' && seed.postFx
+            ? makePostFxArgs(filePath, `${filePath}.fx.mp3`, seed.postFx)
+            : seed.kind === 'music'
+              ? makeLoopArgs(filePath, `${filePath}.fx.mp3`, seed.music_length_ms / 1000, MUSIC_LOOP_XFADE_S)
+              : null;
+        if (fxArgs) {
+          try {
+            await runFfmpeg(fxArgs);
+            // Only swap when ffmpeg actually produced output — never lose the raw.
+            if (existsSync(`${filePath}.fx.mp3`)) {
+              await unlink(filePath);
+              await rename(`${filePath}.fx.mp3`, filePath);
+            }
+          } catch (err) {
+            console.warn(`  postfx failed for ${seed.id} (keeping raw audio): ${(err as Error).message}`);
+          }
+        }
+
         const stats = await stat(filePath);
         entries.push({ ...baseEntry, bytes: stats.size });
         console.log(`  wrote ${file} (${stats.size} bytes)`);

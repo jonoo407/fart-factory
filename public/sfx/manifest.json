@@ -1,6 +1,6 @@
 {
   "version": "v2",
-  "generatedAt": "2026-06-10T13:26:14.189Z",
+  "generatedAt": "2026-06-10T18:06:12.760Z",
   "entries": [
     {
       "id": "mouse-squeak",
@@ -509,26 +509,26 @@
     {
       "id": "music-lab-loop",
       "name": "Lab Loop",
-      "prompt": "seamless looping background music, playful mellow cartoon science lab ambience, soft bouncy pizzicato and light marimba, gentle bubbling undertone, calm low-key, no melody spikes, no intro, no outro, loops perfectly, family-friendly",
-      "durationMs": 20000,
+      "prompt": "Gentle cheerful instrumental background music for a kids science lab game. Warm acoustic ukulele, soft marimba, light hand percussion. Relaxed, cozy, mellow lo-fi feel, sparse arrangement, steady level throughout with no big intro and no ending so it can loop seamlessly. Instrumental only, no vocals.",
+      "durationMs": 22500,
       "mood": "comedic",
       "file": "music-lab-loop.mp3",
-      "checksum": "c0b6ad8c1cfc",
+      "checksum": "b263fe702e63",
       "category": "music",
-      "kind": "sfx",
-      "bytes": 321036
+      "kind": "music",
+      "bytes": 361159
     },
     {
       "id": "music-boss-loop",
       "name": "Boss Arena Loop",
-      "prompt": "seamless looping background music, tense but goofy cartoon showdown ambience, low staccato strings and soft timpani heartbeat, sneaky comedic undertone, restrained and quiet, no melody spikes, no intro, no outro, loops perfectly, family-friendly",
-      "durationMs": 20000,
+      "prompt": "Playful sneaky instrumental background music for a cartoon boss showdown in a kids game. Muted upright bass groove, pizzicato strings, soft brushed drums, lightly mischievous spy-movie feel. Mellow and unobtrusive, steady level throughout with no big intro and no ending so it can loop seamlessly. Instrumental only, no vocals.",
+      "durationMs": 22500,
       "mood": "eerie",
       "file": "music-boss-loop.mp3",
-      "checksum": "9f228797207f",
+      "checksum": "4aeb44ad28f1",
       "category": "music",
-      "kind": "sfx",
-      "bytes": 321036
+      "kind": "music",
+      "bytes": 361159
     },
     {
       "id": "sig-granny-edna",
@@ -784,6 +784,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-granny-edna-liked",
+      "name": "Voice: Granny Edna — liked",
+      "prompt": "Granny Edna smiles politely. \"How nice.\"",
+      "durationMs": 3333,
+      "mood": "voice",
+      "file": "voice-granny-edna-liked.mp3",
+      "checksum": "a861905cc55a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 43511
+    },
+    {
+      "id": "voice-granny-edna-meh",
+      "name": "Voice: Granny Edna — meh",
+      "prompt": "Granny Edna pats your hand. \"Bless your heart.\"",
+      "durationMs": 3917,
+      "mood": "voice",
+      "file": "voice-granny-edna-meh.mp3",
+      "checksum": "82744bc997da",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 51453
+    },
+    {
+      "id": "voice-granny-edna-disliked",
+      "name": "Voice: Granny Edna — disliked",
+      "prompt": "Granny Edna frowns. \"Well I never!\"",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-granny-edna-disliked.mp3",
+      "checksum": "1345b54c98bb",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 38914
+    },
+    {
       "id": "voice-granny-edna-evacuated",
       "name": "Voice: Granny Edna — evacuated",
       "prompt": "Granny Edna marches out muttering about manners.",
@@ -816,11 +855,50 @@
       "durationMs": 4167,
       "mood": "voice",
       "file": "voice-toddler-bday-loved.mp3",
-      "checksum": "6fd89fb48bd0",
+      "checksum": "8f4ceac1a37d",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
-      "bytes": 44765,
-      "category": "voice"
+      "bytes": 45182
+    },
+    {
+      "id": "voice-toddler-bday-liked",
+      "name": "Voice: Toddler Birthday Party — liked",
+      "prompt": "The toddlers giggle, mostly.",
+      "durationMs": 2333,
+      "mood": "voice",
+      "file": "voice-toddler-bday-liked.mp3",
+      "checksum": "56cb8b92b05d",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 28882
+    },
+    {
+      "id": "voice-toddler-bday-meh",
+      "name": "Voice: Toddler Birthday Party — meh",
+      "prompt": "The toddlers continue eating frosting.",
+      "durationMs": 3167,
+      "mood": "voice",
+      "file": "voice-toddler-bday-meh.mp3",
+      "checksum": "6d8990a1dac6",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 36405
+    },
+    {
+      "id": "voice-toddler-bday-disliked",
+      "name": "Voice: Toddler Birthday Party — disliked",
+      "prompt": "A toddler cries. Then they all cry.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-toddler-bday-disliked.mp3",
+      "checksum": "ebe29ef06568",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 44764
     },
     {
       "id": "voice-toddler-bday-evacuated",
@@ -829,11 +907,11 @@
       "durationMs": 4167,
       "mood": "voice",
       "file": "voice-toddler-bday-evacuated.mp3",
-      "checksum": "32754335c6ce",
+      "checksum": "e73cc3e28509",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
-      "bytes": 52288,
-      "category": "voice"
+      "bytes": 50616
     },
     {
       "id": "voice-toddler-bday-intro",
@@ -842,11 +920,11 @@
       "durationMs": 4750,
       "mood": "voice",
       "file": "voice-toddler-bday-intro.mp3",
-      "checksum": "5bf205f10ea4",
+      "checksum": "032661f237f2",
       "category": "voice",
       "kind": "tts",
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
-      "bytes": 61066
+      "bytes": 62318
     },
     {
       "id": "voice-baby-shower-loved",
@@ -855,11 +933,50 @@
       "durationMs": 5083,
       "mood": "voice",
       "file": "voice-baby-shower-loved.mp3",
-      "checksum": "26e55a726944",
+      "checksum": "fc494f26dc5b",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 62737,
-      "category": "voice"
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 66080
+    },
+    {
+      "id": "voice-baby-shower-liked",
+      "name": "Voice: Baby Shower — liked",
+      "prompt": "The Baby Shower smiles politely.",
+      "durationMs": 2667,
+      "mood": "voice",
+      "file": "voice-baby-shower-liked.mp3",
+      "checksum": "65fdefb0299f",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 35569
+    },
+    {
+      "id": "voice-baby-shower-meh",
+      "name": "Voice: Baby Shower — meh",
+      "prompt": "The Baby Shower continues opening presents.",
+      "durationMs": 3583,
+      "mood": "voice",
+      "file": "voice-baby-shower-meh.mp3",
+      "checksum": "17ca417d1a5e",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 43510
+    },
+    {
+      "id": "voice-baby-shower-disliked",
+      "name": "Voice: Baby Shower — disliked",
+      "prompt": "The Baby Shower exchanges worried glances.",
+      "durationMs": 3500,
+      "mood": "voice",
+      "file": "voice-baby-shower-disliked.mp3",
+      "checksum": "ee3945292203",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 44346
     },
     {
       "id": "voice-baby-shower-evacuated",
@@ -868,24 +985,24 @@
       "durationMs": 4583,
       "mood": "voice",
       "file": "voice-baby-shower-evacuated.mp3",
-      "checksum": "dda1db83d32e",
+      "checksum": "c70448cf429f",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 49363,
-      "category": "voice"
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 53959
     },
     {
       "id": "voice-baby-shower-intro",
       "name": "Voice: Baby Shower — intro",
-      "prompt": "Welcome to the baby shower! Keep it cute, keep it classy, and mind the gift table.",
-      "durationMs": 6833,
+      "prompt": "Goo goo ga GA! Da babies are here! Make da funny toot sound for baby... pwease? Hee hee!",
+      "durationMs": 7333,
       "mood": "voice",
       "file": "voice-baby-shower-intro.mp3",
-      "checksum": "31701491a015",
+      "checksum": "1697c0e4f72c",
       "category": "voice",
       "kind": "tts",
-      "voiceId": "EXAVITQu4vr4xnSDxMaL",
-      "bytes": 80710
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 99517
     },
     {
       "id": "voice-kindergarten-loved",
@@ -894,11 +1011,50 @@
       "durationMs": 5667,
       "mood": "voice",
       "file": "voice-kindergarten-loved.mp3",
-      "checksum": "54582eef7f99",
+      "checksum": "1f1ba16a7684",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
-      "bytes": 75276,
-      "category": "voice"
+      "bytes": 69842
+    },
+    {
+      "id": "voice-kindergarten-liked",
+      "name": "Voice: Kindergarten Class — liked",
+      "prompt": "The kindergartners laugh and point.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-kindergarten-liked.mp3",
+      "checksum": "27dbb71e535f",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 35151
+    },
+    {
+      "id": "voice-kindergarten-meh",
+      "name": "Voice: Kindergarten Class — meh",
+      "prompt": "The kindergartners are mildly distracted.",
+      "durationMs": 3417,
+      "mood": "voice",
+      "file": "voice-kindergarten-meh.mp3",
+      "checksum": "d31182b4c3c7",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 36405
+    },
+    {
+      "id": "voice-kindergarten-disliked",
+      "name": "Voice: Kindergarten Class — disliked",
+      "prompt": "A kindergartner says \"ewww\" loudly.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-kindergarten-disliked.mp3",
+      "checksum": "026a5b646610",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 41003
     },
     {
       "id": "voice-kindergarten-evacuated",
@@ -907,11 +1063,11 @@
       "durationMs": 4333,
       "mood": "voice",
       "file": "voice-kindergarten-evacuated.mp3",
-      "checksum": "966b6d1bb283",
+      "checksum": "b571075c7fe7",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
-      "bytes": 44347,
-      "category": "voice"
+      "bytes": 48526
     },
     {
       "id": "voice-kindergarten-intro",
@@ -920,11 +1076,11 @@
       "durationMs": 6417,
       "mood": "voice",
       "file": "voice-kindergarten-intro.mp3",
-      "checksum": "b5cd90f986de",
+      "checksum": "be14b416c79f",
       "category": "voice",
       "kind": "tts",
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
-      "bytes": 73186
+      "bytes": 76529
     },
     {
       "id": "voice-pet-rescue-loved",
@@ -938,6 +1094,45 @@
       "voiceId": "FGY2WhTYpPnrIDTdsKH5",
       "bytes": 69425,
       "category": "voice"
+    },
+    {
+      "id": "voice-pet-rescue-liked",
+      "name": "Voice: Pet Rescue Volunteers — liked",
+      "prompt": "The Pet Rescue volunteers approve gently.",
+      "durationMs": 3417,
+      "mood": "voice",
+      "file": "voice-pet-rescue-liked.mp3",
+      "checksum": "ce907563cd70",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 38914
+    },
+    {
+      "id": "voice-pet-rescue-meh",
+      "name": "Voice: Pet Rescue Volunteers — meh",
+      "prompt": "The dogs sniff, unimpressed. The cats are unbothered.",
+      "durationMs": 4417,
+      "mood": "voice",
+      "file": "voice-pet-rescue-meh.mp3",
+      "checksum": "c3a000cd72a9",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 51453
+    },
+    {
+      "id": "voice-pet-rescue-disliked",
+      "name": "Voice: Pet Rescue Volunteers — disliked",
+      "prompt": "A dog whimpers. The volunteers glare.",
+      "durationMs": 3083,
+      "mood": "voice",
+      "file": "voice-pet-rescue-disliked.mp3",
+      "checksum": "c773c62166b7",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 39750
     },
     {
       "id": "voice-pet-rescue-evacuated",
@@ -979,6 +1174,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-frat-bros-liked",
+      "name": "Voice: The Frat Bros — liked",
+      "prompt": "The Frat Bros high-five each other. \"Bro, decent.\"",
+      "durationMs": 4167,
+      "mood": "voice",
+      "file": "voice-frat-bros-liked.mp3",
+      "checksum": "ee3cfd5ed1ca",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 53124
+    },
+    {
+      "id": "voice-frat-bros-meh",
+      "name": "Voice: The Frat Bros — meh",
+      "prompt": "The Frat Bros shrug. \"Eh, I mean, sure.\"",
+      "durationMs": 3333,
+      "mood": "voice",
+      "file": "voice-frat-bros-meh.mp3",
+      "checksum": "c796caee53d6",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 49363
+    },
+    {
+      "id": "voice-frat-bros-disliked",
+      "name": "Voice: The Frat Bros — disliked",
+      "prompt": "The Frat Bros boo. \"Come on, dude!\"",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-frat-bros-disliked.mp3",
+      "checksum": "e90794231101",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 37660
+    },
+    {
       "id": "voice-frat-bros-evacuated",
       "name": "Voice: The Frat Bros — evacuated",
       "prompt": "The Frat Bros stagger to the parking lot, swearing off you forever.",
@@ -1018,6 +1252,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-goth-teens-liked",
+      "name": "Voice: Goth Teens — liked",
+      "prompt": "The Goth Teens approve, in their joyless way.",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-goth-teens-liked.mp3",
+      "checksum": "1ba671e25808",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 42675
+    },
+    {
+      "id": "voice-goth-teens-meh",
+      "name": "Voice: Goth Teens — meh",
+      "prompt": "The Goth Teens were already disappointed in life.",
+      "durationMs": 4083,
+      "mood": "voice",
+      "file": "voice-goth-teens-meh.mp3",
+      "checksum": "338ae6e0a25a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 47273
+    },
+    {
+      "id": "voice-goth-teens-disliked",
+      "name": "Voice: Goth Teens — disliked",
+      "prompt": "The Goth Teens roll their eyes harder than humanly possible.",
+      "durationMs": 5000,
+      "mood": "voice",
+      "file": "voice-goth-teens-disliked.mp3",
+      "checksum": "de87267deea0",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 53960
+    },
+    {
       "id": "voice-goth-teens-evacuated",
       "name": "Voice: Goth Teens — evacuated",
       "prompt": "The Goth Teens vanish into the shadows, more disappointed than ever.",
@@ -1050,11 +1323,50 @@
       "durationMs": 4583,
       "mood": "voice",
       "file": "voice-alien-tourists-loved.mp3",
-      "checksum": "fbfa2d3af7a6",
+      "checksum": "2ad9c49879ef",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "XB0fDUnXU5powFXDhCwa",
-      "bytes": 56050,
-      "category": "voice"
+      "bytes": 57303
+    },
+    {
+      "id": "voice-alien-tourists-liked",
+      "name": "Voice: Alien Tourists — liked",
+      "prompt": "The Alien Tourists blink approvingly.",
+      "durationMs": 3083,
+      "mood": "voice",
+      "file": "voice-alien-tourists-liked.mp3",
+      "checksum": "033d092937a8",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 38913
+    },
+    {
+      "id": "voice-alien-tourists-meh",
+      "name": "Voice: Alien Tourists — meh",
+      "prompt": "The Alien Tourists tilt their heads, confused.",
+      "durationMs": 3833,
+      "mood": "voice",
+      "file": "voice-alien-tourists-meh.mp3",
+      "checksum": "530db66b456c",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 48526
+    },
+    {
+      "id": "voice-alien-tourists-disliked",
+      "name": "Voice: Alien Tourists — disliked",
+      "prompt": "The Alien Tourists make a low warbling sound.",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-alien-tourists-disliked.mp3",
+      "checksum": "fdb929949cfa",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 48526
     },
     {
       "id": "voice-alien-tourists-evacuated",
@@ -1063,11 +1375,11 @@
       "durationMs": 3583,
       "mood": "voice",
       "file": "voice-alien-tourists-evacuated.mp3",
-      "checksum": "833d02711ab9",
+      "checksum": "dd22dcde8f1a",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "XB0fDUnXU5powFXDhCwa",
-      "bytes": 42675,
-      "category": "voice"
+      "bytes": 43510
     },
     {
       "id": "voice-alien-tourists-intro",
@@ -1076,11 +1388,11 @@
       "durationMs": 8667,
       "mood": "voice",
       "file": "voice-alien-tourists-intro.mp3",
-      "checksum": "a96e611ee4a4",
+      "checksum": "eaf74fe93003",
       "category": "voice",
       "kind": "tts",
       "voiceId": "XB0fDUnXU5powFXDhCwa",
-      "bytes": 97846
+      "bytes": 95755
     },
     {
       "id": "voice-wrestling-fans-loved",
@@ -1094,6 +1406,45 @@
       "voiceId": "bIHbv24MWmeRgasZH58o",
       "bytes": 70261,
       "category": "voice"
+    },
+    {
+      "id": "voice-wrestling-fans-liked",
+      "name": "Voice: Wrestling Fans — liked",
+      "prompt": "The Wrestling Fans cheer. \"DECENT, DECENT, DECENT!\"",
+      "durationMs": 4250,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-liked.mp3",
+      "checksum": "a4ff29e1222d",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 61902
+    },
+    {
+      "id": "voice-wrestling-fans-meh",
+      "name": "Voice: Wrestling Fans — meh",
+      "prompt": "The Wrestling Fans hold up signs saying \"BORING.\"",
+      "durationMs": 4083,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-meh.mp3",
+      "checksum": "b781e5db4631",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 51035
+    },
+    {
+      "id": "voice-wrestling-fans-disliked",
+      "name": "Voice: Wrestling Fans — disliked",
+      "prompt": "The Wrestling Fans throw popcorn.",
+      "durationMs": 2750,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-disliked.mp3",
+      "checksum": "830d214ac015",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 37660
     },
     {
       "id": "voice-wrestling-fans-evacuated",
@@ -1128,11 +1479,50 @@
       "durationMs": 3750,
       "mood": "voice",
       "file": "voice-punk-show-loved.mp3",
-      "checksum": "0eb1432d9ce6",
+      "checksum": "2e6e70638620",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 50199,
-      "category": "voice"
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 61902
+    },
+    {
+      "id": "voice-punk-show-liked",
+      "name": "Voice: Punk Rock Show — liked",
+      "prompt": "The Punk Show nods aggressively.",
+      "durationMs": 2667,
+      "mood": "voice",
+      "file": "voice-punk-show-liked.mp3",
+      "checksum": "f09ba50e00f2",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 31391
+    },
+    {
+      "id": "voice-punk-show-meh",
+      "name": "Voice: Punk Rock Show — meh",
+      "prompt": "The Punk Show is busy starting other fights.",
+      "durationMs": 3667,
+      "mood": "voice",
+      "file": "voice-punk-show-meh.mp3",
+      "checksum": "1c683b85e738",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 41004
+    },
+    {
+      "id": "voice-punk-show-disliked",
+      "name": "Voice: Punk Rock Show — disliked",
+      "prompt": "The Punk Show heckles you for selling out.",
+      "durationMs": 3500,
+      "mood": "voice",
+      "file": "voice-punk-show-disliked.mp3",
+      "checksum": "35cdadc78ab8",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 37660
     },
     {
       "id": "voice-punk-show-evacuated",
@@ -1141,11 +1531,11 @@
       "durationMs": 4000,
       "mood": "voice",
       "file": "voice-punk-show-evacuated.mp3",
-      "checksum": "464624bf1b46",
+      "checksum": "9432ff847587",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 48527,
-      "category": "voice"
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 46437
     },
     {
       "id": "voice-punk-show-intro",
@@ -1154,11 +1544,11 @@
       "durationMs": 5000,
       "mood": "voice",
       "file": "voice-punk-show-intro.mp3",
-      "checksum": "1aa3df0a6054",
+      "checksum": "082d6b84e562",
       "category": "voice",
       "kind": "tts",
-      "voiceId": "bIHbv24MWmeRgasZH58o",
-      "bytes": 58976
+      "voiceId": "TX3LPaxmHKxFdv7VOQHJ",
+      "bytes": 71515
     },
     {
       "id": "voice-skunk-society-loved",
@@ -1172,6 +1562,45 @@
       "voiceId": "nPczCjzI2devNBz1zQrb",
       "bytes": 54378,
       "category": "voice"
+    },
+    {
+      "id": "voice-skunk-society-liked",
+      "name": "Voice: The Skunk Society — liked",
+      "prompt": "The Skunk Society nods knowingly.",
+      "durationMs": 2750,
+      "mood": "voice",
+      "file": "voice-skunk-society-liked.mp3",
+      "checksum": "094b0eb8872d",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 32226
+    },
+    {
+      "id": "voice-skunk-society-meh",
+      "name": "Voice: The Skunk Society — meh",
+      "prompt": "The Skunk Society is unimpressed but tolerant.",
+      "durationMs": 3833,
+      "mood": "voice",
+      "file": "voice-skunk-society-meh.mp3",
+      "checksum": "7f75bd93a09a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 41004
+    },
+    {
+      "id": "voice-skunk-society-disliked",
+      "name": "Voice: The Skunk Society — disliked",
+      "prompt": "The Skunk Society wrinkles their noses. From a SKUNK.",
+      "durationMs": 4417,
+      "mood": "voice",
+      "file": "voice-skunk-society-disliked.mp3",
+      "checksum": "d8e9c081af3c",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 51453
     },
     {
       "id": "voice-skunk-society-evacuated",
@@ -1213,6 +1642,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-food-critics-liked",
+      "name": "Voice: Food Critics — liked",
+      "prompt": "The Food Critics scribble approvingly.",
+      "durationMs": 3167,
+      "mood": "voice",
+      "file": "voice-food-critics-liked.mp3",
+      "checksum": "563bc474908c",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 32226
+    },
+    {
+      "id": "voice-food-critics-meh",
+      "name": "Voice: Food Critics — meh",
+      "prompt": "The Food Critics make tiny notes you cannot read.",
+      "durationMs": 4083,
+      "mood": "voice",
+      "file": "voice-food-critics-meh.mp3",
+      "checksum": "abc026be1c17",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 44765
+    },
+    {
+      "id": "voice-food-critics-disliked",
+      "name": "Voice: Food Critics — disliked",
+      "prompt": "The Food Critics wrinkle their noses in unison.",
+      "durationMs": 3917,
+      "mood": "voice",
+      "file": "voice-food-critics-disliked.mp3",
+      "checksum": "2ed5ca9a7883",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 44347
+    },
+    {
       "id": "voice-food-critics-evacuated",
       "name": "Voice: Food Critics — evacuated",
       "prompt": "The Food Critics storm out, tweeting threads of fury.",
@@ -1252,6 +1720,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-volcano-cult-liked",
+      "name": "Voice: The Volcano Cult — liked",
+      "prompt": "The Volcano Cult nods. \"Acceptable offering.\"",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-volcano-cult-liked.mp3",
+      "checksum": "2509b2c3eb66",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 44347
+    },
+    {
+      "id": "voice-volcano-cult-meh",
+      "name": "Voice: The Volcano Cult — meh",
+      "prompt": "The Volcano Cult is contemplating doctrine.",
+      "durationMs": 3583,
+      "mood": "voice",
+      "file": "voice-volcano-cult-meh.mp3",
+      "checksum": "41f7bc949e95",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 36824
+    },
+    {
+      "id": "voice-volcano-cult-disliked",
+      "name": "Voice: The Volcano Cult — disliked",
+      "prompt": "The Volcano Cult mutters about heresy.",
+      "durationMs": 3167,
+      "mood": "voice",
+      "file": "voice-volcano-cult-disliked.mp3",
+      "checksum": "20005a6acc9c",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 33062
+    },
+    {
       "id": "voice-volcano-cult-evacuated",
       "name": "Voice: The Volcano Cult — evacuated",
       "prompt": "The Volcano Cult retreats to the caldera, plotting.",
@@ -1284,11 +1791,50 @@
       "durationMs": 4167,
       "mood": "voice",
       "file": "voice-haunted-mansion-loved.mp3",
-      "checksum": "d712631c128f",
+      "checksum": "ef7569e35d8b",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 51453,
-      "category": "voice"
+      "bytes": 53959
+    },
+    {
+      "id": "voice-haunted-mansion-liked",
+      "name": "Voice: The Haunted Mansion — liked",
+      "prompt": "A ghost gives a slow, dripping nod.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-liked.mp3",
+      "checksum": "159599a6da5a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 40585
+    },
+    {
+      "id": "voice-haunted-mansion-meh",
+      "name": "Voice: The Haunted Mansion — meh",
+      "prompt": "The ghosts shrug in unison.",
+      "durationMs": 2250,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-meh.mp3",
+      "checksum": "02bc569bc89f",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 33897
+    },
+    {
+      "id": "voice-haunted-mansion-disliked",
+      "name": "Voice: The Haunted Mansion — disliked",
+      "prompt": "The chandeliers shake with disapproval.",
+      "durationMs": 3250,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-disliked.mp3",
+      "checksum": "b5fe48d74185",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 41838
     },
     {
       "id": "voice-haunted-mansion-evacuated",
@@ -1297,11 +1843,11 @@
       "durationMs": 3667,
       "mood": "voice",
       "file": "voice-haunted-mansion-evacuated.mp3",
-      "checksum": "7b243515656f",
+      "checksum": "2bb5afcedae0",
+      "category": "voice",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 44347,
-      "category": "voice"
+      "bytes": 48108
     },
     {
       "id": "voice-haunted-mansion-intro",
@@ -1310,11 +1856,11 @@
       "durationMs": 5500,
       "mood": "voice",
       "file": "voice-haunted-mansion-intro.mp3",
-      "checksum": "2bd49306e334",
+      "checksum": "1ccdb2fb9e30",
       "category": "voice",
       "kind": "tts",
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 77784
+      "bytes": 85724
     },
     {
       "id": "voice-librarians-loved",
@@ -1328,6 +1874,45 @@
       "voiceId": "cjVigY5qzO86Huf0OWal",
       "bytes": 66499,
       "category": "voice"
+    },
+    {
+      "id": "voice-librarians-liked",
+      "name": "Voice: Librarians — liked",
+      "prompt": "The Librarians nod approvingly. Almost smile.",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-librarians-liked.mp3",
+      "checksum": "6a5b3b0940fb",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 47273
+    },
+    {
+      "id": "voice-librarians-meh",
+      "name": "Voice: Librarians — meh",
+      "prompt": "The Librarians return to their books.",
+      "durationMs": 3083,
+      "mood": "voice",
+      "file": "voice-librarians-meh.mp3",
+      "checksum": "40dd92220a90",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 30137
+    },
+    {
+      "id": "voice-librarians-disliked",
+      "name": "Voice: Librarians — disliked",
+      "prompt": "The Librarians shush you violently.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-librarians-disliked.mp3",
+      "checksum": "30fe60be2b38",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 32226
     },
     {
       "id": "voice-librarians-evacuated",
@@ -1369,6 +1954,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-royal-court-liked",
+      "name": "Voice: The Royal Court — liked",
+      "prompt": "The Royal Court nods approvingly. \"Acceptable.\"",
+      "durationMs": 3917,
+      "mood": "voice",
+      "file": "voice-royal-court-liked.mp3",
+      "checksum": "10b97f785f1a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 53124
+    },
+    {
+      "id": "voice-royal-court-meh",
+      "name": "Voice: The Royal Court — meh",
+      "prompt": "The Royal Court murmurs uncertainly behind silk fans.",
+      "durationMs": 4417,
+      "mood": "voice",
+      "file": "voice-royal-court-meh.mp3",
+      "checksum": "2fbc061053e0",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 53960
+    },
+    {
+      "id": "voice-royal-court-disliked",
+      "name": "Voice: The Royal Court — disliked",
+      "prompt": "The Royal Court averts their gaze in horror.",
+      "durationMs": 3667,
+      "mood": "voice",
+      "file": "voice-royal-court-disliked.mp3",
+      "checksum": "8f0247a0f036",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 43511
+    },
+    {
       "id": "voice-royal-court-evacuated",
       "name": "Voice: The Royal Court — evacuated",
       "prompt": "The Royal Court flees the hall, demanding the architect.",
@@ -1406,6 +2030,45 @@
       "voiceId": "EXAVITQu4vr4xnSDxMaL",
       "bytes": 53124,
       "category": "voice"
+    },
+    {
+      "id": "voice-opera-house-liked",
+      "name": "Voice: The Opera House — liked",
+      "prompt": "The Opera House applauds politely. Recital-quality.",
+      "durationMs": 4250,
+      "mood": "voice",
+      "file": "voice-opera-house-liked.mp3",
+      "checksum": "7303a4c46143",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 51035
+    },
+    {
+      "id": "voice-opera-house-meh",
+      "name": "Voice: The Opera House — meh",
+      "prompt": "The Opera House remains seated, fanning themselves.",
+      "durationMs": 4250,
+      "mood": "voice",
+      "file": "voice-opera-house-meh.mp3",
+      "checksum": "47e8d83bfb4e",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 46437
+    },
+    {
+      "id": "voice-opera-house-disliked",
+      "name": "Voice: The Opera House — disliked",
+      "prompt": "The Opera House mutters about cancelling their season tickets.",
+      "durationMs": 5167,
+      "mood": "voice",
+      "file": "voice-opera-house-disliked.mp3",
+      "checksum": "637bfa7036ac",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 51035
     },
     {
       "id": "voice-opera-house-evacuated",
@@ -1447,6 +2110,45 @@
       "category": "voice"
     },
     {
+      "id": "voice-astronauts-liked",
+      "name": "Voice: Astronauts — liked",
+      "prompt": "The Astronauts give a thumbs-up through their helmets.",
+      "durationMs": 4500,
+      "mood": "voice",
+      "file": "voice-astronauts-liked.mp3",
+      "checksum": "5c87124ad34a",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 47691
+    },
+    {
+      "id": "voice-astronauts-meh",
+      "name": "Voice: Astronauts — meh",
+      "prompt": "The Astronauts are mid-checklist. Unbothered.",
+      "durationMs": 3750,
+      "mood": "voice",
+      "file": "voice-astronauts-meh.mp3",
+      "checksum": "59367ea80952",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 48527
+    },
+    {
+      "id": "voice-astronauts-disliked",
+      "name": "Voice: Astronauts — disliked",
+      "prompt": "The Astronauts say \"Houston, we have a problem.\"",
+      "durationMs": 4000,
+      "mood": "voice",
+      "file": "voice-astronauts-disliked.mp3",
+      "checksum": "7e3f915322a7",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 43511
+    },
+    {
       "id": "voice-astronauts-evacuated",
       "name": "Voice: Astronauts — evacuated",
       "prompt": "The Astronauts initiate emergency cabin recycling.",
@@ -1479,11 +2181,50 @@
       "durationMs": 4333,
       "mood": "voice",
       "file": "voice-silent-monks-loved.mp3",
-      "checksum": "59f7ce900b3f",
+      "checksum": "b4726e7479cb",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 47273,
-      "category": "voice"
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 67335
+    },
+    {
+      "id": "voice-silent-monks-liked",
+      "name": "Voice: Silent Monks — liked",
+      "prompt": "The Silent Monks blink their approval.",
+      "durationMs": 3167,
+      "mood": "voice",
+      "file": "voice-silent-monks-liked.mp3",
+      "checksum": "d8dfaf91a1de",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 38078
+    },
+    {
+      "id": "voice-silent-monks-meh",
+      "name": "Voice: Silent Monks — meh",
+      "prompt": "The Silent Monks were already mid-contemplation.",
+      "durationMs": 4000,
+      "mood": "voice",
+      "file": "voice-silent-monks-meh.mp3",
+      "checksum": "9285914a4df6",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 54378
+    },
+    {
+      "id": "voice-silent-monks-disliked",
+      "name": "Voice: Silent Monks — disliked",
+      "prompt": "The Silent Monks meditate harder, pointedly.",
+      "durationMs": 3667,
+      "mood": "voice",
+      "file": "voice-silent-monks-disliked.mp3",
+      "checksum": "5813ac556e34",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 49363
     },
     {
       "id": "voice-silent-monks-evacuated",
@@ -1492,11 +2233,11 @@
       "durationMs": 5167,
       "mood": "voice",
       "file": "voice-silent-monks-evacuated.mp3",
-      "checksum": "ecef11051aaa",
+      "checksum": "40e2c8b68a2d",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 54378,
-      "category": "voice"
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 81128
     },
     {
       "id": "voice-silent-monks-intro",
@@ -1505,11 +2246,11 @@
       "durationMs": 6000,
       "mood": "voice",
       "file": "voice-silent-monks-intro.mp3",
-      "checksum": "85fa99fb3ff4",
+      "checksum": "fed82ecd7591",
       "category": "voice",
       "kind": "tts",
-      "voiceId": "cjVigY5qzO86Huf0OWal",
-      "bytes": 64409
+      "voiceId": "onwK4e9ZLuTAKqWW03F9",
+      "bytes": 86561
     },
     {
       "id": "voice-mystery-guest-loved",
@@ -1518,11 +2259,50 @@
       "durationMs": 6250,
       "mood": "voice",
       "file": "voice-mystery-guest-loved.mp3",
-      "checksum": "98ab61c17c66",
+      "checksum": "1911b38557df",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 76112,
-      "category": "voice"
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 80710
+    },
+    {
+      "id": "voice-mystery-guest-liked",
+      "name": "Voice: The Mystery Guest — liked",
+      "prompt": "The Mystery Guest nods cryptically.",
+      "durationMs": 2917,
+      "mood": "voice",
+      "file": "voice-mystery-guest-liked.mp3",
+      "checksum": "b2b3649bdc33",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 44347
+    },
+    {
+      "id": "voice-mystery-guest-meh",
+      "name": "Voice: The Mystery Guest — meh",
+      "prompt": "The Mystery Guest is reading the room.",
+      "durationMs": 3167,
+      "mood": "voice",
+      "file": "voice-mystery-guest-meh.mp3",
+      "checksum": "eee46f4fd0b3",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 36824
+    },
+    {
+      "id": "voice-mystery-guest-disliked",
+      "name": "Voice: The Mystery Guest — disliked",
+      "prompt": "The Mystery Guest disapproves, in a way that feels personal.",
+      "durationMs": 5000,
+      "mood": "voice",
+      "file": "voice-mystery-guest-disliked.mp3",
+      "checksum": "05c1e00e9ce6",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 59812
     },
     {
       "id": "voice-mystery-guest-evacuated",
@@ -1531,11 +2311,11 @@
       "durationMs": 3083,
       "mood": "voice",
       "file": "voice-mystery-guest-evacuated.mp3",
-      "checksum": "7aa2142609c7",
+      "checksum": "a4b14c924209",
+      "category": "voice",
       "kind": "tts",
-      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 38914,
-      "category": "voice"
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 38914
     },
     {
       "id": "voice-mystery-guest-intro",
@@ -1544,11 +2324,11 @@
       "durationMs": 5667,
       "mood": "voice",
       "file": "voice-mystery-guest-intro.mp3",
-      "checksum": "8582edd401b2",
+      "checksum": "3e86b0a59d62",
       "category": "voice",
       "kind": "tts",
-      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
-      "bytes": 91577
+      "voiceId": "N2lVS1w4EtoT3dr4eOWO",
+      "bytes": 106623
     }
   ]
 }

@@ -129,12 +129,12 @@ describe('audience voice TTS (Phase 4)', () => {
     }
   });
 
-  it('every audience has loved+evacuated TTS seeds', () => {
+  it('every audience has a TTS seed for EVERY tier (no unvoiced lines)', () => {
     const byId = new Map(TTS_SEEDS.map((s) => [s.id, s]));
     for (const aud of AUDIENCES) {
       for (const tier of VOICE_TIERS) {
         const seed = byId.get(voiceSeedId(aud.id, tier));
-        expect(seed).toBeDefined();
+        expect(seed, `missing ${voiceSeedId(aud.id, tier)}`).toBeDefined();
       }
     }
   });
@@ -142,18 +142,91 @@ describe('audience voice TTS (Phase 4)', () => {
   it("every TTS seed's text matches its source line verbatim (REACTIONS or INTROS)", () => {
     for (const seed of TTS_SEEDS) {
       // Parse the id pattern: voice-<audId>-<tier>
-      const match = seed.id.match(/^voice-(.+)-(loved|evacuated|intro)$/);
-      expect(match).not.toBeNull();
+      const match = seed.id.match(/^voice-(.+)-(loved|liked|meh|disliked|evacuated|intro)$/);
+      expect(match, `unparseable voice seed id ${seed.id}`).not.toBeNull();
       const [, audId, tier] = match!;
       const expected =
-        tier === 'intro' ? INTROS[audId!] : REACTIONS[audId!]?.[tier as 'loved' | 'evacuated'];
+        tier === 'intro'
+          ? INTROS[audId!]
+          : REACTIONS[audId!]?.[tier as 'loved' | 'liked' | 'meh' | 'disliked' | 'evacuated'];
       expect(seed.text).toBe(expected);
     }
   });
 
-  it('includes 20 audiences × 3 tiers (loved / evacuated / intro) = 60 voice clips', () => {
+  it('voices ALL 5 reaction tiers + intro for all 20 audiences (120 clips)', () => {
+    // "not all lines are voiced, voice them all" — liked/meh/disliked were
+    // text-only; every tier the player can land must now read its line aloud.
+    expect([...VOICE_TIERS]).toEqual(['loved', 'liked', 'meh', 'disliked', 'evacuated', 'intro']);
     expect(TTS_SEEDS.length).toBe(AUDIENCES.length * VOICE_TIERS.length);
-    expect(VOICE_TIERS.length).toBe(3);
+  });
+});
+
+// "The baby sounds like a woman" — every audience must sound like WHO THEY
+// ARE. ElevenLabs' premade roster has no babies/kids/ghosts/aliens, so the
+// cast carries a postFx (ffmpeg pitch/effect chain applied at generation
+// time) that moves the register where casting alone can't.
+describe('voice casting — characters sound like who they are', () => {
+  it('baby-shower is pitched up to a baby register, not an adult woman', () => {
+    expect(VOICE_CAST['baby-shower']!.postFx?.semitones).toBeGreaterThanOrEqual(6);
+  });
+
+  it('toddler-bday and kindergarten are pitched up to kid registers', () => {
+    expect(VOICE_CAST['toddler-bday']!.postFx?.semitones).toBeGreaterThanOrEqual(4);
+    expect(VOICE_CAST['kindergarten']!.postFx?.semitones).toBeGreaterThanOrEqual(3);
+  });
+
+  it('the baby is pitched higher than the toddler, the toddler above the kindergartner', () => {
+    const baby = VOICE_CAST['baby-shower']!.postFx!.semitones!;
+    const toddler = VOICE_CAST['toddler-bday']!.postFx!.semitones!;
+    const kinder = VOICE_CAST['kindergarten']!.postFx!.semitones!;
+    expect(baby).toBeGreaterThan(toddler);
+    expect(toddler).toBeGreaterThan(kinder);
+  });
+
+  it('haunted-mansion gets a ghostly echo', () => {
+    const fx = VOICE_CAST['haunted-mansion']!.postFx;
+    expect(fx?.filters?.some((f) => f.includes('aecho'))).toBe(true);
+  });
+
+  it('alien-tourists get an unearthly warble', () => {
+    const fx = VOICE_CAST['alien-tourists']!.postFx;
+    expect(fx?.filters?.some((f) => f.includes('vibrato'))).toBe(true);
+  });
+
+  it('no two audiences share the exact same voice signature (voice_id + postFx)', () => {
+    // Four pairs used to share a raw premade voice (George×2, Will×2, Eric×2,
+    // Sarah×2) so e.g. the punk show sounded exactly like the wrestling fans.
+    const sigs = AUDIENCES.map((a) => {
+      const c = VOICE_CAST[a.id]!;
+      return `${c.voice_id}|${JSON.stringify(c.postFx ?? null)}`;
+    });
+    expect(new Set(sigs).size).toBe(AUDIENCES.length);
+  });
+
+  it('TTS seeds inherit their cast postFx (the pitch ships into generation)', () => {
+    const seed = TTS_SEEDS.find((s) => s.id === 'voice-baby-shower-intro');
+    expect(seed?.postFx?.semitones).toBeGreaterThanOrEqual(6);
+  });
+});
+
+// The old loops came from the SFX endpoint ("annoying beeping on repeat").
+// Music must come from the dedicated Music API as real instrumental tracks.
+describe('background music — Music API seeds, not SFX-endpoint beeps', () => {
+  const MUSIC = SEEDS.filter((s): s is Extract<Seed, { kind: 'music' }> => s.kind === 'music');
+
+  it('both loops exist as music-kind seeds and no sfx-kind music remains', () => {
+    expect(MUSIC.map((s) => s.id).sort()).toEqual(['music-boss-loop', 'music-lab-loop']);
+    expect(SEEDS.some((s) => s.kind === 'sfx' && s.category === 'music')).toBe(false);
+  });
+
+  it('asks for instrumental, loopable, 15-60s tracks', () => {
+    for (const m of MUSIC) {
+      expect(m.music_length_ms).toBeGreaterThanOrEqual(15_000);
+      expect(m.music_length_ms).toBeLessThanOrEqual(60_000);
+      expect(m.prompt.toLowerCase()).toContain('instrumental');
+      expect(m.prompt.toLowerCase()).toContain('loop');
+      expect(m.category).toBe('music');
+    }
   });
 });
 

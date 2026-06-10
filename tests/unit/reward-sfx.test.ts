@@ -97,12 +97,12 @@ describe('meh tier plays the awkward beat (no longer dead silence)', () => {
 });
 
 describe('streak milestone stingers', () => {
-  it('unvoiced tier (liked): streak-5 fires in the voice slot', () => {
+  it('liked tier (now voiced): streak-5 waits for the voice line to land', () => {
     localStorage.setItem('fart_streak_count', '5');
-    renderAudienceReaction(80, granny, 1000); // liked — no voice line
-    vi.advanceTimersByTime(reactionDelayMs(1000) + VOICE_AFTER_REACTION_MS - 1);
+    renderAudienceReaction(80, granny, 1000); // liked — voiced like every tier now
+    vi.advanceTimersByTime(reactionDelayMs(1000) + VOICE_AFTER_REACTION_MS);
     expect(playEventSfx).not.toHaveBeenCalledWith('streak-5', expect.anything());
-    vi.advanceTimersByTime(1);
+    vi.advanceTimersByTime(STREAK_AFTER_VOICE_MS);
     expect(playEventSfx).toHaveBeenCalledWith('streak-5', expect.any(Number));
   });
 
