@@ -17,7 +17,8 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-const DEFAULTS = { master: 100, farts: 100, sfx: 100, voices: 100, music: 60 };
+// Music defaults LOW (sound overhaul): mood-setting under the comedy, not over it.
+const DEFAULTS = { master: 100, farts: 100, sfx: 100, voices: 100, music: 35 };
 
 describe('mute (legacy binary API, now Master)', () => {
   it('defaults to false when localStorage is empty', () => {
@@ -41,7 +42,7 @@ describe('mute (legacy binary API, now Master)', () => {
 });
 
 describe('four channels under a Master', () => {
-  it('defaults to Master/Farts/SFX/Voices 100, Music 60', () => {
+  it('defaults to Master/Farts/SFX/Voices 100, Music 35', () => {
     expect(loadAudioSettings()).toEqual(DEFAULTS);
   });
 
@@ -49,7 +50,7 @@ describe('four channels under a Master', () => {
     setChannelVolume('voices', 30);
     expect(channelVolume('voices')).toBe(30);
     expect(channelVolume('farts')).toBe(100);
-    expect(channelVolume('music')).toBe(60);
+    expect(channelVolume('music')).toBe(35);
   });
 
   it('effectiveVolume applies the Master multiplier', () => {

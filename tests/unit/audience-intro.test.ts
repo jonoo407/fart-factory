@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
  */
 
 const { playSample, loadManifest } = vi.hoisted(() => ({
-  playSample: vi.fn(async () => 0),
+  playSample: vi.fn(async (..._args: unknown[]) => 0),
   loadManifest: vi.fn(async () => ({ version: 'v2', generatedAt: '', entries: [] })),
 }));
 

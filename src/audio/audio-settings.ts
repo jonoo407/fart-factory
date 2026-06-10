@@ -26,7 +26,9 @@ export interface AudioSettings {
   music: number;
 }
 
-const DEFAULT: AudioSettings = { master: 100, farts: 100, sfx: 100, voices: 100, music: 60 };
+// Music defaults LOW (sound overhaul): the loop sets mood UNDER the comedy.
+// Only affects new players — an existing fart_audio_channels save wins.
+const DEFAULT: AudioSettings = { master: 100, farts: 100, sfx: 100, voices: 100, music: 35 };
 const CHANNELS: AudioChannel[] = ['master', 'farts', 'sfx', 'voices', 'music'];
 
 function clamp(n: number): number {

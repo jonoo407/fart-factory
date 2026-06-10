@@ -42,7 +42,8 @@ export type SfxCategory =
   | 'boss'
   | 'utility'
   | 'signature'
-  | 'voice';
+  | 'voice'
+  | 'music';
 
 export interface SfxSeed {
   kind: 'sfx';
@@ -164,6 +165,17 @@ const UTILITY_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'drumroll',    name: 'Drum Roll',   mood: 'triumphant',  duration_seconds: 1.6, prompt: 'a brief snare drum roll building into a soft crescendo, theatrical anticipation, family-friendly' },
 ], 'utility');
 
+// ====== Sound overhaul: background music loops (2) ======
+//
+// ~20s ambient loops played at LOW gain (src/audio/music.ts, base 0.22 ×
+// Music channel default 35) under the gameplay — mood, not melody-forward.
+// Prompts ask for seamless loops with no hard intro/outro so AudioBufferSource
+// loop=true reads clean. Category 'music' keeps them out of every picker.
+const MUSIC_SFX: SfxSeed[] = withCat([
+  { kind: 'sfx', id: 'music-lab-loop',  name: 'Lab Loop',        mood: 'comedic', duration_seconds: 20, prompt: 'seamless looping background music, playful mellow cartoon science lab ambience, soft bouncy pizzicato and light marimba, gentle bubbling undertone, calm low-key, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
+  { kind: 'sfx', id: 'music-boss-loop', name: 'Boss Arena Loop', mood: 'eerie',   duration_seconds: 20, prompt: 'seamless looping background music, tense but goofy cartoon showdown ambience, low staccato strings and soft timpani heartbeat, sneaky comedic undertone, restrained and quiet, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
+], 'music');
+
 // ====== Phase 3 (new): per-audience signature SFX (20) ======
 //
 // Short (1-2s) ambient cue that says "this audience just walked in." Played
@@ -271,6 +283,7 @@ export const SEEDS: readonly Seed[] = [
   ...EVENT_SFX,
   ...BOSS_SFX,
   ...UTILITY_SFX,
+  ...MUSIC_SFX,
   ...AUDIENCE_SIGNATURES,
   ...VOICE_SEEDS,
 ];

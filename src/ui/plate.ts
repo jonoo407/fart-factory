@@ -101,6 +101,7 @@ import { AREAS, getArea, type Area } from '../state/containment';
 import { getDailyAudience } from '../state/audience';
 import { audiencePoolForLocation } from '../state/location-progress';
 import { playFart, onAudioUnlocked } from '../audio/procedural';
+import { startMusic, duckMusic } from '../audio/music';
 import { triggerHaptic, HAPTICS } from './haptics';
 import { spawnGas } from '../visuals/gas';
 
@@ -704,7 +705,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   if (isArenaActive()) {
     const [aL, aW, aV, aS, aT, aM] = recipeToSliderInputs(propsAfterArea);
     triggerHaptic(HAPTICS.launch);
-    playFart(aL, aW, aV, aS, aT, aM, audioProps);
+    const arenaFartS = playFart(aL, aW, aV, aS, aT, aM, audioProps);
+    duckMusic(arenaFartS + 1.0); // music never talks over the fart
     spawnGas(aS, aV);
     commitBellySpend();
     // Read declared target (Boss 5 only) from the arena's select.
@@ -764,6 +766,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // matching grid clip from the true plate magnitude. Its return value is the
   // real clip duration — the crowd reaction is staggered past it.
   const fartDurationMs = Math.round(playFart(length, wetness, volume, stink, temp, musical, audioProps) * 1000);
+  // Duck the music through the fart + the crowd's comic beat after it.
+  duckMusic(fartDurationMs / 1000 + 1.0);
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.
@@ -1250,9 +1254,11 @@ export function initStoryPantry(): void {
   paintMoveOnButton(isWowed(aud0.id, currentEncounterIdx()));
   renderMoveOnGate(); // PLAN v9 P2 — gate advance until the crowd is passed
   // Sound overhaul — today's audience greets the player on the first gesture
-  // (the context is locked until then; before this, load-in was always silent).
+  // (the context is locked until then; before this, load-in was always silent),
+  // and the lab loop fades in underneath (boss-arena swaps it when active).
   onAudioUnlocked(() => {
     void playAudienceArrival(currentAudience().id);
+    if (!isArenaActive()) void startMusic('lab');
   });
 }
 
