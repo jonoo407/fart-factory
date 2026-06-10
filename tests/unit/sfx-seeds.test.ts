@@ -52,7 +52,6 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
       'granny-cackle',
       'royal-court-applause',
       'frat-howl',
-      'haunted-mansion-moan',
       'alien-tourists-gasp',
       'toddler-giggle',
     ];
@@ -95,6 +94,20 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
     ]) {
       expect(ids.has(id)).toBe(true);
     }
+  });
+});
+
+// Sound-overhaul cleanup: the live-layering stem system was scrapped for the
+// 96-clip grid bank, and haunted-mansion-moan was orphaned by the flop-variety
+// rework. Neither may ship — dead bytes in public/sfx and dead manifest rows.
+describe('dead-asset cleanup (sound overhaul)', () => {
+  it('has no stem-category seeds (live layering was scrapped)', () => {
+    const stems = SEEDS.filter((s) => (s as { category?: string }).category === 'stem');
+    expect(stems.map((s) => s.id)).toEqual([]);
+  });
+
+  it('has no haunted-mansion-moan seed (orphaned by flop variety)', () => {
+    expect(SEEDS.some((s) => s.id === 'haunted-mansion-moan')).toBe(false);
   });
 });
 

@@ -45,6 +45,12 @@ describe('shipped manifest.json integrity', () => {
     expect(farts.some((e) => e.durationMs > 1700)).toBe(true);
   });
 
+  it('ships no dead assets (stems were scrapped; haunted-mansion-moan orphaned)', () => {
+    const stems = manifest.entries.filter((e) => e.category === 'stem');
+    expect(stems.map((e) => e.id)).toEqual([]);
+    expect(manifest.entries.some((e) => e.id === 'haunted-mansion-moan')).toBe(false);
+  });
+
   it('known headline farts are tagged fart; reactions/signatures/voices are not', () => {
     const cat = (id: string) => manifest.entries.find((e) => e.id === id)?.category;
     expect(cat('wet-flapper')).toBe('fart');

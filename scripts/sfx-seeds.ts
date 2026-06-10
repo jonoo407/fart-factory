@@ -36,7 +36,6 @@ export type Mood =
  */
 export type SfxCategory =
   | 'fart'
-  | 'stem'
   | 'reaction'
   | 'food'
   | 'event'
@@ -104,58 +103,11 @@ const FART_SFX: SfxSeed[] = withCat([
 
 ], 'fart');
 
-// ====== PLAN v9 P6 — fart READOUT stems (02 §3-§4) ======
-// Layerable building blocks the runtime assembles per the normalized axes
-// (src/audio/fart-stems.ts selectFartLayers): a base rip from wet|dry × length,
-// plus optional melody / sizzle / haze. Category 'stem' so the whole-clip
-// Launch picker never selects them — they are only played layered. ids MUST
-// match selectFartLayers' output exactly.
-const STEM_SFX: SfxSeed[] = withCat([
-  // base rips — wet × short/med/long
-  { kind: 'sfx', id: 'rip-wet-short', name: 'Wet Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short wet squelchy bubbly fart, quick juicy blubber, dry studio recording, no music' },
-  { kind: 'sfx', id: 'rip-wet-med',   name: 'Wet Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet flubbering bubbly fart, juicy sputtering raspberry, no music' },
-  { kind: 'sfx', id: 'rip-wet-long',  name: 'Wet Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long sustained wet gurgling fart, drawn-out bubbly blubber, no music' },
-  // base rips — dry × short/med/long
-  { kind: 'sfx', id: 'rip-dry-short', name: 'Dry Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short dry papery fart rip, crisp quick brrrap, no music' },
-  { kind: 'sfx', id: 'rip-dry-med',   name: 'Dry Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry raspy fart rip, papery brrrrap tearing, no music' },
-  { kind: 'sfx', id: 'rip-dry-long',  name: 'Dry Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry sustained raspy fart, drawn-out braaaaap, papery, no music' },
-  // melody — pitched tooty notes (selector emits melody-3..7)
-  { kind: 'sfx', id: 'melody-3', name: 'Toot Note 3', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single low-mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
-  { kind: 'sfx', id: 'melody-4', name: 'Toot Note 4', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
-  { kind: 'sfx', id: 'melody-5', name: 'Toot Note 5', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid-high tooty musical fart note like a kazoo, one bright comedic pitch' },
-  { kind: 'sfx', id: 'melody-6', name: 'Toot Note 6', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single high tooty musical fart note like a kazoo, one bright squeaky comedic pitch' },
-  { kind: 'sfx', id: 'melody-7', name: 'Toot Note 7', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single very high squeaky tooty musical fart note like a piccolo kazoo, comedic' },
-  // sizzle — hot crackle layer
-  { kind: 'sfx', id: 'sizzle-lo', name: 'Sizzle (low)',  mood: 'triumphant', duration_seconds: 0.6, prompt: 'a soft sizzling crackling hot layer, gentle kettle steam crackle, subtle' },
-  { kind: 'sfx', id: 'sizzle-hi', name: 'Sizzle (high)', mood: 'triumphant', duration_seconds: 0.6, prompt: 'an intense sizzling crackling hot layer, fierce kettle steam hiss and crackle' },
-  // haze — lingering stink tail
-  { kind: 'sfx', id: 'haze-lo', name: 'Haze (low)',  mood: 'eerie', duration_seconds: 1.2, prompt: 'a faint lingering eerie haze drone tail, subtle sour detuned overtone, soft' },
-  { kind: 'sfx', id: 'haze-hi', name: 'Haze (high)', mood: 'eerie', duration_seconds: 1.4, prompt: 'a thick lingering eerie haze drone tail, sour detuned overtone hum, unsettling' },
-
-  // ====== Stem-bank extension — base-rip VARIANTS (variety in the core loop) ======
-  // selectFartLayers emits the family id (rip-wet-long); pickBaseVariant picks
-  // among these texture variants so repeated recipes don't sound identical.
-  // Distinct timbres from the originals; same duration bucket. Manifest-gated, so
-  // safe to define ahead of generation.
-  { kind: 'sfx', id: 'rip-wet-med-2',  name: 'Wet Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet sputtering bubbly fart, slappy flubber with a chunky pop, no music' },
-  { kind: 'sfx', id: 'rip-dry-med-2',  name: 'Dry Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry buzzy fart rip, brassy raspberry with a stuttering edge, no music' },
-  { kind: 'sfx', id: 'rip-wet-long-2', name: 'Wet Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long wet warbling fart, gurgling blubber that wobbles in pitch as it goes, no music' },
-  { kind: 'sfx', id: 'rip-dry-long-2', name: 'Dry Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry crackling fart rip, tearing braaap that splutters near the end, no music' },
-
-  // ====== Stem-bank extension — EPIC long rips (`-xl`, ~4.5s) ======
-  // Only played at the very top of the length axis (pickBaseVariant), so length=10
-  // finally FEELS long — fixing "the long bucket caps at ~2s" in the tier that
-  // actually plays the core-loop fart.
-  { kind: 'sfx', id: 'rip-wet-long-xl', name: 'Wet Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long wet gurgling fart that builds, sustains, and slowly peters out with bubbly aftershocks, comedic, no music' },
-  { kind: 'sfx', id: 'rip-dry-long-xl', name: 'Dry Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long dry braaaaap fart that rolls on and on with peaks and valleys before fading, comedic, no music' },
-], 'stem');
-
 // ====== Phase K audience-reaction seeds (item 61) ======
 const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'granny-cackle',         name: "Granny's Cackle",        mood: 'comedic',    duration_seconds: 1.8, prompt: 'an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style' },
   { kind: 'sfx', id: 'royal-court-applause',  name: 'Royal Court Applause',   mood: 'enthralled', duration_seconds: 2.4, prompt: 'a dignified royal-court polite applause, refined hand-clapping with brief approving murmur, family-friendly' },
   { kind: 'sfx', id: 'frat-howl',             name: 'Frat House Howl',        mood: 'triumphant', duration_seconds: 1.6, prompt: 'a small group of college friends cheering and hollering enthusiastically, comedic celebration, family-friendly tone' },
-  { kind: 'sfx', id: 'haunted-mansion-moan',  name: 'Haunted Mansion Moan',   mood: 'eerie',      duration_seconds: 2.0, prompt: 'a low spooky cartoon ghostly moan and woooo, kid-friendly Halloween, gentle eerie' },
   { kind: 'sfx', id: 'alien-tourists-gasp',   name: 'Alien Tourists Gasp',    mood: 'surprised',  duration_seconds: 1.4, prompt: 'small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly' },
   { kind: 'sfx', id: 'toddler-giggle',        name: 'Toddler Giggle',         mood: 'comedic',    duration_seconds: 1.5, prompt: 'a small toddler giggling and laughing with delight, gentle and warm, family-friendly' },
 
@@ -300,7 +252,6 @@ const VOICE_SEEDS = buildVoiceSeeds();
 
 export const SEEDS: readonly Seed[] = [
   ...FART_SFX,
-  ...STEM_SFX,
   ...REACTION_SFX,
   ...FOOD_SFX,
   ...EVENT_SFX,
