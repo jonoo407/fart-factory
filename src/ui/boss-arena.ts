@@ -28,6 +28,7 @@ import {
 import { dispatchBossReward } from '../scoring/boss-reward';
 import { renderPantryGrid, renderProgression } from './plate';
 import { playEventSfx, QUEST_CLAIMED_SFX, LEGENDARY_FANFARE_SFX } from '../audio/event-sfx';
+import { startMusic } from '../audio/music';
 
 const BOSS_ENTRANCE_SFX: Record<string, string> = {
   'granny-family-reunion':    'boss-entrance-granny',
@@ -120,6 +121,8 @@ export function openArena(bossId: string): void {
   // P8: per-boss entrance SFX (silent until operator regenerates audio).
   const sfxId = BOSS_ENTRANCE_SFX[boss.id];
   if (sfxId) void playEventSfx(sfxId, 8);
+  // Sound overhaul — the arena swaps the lab loop for the tenser boss loop.
+  void startMusic('boss');
   renderArenaStage();
 }
 
@@ -128,6 +131,8 @@ export function closeArena(): void {
   delete document.body.dataset.arenaActive;
   currentBoss = null;
   currentState = null;
+  // Back to the lab mood when leaving the arena (win, loss, or forfeit).
+  void startMusic('lab');
   // Refresh underlying UI in case state changed (defeated bosses).
   renderProgression();
   renderPantryGrid();

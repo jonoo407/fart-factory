@@ -17,6 +17,7 @@ import {
   type AudioChannel,
 } from '../audio/audio-settings';
 import { suspendAudio, resumeAudio } from '../audio/procedural';
+import { refreshMusicGain } from '../audio/music';
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -130,6 +131,8 @@ export function wireAudioPopover(): void {
     if (!target || !ch) return;
     const v = Number(target.value);
     setChannelVolume(ch, v);
+    // Music is a continuous loop — re-aim its gain live so the slider is heard.
+    refreshMusicGain();
     const val = document.querySelector<HTMLElement>(`#${POPOVER_ID} [data-channel-value="${ch}"]`);
     if (val) val.textContent = String(v);
     paintMuteBtn();

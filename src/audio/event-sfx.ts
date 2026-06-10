@@ -65,12 +65,31 @@ export const AUDIENCE_REACTION_SFX: Record<
 > = {
   loved:     ['royal-court-applause', 'frat-howl', 'granny-cackle'],
   liked:     ['toddler-giggle', 'alien-tourists-gasp'],
-  meh:       [],
+  // A shrug you can hear: one soft cough or seat-shuffle beat. Quieter than the
+  // fail stingers (see MEH_STINGER_VOLUME) — awkward, not punishing.
+  meh:       ['meh-cough', 'meh-shuffle'],
   disliked:  ['flop-groan', 'flop-crickets', 'flop-whistle-down'],
   evacuated: ['flop-boo', 'flop-groan', 'flop-whistle-down'],
 };
 export const LEGENDARY_FANFARE_SFX = 'legendary-fanfare';
 export const QUEST_CLAIMED_SFX = 'quest-claimed';
+
+// ---------- Sound overhaul: economy + milestone cues ----------
+/** Soft coin chime when a launch actually pays gold (improvement-only payout). */
+export const COIN_SFX = 'coin-clink';
+/** Ka-ching on a successful pantry-shop buy. */
+export const SHOP_PURCHASE_SFX = 'shop-purchase';
+
+/**
+ * Streak milestone stingers — EXACTLY ×5 and ×10, the two moments the streak
+ * UI also escalates (🔥🔥 at 5, LEGENDARY at 10). Returning null for every
+ * other count keeps a held streak from re-stinging on each launch.
+ */
+export function streakMilestoneSfx(streak: number): string | null {
+  if (streak === 5) return 'streak-5';
+  if (streak === 10) return 'streak-10';
+  return null;
+}
 
 // ---------- Per-audience audio (signatures + voice lines) ----------
 //
@@ -79,7 +98,7 @@ export const QUEST_CLAIMED_SFX = 'quest-claimed';
 // resolve to silent no-ops via playSample when the id isn't in the
 // manifest — so the runtime ships safely even before assets are generated.
 
-export type AudienceVoiceTier = 'loved' | 'evacuated';
+export type AudienceVoiceTier = 'loved' | 'evacuated' | 'intro';
 
 export function audienceSignatureSfxId(audienceId: string): string {
   return `sig-${audienceId}`;
@@ -100,4 +119,20 @@ export async function playAudienceVoice(
 ): Promise<void> {
   // PLAN v9 P6 — character VO routes through the independent Voices channel.
   await playEventSfx(audienceVoiceSfxId(audienceId, tier), volume, 'voices');
+}
+
+/** Gap between the signature cue and the spoken greeting — arrival reads as
+ *  "who's here" (signature) then "what they say" (intro line). */
+export const INTRO_AFTER_SIGNATURE_MS = 1400;
+
+/**
+ * Sound overhaul — full arrival moment: signature cue now, intro greeting a
+ * beat later. Fired on audience rotation and on the first unlocked gesture
+ * after page load. Both halves are manifest-gated no-ops if assets are absent.
+ */
+export async function playAudienceArrival(audienceId: string): Promise<void> {
+  await playAudienceSignature(audienceId);
+  setTimeout(() => {
+    void playAudienceVoice(audienceId, 'intro');
+  }, INTRO_AFTER_SIGNATURE_MS);
 }

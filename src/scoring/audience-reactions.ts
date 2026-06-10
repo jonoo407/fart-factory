@@ -174,6 +174,35 @@ const REACTIONS: Record<string, Record<Tier, string>> = {
   },
 };
 
+/**
+ * Sound overhaul — per-audience INTRO greeting, spoken (same ElevenLabs voice
+ * as the reaction lines) when the audience walks in: on rotation, and on the
+ * first gesture after page load. One or two short sentences, in-character,
+ * kid-safe, ≤160 chars so the TTS lands as a greeting and not a speech.
+ */
+const INTROS: Record<string, string> = {
+  'granny-edna':      "Oh, hello dearie! Granny Edna's here for the show. Do be gentle with an old lady's nose.",
+  'royal-court':      'The Royal Court has arrived. You may begin... when the trumpets finish. Impress us.',
+  'frat-bros':        "YOOOO, the bros are HERE! Let's GO, dude! Show us something LEGENDARY!",
+  'haunted-mansion':  'Woooooo... the mansion stirs... entertain ussss, or join usssss...',
+  'alien-tourists':   'Greetings, Earth specialist. We traveled forty light-years for your famous gas. Begin the demonstration.',
+  'toddler-bday':     "It's my BIRTHDAY! Do the funny noise! DO THE FUNNY NOISE!",
+  'goth-teens':       "Ugh. We're here, I guess. Whatever. Try not to be boring like everything else.",
+  'kindergarten':     "Hi mister fart scientist! We promise we won't laugh. Okay, we'll laugh a LOT.",
+  'skunk-society':    'The Skunk Society convenes. We are connoisseurs of fine aromas. Impress our professional noses.',
+  'opera-house':      'Ahh, the Opera House awaits. We expect range. We expect drama. We expect... perfection, darling.',
+  'wrestling-fans':   'LADIES AND GENTLEMEN... welcome to the MAIN EVENT! Bring! The! THUNDER!',
+  'librarians':       'Shhh. The library is now in session. Quietly impress us... if you can.',
+  'volcano-cult':     'The Volcano Cult gathers, o gassy one. The Magma God hungers for a worthy offering.',
+  'pet-rescue':       'Welcome to the rescue shelter! The puppies are SO excited. Nothing too scary, please!',
+  'astronauts':       'Mission control, we are go for launch. Repeat: we are GO for launch.',
+  'food-critics':     'We are the Food Critics. We have tasted everything. Surprise us... if you dare.',
+  'baby-shower':      "Welcome to the baby shower! Keep it cute, keep it classy, and mind the gift table.",
+  'punk-show':        "OI! You're on! This crowd waits for NOBODY, so make it LOUD!",
+  'silent-monks':     'The monks have taken their seats. We shall judge... in complete silence.',
+  'mystery-guest':    'Someone has arrived. Who? That is the mystery. Proceed... carefully.',
+};
+
 const FALLBACK_TIERS: Record<Tier, string> = {
   loved:     '😍 The audience LOVES it!',
   liked:     '🙂 They liked that.',
@@ -184,7 +213,7 @@ const FALLBACK_TIERS: Record<Tier, string> = {
 
 // Exported for the SFX-seed generator so it can fetch the exact lines
 // to voice (single source of truth — never re-typed in seeds).
-export { REACTIONS };
+export { REACTIONS, INTROS };
 export type { Tier };
 
 export function reactionTextForAudience(aud: Audience, tier: Tier): string {

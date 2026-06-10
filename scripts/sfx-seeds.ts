@@ -14,7 +14,7 @@
  */
 
 import { AUDIENCES } from '../src/state/audience';
-import { REACTIONS } from '../src/scoring/audience-reactions';
+import { REACTIONS, INTROS } from '../src/scoring/audience-reactions';
 
 export type Mood =
   | 'comedic'
@@ -36,14 +36,14 @@ export type Mood =
  */
 export type SfxCategory =
   | 'fart'
-  | 'stem'
   | 'reaction'
   | 'food'
   | 'event'
   | 'boss'
   | 'utility'
   | 'signature'
-  | 'voice';
+  | 'voice'
+  | 'music';
 
 export interface SfxSeed {
   kind: 'sfx';
@@ -104,58 +104,11 @@ const FART_SFX: SfxSeed[] = withCat([
 
 ], 'fart');
 
-// ====== PLAN v9 P6 — fart READOUT stems (02 §3-§4) ======
-// Layerable building blocks the runtime assembles per the normalized axes
-// (src/audio/fart-stems.ts selectFartLayers): a base rip from wet|dry × length,
-// plus optional melody / sizzle / haze. Category 'stem' so the whole-clip
-// Launch picker never selects them — they are only played layered. ids MUST
-// match selectFartLayers' output exactly.
-const STEM_SFX: SfxSeed[] = withCat([
-  // base rips — wet × short/med/long
-  { kind: 'sfx', id: 'rip-wet-short', name: 'Wet Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short wet squelchy bubbly fart, quick juicy blubber, dry studio recording, no music' },
-  { kind: 'sfx', id: 'rip-wet-med',   name: 'Wet Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet flubbering bubbly fart, juicy sputtering raspberry, no music' },
-  { kind: 'sfx', id: 'rip-wet-long',  name: 'Wet Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long sustained wet gurgling fart, drawn-out bubbly blubber, no music' },
-  // base rips — dry × short/med/long
-  { kind: 'sfx', id: 'rip-dry-short', name: 'Dry Rip (short)', mood: 'comedic', duration_seconds: 0.5, prompt: 'a short dry papery fart rip, crisp quick brrrap, no music' },
-  { kind: 'sfx', id: 'rip-dry-med',   name: 'Dry Rip (med)',   mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry raspy fart rip, papery brrrrap tearing, no music' },
-  { kind: 'sfx', id: 'rip-dry-long',  name: 'Dry Rip (long)',  mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry sustained raspy fart, drawn-out braaaaap, papery, no music' },
-  // melody — pitched tooty notes (selector emits melody-3..7)
-  { kind: 'sfx', id: 'melody-3', name: 'Toot Note 3', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single low-mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
-  { kind: 'sfx', id: 'melody-4', name: 'Toot Note 4', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid tooty musical fart note like a kazoo, one sustained comedic pitch' },
-  { kind: 'sfx', id: 'melody-5', name: 'Toot Note 5', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single mid-high tooty musical fart note like a kazoo, one bright comedic pitch' },
-  { kind: 'sfx', id: 'melody-6', name: 'Toot Note 6', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single high tooty musical fart note like a kazoo, one bright squeaky comedic pitch' },
-  { kind: 'sfx', id: 'melody-7', name: 'Toot Note 7', mood: 'comedic', duration_seconds: 0.7, prompt: 'a single very high squeaky tooty musical fart note like a piccolo kazoo, comedic' },
-  // sizzle — hot crackle layer
-  { kind: 'sfx', id: 'sizzle-lo', name: 'Sizzle (low)',  mood: 'triumphant', duration_seconds: 0.6, prompt: 'a soft sizzling crackling hot layer, gentle kettle steam crackle, subtle' },
-  { kind: 'sfx', id: 'sizzle-hi', name: 'Sizzle (high)', mood: 'triumphant', duration_seconds: 0.6, prompt: 'an intense sizzling crackling hot layer, fierce kettle steam hiss and crackle' },
-  // haze — lingering stink tail
-  { kind: 'sfx', id: 'haze-lo', name: 'Haze (low)',  mood: 'eerie', duration_seconds: 1.2, prompt: 'a faint lingering eerie haze drone tail, subtle sour detuned overtone, soft' },
-  { kind: 'sfx', id: 'haze-hi', name: 'Haze (high)', mood: 'eerie', duration_seconds: 1.4, prompt: 'a thick lingering eerie haze drone tail, sour detuned overtone hum, unsettling' },
-
-  // ====== Stem-bank extension — base-rip VARIANTS (variety in the core loop) ======
-  // selectFartLayers emits the family id (rip-wet-long); pickBaseVariant picks
-  // among these texture variants so repeated recipes don't sound identical.
-  // Distinct timbres from the originals; same duration bucket. Manifest-gated, so
-  // safe to define ahead of generation.
-  { kind: 'sfx', id: 'rip-wet-med-2',  name: 'Wet Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium wet sputtering bubbly fart, slappy flubber with a chunky pop, no music' },
-  { kind: 'sfx', id: 'rip-dry-med-2',  name: 'Dry Rip (med, alt)',  mood: 'comedic', duration_seconds: 1.0, prompt: 'a medium dry buzzy fart rip, brassy raspberry with a stuttering edge, no music' },
-  { kind: 'sfx', id: 'rip-wet-long-2', name: 'Wet Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long wet warbling fart, gurgling blubber that wobbles in pitch as it goes, no music' },
-  { kind: 'sfx', id: 'rip-dry-long-2', name: 'Dry Rip (long, alt)', mood: 'comedic', duration_seconds: 2.0, prompt: 'a long dry crackling fart rip, tearing braaap that splutters near the end, no music' },
-
-  // ====== Stem-bank extension — EPIC long rips (`-xl`, ~4.5s) ======
-  // Only played at the very top of the length axis (pickBaseVariant), so length=10
-  // finally FEELS long — fixing "the long bucket caps at ~2s" in the tier that
-  // actually plays the core-loop fart.
-  { kind: 'sfx', id: 'rip-wet-long-xl', name: 'Wet Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long wet gurgling fart that builds, sustains, and slowly peters out with bubbly aftershocks, comedic, no music' },
-  { kind: 'sfx', id: 'rip-dry-long-xl', name: 'Dry Rip (epic)', mood: 'triumphant', duration_seconds: 4.5, prompt: 'an enormous very long dry braaaaap fart that rolls on and on with peaks and valleys before fading, comedic, no music' },
-], 'stem');
-
 // ====== Phase K audience-reaction seeds (item 61) ======
 const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'granny-cackle',         name: "Granny's Cackle",        mood: 'comedic',    duration_seconds: 1.8, prompt: 'an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style' },
   { kind: 'sfx', id: 'royal-court-applause',  name: 'Royal Court Applause',   mood: 'enthralled', duration_seconds: 2.4, prompt: 'a dignified royal-court polite applause, refined hand-clapping with brief approving murmur, family-friendly' },
   { kind: 'sfx', id: 'frat-howl',             name: 'Frat House Howl',        mood: 'triumphant', duration_seconds: 1.6, prompt: 'a small group of college friends cheering and hollering enthusiastically, comedic celebration, family-friendly tone' },
-  { kind: 'sfx', id: 'haunted-mansion-moan',  name: 'Haunted Mansion Moan',   mood: 'eerie',      duration_seconds: 2.0, prompt: 'a low spooky cartoon ghostly moan and woooo, kid-friendly Halloween, gentle eerie' },
   { kind: 'sfx', id: 'alien-tourists-gasp',   name: 'Alien Tourists Gasp',    mood: 'surprised',  duration_seconds: 1.4, prompt: 'small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly' },
   { kind: 'sfx', id: 'toddler-giggle',        name: 'Toddler Giggle',         mood: 'comedic',    duration_seconds: 1.5, prompt: 'a small toddler giggling and laughing with delight, gentle and warm, family-friendly' },
 
@@ -166,6 +119,12 @@ const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'flop-boo',           name: 'Playful Boo',         mood: 'embarrassed', duration_seconds: 1.0, prompt: 'a small crowd giving one brief playful pantomime boo, lighthearted and gentle, family-friendly' },
   { kind: 'sfx', id: 'flop-crickets',      name: 'Awkward Crickets',    mood: 'sneaky',      duration_seconds: 1.4, prompt: 'awkward silence with two soft cricket chirps, comedic empty-room beat, family-friendly' },
   { kind: 'sfx', id: 'flop-whistle-down',  name: 'Slide Whistle Down',  mood: 'embarrassed', duration_seconds: 0.8, prompt: 'a single quick descending slide whistle womp, brief cartoon failure sting, family-friendly' },
+
+  // --- meh variants (sound overhaul) ---
+  // The 50-69% shrug. Quieter and shorter than the flops: an audible "we're
+  // unmoved" beat, not a punishment. Played at MEH_STINGER_VOLUME (3).
+  { kind: 'sfx', id: 'meh-cough',   name: 'Polite Cough',     mood: 'embarrassed', duration_seconds: 0.8, prompt: 'one single polite quiet cough in a silent room, small awkward beat, family-friendly' },
+  { kind: 'sfx', id: 'meh-shuffle', name: 'Awkward Shuffle',  mood: 'embarrassed', duration_seconds: 1.0, prompt: 'a small audience shifting in creaky seats with a faint unimpressed hmm, brief awkward pause, family-friendly' },
 
 ], 'reaction');
 
@@ -183,6 +142,12 @@ const EVENT_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'legendary-fanfare', name: 'Legendary Fanfare', mood: 'enthralled', duration_seconds: 2.6, prompt: 'a short triumphant brass fanfare with bright glittery chimes, victorious cartoon, family-friendly' },
   { kind: 'sfx', id: 'quest-claimed',     name: 'Quest Claimed',     mood: 'triumphant', duration_seconds: 1.8, prompt: 'a magical sparkly chime ascending arpeggio with subtle bell shimmer, achievement-unlocked feel, family-friendly' },
 
+  // --- economy + milestone cues (sound overhaul) ---
+  { kind: 'sfx', id: 'coin-clink',    name: 'Coin Clink',     mood: 'triumphant', duration_seconds: 0.6, prompt: 'two or three small gold coins dropping into a pouch with a bright clink, brief, family-friendly cartoon foley' },
+  { kind: 'sfx', id: 'shop-purchase', name: 'Shop Purchase',  mood: 'triumphant', duration_seconds: 0.9, prompt: 'an old-fashioned cash register ka-ching with a small coin jingle, quick satisfying purchase sound, family-friendly' },
+  { kind: 'sfx', id: 'streak-5',      name: 'Streak ×5',      mood: 'enthralled', duration_seconds: 1.4, prompt: 'a small crowd rising oooh into a short cheer with one bright chime, building excitement, family-friendly' },
+  { kind: 'sfx', id: 'streak-10',     name: 'Streak ×10',     mood: 'enthralled', duration_seconds: 2.0, prompt: 'a big crowd eruption with a firework pop and glittering chime cascade, legendary celebration, family-friendly' },
+
 ], 'event');
 
 // ====== PLAN_v5 P8 boss entrance seeds (5 themed cues) ======
@@ -199,6 +164,17 @@ const UTILITY_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'plate-pluck', name: 'Plate Pluck', mood: 'comedic',     duration_seconds: 0.6, prompt: 'a soft cartoon mouth pop or finger pluck, brief light comedic foley, family-friendly' },
   { kind: 'sfx', id: 'drumroll',    name: 'Drum Roll',   mood: 'triumphant',  duration_seconds: 1.6, prompt: 'a brief snare drum roll building into a soft crescendo, theatrical anticipation, family-friendly' },
 ], 'utility');
+
+// ====== Sound overhaul: background music loops (2) ======
+//
+// ~20s ambient loops played at LOW gain (src/audio/music.ts, base 0.22 ×
+// Music channel default 35) under the gameplay — mood, not melody-forward.
+// Prompts ask for seamless loops with no hard intro/outro so AudioBufferSource
+// loop=true reads clean. Category 'music' keeps them out of every picker.
+const MUSIC_SFX: SfxSeed[] = withCat([
+  { kind: 'sfx', id: 'music-lab-loop',  name: 'Lab Loop',        mood: 'comedic', duration_seconds: 20, prompt: 'seamless looping background music, playful mellow cartoon science lab ambience, soft bouncy pizzicato and light marimba, gentle bubbling undertone, calm low-key, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
+  { kind: 'sfx', id: 'music-boss-loop', name: 'Boss Arena Loop', mood: 'eerie',   duration_seconds: 20, prompt: 'seamless looping background music, tense but goofy cartoon showdown ambience, low staccato strings and soft timpani heartbeat, sneaky comedic undertone, restrained and quiet, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
+], 'music');
 
 // ====== Phase 3 (new): per-audience signature SFX (20) ======
 //
@@ -265,7 +241,9 @@ const VOICE_CAST: Record<string, VoiceCast> = {
   'mystery-guest':    { voice_id: 'JBFqnCBsd6RMkjVDRZzb', voiceLabel: 'George — mysterious' },
 };
 
-const VOICE_TIERS = ['loved', 'evacuated'] as const;
+// 'intro' (sound overhaul): the audience greets the player as it walks in —
+// text from INTROS, same voice as the reaction lines so the character holds.
+const VOICE_TIERS = ['loved', 'evacuated', 'intro'] as const;
 type VoiceTier = (typeof VOICE_TIERS)[number];
 
 export function voiceSeedId(audienceId: string, tier: VoiceTier): string {
@@ -280,7 +258,7 @@ function buildVoiceSeeds(): TtsSeed[] {
     const reactions = REACTIONS[aud.id];
     if (!reactions) continue;
     for (const tier of VOICE_TIERS) {
-      const text = reactions[tier];
+      const text = tier === 'intro' ? INTROS[aud.id] : reactions[tier];
       if (!text) continue;
       out.push({
         kind: 'tts',
@@ -300,12 +278,12 @@ const VOICE_SEEDS = buildVoiceSeeds();
 
 export const SEEDS: readonly Seed[] = [
   ...FART_SFX,
-  ...STEM_SFX,
   ...REACTION_SFX,
   ...FOOD_SFX,
   ...EVENT_SFX,
   ...BOSS_SFX,
   ...UTILITY_SFX,
+  ...MUSIC_SFX,
   ...AUDIENCE_SIGNATURES,
   ...VOICE_SEEDS,
 ];

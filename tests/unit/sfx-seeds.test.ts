@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { SEEDS, VOICE_CAST, VOICE_TIERS, voiceSeedId, type Seed } from '../../scripts/sfx-seeds';
 import { AUDIENCES } from '../../src/state/audience';
-import { REACTIONS } from '../../src/scoring/audience-reactions';
+import { REACTIONS, INTROS } from '../../src/scoring/audience-reactions';
 
 const SFX_SEEDS = SEEDS.filter((s): s is Extract<typeof s, { kind: 'sfx' }> => s.kind === 'sfx');
 const TTS_SEEDS = SEEDS.filter((s): s is Extract<typeof s, { kind: 'tts' }> => s.kind === 'tts');
@@ -52,7 +52,6 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
       'granny-cackle',
       'royal-court-applause',
       'frat-howl',
-      'haunted-mansion-moan',
       'alien-tourists-gasp',
       'toddler-giggle',
     ];
@@ -98,6 +97,20 @@ describe('SFX seeds catalog (Phase K — Library Richness)', () => {
   });
 });
 
+// Sound-overhaul cleanup: the live-layering stem system was scrapped for the
+// 96-clip grid bank, and haunted-mansion-moan was orphaned by the flop-variety
+// rework. Neither may ship — dead bytes in public/sfx and dead manifest rows.
+describe('dead-asset cleanup (sound overhaul)', () => {
+  it('has no stem-category seeds (live layering was scrapped)', () => {
+    const stems = SEEDS.filter((s) => (s as { category?: string }).category === 'stem');
+    expect(stems.map((s) => s.id)).toEqual([]);
+  });
+
+  it('has no haunted-mansion-moan seed (orphaned by flop variety)', () => {
+    expect(SEEDS.some((s) => s.id === 'haunted-mansion-moan')).toBe(false);
+  });
+});
+
 describe('audience signature SFX (Phase 3)', () => {
   it('every audience has a signature SFX seed (sig-<audId>)', () => {
     const ids = new Set(SEEDS.map((s) => s.id));
@@ -126,19 +139,21 @@ describe('audience voice TTS (Phase 4)', () => {
     }
   });
 
-  it("every TTS seed's text matches REACTIONS[audId][tier] verbatim", () => {
+  it("every TTS seed's text matches its source line verbatim (REACTIONS or INTROS)", () => {
     for (const seed of TTS_SEEDS) {
       // Parse the id pattern: voice-<audId>-<tier>
-      const match = seed.id.match(/^voice-(.+)-(loved|evacuated)$/);
+      const match = seed.id.match(/^voice-(.+)-(loved|evacuated|intro)$/);
       expect(match).not.toBeNull();
       const [, audId, tier] = match!;
-      const expected = REACTIONS[audId!]?.[tier as 'loved' | 'evacuated'];
+      const expected =
+        tier === 'intro' ? INTROS[audId!] : REACTIONS[audId!]?.[tier as 'loved' | 'evacuated'];
       expect(seed.text).toBe(expected);
     }
   });
 
-  it('includes 20 audiences × 2 tiers = 40 voice clips', () => {
+  it('includes 20 audiences × 3 tiers (loved / evacuated / intro) = 60 voice clips', () => {
     expect(TTS_SEEDS.length).toBe(AUDIENCES.length * VOICE_TIERS.length);
+    expect(VOICE_TIERS.length).toBe(3);
   });
 });
 

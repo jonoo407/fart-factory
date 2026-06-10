@@ -1,4 +1,4 @@
-import { isChannelAudible } from './audio-settings';
+import { isChannelAudible, effectiveVolume } from './audio-settings';
 import {
   loadManifest,
   pickSampleId,
@@ -79,8 +79,30 @@ export function wireAudioUnlock(target: Pick<Document, 'addEventListener' | 'rem
     const ctx = ensureAudio();
     if (ctx && ctx.state === 'suspended') void ctx.resume();
     for (const ev of events) target.removeEventListener(ev, unlock);
+    flushUnlockCallbacks();
   };
   for (const ev of events) target.addEventListener(ev, unlock);
+}
+
+// ---- unlock callbacks (sound overhaul) ----
+// Anything that wants to SOUND at page load (audience greeting, background
+// music) would be silently dropped before the first gesture — the context
+// doesn't exist yet. Queue it here; flushed once by wireAudioUnlock's unlock.
+let audioUnlocked = false;
+const unlockCallbacks: Array<() => void> = [];
+
+function flushUnlockCallbacks(): void {
+  audioUnlocked = true;
+  while (unlockCallbacks.length) unlockCallbacks.shift()!();
+}
+
+/** Run `cb` after the first-gesture audio unlock (immediately if already unlocked). */
+export function onAudioUnlocked(cb: () => void): void {
+  if (audioUnlocked) {
+    cb();
+    return;
+  }
+  unlockCallbacks.push(cb);
 }
 
 /**
@@ -291,7 +313,9 @@ export function playCelebrationSting(): number {
   const noteDur = 0.25;
   const stride = 0.08;
   const master = ctx.createGain();
-  master.gain.value = 0.18;
+  // 0.18 sting level, scaled by the player's SFX channel (× Master) like every
+  // other cue — a flat 0.18 ignored the slider between "audible" and "full".
+  master.gain.value = 0.18 * (effectiveVolume('sfx') / 100);
   master.connect(ctx.destination);
   for (let i = 0; i < notes.length; i++) {
     const osc = ctx.createOscillator();

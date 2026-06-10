@@ -1,6 +1,6 @@
 {
   "version": "v2",
-  "generatedAt": "2026-06-10T12:28:41.089Z",
+  "generatedAt": "2026-06-10T13:26:14.189Z",
   "entries": [
     {
       "id": "mouse-squeak",
@@ -171,258 +171,6 @@
       "category": "fart"
     },
     {
-      "id": "rip-wet-short",
-      "name": "Wet Rip (short)",
-      "prompt": "a short wet squelchy bubbly fart, quick juicy blubber, dry studio recording, no music",
-      "durationMs": 500,
-      "mood": "comedic",
-      "file": "rip-wet-short.mp3",
-      "checksum": "d59226b392e5",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 8821
-    },
-    {
-      "id": "rip-wet-med",
-      "name": "Wet Rip (med)",
-      "prompt": "a medium wet flubbering bubbly fart, juicy sputtering raspberry, no music",
-      "durationMs": 1000,
-      "mood": "comedic",
-      "file": "rip-wet-med.mp3",
-      "checksum": "95f18c37e33b",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 17180
-    },
-    {
-      "id": "rip-wet-long",
-      "name": "Wet Rip (long)",
-      "prompt": "a long sustained wet gurgling fart, drawn-out bubbly blubber, no music",
-      "durationMs": 2000,
-      "mood": "comedic",
-      "file": "rip-wet-long.mp3",
-      "checksum": "2c0b281e199a",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 33062
-    },
-    {
-      "id": "rip-dry-short",
-      "name": "Dry Rip (short)",
-      "prompt": "a short dry papery fart rip, crisp quick brrrap, no music",
-      "durationMs": 500,
-      "mood": "comedic",
-      "file": "rip-dry-short.mp3",
-      "checksum": "efccf80d90a7",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 8821
-    },
-    {
-      "id": "rip-dry-med",
-      "name": "Dry Rip (med)",
-      "prompt": "a medium dry raspy fart rip, papery brrrrap tearing, no music",
-      "durationMs": 1000,
-      "mood": "comedic",
-      "file": "rip-dry-med.mp3",
-      "checksum": "2e81a675cae5",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 17180
-    },
-    {
-      "id": "rip-dry-long",
-      "name": "Dry Rip (long)",
-      "prompt": "a long dry sustained raspy fart, drawn-out braaaaap, papery, no music",
-      "durationMs": 2000,
-      "mood": "comedic",
-      "file": "rip-dry-long.mp3",
-      "checksum": "b9d04257142f",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 33062
-    },
-    {
-      "id": "melody-3",
-      "name": "Toot Note 3",
-      "prompt": "a single low-mid tooty musical fart note like a kazoo, one sustained comedic pitch",
-      "durationMs": 700,
-      "mood": "comedic",
-      "file": "melody-3.mp3",
-      "checksum": "b68c33de0548",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 12164
-    },
-    {
-      "id": "melody-4",
-      "name": "Toot Note 4",
-      "prompt": "a single mid tooty musical fart note like a kazoo, one sustained comedic pitch",
-      "durationMs": 700,
-      "mood": "comedic",
-      "file": "melody-4.mp3",
-      "checksum": "cd9c395c5bcc",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 12164
-    },
-    {
-      "id": "melody-5",
-      "name": "Toot Note 5",
-      "prompt": "a single mid-high tooty musical fart note like a kazoo, one bright comedic pitch",
-      "durationMs": 700,
-      "mood": "comedic",
-      "file": "melody-5.mp3",
-      "checksum": "b86bc8090899",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 12164
-    },
-    {
-      "id": "melody-6",
-      "name": "Toot Note 6",
-      "prompt": "a single high tooty musical fart note like a kazoo, one bright squeaky comedic pitch",
-      "durationMs": 700,
-      "mood": "comedic",
-      "file": "melody-6.mp3",
-      "checksum": "033a3dff121f",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 12164
-    },
-    {
-      "id": "melody-7",
-      "name": "Toot Note 7",
-      "prompt": "a single very high squeaky tooty musical fart note like a piccolo kazoo, comedic",
-      "durationMs": 700,
-      "mood": "comedic",
-      "file": "melody-7.mp3",
-      "checksum": "f926878c675c",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 12164
-    },
-    {
-      "id": "sizzle-lo",
-      "name": "Sizzle (low)",
-      "prompt": "a soft sizzling crackling hot layer, gentle kettle steam crackle, subtle",
-      "durationMs": 600,
-      "mood": "triumphant",
-      "file": "sizzle-lo.mp3",
-      "checksum": "8c7ded6870be",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 10493
-    },
-    {
-      "id": "sizzle-hi",
-      "name": "Sizzle (high)",
-      "prompt": "an intense sizzling crackling hot layer, fierce kettle steam hiss and crackle",
-      "durationMs": 600,
-      "mood": "triumphant",
-      "file": "sizzle-hi.mp3",
-      "checksum": "e61f68e0de82",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 10493
-    },
-    {
-      "id": "haze-lo",
-      "name": "Haze (low)",
-      "prompt": "a faint lingering eerie haze drone tail, subtle sour detuned overtone, soft",
-      "durationMs": 1200,
-      "mood": "eerie",
-      "file": "haze-lo.mp3",
-      "checksum": "fe0488861c65",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 20106
-    },
-    {
-      "id": "haze-hi",
-      "name": "Haze (high)",
-      "prompt": "a thick lingering eerie haze drone tail, sour detuned overtone hum, unsettling",
-      "durationMs": 1400,
-      "mood": "eerie",
-      "file": "haze-hi.mp3",
-      "checksum": "f5e89189d3d9",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 23031
-    },
-    {
-      "id": "rip-wet-med-2",
-      "name": "Wet Rip (med, alt)",
-      "prompt": "a medium wet sputtering bubbly fart, slappy flubber with a chunky pop, no music",
-      "durationMs": 1000,
-      "mood": "comedic",
-      "file": "rip-wet-med-2.mp3",
-      "checksum": "1c19aa551894",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 17180
-    },
-    {
-      "id": "rip-dry-med-2",
-      "name": "Dry Rip (med, alt)",
-      "prompt": "a medium dry buzzy fart rip, brassy raspberry with a stuttering edge, no music",
-      "durationMs": 1000,
-      "mood": "comedic",
-      "file": "rip-dry-med-2.mp3",
-      "checksum": "7562af332b02",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 17180
-    },
-    {
-      "id": "rip-wet-long-2",
-      "name": "Wet Rip (long, alt)",
-      "prompt": "a long wet warbling fart, gurgling blubber that wobbles in pitch as it goes, no music",
-      "durationMs": 2000,
-      "mood": "comedic",
-      "file": "rip-wet-long-2.mp3",
-      "checksum": "8e8765ac50c6",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 33062
-    },
-    {
-      "id": "rip-dry-long-2",
-      "name": "Dry Rip (long, alt)",
-      "prompt": "a long dry crackling fart rip, tearing braaap that splutters near the end, no music",
-      "durationMs": 2000,
-      "mood": "comedic",
-      "file": "rip-dry-long-2.mp3",
-      "checksum": "8e4a533d491d",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 33062
-    },
-    {
-      "id": "rip-wet-long-xl",
-      "name": "Wet Rip (epic)",
-      "prompt": "an enormous very long wet gurgling fart that builds, sustains, and slowly peters out with bubbly aftershocks, comedic, no music",
-      "durationMs": 4500,
-      "mood": "triumphant",
-      "file": "rip-wet-long-xl.mp3",
-      "checksum": "e2e9a1c74ef9",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 72768
-    },
-    {
-      "id": "rip-dry-long-xl",
-      "name": "Dry Rip (epic)",
-      "prompt": "an enormous very long dry braaaaap fart that rolls on and on with peaks and valleys before fading, comedic, no music",
-      "durationMs": 4500,
-      "mood": "triumphant",
-      "file": "rip-dry-long-xl.mp3",
-      "checksum": "8c0b69eeb603",
-      "category": "stem",
-      "kind": "sfx",
-      "bytes": 72768
-    },
-    {
       "id": "granny-cackle",
       "name": "Granny's Cackle",
       "prompt": "an elderly grandmother gentle cackling laugh, warm and surprised, family-friendly cartoon style",
@@ -456,18 +204,6 @@
       "checksum": "1ce75cc1526c",
       "kind": "sfx",
       "bytes": 26793,
-      "category": "reaction"
-    },
-    {
-      "id": "haunted-mansion-moan",
-      "name": "Haunted Mansion Moan",
-      "prompt": "a low spooky cartoon ghostly moan and woooo, kid-friendly Halloween, gentle eerie",
-      "durationMs": 2000,
-      "mood": "eerie",
-      "file": "haunted-mansion-moan.mp3",
-      "checksum": "ca842b3a072b",
-      "kind": "sfx",
-      "bytes": 33062,
       "category": "reaction"
     },
     {
@@ -543,6 +279,30 @@
       "bytes": 13836
     },
     {
+      "id": "meh-cough",
+      "name": "Polite Cough",
+      "prompt": "one single polite quiet cough in a silent room, small awkward beat, family-friendly",
+      "durationMs": 800,
+      "mood": "embarrassed",
+      "file": "meh-cough.mp3",
+      "checksum": "26db88c3c9ae",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 13836
+    },
+    {
+      "id": "meh-shuffle",
+      "name": "Awkward Shuffle",
+      "prompt": "a small audience shifting in creaky seats with a faint unimpressed hmm, brief awkward pause, family-friendly",
+      "durationMs": 1000,
+      "mood": "embarrassed",
+      "file": "meh-shuffle.mp3",
+      "checksum": "103fe5512240",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 17180
+    },
+    {
       "id": "food-munch",
       "name": "Food Munch",
       "prompt": "a quick comedic cartoon chewing crunch, brief munching foley, family-friendly",
@@ -613,6 +373,54 @@
       "kind": "sfx",
       "bytes": 29301,
       "category": "event"
+    },
+    {
+      "id": "coin-clink",
+      "name": "Coin Clink",
+      "prompt": "two or three small gold coins dropping into a pouch with a bright clink, brief, family-friendly cartoon foley",
+      "durationMs": 600,
+      "mood": "triumphant",
+      "file": "coin-clink.mp3",
+      "checksum": "c656efe47aa0",
+      "category": "event",
+      "kind": "sfx",
+      "bytes": 10493
+    },
+    {
+      "id": "shop-purchase",
+      "name": "Shop Purchase",
+      "prompt": "an old-fashioned cash register ka-ching with a small coin jingle, quick satisfying purchase sound, family-friendly",
+      "durationMs": 900,
+      "mood": "triumphant",
+      "file": "shop-purchase.mp3",
+      "checksum": "45f9cbdee3ca",
+      "category": "event",
+      "kind": "sfx",
+      "bytes": 15090
+    },
+    {
+      "id": "streak-5",
+      "name": "Streak ×5",
+      "prompt": "a small crowd rising oooh into a short cheer with one bright chime, building excitement, family-friendly",
+      "durationMs": 1400,
+      "mood": "enthralled",
+      "file": "streak-5.mp3",
+      "checksum": "4afa9a2f2229",
+      "category": "event",
+      "kind": "sfx",
+      "bytes": 23031
+    },
+    {
+      "id": "streak-10",
+      "name": "Streak ×10",
+      "prompt": "a big crowd eruption with a firework pop and glittering chime cascade, legendary celebration, family-friendly",
+      "durationMs": 2000,
+      "mood": "enthralled",
+      "file": "streak-10.mp3",
+      "checksum": "b68ea8a84f8b",
+      "category": "event",
+      "kind": "sfx",
+      "bytes": 33062
     },
     {
       "id": "boss-entrance-granny",
@@ -697,6 +505,30 @@
       "kind": "sfx",
       "bytes": 26793,
       "category": "utility"
+    },
+    {
+      "id": "music-lab-loop",
+      "name": "Lab Loop",
+      "prompt": "seamless looping background music, playful mellow cartoon science lab ambience, soft bouncy pizzicato and light marimba, gentle bubbling undertone, calm low-key, no melody spikes, no intro, no outro, loops perfectly, family-friendly",
+      "durationMs": 20000,
+      "mood": "comedic",
+      "file": "music-lab-loop.mp3",
+      "checksum": "c0b6ad8c1cfc",
+      "category": "music",
+      "kind": "sfx",
+      "bytes": 321036
+    },
+    {
+      "id": "music-boss-loop",
+      "name": "Boss Arena Loop",
+      "prompt": "seamless looping background music, tense but goofy cartoon showdown ambience, low staccato strings and soft timpani heartbeat, sneaky comedic undertone, restrained and quiet, no melody spikes, no intro, no outro, loops perfectly, family-friendly",
+      "durationMs": 20000,
+      "mood": "eerie",
+      "file": "music-boss-loop.mp3",
+      "checksum": "9f228797207f",
+      "category": "music",
+      "kind": "sfx",
+      "bytes": 321036
     },
     {
       "id": "sig-granny-edna",
@@ -965,6 +797,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-granny-edna-intro",
+      "name": "Voice: Granny Edna — intro",
+      "prompt": "Oh, hello dearie! Granny Edna's here for the show. Do be gentle with an old lady's nose.",
+      "durationMs": 7333,
+      "mood": "voice",
+      "file": "voice-granny-edna-intro.mp3",
+      "checksum": "487f6eb3d4f2",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "9BWtsMINqrJLrRacOk9x",
+      "bytes": 81128
+    },
+    {
       "id": "voice-toddler-bday-loved",
       "name": "Voice: Toddler Birthday Party — loved",
       "prompt": "The toddlers SHRIEK with laughter and demand cake.",
@@ -989,6 +834,19 @@
       "voiceId": "XrExE9yKIg1WjnnlVkGX",
       "bytes": 52288,
       "category": "voice"
+    },
+    {
+      "id": "voice-toddler-bday-intro",
+      "name": "Voice: Toddler Birthday Party — intro",
+      "prompt": "It's my BIRTHDAY! Do the funny noise! DO THE FUNNY NOISE!",
+      "durationMs": 4750,
+      "mood": "voice",
+      "file": "voice-toddler-bday-intro.mp3",
+      "checksum": "5bf205f10ea4",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XrExE9yKIg1WjnnlVkGX",
+      "bytes": 61066
     },
     {
       "id": "voice-baby-shower-loved",
@@ -1017,6 +875,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-baby-shower-intro",
+      "name": "Voice: Baby Shower — intro",
+      "prompt": "Welcome to the baby shower! Keep it cute, keep it classy, and mind the gift table.",
+      "durationMs": 6833,
+      "mood": "voice",
+      "file": "voice-baby-shower-intro.mp3",
+      "checksum": "31701491a015",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 80710
+    },
+    {
       "id": "voice-kindergarten-loved",
       "name": "Voice: Kindergarten Class — loved",
       "prompt": "The kindergartners erupt in giggles. A spontaneous dance breaks out.",
@@ -1041,6 +912,19 @@
       "voiceId": "pFZP5JQG7iQjIQuC4Bku",
       "bytes": 44347,
       "category": "voice"
+    },
+    {
+      "id": "voice-kindergarten-intro",
+      "name": "Voice: Kindergarten Class — intro",
+      "prompt": "Hi mister fart scientist! We promise we won't laugh. Okay, we'll laugh a LOT.",
+      "durationMs": 6417,
+      "mood": "voice",
+      "file": "voice-kindergarten-intro.mp3",
+      "checksum": "b5cd90f986de",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "pFZP5JQG7iQjIQuC4Bku",
+      "bytes": 73186
     },
     {
       "id": "voice-pet-rescue-loved",
@@ -1069,6 +953,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-pet-rescue-intro",
+      "name": "Voice: Pet Rescue Volunteers — intro",
+      "prompt": "Welcome to the rescue shelter! The puppies are SO excited. Nothing too scary, please!",
+      "durationMs": 7083,
+      "mood": "voice",
+      "file": "voice-pet-rescue-intro.mp3",
+      "checksum": "7a0e4559bebb",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "FGY2WhTYpPnrIDTdsKH5",
+      "bytes": 80710
+    },
+    {
       "id": "voice-frat-bros-loved",
       "name": "Voice: The Frat Bros — loved",
       "prompt": "THE FRAT BROS HOLLER. BEER GETS SPILLED. SOMEONE YELLS 'LEGEND!'",
@@ -1093,6 +990,19 @@
       "voiceId": "IKne3meq5aSn9XLyUdCD",
       "bytes": 57722,
       "category": "voice"
+    },
+    {
+      "id": "voice-frat-bros-intro",
+      "name": "Voice: The Frat Bros — intro",
+      "prompt": "YOOOO, the bros are HERE! Let's GO, dude! Show us something LEGENDARY!",
+      "durationMs": 5833,
+      "mood": "voice",
+      "file": "voice-frat-bros-intro.mp3",
+      "checksum": "e87aafc4b268",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "IKne3meq5aSn9XLyUdCD",
+      "bytes": 77784
     },
     {
       "id": "voice-goth-teens-loved",
@@ -1121,6 +1031,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-goth-teens-intro",
+      "name": "Voice: Goth Teens — intro",
+      "prompt": "Ugh. We're here, I guess. Whatever. Try not to be boring like everything else.",
+      "durationMs": 6500,
+      "mood": "voice",
+      "file": "voice-goth-teens-intro.mp3",
+      "checksum": "5e08e891f102",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cgSgspJ2msm6clMCkdW9",
+      "bytes": 92413
+    },
+    {
       "id": "voice-alien-tourists-loved",
       "name": "Voice: Alien Tourists — loved",
       "prompt": "The Alien Tourists emit synchronized chirps of delight.",
@@ -1145,6 +1068,19 @@
       "voiceId": "XB0fDUnXU5powFXDhCwa",
       "bytes": 42675,
       "category": "voice"
+    },
+    {
+      "id": "voice-alien-tourists-intro",
+      "name": "Voice: Alien Tourists — intro",
+      "prompt": "Greetings, Earth specialist. We traveled forty light-years for your famous gas. Begin the demonstration.",
+      "durationMs": 8667,
+      "mood": "voice",
+      "file": "voice-alien-tourists-intro.mp3",
+      "checksum": "a96e611ee4a4",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "XB0fDUnXU5powFXDhCwa",
+      "bytes": 97846
     },
     {
       "id": "voice-wrestling-fans-loved",
@@ -1173,6 +1109,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-wrestling-fans-intro",
+      "name": "Voice: Wrestling Fans — intro",
+      "prompt": "LADIES AND GENTLEMEN... welcome to the MAIN EVENT! Bring! The! THUNDER!",
+      "durationMs": 5917,
+      "mood": "voice",
+      "file": "voice-wrestling-fans-intro.mp3",
+      "checksum": "7643b4583214",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 95338
+    },
+    {
       "id": "voice-punk-show-loved",
       "name": "Voice: Punk Rock Show — loved",
       "prompt": "The Punk Show MOSHES. Someone yells \"ENCORE!\"",
@@ -1197,6 +1146,19 @@
       "voiceId": "bIHbv24MWmeRgasZH58o",
       "bytes": 48527,
       "category": "voice"
+    },
+    {
+      "id": "voice-punk-show-intro",
+      "name": "Voice: Punk Rock Show — intro",
+      "prompt": "OI! You're on! This crowd waits for NOBODY, so make it LOUD!",
+      "durationMs": 5000,
+      "mood": "voice",
+      "file": "voice-punk-show-intro.mp3",
+      "checksum": "1aa3df0a6054",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "bIHbv24MWmeRgasZH58o",
+      "bytes": 58976
     },
     {
       "id": "voice-skunk-society-loved",
@@ -1225,6 +1187,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-skunk-society-intro",
+      "name": "Voice: The Skunk Society — intro",
+      "prompt": "The Skunk Society convenes. We are connoisseurs of fine aromas. Impress our professional noses.",
+      "durationMs": 7917,
+      "mood": "voice",
+      "file": "voice-skunk-society-intro.mp3",
+      "checksum": "378a06749c50",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "nPczCjzI2devNBz1zQrb",
+      "bytes": 89487
+    },
+    {
       "id": "voice-food-critics-loved",
       "name": "Voice: Food Critics — loved",
       "prompt": "The Food Critics write glowing reviews. Three stars confirmed.",
@@ -1249,6 +1224,19 @@
       "voiceId": "SAz9YHcvj6GT2YYXdXww",
       "bytes": 48527,
       "category": "voice"
+    },
+    {
+      "id": "voice-food-critics-intro",
+      "name": "Voice: Food Critics — intro",
+      "prompt": "We are the Food Critics. We have tasted everything. Surprise us... if you dare.",
+      "durationMs": 6583,
+      "mood": "voice",
+      "file": "voice-food-critics-intro.mp3",
+      "checksum": "8a591f5c2d96",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "SAz9YHcvj6GT2YYXdXww",
+      "bytes": 78202
     },
     {
       "id": "voice-volcano-cult-loved",
@@ -1277,6 +1265,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-volcano-cult-intro",
+      "name": "Voice: The Volcano Cult — intro",
+      "prompt": "The Volcano Cult gathers, o gassy one. The Magma God hungers for a worthy offering.",
+      "durationMs": 6917,
+      "mood": "voice",
+      "file": "voice-volcano-cult-intro.mp3",
+      "checksum": "874ca0882b28",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "iP95p4xoKVk53GoZ742B",
+      "bytes": 78202
+    },
+    {
       "id": "voice-haunted-mansion-loved",
       "name": "Voice: The Haunted Mansion — loved",
       "prompt": "Spectral wails of approval echo through the halls.",
@@ -1301,6 +1302,19 @@
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
       "bytes": 44347,
       "category": "voice"
+    },
+    {
+      "id": "voice-haunted-mansion-intro",
+      "name": "Voice: The Haunted Mansion — intro",
+      "prompt": "Woooooo... the mansion stirs... entertain ussss, or join usssss...",
+      "durationMs": 5500,
+      "mood": "voice",
+      "file": "voice-haunted-mansion-intro.mp3",
+      "checksum": "2bd49306e334",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 77784
     },
     {
       "id": "voice-librarians-loved",
@@ -1329,6 +1343,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-librarians-intro",
+      "name": "Voice: Librarians — intro",
+      "prompt": "Shhh. The library is now in session. Quietly impress us... if you can.",
+      "durationMs": 5833,
+      "mood": "voice",
+      "file": "voice-librarians-intro.mp3",
+      "checksum": "d1d32a84c22b",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 84889
+    },
+    {
       "id": "voice-royal-court-loved",
       "name": "Voice: The Royal Court — loved",
       "prompt": "The Royal Court erupts in dignified applause. A knighthood is whispered of.",
@@ -1353,6 +1380,19 @@
       "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
       "bytes": 58140,
       "category": "voice"
+    },
+    {
+      "id": "voice-royal-court-intro",
+      "name": "Voice: The Royal Court — intro",
+      "prompt": "The Royal Court has arrived. You may begin... when the trumpets finish. Impress us.",
+      "durationMs": 6917,
+      "mood": "voice",
+      "file": "voice-royal-court-intro.mp3",
+      "checksum": "aeb06ddd712d",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "Xb7hH8MSUJpSbSDYk0k2",
+      "bytes": 84889
     },
     {
       "id": "voice-opera-house-loved",
@@ -1381,6 +1421,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-opera-house-intro",
+      "name": "Voice: The Opera House — intro",
+      "prompt": "Ahh, the Opera House awaits. We expect range. We expect drama. We expect... perfection, darling.",
+      "durationMs": 8000,
+      "mood": "voice",
+      "file": "voice-opera-house-intro.mp3",
+      "checksum": "c1c7306ebd08",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "EXAVITQu4vr4xnSDxMaL",
+      "bytes": 122088
+    },
+    {
       "id": "voice-astronauts-loved",
       "name": "Voice: Astronauts — loved",
       "prompt": "The Astronauts radio back: \"ZERO-G OBSERVATION, IMPRESSIVE.\"",
@@ -1405,6 +1458,19 @@
       "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
       "bytes": 53124,
       "category": "voice"
+    },
+    {
+      "id": "voice-astronauts-intro",
+      "name": "Voice: Astronauts — intro",
+      "prompt": "Mission control, we are go for launch. Repeat: we are GO for launch.",
+      "durationMs": 5667,
+      "mood": "voice",
+      "file": "voice-astronauts-intro.mp3",
+      "checksum": "f99921876406",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "CwhRBWXzGAHq8TQ4Fs17",
+      "bytes": 83635
     },
     {
       "id": "voice-silent-monks-loved",
@@ -1433,6 +1499,19 @@
       "category": "voice"
     },
     {
+      "id": "voice-silent-monks-intro",
+      "name": "Voice: Silent Monks — intro",
+      "prompt": "The monks have taken their seats. We shall judge... in complete silence.",
+      "durationMs": 6000,
+      "mood": "voice",
+      "file": "voice-silent-monks-intro.mp3",
+      "checksum": "85fa99fb3ff4",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "cjVigY5qzO86Huf0OWal",
+      "bytes": 64409
+    },
+    {
       "id": "voice-mystery-guest-loved",
       "name": "Voice: The Mystery Guest — loved",
       "prompt": "The Mystery Guest gives a knowing smile. You will never know who they were.",
@@ -1457,6 +1536,19 @@
       "voiceId": "JBFqnCBsd6RMkjVDRZzb",
       "bytes": 38914,
       "category": "voice"
+    },
+    {
+      "id": "voice-mystery-guest-intro",
+      "name": "Voice: The Mystery Guest — intro",
+      "prompt": "Someone has arrived. Who? That is the mystery. Proceed... carefully.",
+      "durationMs": 5667,
+      "mood": "voice",
+      "file": "voice-mystery-guest-intro.mp3",
+      "checksum": "8582edd401b2",
+      "category": "voice",
+      "kind": "tts",
+      "voiceId": "JBFqnCBsd6RMkjVDRZzb",
+      "bytes": 91577
     }
   ]
 }
