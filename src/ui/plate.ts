@@ -70,7 +70,7 @@ import {
   scheduleHide,
   showUnicornSplash,
 } from './splashes';
-import { renderAudienceReaction, renderStoryResult, scheduleGoldChime } from './result-panel';
+import { renderAudienceReaction, renderStoryResult, scheduleGoldChime, performanceWindowMs } from './result-panel';
 import {
   recordLaunch as recordEncounterLaunch,
   getOrCreate as getEncounterProgress,
@@ -706,7 +706,8 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     const [aL, aW, aV, aS, aT, aM] = recipeToSliderInputs(propsAfterArea);
     triggerHaptic(HAPTICS.launch);
     const arenaFartS = playFart(aL, aW, aV, aS, aT, aM, audioProps);
-    duckMusic(arenaFartS + 1.0); // music never talks over the fart
+    // Music is silent for the whole performance (fart + reaction + voice).
+    duckMusic(performanceWindowMs(arenaFartS * 1000) / 1000);
     spawnGas(aS, aV);
     commitBellySpend();
     // Read declared target (Boss 5 only) from the arena's select.
@@ -766,8 +767,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // matching grid clip from the true plate magnitude. Its return value is the
   // real clip duration — the crowd reaction is staggered past it.
   const fartDurationMs = Math.round(playFart(length, wetness, volume, stink, temp, musical, audioProps) * 1000);
-  // Duck the music through the fart + the crowd's comic beat after it.
-  duckMusic(fartDurationMs / 1000 + 1.0);
+  // Music is silent through the whole launch arc — fart, crowd stinger, voice
+  // line — and fades back once the performance is over.
+  duckMusic(performanceWindowMs(fartDurationMs) / 1000);
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.

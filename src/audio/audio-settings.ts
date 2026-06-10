@@ -26,9 +26,11 @@ export interface AudioSettings {
   music: number;
 }
 
-// Music defaults LOW (sound overhaul): the loop sets mood UNDER the comedy.
+// Music defaults FULL (overhaul v2) — the loop is fully silenced during the
+// launch arc (hold/duck in music.ts), so it no longer needs a low channel
+// default to stay out of the comedy's way; MUSIC_BASE_GAIN keeps it a bed.
 // Only affects new players — an existing fart_audio_channels save wins.
-const DEFAULT: AudioSettings = { master: 100, farts: 100, sfx: 100, voices: 100, music: 35 };
+const DEFAULT: AudioSettings = { master: 100, farts: 100, sfx: 100, voices: 100, music: 100 };
 const CHANNELS: AudioChannel[] = ['master', 'farts', 'sfx', 'voices', 'music'];
 
 function clamp(n: number): number {

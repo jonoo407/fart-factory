@@ -10,6 +10,7 @@
  */
 import { chargeQuality, type ChargeResult } from '../scoring/charge';
 import { startChargeTone, type ChargeTone } from '../audio/charge-tone';
+import { holdMusic, releaseMusic } from '../audio/music';
 
 const SWEEP_PER_FRAME = 2.2;
 
@@ -78,6 +79,9 @@ export function mountChargeMeter(
     if (bigEl) bigEl.textContent = 'CHARGING…';
     if (subEl) subEl.textContent = 'release in the zone!';
     if (hintEl) hintEl.textContent = 'release in the dashed zone!';
+    // The charge sweep opens the launch arc — music stays silent until the
+    // hold releases (the launch then re-silences for its own timed window).
+    holdMusic();
     tone = startChargeTone();
     tone.update(value);
     raf = requestAnimationFrame(tick);
@@ -94,6 +98,7 @@ export function mountChargeMeter(
     if (!charging) return;
     charging = false;
     cancelAnimationFrame(raf);
+    releaseMusic();
     tone?.stop();
     tone = null;
     const held = performance.now() - startT;
@@ -120,6 +125,8 @@ export function mountChargeMeter(
   return {
     destroy(): void {
       cancelAnimationFrame(raf);
+      if (charging) releaseMusic(); // never leak a hold
+      charging = false;
       tone?.stop();
       tone = null;
       button.removeEventListener('pointerdown', begin);

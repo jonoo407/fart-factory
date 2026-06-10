@@ -80,18 +80,19 @@ afterEach(async () => {
   vi.useRealTimers();
 });
 
-describe('audio-settings: music defaults LOW', () => {
-  it('new players get music at 35 (mood-setting, not distracting)', async () => {
+describe('audio-settings: music defaults FULL (overhaul v2)', () => {
+  it('new players get music at 100 — it goes silent during launches instead', async () => {
     const { loadAudioSettings } = await import('../../src/audio/audio-settings');
-    expect(loadAudioSettings().music).toBe(35);
+    expect(loadAudioSettings().music).toBe(100);
   });
 });
 
 describe('musicGainValue', () => {
   it('scales the low base gain by the effective music volume', async () => {
     const { musicGainValue, MUSIC_BASE_GAIN } = await import('../../src/audio/music');
-    // default music 35, master 100
-    expect(musicGainValue()).toBeCloseTo(MUSIC_BASE_GAIN * 0.35, 5);
+    // default music 100, master 100 (overhaul v2: the channel default is full;
+    // the low MUSIC_BASE_GAIN alone keeps the bed under the comedy)
+    expect(musicGainValue()).toBeCloseTo(MUSIC_BASE_GAIN, 5);
   });
 
   it('is 0 when the music channel is muted', async () => {
@@ -145,15 +146,40 @@ describe('startMusic / switch / stop', () => {
   });
 });
 
-describe('duckMusic — the fart is the readout', () => {
-  it('drops the gain during the launch window and restores it after', async () => {
-    const { startMusic, duckMusic, musicGainValue, MUSIC_DUCK_FACTOR } = await import('../../src/audio/music');
+describe('duckMusic — music is SILENT during the performance, not just quieter', () => {
+  it('duck factor is 0: no music under the fart launch arc', async () => {
+    const { MUSIC_DUCK_FACTOR } = await import('../../src/audio/music');
+    expect(MUSIC_DUCK_FACTOR).toBe(0);
+  });
+
+  it('silences the loop during the launch window and restores it after', async () => {
+    const { startMusic, duckMusic, musicGainValue } = await import('../../src/audio/music');
     await startMusic('lab');
     const full = musicGainValue();
+    expect(full).toBeGreaterThan(0);
     duckMusic(2);
-    expect(created.gains[0]!.gain.value).toBeCloseTo(full * MUSIC_DUCK_FACTOR, 5);
+    expect(created.gains[0]!.gain.value).toBe(0);
     vi.advanceTimersByTime(2100);
     expect(created.gains[0]!.gain.value).toBeCloseTo(full, 5);
+  });
+});
+
+describe('holdMusic / releaseMusic — silent while the charge sweep plays', () => {
+  it('holdMusic silences the loop until releaseMusic', async () => {
+    const { startMusic, holdMusic, releaseMusic, musicGainValue } = await import('../../src/audio/music');
+    await startMusic('lab');
+    const full = musicGainValue();
+    holdMusic();
+    expect(created.gains[0]!.gain.value).toBe(0);
+    releaseMusic();
+    expect(created.gains[0]!.gain.value).toBeCloseTo(full, 5);
+  });
+
+  it('release without a hold is a safe no-op', async () => {
+    const { startMusic, releaseMusic, musicGainValue } = await import('../../src/audio/music');
+    await startMusic('lab');
+    releaseMusic();
+    expect(created.gains[0]!.gain.value).toBeCloseTo(musicGainValue(), 5);
   });
 });
 

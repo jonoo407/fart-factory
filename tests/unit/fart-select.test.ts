@@ -95,7 +95,7 @@ describe('fart selector — behaviour', () => {
     const r = resolveFart(p, () => 0);
     expect(fartPoolFor(r.cellId)).toContain(r.clipId);
     expect(r.gain).toBeGreaterThan(0);
-    expect(r.gain).toBeLessThanOrEqual(0.95);
+    expect(r.gain).toBeLessThanOrEqual(1.0);
     expect(r.durationSeconds).toBeGreaterThan(0);
   });
 
@@ -103,5 +103,16 @@ describe('fart selector — behaviour', () => {
     const quiet = computeFartFromPlate(['egg']).props; // loud 0
     const loud = computeFartFromPlate(['volcano-chili']).props; // loud 5
     expect(fartGain(loud)).toBeGreaterThan(fartGain(quiet));
+  });
+
+  // "the farts arent quite loud enough relative to the other sounds — they
+  // are the main event!" The voice lines play at 0.725 gain (slider 7 via the
+  // sample-player mapping); even the QUIETEST plate's fart must sit above
+  // that, and a maxed plate hits full scale.
+  it('farts are the main event: gain floor beats the loudest contextual cue', () => {
+    const quiet = computeFartFromPlate(['egg']).props; // loud 0
+    expect(fartGain(quiet)).toBeGreaterThanOrEqual(0.75);
+    const maxed = { ...quiet, loud: 12 };
+    expect(fartGain(maxed)).toBeCloseTo(1.0, 5);
   });
 });
