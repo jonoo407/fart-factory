@@ -159,6 +159,14 @@ const REACTION_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'alien-tourists-gasp',   name: 'Alien Tourists Gasp',    mood: 'surprised',  duration_seconds: 1.4, prompt: 'small group of cartoon aliens emitting an astonished collective gasp followed by curious chirps, family-friendly' },
   { kind: 'sfx', id: 'toddler-giggle',        name: 'Toddler Giggle',         mood: 'comedic',    duration_seconds: 1.5, prompt: 'a small toddler giggling and laughing with delight, gentle and warm, family-friendly' },
 
+  // --- flop variants (failed launch) ---
+  // Deliberately SHORT and soft: the fart is the showcase, the crowd reaction
+  // is a quick punchline after it — never a 2s wail talking over it.
+  { kind: 'sfx', id: 'flop-groan',         name: 'Crowd Groan',         mood: 'embarrassed', duration_seconds: 1.0, prompt: 'a small crowd letting out one short disappointed aww groan, brief comedic letdown, family-friendly' },
+  { kind: 'sfx', id: 'flop-boo',           name: 'Playful Boo',         mood: 'embarrassed', duration_seconds: 1.0, prompt: 'a small crowd giving one brief playful pantomime boo, lighthearted and gentle, family-friendly' },
+  { kind: 'sfx', id: 'flop-crickets',      name: 'Awkward Crickets',    mood: 'sneaky',      duration_seconds: 1.4, prompt: 'awkward silence with two soft cricket chirps, comedic empty-room beat, family-friendly' },
+  { kind: 'sfx', id: 'flop-whistle-down',  name: 'Slide Whistle Down',  mood: 'embarrassed', duration_seconds: 0.8, prompt: 'a single quick descending slide whistle womp, brief cartoon failure sting, family-friendly' },
+
 ], 'reaction');
 
 // ====== Phase K food-eating seeds (item 62) ======

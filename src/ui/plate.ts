@@ -759,8 +759,9 @@ async function onStoryLaunch(quality = 1): Promise<void> {
 
   triggerHaptic(HAPTICS.launch);
   // The fart bank: pass the RAW plate props (audioProps) so playFart picks the
-  // matching grid clip from the true plate magnitude.
-  playFart(length, wetness, volume, stink, temp, musical, audioProps);
+  // matching grid clip from the true plate magnitude. Its return value is the
+  // real clip duration — the crowd reaction is staggered past it.
+  const fartDurationMs = Math.round(playFart(length, wetness, volume, stink, temp, musical, audioProps) * 1000);
   spawnGas(stink, volume);
 
   // Phase J item 60 — legendary fanfare on the audience portrait.
@@ -923,7 +924,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   // Phase P item 79 — once-per-boss toast when a boss becomes newly unlocked.
   maybeShowBossUnlockToast();
   if (ingredientCount > 0) {
-    renderAudienceReaction(match.pct, aud);
+    renderAudienceReaction(match.pct, aud, fartDurationMs);
     // Belly fail loop: if you still haven't pleased this crowd and you're too
     // stuffed for another real attempt, they give up and leave (soft fail →
     // fresh crowd). Otherwise show the normal reaction overlay (retry/next).

@@ -12,7 +12,7 @@ import { audienceReaction } from '../scoring/audience-reactions';
 import { reactionTextForAudience } from '../scoring/audience-reactions';
 import { loadLastMatch } from '../state/persistence';
 import { loadStreak } from '../scoring/streak';
-import { playEventSfx, AUDIENCE_REACTION_SFX, playAudienceVoice } from '../audio/event-sfx';
+import { playEventSfxOneOf, AUDIENCE_REACTION_SFX, playAudienceVoice } from '../audio/event-sfx';
 import { loadDiscoveredAxes } from '../state/axis-discovery';
 import { getRecipe } from '../state/recipes';
 import { renderFartProfileHtml } from './fart-profile';
@@ -28,15 +28,26 @@ type Tier = ReturnType<typeof audienceReaction>['tier'];
 type Trend = ReturnType<typeof audienceReaction>['trend'];
 
 /**
- * Post-launch audio stagger. The crowd reaction must land AFTER the fart's main
- * hit — the fart schedules a cue at t=0, its main hit ~0.2s later and its body
- * runs ~1s — so firing the stinger at t=0 (as it used to) started it before the
- * fart, ran longer and ~3x louder, and masked the fart entirely. We defer the
- * stinger past the fart's main hit; the voice line lands as a punchline after
- * the stinger. Exported for the timing test.
+ * Post-launch audio stagger. The crowd reaction must land AFTER the fart —
+ * twice now a reaction fired over it: first synchronously at t=0 (~3x louder,
+ * masked the fart entirely), then on a FIXED 700ms timer tuned for the old ~1s
+ * procedural fart, which the rebuilt bank (clips up to ~4.5s) outlived. The
+ * delay is now computed from the actual fart duration plus a comic beat, with
+ * 700ms as the floor when the duration is unknown. The voice line lands as a
+ * punchline after the stinger. Exported for the timing test.
  */
 export const REACTION_SFX_DELAY_MS = 700;
+export const REACTION_BREATH_MS = 500;
 export const VOICE_AFTER_REACTION_MS = 800;
+
+/** A flop stinger is a punchline, not a headline — quieter than the cheers. */
+const FAIL_STINGER_VOLUME = 4;
+const STINGER_VOLUME = 5;
+
+export function reactionDelayMs(fartDurationMs?: number): number {
+  if (!fartDurationMs || fartDurationMs <= 0) return REACTION_SFX_DELAY_MS;
+  return Math.max(REACTION_SFX_DELAY_MS, fartDurationMs + REACTION_BREATH_MS);
+}
 
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
@@ -86,7 +97,7 @@ function applyReactionFace(tier: Tier): void {
   emojiEl.textContent = emojiMap[tier];
 }
 
-export function renderAudienceReaction(pct: number, audience: Audience): void {
+export function renderAudienceReaction(pct: number, audience: Audience, fartDurationMs?: number): void {
   const wrap = $('audienceReaction');
   const tierEl = $('audienceReactionTier');
   const trendEl = $('audienceReactionTrend');
@@ -105,13 +116,15 @@ export function renderAudienceReaction(pct: number, audience: Audience): void {
       streakEl.setAttribute('hidden', '');
     }
   }
-  // Stagger the crowd reaction past the fart's main hit so it reacts TO the
-  // fart instead of masking it (see REACTION_SFX_DELAY_MS).
-  const reactionSfx = AUDIENCE_REACTION_SFX[r.tier];
-  if (reactionSfx) {
+  // Stagger the crowd reaction past the END of the fart (plus a beat to take
+  // it in) so it reacts TO the fart instead of masking it — see reactionDelayMs.
+  const delay = reactionDelayMs(fartDurationMs);
+  const pool = AUDIENCE_REACTION_SFX[r.tier];
+  if (pool.length > 0) {
+    const vol = r.tier === 'disliked' || r.tier === 'evacuated' ? FAIL_STINGER_VOLUME : STINGER_VOLUME;
     setTimeout(() => {
-      void playEventSfx(reactionSfx, 5);
-    }, REACTION_SFX_DELAY_MS);
+      void playEventSfxOneOf(pool, vol);
+    }, delay);
   }
   void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
     spawnReactionParticles(r.tier);
@@ -122,7 +135,7 @@ export function renderAudienceReaction(pct: number, audience: Audience): void {
     const tier = r.tier;
     setTimeout(() => {
       void playAudienceVoice(audience.id, tier);
-    }, REACTION_SFX_DELAY_MS + VOICE_AFTER_REACTION_MS);
+    }, delay + VOICE_AFTER_REACTION_MS);
   }
 }
 

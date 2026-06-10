@@ -1,6 +1,6 @@
 {
   "version": "v2",
-  "generatedAt": "2026-06-08T19:28:50.809Z",
+  "generatedAt": "2026-06-10T12:28:41.089Z",
   "entries": [
     {
       "id": "mouse-squeak",
@@ -493,6 +493,54 @@
       "kind": "sfx",
       "bytes": 24703,
       "category": "reaction"
+    },
+    {
+      "id": "flop-groan",
+      "name": "Crowd Groan",
+      "prompt": "a small crowd letting out one short disappointed aww groan, brief comedic letdown, family-friendly",
+      "durationMs": 1000,
+      "mood": "embarrassed",
+      "file": "flop-groan.mp3",
+      "checksum": "709f595051b3",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 17180
+    },
+    {
+      "id": "flop-boo",
+      "name": "Playful Boo",
+      "prompt": "a small crowd giving one brief playful pantomime boo, lighthearted and gentle, family-friendly",
+      "durationMs": 1000,
+      "mood": "embarrassed",
+      "file": "flop-boo.mp3",
+      "checksum": "da460dba1f8c",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 17180
+    },
+    {
+      "id": "flop-crickets",
+      "name": "Awkward Crickets",
+      "prompt": "awkward silence with two soft cricket chirps, comedic empty-room beat, family-friendly",
+      "durationMs": 1400,
+      "mood": "sneaky",
+      "file": "flop-crickets.mp3",
+      "checksum": "a3a653a4c4f8",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 23031
+    },
+    {
+      "id": "flop-whistle-down",
+      "name": "Slide Whistle Down",
+      "prompt": "a single quick descending slide whistle womp, brief cartoon failure sting, family-friendly",
+      "durationMs": 800,
+      "mood": "embarrassed",
+      "file": "flop-whistle-down.mp3",
+      "checksum": "969ac35c76ed",
+      "category": "reaction",
+      "kind": "sfx",
+      "bytes": 13836
     },
     {
       "id": "food-munch",
