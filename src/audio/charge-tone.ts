@@ -16,6 +16,18 @@ import { getAudioContext } from './procedural';
 export const CHARGE_TONE_MIN_HZ = 140;
 export const CHARGE_TONE_MAX_HZ = 740;
 
+// Ready ping: the meter sweeps 0→100→0 with nothing marking the top, so a tiny
+// bright tick fires when the charge crosses this threshold going UP — a timing
+// cue for releasing at the peak. Cooldown stops it from machine-gunning when
+// the sweep oscillates around the top.
+export const CHARGE_READY_THRESHOLD = 95;
+export const CHARGE_READY_COOLDOWN_S = 0.3;
+
+/** True only on an upward crossing of the ready threshold. */
+export function chargeReadyCrossing(prev: number, value: number): boolean {
+  return prev < CHARGE_READY_THRESHOLD && value >= CHARGE_READY_THRESHOLD;
+}
+
 /** Map a 0–100 charge value to a pitch. Exponential so the rise sounds even. */
 export function chargeToneFrequency(value: number): number {
   const t = Math.max(0, Math.min(100, value)) / 100;
@@ -36,6 +48,22 @@ const SILENT: ChargeTone = { update: () => {}, stop: () => {} };
  * SFX channel off, or no unlocked AudioContext) it's a no-op controller so the
  * caller never has to branch.
  */
+/** One short bright tick — sits just above the tone's ceiling so it cuts through. */
+function playReadyPing(ctx: AudioContext, tonePeak: number): void {
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1568, t); // G6 — bright, not shrill
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(tonePeak * 1.6, t + 0.01);
+  g.gain.linearRampToValueAtTime(0.0001, t + 0.07);
+  osc.connect(g);
+  g.connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + 0.08);
+}
+
 export function startChargeTone(): ChargeTone {
   const ctx = getAudioContext();
   if (!ctx || !isChannelAudible('sfx')) return SILENT;
@@ -61,11 +89,18 @@ export function startChargeTone(): ChargeTone {
   osc.start();
 
   let stopped = false;
+  let prevValue = 0;
+  let lastPingAt = -Infinity;
   return {
     update(value: number): void {
       if (stopped) return;
       // setTargetAtTime glides toward the new pitch so the sweep is smooth, not steppy.
       osc.frequency.setTargetAtTime(chargeToneFrequency(value), ctx.currentTime, 0.02);
+      if (chargeReadyCrossing(prevValue, value) && ctx.currentTime - lastPingAt >= CHARGE_READY_COOLDOWN_S) {
+        lastPingAt = ctx.currentTime;
+        playReadyPing(ctx, peak);
+      }
+      prevValue = value;
     },
     stop(): void {
       if (stopped) return;
