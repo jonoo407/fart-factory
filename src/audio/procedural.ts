@@ -1,4 +1,4 @@
-import { isChannelAudible } from './audio-settings';
+import { isChannelAudible, effectiveVolume } from './audio-settings';
 import {
   loadManifest,
   pickSampleId,
@@ -291,7 +291,9 @@ export function playCelebrationSting(): number {
   const noteDur = 0.25;
   const stride = 0.08;
   const master = ctx.createGain();
-  master.gain.value = 0.18;
+  // 0.18 sting level, scaled by the player's SFX channel (× Master) like every
+  // other cue — a flat 0.18 ignored the slider between "audible" and "full".
+  master.gain.value = 0.18 * (effectiveVolume('sfx') / 100);
   master.connect(ctx.destination);
   for (let i = 0; i < notes.length; i++) {
     const osc = ctx.createOscillator();
