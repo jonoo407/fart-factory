@@ -77,6 +77,18 @@ export function reactionDelayMs(fartDurationMs?: number): number {
   return Math.max(REACTION_SFX_DELAY_MS, fartDurationMs + REACTION_BREATH_MS);
 }
 
+/** Generous cap for a spoken reaction line — the longest clip is ~5.0s. */
+export const VOICE_LINE_ALLOWANCE_MS = 5500;
+
+/**
+ * Overhaul v2 — how long the launch arc owns the room: fart, then the crowd
+ * stinger, then the voice line. Music is fully silenced (duckMusic) for this
+ * window; it's a performance, not background listening.
+ */
+export function performanceWindowMs(fartDurationMs?: number): number {
+  return reactionDelayMs(fartDurationMs) + VOICE_AFTER_REACTION_MS + VOICE_LINE_ALLOWANCE_MS;
+}
+
 function $(id: string): HTMLElement | null {
   return document.getElementById(id);
 }

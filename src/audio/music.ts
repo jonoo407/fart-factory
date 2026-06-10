@@ -6,10 +6,12 @@
  *   boss → the boss arena (tense, still goofy)
  *
  * Design constraints:
- *  - LOW: base gain 0.22 scaled by the Music channel (new-player default 35).
- *    Music sets mood UNDER the comedy; the fart is the readout.
- *  - Ducks during the launch window (duckMusic) so it never talks over the
- *    cue → fart → reaction arc.
+ *  - LOW: base gain 0.22 scaled by the Music channel (default 100). Music sets
+ *    mood UNDER the comedy; the fart is the readout.
+ *  - SILENT during the launch arc: held while the charge sweep plays
+ *    (holdMusic/releaseMusic) and ducked to ZERO for the timed
+ *    fart → reaction → voice window (duckMusic + performanceWindowMs). Music
+ *    plays only between performances / while navigating the UI.
  *  - Manifest-free: loads sfx/<id>.mp3 directly and no-ops on 404/decode
  *    failure, so the game ships safely before the loops are generated.
  *  - Starts only when a context exists (post-gesture; see onAudioUnlocked).
@@ -19,7 +21,10 @@ import { getAudioContext } from './procedural';
 import { effectiveVolume } from './audio-settings';
 
 export const MUSIC_BASE_GAIN = 0.22;
-export const MUSIC_DUCK_FACTOR = 0.3;
+/** Overhaul v2: music doesn't duck under the performance — it goes SILENT.
+ *  The fart launch arc (charge → fart → reaction → voice) owns the room;
+ *  music only plays between performances / while navigating the UI. */
+export const MUSIC_DUCK_FACTOR = 0;
 const FADE_S = 0.4;
 
 export const MUSIC_TRACKS = {
@@ -36,13 +41,31 @@ interface Playing {
 
 let playing: Playing | null = null;
 let ducked = false;
+let holdCount = 0;
 let duckTimer: ReturnType<typeof setTimeout> | null = null;
 const bufferCache = new Map<string, AudioBuffer>();
 
-/** Current loop gain target: low base × Music channel (× duck while a fart plays). */
+/** Current loop gain target: low base × Music channel — and 0 (silent) while
+ *  ducked (timed launch window) or held (charge sweep in progress). */
 export function musicGainValue(): number {
   const v = MUSIC_BASE_GAIN * (effectiveVolume('music') / 100);
-  return ducked ? v * MUSIC_DUCK_FACTOR : v;
+  return ducked || holdCount > 0 ? v * MUSIC_DUCK_FACTOR : v;
+}
+
+/**
+ * Hold the music silent for as long as a launch-arc sound is live with no
+ * fixed end time — the charge sweep (player holds the button). Counted, so
+ * overlapping holds can't release each other early; the launch that follows
+ * release re-silences via duckMusic for the precise post-launch window.
+ */
+export function holdMusic(): void {
+  holdCount++;
+  refreshMusicGain();
+}
+
+export function releaseMusic(): void {
+  holdCount = Math.max(0, holdCount - 1);
+  refreshMusicGain();
 }
 
 export function currentMusicTrack(): MusicTrack | null {
@@ -144,6 +167,7 @@ export function duckMusic(durationS: number): void {
 export function _resetMusicForTests(): void {
   playing = null;
   ducked = false;
+  holdCount = 0;
   if (duckTimer) clearTimeout(duckTimer);
   duckTimer = null;
   bufferCache.clear();

@@ -87,10 +87,15 @@ export function fartPoolFor(cellId: string): string[] {
   return POOLS.get(cellId) ?? [cellId];
 }
 
-/** Playback gain from loudness — keeps every fart audible, louder for big plates. */
+/**
+ * Playback gain from loudness. The fart is the MAIN EVENT: the floor sits
+ * above every contextual cue (voices peak at 0.725 via the sample-player
+ * slider mapping) and a maxed plate hits full scale. Loudness still matters —
+ * big plates are bigger — but no fart ever plays second fiddle.
+ */
 export function fartGain(props: FoodProperties): number {
   const loudNorm = Math.min(1, props.loud / 12);
-  return Math.min(0.95, Math.max(0.4, 0.4 + loudNorm * 0.55));
+  return Math.min(1.0, Math.max(0.75, 0.75 + loudNorm * 0.25));
 }
 
 export interface ResolvedFart {

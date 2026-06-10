@@ -11,6 +11,14 @@ const tone = vi.hoisted(() => ({ update: vi.fn(), stop: vi.fn() }));
 const startChargeTone = vi.hoisted(() => vi.fn(() => tone));
 vi.mock('../../src/audio/charge-tone', () => ({ startChargeTone }));
 
+// Music must be SILENT while the charge sweep plays (it's part of the launch
+// arc) — the meter holds the music on begin and releases it on end.
+const { holdMusic, releaseMusic } = vi.hoisted(() => ({
+  holdMusic: vi.fn(),
+  releaseMusic: vi.fn(),
+}));
+vi.mock('../../src/audio/music', () => ({ holdMusic, releaseMusic }));
+
 import { mountChargeMeter } from '../../src/ui/charge-meter';
 
 // ---- deterministic rAF + clock -------------------------------------------
@@ -84,6 +92,8 @@ beforeEach(() => {
   startChargeTone.mockClear();
   tone.update.mockClear();
   tone.stop.mockClear();
+  holdMusic.mockClear();
+  releaseMusic.mockClear();
   vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback): number => {
     const id = nextRafId++;
     pendingFrames.set(id, cb);
@@ -355,5 +365,33 @@ describe('destroy()', () => {
     pointer(btn, 'pointerup');
     pressKey(btn, 'Enter');
     expect(onRelease).not.toHaveBeenCalled();
+  });
+});
+
+describe('music is held silent during the charge sweep (launch arc starts at hold)', () => {
+  it('pointerdown holds the music; release lets it back (launch will re-silence)', () => {
+    const { btn } = mount();
+    pointer(btn, 'pointerdown');
+    expect(holdMusic).toHaveBeenCalledTimes(1);
+    expect(releaseMusic).not.toHaveBeenCalled();
+    pumpFrames(3);
+    pointer(btn, 'pointerup');
+    expect(releaseMusic).toHaveBeenCalledTimes(1);
+  });
+
+  it('a cancelled charge (pointerleave) also releases the hold', () => {
+    const { btn } = mount();
+    pointer(btn, 'pointerdown');
+    pumpFrames(2);
+    pointer(btn, 'pointerleave');
+    expect(releaseMusic).toHaveBeenCalledTimes(1);
+  });
+
+  it('mid-charge destroy never leaks a hold', () => {
+    const { btn, handle } = mount();
+    pointer(btn, 'pointerdown');
+    pumpFrames(2);
+    handle.destroy();
+    expect(releaseMusic).toHaveBeenCalledTimes(1);
   });
 });

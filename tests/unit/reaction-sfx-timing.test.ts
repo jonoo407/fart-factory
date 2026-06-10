@@ -27,9 +27,11 @@ vi.mock('../../src/visuals/reaction-particles', () => ({
 import {
   renderAudienceReaction,
   reactionDelayMs,
+  performanceWindowMs,
   REACTION_SFX_DELAY_MS,
   REACTION_BREATH_MS,
   VOICE_AFTER_REACTION_MS,
+  VOICE_LINE_ALLOWANCE_MS,
 } from '../../src/ui/result-panel';
 import { AUDIENCE_REACTION_SFX } from '../../src/audio/event-sfx';
 import { AUDIENCES } from '../../src/state/audience';
@@ -61,6 +63,24 @@ describe('reactionDelayMs — the crowd waits for the fart to finish', () => {
 
   it('never reacts sooner than the floor on a very short fart', () => {
     expect(reactionDelayMs(100)).toBe(REACTION_SFX_DELAY_MS);
+  });
+});
+
+describe('performanceWindowMs — music stays SILENT through the whole launch arc', () => {
+  it('covers fart + crowd stinger + voice line for a known fart duration', () => {
+    expect(performanceWindowMs(3000)).toBe(
+      reactionDelayMs(3000) + VOICE_AFTER_REACTION_MS + VOICE_LINE_ALLOWANCE_MS,
+    );
+  });
+
+  it('falls back to the floor delay when the fart duration is unknown', () => {
+    expect(performanceWindowMs(undefined)).toBe(
+      REACTION_SFX_DELAY_MS + VOICE_AFTER_REACTION_MS + VOICE_LINE_ALLOWANCE_MS,
+    );
+  });
+
+  it('the voice allowance outlasts the longest reaction clip (~5.0s)', () => {
+    expect(VOICE_LINE_ALLOWANCE_MS).toBeGreaterThanOrEqual(5000);
   });
 });
 

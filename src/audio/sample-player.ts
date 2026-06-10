@@ -236,7 +236,8 @@ export async function playGridClip(
   const src = ctx.createBufferSource();
   src.buffer = buf;
   const g = ctx.createGain();
-  g.gain.value = Math.min(0.95, gainValue * (effectiveVolume('farts') / 100));
+  // Cap at full scale (not 0.95) — the launch fart is the loudest thing in the mix.
+  g.gain.value = Math.min(1.0, gainValue * (effectiveVolume('farts') / 100));
   src.connect(g);
   g.connect(ctx.destination);
   src.start(startAtSeconds);
