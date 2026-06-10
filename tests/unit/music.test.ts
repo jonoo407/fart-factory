@@ -169,17 +169,18 @@ describe('refreshMusicGain — follows the settings sliders live', () => {
 });
 
 describe('music track seeds', () => {
-  it('both loops are seeded with the music category at ~20s', async () => {
+  it('both loops are seeded via the Music API (sound overhaul v2 — real music, not SFX beeps)', async () => {
     const { SEEDS } = await import('../../scripts/sfx-seeds');
     const lab = SEEDS.find((s) => s.id === 'music-lab-loop');
     const boss = SEEDS.find((s) => s.id === 'music-boss-loop');
     for (const seed of [lab, boss]) {
       expect(seed).toBeDefined();
       expect((seed as { category?: string }).category).toBe('music');
-      if (seed!.kind !== 'sfx') throw new Error('music seed must be sfx kind');
-      expect(seed!.duration_seconds).toBeGreaterThanOrEqual(15);
-      expect(seed!.duration_seconds).toBeLessThanOrEqual(22);
+      if (seed!.kind !== 'music') throw new Error('music seed must be music kind (Music API)');
+      expect(seed!.music_length_ms).toBeGreaterThanOrEqual(15_000);
+      expect(seed!.music_length_ms).toBeLessThanOrEqual(60_000);
       expect(seed!.prompt).toMatch(/loop/i);
+      expect(seed!.prompt).toMatch(/instrumental/i);
     }
   });
 });

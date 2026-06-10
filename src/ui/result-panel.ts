@@ -157,12 +157,11 @@ export function renderAudienceReaction(pct: number, audience: Audience, fartDura
       void playEventSfxOneOf(pool, vol);
     }, delay);
   }
-  // Streak milestone stinger (×5 / ×10). On voiced tiers it waits out the
-  // voice line so the audio order stays fart → crowd → voice → flourish.
+  // Streak milestone stinger (×5 / ×10). Every tier is voiced now, so the
+  // flourish always waits out the voice line: fart → crowd → voice → flourish.
   const milestone = streakMilestoneSfx(streak);
   if (milestone) {
-    const voiced = r.tier === 'loved' || r.tier === 'evacuated';
-    const milestoneDelay = delay + VOICE_AFTER_REACTION_MS + (voiced ? STREAK_AFTER_VOICE_MS : 0);
+    const milestoneDelay = delay + VOICE_AFTER_REACTION_MS + STREAK_AFTER_VOICE_MS;
     setTimeout(() => {
       void playEventSfx(milestone, STREAK_STINGER_VOLUME);
     }, milestoneDelay);
@@ -170,14 +169,13 @@ export function renderAudienceReaction(pct: number, audience: Audience, fartDura
   void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
     spawnReactionParticles(r.tier);
   });
-  // PR10 — voiced reaction line. Only loved + evacuated are voiced today.
-  // Lands as a punchline after the stinger (reaction delay + voice delay).
-  if (r.tier === 'loved' || r.tier === 'evacuated') {
-    const tier = r.tier;
-    setTimeout(() => {
-      void playAudienceVoice(audience.id, tier);
-    }, delay + VOICE_AFTER_REACTION_MS);
-  }
+  // Voiced reaction line — EVERY tier reads its line (sound overhaul v2:
+  // liked/meh/disliked were text-only). Lands as a punchline after the
+  // stinger (reaction delay + voice delay).
+  const tier = r.tier;
+  setTimeout(() => {
+    void playAudienceVoice(audience.id, tier);
+  }, delay + VOICE_AFTER_REACTION_MS);
 }
 
 function matchEmoji(pct: number): string {

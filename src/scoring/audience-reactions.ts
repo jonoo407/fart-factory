@@ -197,7 +197,7 @@ const INTROS: Record<string, string> = {
   'pet-rescue':       'Welcome to the rescue shelter! The puppies are SO excited. Nothing too scary, please!',
   'astronauts':       'Mission control, we are go for launch. Repeat: we are GO for launch.',
   'food-critics':     'We are the Food Critics. We have tasted everything. Surprise us... if you dare.',
-  'baby-shower':      "Welcome to the baby shower! Keep it cute, keep it classy, and mind the gift table.",
+  'baby-shower':      "Goo goo ga GA! Da babies are here! Make da funny toot sound for baby... pwease? Hee hee!",
   'punk-show':        "OI! You're on! This crowd waits for NOBODY, so make it LOUD!",
   'silent-monks':     'The monks have taken their seats. We shall judge... in complete silence.',
   'mystery-guest':    'Someone has arrived. Who? That is the mystery. Proceed... carefully.',

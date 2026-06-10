@@ -94,11 +94,12 @@ export function streakMilestoneSfx(streak: number): string | null {
 // ---------- Per-audience audio (signatures + voice lines) ----------
 //
 // Convention: signature id is `sig-${audienceId}`; voice id is
-// `voice-${audienceId}-${tier}` (tiers: loved | evacuated). Both helpers
+// `voice-${audienceId}-${tier}`. EVERY reaction tier is voiced (sound
+// overhaul v2 — "voice them all"), plus the arrival intro. Both helpers
 // resolve to silent no-ops via playSample when the id isn't in the
 // manifest — so the runtime ships safely even before assets are generated.
 
-export type AudienceVoiceTier = 'loved' | 'evacuated' | 'intro';
+export type AudienceVoiceTier = 'loved' | 'liked' | 'meh' | 'disliked' | 'evacuated' | 'intro';
 
 export function audienceSignatureSfxId(audienceId: string): string {
   return `sig-${audienceId}`;

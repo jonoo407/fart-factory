@@ -9,8 +9,9 @@
  * docs/PLAN.md §C kid-safety constraint.
  *
  * Schema: discriminated union on `kind`.
- *   - kind: 'sfx' → POST /v1/sound-generation with `prompt` + duration
- *   - kind: 'tts' → POST /v1/text-to-speech/{voice_id} with `text`
+ *   - kind: 'sfx'   → POST /v1/sound-generation with `prompt` + duration
+ *   - kind: 'tts'   → POST /v1/text-to-speech/{voice_id} with `text`
+ *   - kind: 'music' → POST /v1/music with `prompt` + music_length_ms
  */
 
 import { AUDIENCES } from '../src/state/audience';
@@ -55,6 +56,20 @@ export interface SfxSeed {
   category: SfxCategory;
 }
 
+/**
+ * ffmpeg post-processing applied by generate-sfx right after download.
+ * ElevenLabs' premade roster has no babies, kids, ghosts or aliens — the
+ * postFx moves the register where casting alone can't:
+ *   - semitones: pitch shift preserving speed (asetrate + atempo compensation)
+ *   - tempo: optional speed multiplier on top (e.g. 0.95 = slightly slower)
+ *   - filters: raw ffmpeg audio filters appended after the pitch chain
+ */
+export interface PostFx {
+  semitones?: number;
+  tempo?: number;
+  filters?: string[];
+}
+
 export interface TtsSeed {
   kind: 'tts';
   id: string;
@@ -64,9 +79,23 @@ export interface TtsSeed {
   /** Mood is informational for TTS — stored in manifest, doesn't change the request. */
   mood: Mood;
   category: 'voice';
+  /** Optional ffmpeg chain (pitch/echo/warble) — part of the checksum. */
+  postFx?: PostFx;
 }
 
-export type Seed = SfxSeed | TtsSeed;
+/** Background music via the dedicated Music API — the SFX endpoint produced
+ *  beeping, not music. Generated tracks are crossfade-looped by generate-sfx. */
+export interface MusicSeed {
+  kind: 'music';
+  id: string;
+  name: string;
+  prompt: string;
+  music_length_ms: number;
+  mood: Mood;
+  category: 'music';
+}
+
+export type Seed = SfxSeed | TtsSeed | MusicSeed;
 
 /**
  * Tag a group of SFX specs with a shared category. Keeps `category` attached to
@@ -165,16 +194,17 @@ const UTILITY_SFX: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'drumroll',    name: 'Drum Roll',   mood: 'triumphant',  duration_seconds: 1.6, prompt: 'a brief snare drum roll building into a soft crescendo, theatrical anticipation, family-friendly' },
 ], 'utility');
 
-// ====== Sound overhaul: background music loops (2) ======
+// ====== Sound overhaul v2: background music loops (2) ======
 //
-// ~20s ambient loops played at LOW gain (src/audio/music.ts, base 0.22 ×
-// Music channel default 35) under the gameplay — mood, not melody-forward.
-// Prompts ask for seamless loops with no hard intro/outro so AudioBufferSource
-// loop=true reads clean. Category 'music' keeps them out of every picker.
-const MUSIC_SFX: SfxSeed[] = withCat([
-  { kind: 'sfx', id: 'music-lab-loop',  name: 'Lab Loop',        mood: 'comedic', duration_seconds: 20, prompt: 'seamless looping background music, playful mellow cartoon science lab ambience, soft bouncy pizzicato and light marimba, gentle bubbling undertone, calm low-key, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
-  { kind: 'sfx', id: 'music-boss-loop', name: 'Boss Arena Loop', mood: 'eerie',   duration_seconds: 20, prompt: 'seamless looping background music, tense but goofy cartoon showdown ambience, low staccato strings and soft timpani heartbeat, sneaky comedic undertone, restrained and quiet, no melody spikes, no intro, no outro, loops perfectly, family-friendly' },
-], 'music');
+// Real instrumental tracks from the dedicated Music API (the SFX endpoint
+// produced "annoying beeping on repeat", not music). ~25s tracks, crossfade-
+// looped to seamless by generate-sfx, played at LOW gain (src/audio/music.ts,
+// base 0.22 × Music channel default 35) under the gameplay — warm mood, never
+// melody-forward. Category 'music' keeps them out of every picker.
+const MUSIC_SEEDS: MusicSeed[] = [
+  { kind: 'music', id: 'music-lab-loop',  name: 'Lab Loop',        mood: 'comedic', music_length_ms: 25_000, category: 'music', prompt: 'Gentle cheerful instrumental background music for a kids science lab game. Warm acoustic ukulele, soft marimba, light hand percussion. Relaxed, cozy, mellow lo-fi feel, sparse arrangement, steady level throughout with no big intro and no ending so it can loop seamlessly. Instrumental only, no vocals.' },
+  { kind: 'music', id: 'music-boss-loop', name: 'Boss Arena Loop', mood: 'eerie',   music_length_ms: 25_000, category: 'music', prompt: 'Playful sneaky instrumental background music for a cartoon boss showdown in a kids game. Muted upright bass groove, pizzicato strings, soft brushed drums, lightly mischievous spy-movie feel. Mellow and unobtrusive, steady level throughout with no big intro and no ending so it can loop seamlessly. Instrumental only, no vocals.' },
+];
 
 // ====== Phase 3 (new): per-audience signature SFX (20) ======
 //
@@ -205,28 +235,40 @@ const AUDIENCE_SIGNATURES: SfxSeed[] = withCat([
   { kind: 'sfx', id: 'sig-mystery-guest',    name: 'Signature: Mystery Guest',     mood: 'eerie',      duration_seconds: 1.6, prompt: 'a low mysterious synth swell with a distant indistinct whisper, family-friendly intrigue' },
 ], 'signature');
 
-// ====== Phase 4 (new): TTS voice lines (40 — loved + evacuated × 20) ======
+// ====== Phase 4: TTS voice lines (120 — all 5 tiers + intro × 20) ======
 //
 // Voice-cast mapping per audience. Voice IDs are from ElevenLabs' shared
 // voice library — stable string identifiers. Text is pulled VERBATIM from
 // REACTIONS in src/scoring/audience-reactions.ts so there's exactly one
 // source of truth for what the audience says.
+//
+// Casting rule (sound overhaul v2): every audience must sound like WHO THEY
+// ARE. The baby shower was voiced by a plain adult woman ("the baby sounds
+// like a woman") and four pairs shared a raw voice (George/Will/Eric/Sarah
+// ×2 each — punk show sounded exactly like the wrestling fans). Babies, kids,
+// ghosts and aliens don't exist in the premade roster, so those casts carry a
+// postFx (ffmpeg pitch/effect chain, applied at generation time): pitch-up for
+// the baby/toddler/kindergarten registers, echo for the ghosts, warble for
+// the aliens. No two audiences may share an identical (voice_id, postFx) pair
+// — asserted in tests/unit/sfx-seeds.test.ts.
 
 interface VoiceCast {
   voice_id: string;
   /** Optional human-readable label for the voice (informational only). */
   voiceLabel: string;
+  /** Optional ffmpeg post-chain inherited by every seed of this audience. */
+  postFx?: PostFx;
 }
 
 const VOICE_CAST: Record<string, VoiceCast> = {
   'granny-edna':      { voice_id: '9BWtsMINqrJLrRacOk9x', voiceLabel: 'Aria — warm older woman' },
   'royal-court':      { voice_id: 'Xb7hH8MSUJpSbSDYk0k2', voiceLabel: 'Alice — formal Brit' },
   'frat-bros':        { voice_id: 'IKne3meq5aSn9XLyUdCD', voiceLabel: 'Charlie — hyped male' },
-  'haunted-mansion':  { voice_id: 'JBFqnCBsd6RMkjVDRZzb', voiceLabel: 'George — deep slow' },
-  'alien-tourists':   { voice_id: 'XB0fDUnXU5powFXDhCwa', voiceLabel: 'Charlotte — airy' },
-  'toddler-bday':     { voice_id: 'XrExE9yKIg1WjnnlVkGX', voiceLabel: 'Matilda — bright' },
+  'haunted-mansion':  { voice_id: 'JBFqnCBsd6RMkjVDRZzb', voiceLabel: 'George — ghostly', postFx: { semitones: -2, filters: ['aecho=0.8:0.9:60|180:0.35|0.25'] } },
+  'alien-tourists':   { voice_id: 'XB0fDUnXU5powFXDhCwa', voiceLabel: 'Charlotte — alien warble', postFx: { semitones: 2, filters: ['vibrato=f=6:d=0.35'] } },
+  'toddler-bday':     { voice_id: 'XrExE9yKIg1WjnnlVkGX', voiceLabel: 'Matilda — pitched to toddler', postFx: { semitones: 5 } },
   'goth-teens':       { voice_id: 'cgSgspJ2msm6clMCkdW9', voiceLabel: 'Jessica — flat teen' },
-  'kindergarten':     { voice_id: 'pFZP5JQG7iQjIQuC4Bku', voiceLabel: 'Lily — youthful' },
+  'kindergarten':     { voice_id: 'pFZP5JQG7iQjIQuC4Bku', voiceLabel: 'Lily — pitched to kid', postFx: { semitones: 4 } },
   'skunk-society':    { voice_id: 'nPczCjzI2devNBz1zQrb', voiceLabel: 'Brian — gravelly' },
   'opera-house':      { voice_id: 'EXAVITQu4vr4xnSDxMaL', voiceLabel: 'Sarah — operatic' },
   'wrestling-fans':   { voice_id: 'bIHbv24MWmeRgasZH58o', voiceLabel: 'Will — broadcaster' },
@@ -235,15 +277,16 @@ const VOICE_CAST: Record<string, VoiceCast> = {
   'pet-rescue':       { voice_id: 'FGY2WhTYpPnrIDTdsKH5', voiceLabel: 'Laura — warm' },
   'astronauts':       { voice_id: 'CwhRBWXzGAHq8TQ4Fs17', voiceLabel: 'Roger — confident' },
   'food-critics':     { voice_id: 'SAz9YHcvj6GT2YYXdXww', voiceLabel: 'River — snooty' },
-  'baby-shower':      { voice_id: 'EXAVITQu4vr4xnSDxMaL', voiceLabel: 'Sarah — motherly' },
-  'punk-show':        { voice_id: 'bIHbv24MWmeRgasZH58o', voiceLabel: 'Will — shouty' },
-  'silent-monks':     { voice_id: 'cjVigY5qzO86Huf0OWal', voiceLabel: 'Eric — whisper' },
-  'mystery-guest':    { voice_id: 'JBFqnCBsd6RMkjVDRZzb', voiceLabel: 'George — mysterious' },
+  'baby-shower':      { voice_id: 'XrExE9yKIg1WjnnlVkGX', voiceLabel: 'Matilda — pitched to baby', postFx: { semitones: 8, tempo: 0.95 } },
+  'punk-show':        { voice_id: 'TX3LPaxmHKxFdv7VOQHJ', voiceLabel: 'Liam — young punk energy' },
+  'silent-monks':     { voice_id: 'onwK4e9ZLuTAKqWW03F9', voiceLabel: 'Daniel — deep calm hush' },
+  'mystery-guest':    { voice_id: 'N2lVS1w4EtoT3dr4eOWO', voiceLabel: 'Callum — low intrigue' },
 };
 
-// 'intro' (sound overhaul): the audience greets the player as it walks in —
-// text from INTROS, same voice as the reaction lines so the character holds.
-const VOICE_TIERS = ['loved', 'evacuated', 'intro'] as const;
+// Every tier the player can land is voiced ("voice them all") plus the
+// arrival 'intro' greeting — text from REACTIONS/INTROS, one voice per
+// audience so the character holds across tiers.
+const VOICE_TIERS = ['loved', 'liked', 'meh', 'disliked', 'evacuated', 'intro'] as const;
 type VoiceTier = (typeof VOICE_TIERS)[number];
 
 export function voiceSeedId(audienceId: string, tier: VoiceTier): string {
@@ -268,6 +311,7 @@ function buildVoiceSeeds(): TtsSeed[] {
         voice_id: cast.voice_id,
         mood: 'voice',
         category: 'voice',
+        ...(cast.postFx ? { postFx: cast.postFx } : {}),
       });
     }
   }
@@ -283,7 +327,7 @@ export const SEEDS: readonly Seed[] = [
   ...EVENT_SFX,
   ...BOSS_SFX,
   ...UTILITY_SFX,
-  ...MUSIC_SFX,
+  ...MUSIC_SEEDS,
   ...AUDIENCE_SIGNATURES,
   ...VOICE_SEEDS,
 ];

@@ -100,10 +100,26 @@ describe('audience reaction SFX is staggered AFTER the fart (not simultaneous)',
     expect(playAudienceVoice).toHaveBeenCalledWith('granny-edna', 'loved');
   });
 
-  it('meh tier plays the soft shrug pool, never a voice line', () => {
+  it('meh tier plays the soft shrug pool AND still reads its line', () => {
     renderAudienceReaction(60, granny, 2000); // 60% -> meh
     vi.advanceTimersByTime(reactionDelayMs(2000) + VOICE_AFTER_REACTION_MS);
     expect(playEventSfxOneOf).toHaveBeenCalledWith(AUDIENCE_REACTION_SFX.meh, 3);
+    expect(playAudienceVoice).toHaveBeenCalledWith('granny-edna', 'meh');
+  });
+
+  // "if you pass it should still read it for all of them" — every tier the
+  // player can land gets its line read aloud, not just loved/evacuated.
+  it.each([
+    [100, 'loved'],
+    [75, 'liked'],
+    [60, 'meh'],
+    [40, 'disliked'],
+    [10, 'evacuated'],
+  ] as const)('%i%% voices the %s line as the punchline', (pct, tier) => {
+    renderAudienceReaction(pct, granny, 1000);
+    vi.advanceTimersByTime(reactionDelayMs(1000) + VOICE_AFTER_REACTION_MS - 1);
     expect(playAudienceVoice).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
+    expect(playAudienceVoice).toHaveBeenCalledWith('granny-edna', tier);
   });
 });
