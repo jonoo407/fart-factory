@@ -3692,3 +3692,101 @@ body { padding-bottom: 66px; }
 @media (prefers-reduced-motion: reduce) {
   .vnode.cur .circle { animation: none; }
 }
+
+/* ============================================================
+   THE LIVE SHOW — live crowd read strip + Danger Zone overcharge
+   + misfire FIZZLE stamp. Order Ticket language throughout.
+   ============================================================ */
+
+/* ---- crowd mood strip (inside the audience ticket) ---- */
+.crowd-mood {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--paper2);
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.crowd-mood[hidden] { display: none; }
+.crowd-mood .cm-emoji { font-size: 18px; flex: 0 0 auto; line-height: 1; }
+.crowd-mood .cm-caption {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+}
+.crowd-mood .cm-trend {
+  flex: 0 0 auto;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  line-height: 1;
+}
+.crowd-mood .cm-trend-warmer { color: var(--green-d, #4d8f0e); }
+.crowd-mood .cm-trend-colder { color: var(--orange, #ff7a2f); }
+.crowd-mood .cm-trend-same { color: var(--muted, #8a7d63); }
+/* mood SHIFT beat — quick pop, re-triggered from crowd-mood.ts */
+.crowd-mood.cm-pop { animation: cm-pop 0.35s ease; }
+@keyframes cm-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+/* restriction broken — uncomfortable wiggle + warning tint */
+.crowd-mood.cm-violation {
+  background: #ffe3d6;
+  border-color: var(--orange, #ff7a2f);
+  animation: cm-wiggle 0.4s ease;
+}
+@keyframes cm-wiggle {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .crowd-mood.cm-pop, .crowd-mood.cm-violation { animation: none; }
+}
+
+/* ---- Danger Zone: the meter pins red past the top ---- */
+.charge-meter.overcharge {
+  border-color: #c81e1e;
+  animation: oc-shake 0.12s linear infinite;
+}
+.charge-meter.overcharge .charge-fill {
+  background: linear-gradient(90deg, var(--orange, #ff7a2f), #e02424, #991b1b);
+  /* --oc-depth (0→1, set per frame by charge-meter.ts) heats the glow */
+  filter: brightness(calc(1 + var(--oc-depth, 0) * 0.5));
+  box-shadow: 0 0 calc(4px + var(--oc-depth, 0) * 14px) rgba(224, 36, 36, 0.8);
+}
+.charge-meter.overcharge .charge-hint { color: #fff; opacity: 1; text-shadow: 0 1px 0 #991b1b; }
+.charge-meter.overcharge .charge-sweet { opacity: 0.25; }
+@keyframes oc-shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-1px, 1px); }
+  75% { transform: translate(1px, -1px); }
+}
+#storyLaunchBtn.overcharge {
+  background: linear-gradient(180deg, #ff7a2f, #e02424) !important;
+  border-color: #991b1b !important;
+}
+#storyLaunchBtn.overcharge .big { animation: blast-shake 0.08s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .charge-meter.overcharge { animation: none; }
+  #storyLaunchBtn.overcharge .big { animation: none; }
+}
+
+/* ---- misfire FIZZLE! stamp — dizzy wobble, comedy not doom ---- */
+.stamp.stamp-misfire { animation: fizzle-wobble 2s ease-in-out infinite; }
+.stamp.stamp-misfire .g { font-size: 1.1em; }
+@keyframes fizzle-wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp.stamp-misfire { animation: none; }
+}

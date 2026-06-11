@@ -87,4 +87,36 @@ describe('showReactionOverlay — belly readout', () => {
     expect(line).not.toBeNull();
     expect(line!.classList.contains('warn')).toBe(true);
   });
+
+  // The Live Show — Danger Zone misfire: a comic fizzle, not a scored launch.
+  // There's no score to explain, so the judge card / breakdown / stars are
+  // suppressed and the FIZZLE stamp + laughing crowd render instead.
+  describe('misfire mode', () => {
+    it('renders the FIZZLE stamp and suppresses judge card, breakdown, and stars', () => {
+      showReactionOverlay({
+        ...baseData(),
+        misfire: true,
+        stars: 3, // even if set, a misfire never shows stars
+        verdict: 'It… squeaked.',
+        learned: ['+1 📝 research note — science is also failure.'],
+      });
+      const stamp = document.querySelector('.stamp');
+      expect(stamp).not.toBeNull();
+      expect(stamp!.classList.contains('stamp-misfire')).toBe(true);
+      expect(stamp!.textContent).toContain('FIZZLE!');
+      expect(document.querySelector('.judge-card')).toBeNull();
+      expect(document.querySelector('.bd-card')).toBeNull();
+      expect(document.querySelector('.rxn-stars')).toBeNull();
+      // The consolation note travels through the learned toasts.
+      expect(document.querySelector('.rxn-toast.learn')!.textContent).toContain('research note');
+      // The crowd is laughing, not booing.
+      expect(document.querySelector('.rxn-crowd')!.textContent).toContain('🤣');
+    });
+
+    it('a misfire flop offers only the retry footer (same gate as any flop)', () => {
+      showReactionOverlay({ ...baseData(), misfire: true });
+      const ctas = [...document.querySelectorAll('.rxn-cta')];
+      expect(ctas.map((b) => b.getAttribute('data-action'))).toEqual(['retry']);
+    });
+  });
 });

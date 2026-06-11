@@ -73,6 +73,17 @@ export const AUDIENCE_REACTION_SFX: Record<
 };
 export const LEGENDARY_FANFARE_SFX = 'legendary-fanfare';
 export const QUEST_CLAIMED_SFX = 'quest-claimed';
+/**
+ * Live Crowd Read murmur cues — fired on a mood-tier SHIFT while plating
+ * (crowd-mood.ts). Manifest-gated: silent no-ops until the operator bakes
+ * the clips via sfx:generate, same convention as every other cue here.
+ */
+export const CROWD_MURMUR_SFX = {
+  up: 'murmur-warm',
+  down: 'murmur-cold',
+} as const;
+/** Danger Zone misfire — the comic squeak overlay cue (manifest-gated). */
+export const MISFIRE_SQUEAK_SFX = 'misfire-squeak';
 
 // ---------- Sound overhaul: economy + milestone cues ----------
 /** Soft coin chime when a launch actually pays gold (improvement-only payout). */
