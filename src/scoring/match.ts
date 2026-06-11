@@ -138,37 +138,53 @@ export function computeMatchPct(actual: FoodProperties, target: FoodProperties):
   return Math.round(computeBase(judgedFromTarget(actual, target)) * 100);
 }
 
+/** Qualitative want bucket: craving 4-5 → lots, 3 → some, 1-2 → little. */
+export type WantLevel = 'lots' | 'some' | 'little';
+
 export interface AxisFeedback {
   axis: keyof FoodProperties;
   hate: boolean;
-  /** target ≥ 0.5 — "wanted LOTS" vs "wanted a little" (vs "wanted NONE" for hate). */
-  wantHigh: boolean;
+  /**
+   * Three buckets, not two: a mid craving (3/5 → target 0.6) must NOT read
+   * "wanted LOTS" — maxing the axis against it is an overshoot miss under the
+   * symmetric scorer, which read as "wanted lots, gave lots, ✗?!".
+   */
+  wantLevel: WantLevel;
   /** desired level, normalized 0-1. */
   target: number;
   /** the plate's level on this axis, normalized 0-1. */
   got: number;
   closeness: number;
   status: 'hit' | 'near' | 'miss';
+  /** Which side of the target the plate landed on, so a miss can say WHY. */
+  direction: 'over' | 'under' | 'on';
+}
+
+function wantLevelFor(target: number): WantLevel {
+  return target >= 0.7 ? 'lots' : target >= 0.45 ? 'some' : 'little';
 }
 
 /**
  * The judge-card data layer (PLAN v9 P2 / 04 §3). One row per judged axis with
- * the wanted/hated label, the bar level + dashed target marker positions, and a
- * ✓ hit (≥0.8) / ~ close (≥0.55) / ✗ miss status. Shares the production
- * `closeness`, so the card lines up with the headline pct.
+ * the wanted/hated label, the bar level + dashed target marker positions, a
+ * ✓ hit (≥0.8) / ~ close (≥0.55) / ✗ miss status, and the miss direction
+ * (over/under the target) so the card can say "too much" vs "not enough".
+ * Shares the production `closeness`, so the card lines up with the headline pct.
  */
 export function computeAxisFeedback(actual: FoodProperties, audience: Audience): AxisFeedback[] {
   return deriveWants(audience).map((w) => {
     const got = Math.min(1, actual[w.axis] / AXIS_CAP);
     const c = axisCredit(w.target, got, w.hate);
+    const diff = got - w.target;
     return {
       axis: w.axis,
       hate: w.hate,
-      wantHigh: w.target >= 0.5,
+      wantLevel: wantLevelFor(w.target),
       target: w.target,
       got,
       closeness: c,
       status: c >= 0.8 ? 'hit' : c >= 0.55 ? 'near' : 'miss',
+      direction: diff > 0.05 ? 'over' : diff < -0.05 ? 'under' : 'on',
     };
   });
 }
