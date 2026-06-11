@@ -64,3 +64,47 @@ describe('match % penalizes overshooting a craved axis', () => {
     expect(stink.status).toBe('near'); // closeness 0.618 ∈ [0.55, 0.8)
   });
 });
+
+// Regression — punk-show screenshot: craving 3/5 read "wanted LOTS", the
+// player maxed the axis, and the symmetric scorer marked it ✗ with no hint
+// that the miss was an OVERSHOOT. The feedback layer must (a) bucket a mid
+// craving as "some", not "lots", and (b) report the miss direction.
+describe('judge-card want labels + miss direction', () => {
+  it('buckets cravings: 1-2 little, 3 some, 4-5 lots', () => {
+    const fb = computeAxisFeedback(props({}), aud({ wet: 1, dry: 2, stink: 3, loud: 4, temp: 5 }));
+    const byAxis = Object.fromEntries(fb.map((f) => [f.axis, f.wantLevel]));
+    expect(byAxis['wet']).toBe('little');
+    expect(byAxis['dry']).toBe('little');
+    expect(byAxis['stink']).toBe('some');
+    expect(byAxis['loud']).toBe('lots');
+    expect(byAxis['temp']).toBe('lots');
+  });
+
+  it('a maxed plate vs a mid craving is an overshoot miss, labelled "some" + over', () => {
+    // craving stink=3 → target 0.6; plate stink=8 → got 1.0 → closeness 0.31
+    const fb = computeAxisFeedback(props({ stink: 8 }), aud({ stink: 3 }));
+    const stink = fb.find((f) => f.axis === 'stink')!;
+    expect(stink.status).toBe('miss');
+    expect(stink.wantLevel).toBe('some');
+    expect(stink.direction).toBe('over');
+  });
+
+  it('an underfilled max craving reports direction under', () => {
+    // craving loud=5 → target 1.0; plate loud=6 → got 0.75 → closeness ≈ 0.54
+    const fb = computeAxisFeedback(props({ loud: 6 }), aud({ loud: 5 }));
+    const loud = fb.find((f) => f.axis === 'loud')!;
+    expect(loud.direction).toBe('under');
+  });
+
+  it('a hated axis with output reports direction over', () => {
+    const fb = computeAxisFeedback(props({ wet: 4 }), aud({}, ['no-wet']));
+    const wet = fb.find((f) => f.axis === 'wet')!;
+    expect(wet.hate).toBe(true);
+    expect(wet.direction).toBe('over');
+  });
+
+  it('an exact hit reports direction on', () => {
+    const fb = computeAxisFeedback(props({ stink: 6.4 }), aud({ stink: 4 }));
+    expect(fb.find((f) => f.axis === 'stink')!.direction).toBe('on');
+  });
+});

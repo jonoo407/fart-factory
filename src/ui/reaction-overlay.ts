@@ -70,12 +70,21 @@ function gradeLabel(grade: Grade): string {
 
 const STATUS_BADGE = { hit: '✓', near: '~', miss: '✗' } as const;
 
+const WANT_LABEL = { lots: 'wanted LOTS', some: 'wanted some', little: 'wanted a little' } as const;
+
+/** "too much!" / "not enough" — a non-hit row must say WHICH WAY it missed. */
+function directionHint(a: AxisFeedback): string {
+  if (a.status === 'hit' || a.direction === 'on') return '';
+  return a.direction === 'over' ? ' — too much!' : ' — not enough';
+}
+
 function judgeCardHtml(audience: Audience, feedback: AxisFeedback[], passed: boolean): string {
   if (feedback.length === 0) return '';
   const rows = feedback
     .map((a) => {
-      const wantLabel = a.hate ? 'wanted NONE' : a.wantHigh ? 'wanted LOTS' : 'wanted a little';
-      const targetPct = a.hate ? 2 : Math.round(a.target * 100);
+      const wantLabel = (a.hate ? 'wanted NONE' : WANT_LABEL[a.wantLevel]) + directionHint(a);
+      // Clamp so the dashed marker of a maxed-out target stays inside the bar.
+      const targetPct = a.hate ? 2 : Math.min(97, Math.round(a.target * 100));
       const gotPct = Math.max(3, Math.round(a.got * 100));
       return `<div class="judge-row ${a.status}">
         <span class="je">${axisEmoji(a.axis)}</span>

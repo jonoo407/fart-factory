@@ -201,14 +201,24 @@ function matchEmoji(pct: number): string {
 
 function wantLabel(f: AxisFeedback): string {
   if (f.hate) return 'wanted NONE';
-  return f.wantHigh ? 'wanted LOTS' : 'wanted a little';
+  if (f.wantLevel === 'lots') return 'wanted LOTS';
+  if (f.wantLevel === 'some') return 'wanted some';
+  return 'wanted a little';
+}
+
+/** A non-hit verdict says WHICH WAY it missed, not just that it did. */
+function verdictLabel(f: AxisFeedback): string {
+  if (f.status === 'hit') return 'nailed it';
+  if (f.direction === 'over') return 'too much';
+  if (f.direction === 'under') return 'not enough';
+  return f.status === 'near' ? 'close' : 'off';
 }
 
 /**
  * Per-axis "why N%?" rows. Sourced from the SAME normalized closeness model as
  * the headline % (computeAxisFeedback), not the abandoned raw-scale breakdown —
  * so a satisfied axis never renders as a ✗ miss. Shows the qualitative want
- * (LOTS / a little / NONE) + a hit/near/miss verdict; no raw plate numbers
+ * (LOTS / some / a little / NONE) + a directional verdict; no raw plate numbers
  * (avoids the "actual 4 / wanted 2 but ✓?!" confusion + is spoiler-free).
  */
 export function renderBreakdown(feedback: AxisFeedback[]): string {
@@ -218,8 +228,7 @@ export function renderBreakdown(feedback: AxisFeedback[]): string {
     const cls =
       f.status === 'hit' ? 'breakdown-matched' : f.status === 'near' ? 'breakdown-near' : 'breakdown-miss';
     const icon = f.status === 'hit' ? '✓' : f.status === 'near' ? '〜' : '✗';
-    const verdict = f.status === 'hit' ? 'nailed it' : f.status === 'near' ? 'close' : 'off';
-    return `<div class="breakdown-row ${cls}">${axisEmoji(f.axis)} ${f.axis}: ${wantLabel(f)} — ${verdict} ${icon}</div>`;
+    return `<div class="breakdown-row ${cls}">${axisEmoji(f.axis)} ${f.axis}: ${wantLabel(f)} — ${verdictLabel(f)} ${icon}</div>`;
   }).join('');
 }
 
