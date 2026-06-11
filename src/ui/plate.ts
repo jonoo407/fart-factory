@@ -27,7 +27,11 @@ import { resolveEquippedLaunch } from '../scoring/launch-resolver';
 import { evaluateMatch, computeAxisFeedback, gradeForPct, starsForPct } from '../scoring/match';
 import { classifyCriticalTier, criticalGoldBonus, criticalNotesBonus } from '../scoring/critical-tier';
 import { awardGoldForEncounter, launchBaseGold, legendaryGold } from '../scoring/reward';
-import { PASS_PCT, CHARGE } from '../scoring/tuning';
+import { PASS_PCT, CHARGE, MISFIRE_CONSOLATION_NOTES } from '../scoring/tuning';
+import { computeCrowdRead, plateKey } from '../scoring/crowd-read';
+import { updateCrowdMood, resetCrowdMood } from './crowd-mood';
+import { misfireChance, misfireSeed, rollMisfire } from '../scoring/danger-zone';
+import type { ChargeResult, ChargeLabel } from '../scoring/charge';
 import { rollLootDrop, dropChanceForLaunch, rollLegendaryDrop } from '../scoring/loot-drops';
 import { loadStreak, recordLaunchForStreak } from '../scoring/streak';
 import { recordFoodUse, applyMasteryBonuses, loadFoodMastery } from '../scoring/food-mastery';
@@ -42,6 +46,7 @@ import {
   playEventSfxOneOf,
   FOOD_EATING_SFX,
   LEGENDARY_FANFARE_SFX,
+  MISFIRE_SQUEAK_SFX,
   playEventSfx,
   playAudienceSignature,
   playAudienceArrival,
@@ -74,6 +79,7 @@ import { renderAudienceReaction, renderStoryResult, scheduleGoldChime, performan
 import {
   recordLaunch as recordEncounterLaunch,
   getOrCreate as getEncounterProgress,
+  upcomingLaunchIdx,
   isWowed,
   clearEncounterProgress,
   WOW_BONUS_GOLD,
@@ -274,6 +280,44 @@ export function renderPlate(): void {
   if (countEl) countEl.textContent = `${plate.filter(Boolean).length} / ${SLOTS} · tap to remove`;
   renderPlatePreview();
   renderRecipeRibbon();
+  updateLiveCrowdRead();
+}
+
+/**
+ * The Live Show — feed the crowd-mood strip on every plate change.
+ * renderPlate() is the single seam every plate mutation already flows through
+ * (add/remove/clear/treatment-change), so the read can never go stale.
+ *
+ * Anti-oracle: the provisional score (charge quality = 1, FULL restrictions —
+ * the Long Shower restriction-cancel buff and hidden-combo guaranteed-perfects
+ * are deliberately NOT previewed) is jittered + bucketed into tiers by
+ * computeCrowdRead; only the tier reaches the UI. Trend compares jittered to
+ * jittered. Bosses are excluded in v1.
+ */
+let prevCrowdReadPct: number | null = null;
+
+function updateLiveCrowdRead(): void {
+  if (isArenaActive()) {
+    resetCrowdMood();
+    return;
+  }
+  const aud = currentAudience();
+  const ids = plateIngredientIds();
+  if (ids.length === 0) {
+    updateCrowdMood({ read: null, audienceName: aud.name });
+    return;
+  }
+  const { props } = resolveLaunchProps(ids);
+  const m = evaluateMatch(props, ids, aud.cravings, aud.restrictions, 1);
+  const read = computeCrowdRead(
+    m.pct,
+    m.violations.length,
+    encounterSeed(currentEncounterIdx()),
+    plateKey(ids, loadEquippedTreatment()),
+    prevCrowdReadPct,
+  );
+  prevCrowdReadPct = read.jitteredPct;
+  updateCrowdMood({ read, audienceName: aud.name });
 }
 
 /**
@@ -409,6 +453,9 @@ function showWowSplash(aud: Audience, pct: number): void {
  * Finish" (PLAN v9 P2) and the standalone Move On button.
  */
 function advanceToNextEncounter(): void {
+  // The Live Show — a fresh crowd starts with a fresh mood (trend resets).
+  prevCrowdReadPct = null;
+  resetCrowdMood();
   // PR10 — drumroll cue announces the transition.
   void playEventSfx('drumroll', 5);
   // PR9: claim encore bonus if currently wowed.
@@ -683,7 +730,7 @@ export function resolveLaunchProps(ids: string[]): {
   return { props, resolved };
 }
 
-async function onStoryLaunch(quality = 1): Promise<void> {
+async function onStoryLaunch(quality = 1, charge?: ChargeResult): Promise<void> {
   if (!launchGate.open()) return;
   const ids = plateIngredientIds();
   const ingredientCount = ids.length;
@@ -728,6 +775,14 @@ async function onStoryLaunch(quality = 1): Promise<void> {
   }
 
   const aud = currentAudience();
+
+  // The Live Show — Danger Zone. An overcharged release rolls a misfire
+  // BEFORE the normal scoring path (see overchargeMisfired for the rules).
+  if (overchargeMisfired(charge, aud.id, ingredientCount)) {
+    resolveMisfire(aud, ids);
+    return;
+  }
+
   // PLAN_v5 Phase 6: Long Shower buff cancels one of the audience's
   // restrictions for this launch (the first one in the list).
   const restrictions = aud.restrictions && cancelOneRestrictionFromBuffs()
@@ -947,6 +1002,7 @@ async function onStoryLaunch(quality = 1): Promise<void> {
         finalPct: match.pct,
         preChargePct,
         quality,
+        chargeLabel: charge?.label,
         violations: match.violations,
         goldPaid,
         passed: passedThisLaunch,
@@ -958,6 +1014,101 @@ async function onStoryLaunch(quality = 1): Promise<void> {
     }
     setLastMatch(match.pct);
   }
+}
+
+/**
+ * The Live Show — Danger Zone misfire roll. Only an overcharged release can
+ * misfire; the roll is deterministic per encounter + launch index
+ * (misfireSeed), computed with upcomingLaunchIdx BEFORE recordEncounterLaunch
+ * increments the counter. The first overcharge — hit or fizzle — explains the
+ * zone once via the feature-intro.
+ */
+function overchargeMisfired(
+  charge: ChargeResult | undefined,
+  audienceId: string,
+  ingredientCount: number,
+): boolean {
+  if (charge?.label !== 'overcharge' || ingredientCount === 0) return false;
+  showFeatureIntro({
+    id: 'danger_zone',
+    emoji: '🔥',
+    title: 'You found the Danger Zone!',
+    body: 'Holding past the top overcharges your blast — up to ×1.5! But the deeper you push, the bigger the chance it fizzles into a squeak. Risky business.',
+    cta: 'Spicy',
+  });
+  const idx = currentEncounterIdx();
+  const seed = misfireSeed(idx, upcomingLaunchIdx(audienceId, idx));
+  return rollMisfire(misfireChance(charge.overchargeDepth ?? 0), seed);
+}
+
+/**
+ * The Live Show — Danger Zone misfire. The overcharged blast fizzles into a
+ * comic squeak: dizzy performer, crowd cracks up, automatic flop. Kid-friendly
+ * by design (laughter, not gross-out). The food is still eaten (risk stays
+ * real) and the streak breaks (the one debatable knob — isolated here for
+ * easy reversal), but a research note consoles: science is also failure.
+ */
+function resolveMisfire(aud: Audience, ids: string[]): void {
+  triggerHaptic(HAPTICS.launch);
+  // The squeak: a tiny, high-musical clip from the existing fart bank (zero
+  // new assets), plus a manifest-gated dedicated cue for when one is baked.
+  const squeakMs = Math.round(playFart(1, 2, 2, 1, 6, 10) * 1000);
+  void playEventSfx(MISFIRE_SQUEAK_SFX, 6);
+  duckMusic(performanceWindowMs(squeakMs) / 1000);
+  // The crowd cracks up a beat after the fizzle lands.
+  window.setTimeout(() => {
+    void playEventSfxOneOf(['toddler-giggle', 'granny-cackle', 'frat-howl'], 6);
+    void import('../visuals/reaction-particles').then(({ spawnReactionParticles }) => {
+      spawnReactionParticles('liked');
+    });
+  }, squeakMs + 200);
+
+  commitBellySpend();
+  recordLaunchForStreak(0); // a misfire is a flop — breaks the streak
+  recordEncounterLaunch(aud.id, currentEncounterIdx(), 0);
+  addResearchNotes(MISFIRE_CONSOLATION_NOTES);
+  recordFoodUse(ids);
+  incrementLaunchCount();
+  setLastMatch(0);
+
+  clearPlate();
+  renderPlate();
+  renderBellyMeter();
+  renderProgression();
+  renderMoveOnGate();
+
+  // Same belly fail loop as the normal path — a misfire while stuffed with no
+  // win still sends the crowd home (no deadlock behind the overlay).
+  const encounterPassed = getEncounterProgress(aud.id, currentEncounterIdx()).bestPct >= PASS_PCT;
+  if (crowdOutcome(encounterPassed, remainingBelly()) === 'stuffed-fail') {
+    failCurrentCrowd(aud);
+    return;
+  }
+  const remaining = remainingBelly();
+  const capacity = bellyCapacity();
+  showReactionOverlay({
+    misfire: true,
+    pct: 0,
+    grade: 'F',
+    stars: 0,
+    passed: false,
+    isBoss: aud.difficultyTier === 'boss',
+    audience: aud,
+    verdict: 'It… squeaked. You go a little dizzy. 💫',
+    caption: `${aud.name} absolutely cracks up laughing!`,
+    axisFeedback: [],
+    breakdownLines: [],
+    goldPaid: 0,
+    learned: [`+${MISFIRE_CONSOLATION_NOTES} 📝 research note — science is also failure.`],
+    newRecipe: null,
+    belly: {
+      used: capacity - remaining,
+      cap: capacity,
+      warn: remaining < MIN_ATTEMPT_BELLY + 4,
+    },
+    canAttempt: remaining >= MIN_ATTEMPT_BELLY,
+    onAction: handleReactionAction,
+  });
 }
 
 /** How long the "stuffed!" splash lingers before the crowd leaves. */
@@ -1001,6 +1152,8 @@ interface ReactionArgs {
   finalPct: number;
   preChargePct: number;
   quality: number;
+  /** Meter zone label (so a survived overcharge reads 'Overcharged!'). */
+  chargeLabel?: ChargeLabel;
   violations: string[];
   goldPaid: number;
   passed: boolean;
@@ -1019,8 +1172,12 @@ function adjForValue(v: number): string {
  * quality > 1 read "Perfect charge", so a good (×1.10) was indistinguishable
  * from a true sweet-zone perfect (×1.25). Null for a neutral tap/ok (×1.0).
  */
-export function chargeBreakdownLine(quality: number): { icon: string; label: string; val: string } | null {
+export function chargeBreakdownLine(quality: number, label?: ChargeLabel): { icon: string; label: string; val: string } | null {
   const val = `×${quality.toFixed(2)}`;
+  // A survived Danger Zone release gets its own line (its ×1.0–1.5 range
+  // overlaps the perfect threshold, so the zone label must come from the
+  // meter, not the multiplier).
+  if (label === 'overcharge') return { icon: '🔥', label: 'Overcharged!', val };
   if (quality >= CHARGE.perfect - 0.001) return { icon: '💥', label: 'Perfect charge', val };
   if (quality > 1.001) return { icon: '✨', label: 'Good charge', val };
   if (quality < 0.999) return { icon: '💨', label: 'Weak charge', val };
@@ -1036,7 +1193,7 @@ function presentReactionOverlay(a: ReactionArgs): void {
   const breakdownLines: { icon: string; label: string; val: string }[] = [
     { icon: '🎯', label: 'Base match', val: `${a.preChargePct}%` },
   ];
-  const chargeLine = chargeBreakdownLine(a.quality);
+  const chargeLine = chargeBreakdownLine(a.quality, a.chargeLabel);
   if (chargeLine) breakdownLines.push(chargeLine);
   for (const v of a.violations) breakdownLines.push({ icon: '🚫', label: `Broke: ${v}`, val: '−25%' });
 
@@ -1091,10 +1248,16 @@ function wireStoryLaunchButton(): void {
   const btn = $('storyLaunchBtn');
   if (!btn) return;
   // PLAN v9 P2 — hold-to-charge replaces the bare click. A quick tap resolves
-  // to a safe 1.0× via the charge logic.
-  mountChargeMeter(btn, $('chargeFill'), (result) => {
-    void onStoryLaunch(result.quality);
-  });
+  // to a safe 1.0× via the charge logic. The Danger Zone overcharge is story
+  // mode only — the boss arena keeps the legacy ping-pong sweep.
+  mountChargeMeter(
+    btn,
+    $('chargeFill'),
+    (result) => {
+      void onStoryLaunch(result.quality, result);
+    },
+    { canOvercharge: () => !isArenaActive() },
+  );
 }
 
 /** V8 T5 — wire the "Show locked teasers" toggle. */

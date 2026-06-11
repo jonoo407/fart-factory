@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { CHARGE, CHARGE_ZONES } from '../../src/scoring/tuning';
+import { CHARGE, CHARGE_ZONES, OVERCHARGE } from '../../src/scoring/tuning';
 
 // mountChargeMeter is the DOM glue for the hold-to-charge BLAST loop:
 // pointerdown starts a rAF sweep (0→100→0), release resolves a quality via the
@@ -69,10 +69,10 @@ const LAUNCH_MARKUP = `
     </button>
   </div>`;
 
-function mount() {
+function mount(opts?: Parameters<typeof mountChargeMeter>[3]) {
   const btn = document.getElementById('storyLaunchBtn') as HTMLButtonElement;
   const onRelease = vi.fn();
-  const handle = mountChargeMeter(btn, document.getElementById('chargeFill'), onRelease);
+  const handle = mountChargeMeter(btn, document.getElementById('chargeFill'), onRelease, opts);
   return { btn, onRelease, handle };
 }
 
@@ -338,6 +338,82 @@ describe('disabled gating', () => {
     expect(btn.classList.contains('charging')).toBe(false);
     expect(fillPct()).toBe(0);
     expect(tone.stop).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Danger Zone overcharge (canOvercharge option)', () => {
+  // The Live Show: with canOvercharge, the up-sweep PINS at 100 instead of
+  // bouncing back down, depth ramps over OVERCHARGE.rampMs, and release
+  // resolves label 'overcharge' with quality minMult→maxMult by depth.
+  it('reaching the top pins the meter at 100 and enters the overcharge state', () => {
+    const { btn } = mount({ canOvercharge: () => true });
+    pointer(btn, 'pointerdown');
+    pumpUntil(() => fillPct() >= 100);
+    pumpFrames(10);
+
+    expect(fillPct()).toBe(100); // pinned — no down-sweep
+    expect(document.getElementById('chargeMeter')!.classList.contains('overcharge')).toBe(true);
+    expect(btn.classList.contains('overcharge')).toBe(true);
+    expect(document.getElementById('launchBig')!.textContent).toBe('OVERCHARGE!!');
+    expect(document.getElementById('launchSub')!.textContent).toBe('release… if you dare!');
+  });
+
+  it('releasing while overcharged resolves label "overcharge" with depth-scaled quality, and resets', () => {
+    const { btn, onRelease } = mount({ canOvercharge: () => true });
+    pointer(btn, 'pointerdown');
+    pumpUntil(() => fillPct() >= 100);
+    pumpFrames(10); // 10 frames × 16ms = 160ms into the 1400ms ramp
+
+    pointer(btn, 'pointerup');
+    expect(onRelease).toHaveBeenCalledTimes(1);
+    const result = onRelease.mock.calls[0]![0] as {
+      quality: number;
+      label: string;
+      overchargeDepth?: number;
+    };
+    expect(result.label).toBe('overcharge');
+    expect(result.overchargeDepth).toBeGreaterThan(0);
+    expect(result.overchargeDepth).toBeLessThanOrEqual(1);
+    expect(result.quality).toBeGreaterThan(OVERCHARGE.minMult);
+    expect(result.quality).toBeLessThanOrEqual(OVERCHARGE.maxMult);
+    // Full UI reset, including the overcharge dressing.
+    expect(btn.classList.contains('overcharge')).toBe(false);
+    expect(document.getElementById('chargeMeter')!.classList.contains('overcharge')).toBe(false);
+    expect(document.getElementById('launchBig')!.textContent).toBe('BLAST!');
+    expect(fillPct()).toBe(0);
+  });
+
+  it('depth caps at 1 → quality is exactly maxMult after a full ramp', () => {
+    const { btn, onRelease } = mount({ canOvercharge: () => true });
+    pointer(btn, 'pointerdown');
+    pumpUntil(() => fillPct() >= 100);
+    pumpFrames(Math.ceil(OVERCHARGE.rampMs / FRAME_MS) + 10);
+
+    pointer(btn, 'pointerup');
+    const result = onRelease.mock.calls[0]![0] as { quality: number; overchargeDepth?: number };
+    expect(result.overchargeDepth).toBe(1);
+    expect(result.quality).toBe(OVERCHARGE.maxMult);
+  });
+
+  it('canOvercharge() returning false preserves the legacy ping-pong (boss arena)', () => {
+    const { btn } = mount({ canOvercharge: () => false });
+    pointer(btn, 'pointerdown');
+    pumpUntil(() => fillPct() >= 100);
+    pumpFrames(1);
+    expect(fillPct()).toBeLessThan(100); // bounced back down
+    expect(document.getElementById('chargeMeter')!.classList.contains('overcharge')).toBe(false);
+  });
+
+  it('mid-overcharge destroy clears the overcharge dressing', () => {
+    const { btn, handle } = mount({ canOvercharge: () => true });
+    pointer(btn, 'pointerdown');
+    pumpUntil(() => fillPct() >= 100);
+    pumpFrames(5);
+
+    handle.destroy();
+    expect(document.getElementById('chargeMeter')!.classList.contains('overcharge')).toBe(false);
+    expect(btn.classList.contains('overcharge')).toBe(false);
+    expect(pendingFrames.size).toBe(0);
   });
 });
 

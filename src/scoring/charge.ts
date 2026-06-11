@@ -9,11 +9,15 @@
  */
 import { CHARGE, CHARGE_ZONES } from './tuning';
 
-export type ChargeLabel = 'tap' | 'perfect' | 'good' | 'weak' | 'ok';
+/** 'overcharge' is produced only by the meter's Danger Zone phase
+ *  (ui/charge-meter.ts + scoring/danger-zone.ts), never by chargeQuality. */
+export type ChargeLabel = 'tap' | 'perfect' | 'good' | 'weak' | 'ok' | 'overcharge';
 
 export interface ChargeResult {
   quality: number;
   label: ChargeLabel;
+  /** Danger Zone depth 0-1 at release (overcharge releases only). */
+  overchargeDepth?: number;
 }
 
 export function chargeQuality(value: number, heldMs: number): ChargeResult {

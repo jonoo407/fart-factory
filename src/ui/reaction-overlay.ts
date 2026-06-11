@@ -138,6 +138,12 @@ export interface ReactionData {
   belly?: { used: number; cap: number; warn: boolean };
   /** False when the belly is too stuffed for another real attempt. */
   canAttempt?: boolean;
+  /**
+   * The Live Show — Danger Zone misfire: the blast fizzled into a squeak.
+   * Renders the FIZZLE! stamp + laughing crowd and skips the judge card,
+   * stars, and breakdown (there's no score to explain — it never launched).
+   */
+  misfire?: boolean;
   onAction: (a: FooterAction) => void;
 }
 
@@ -187,19 +193,37 @@ export function hideReactionOverlay(): void {
   }
 }
 
+/** The crowd is laughing AT you, not booing — a misfire is comedy, not doom. */
+const MISFIRE_FACES = ['🤣', '😂', '🤭', '😆', '😂'];
+
+function buildStarsHtml(d: ReactionData): string {
+  if (d.misfire || d.stars <= 0) return '';
+  return `<div class="rxn-stars">${[0, 1, 2].map((i) => `<span class="${i < d.stars ? 'on' : ''}">★</span>`).join('')}</div>`;
+}
+
+/** A misfire has no score to explain — the breakdown card is suppressed. */
+function buildBreakdownHtml(d: ReactionData): string {
+  if (d.misfire) return '';
+  return `<div class="bd-card">
+    ${d.breakdownLines.map((b) => `<div class="bd-line"><span class="l">${b.icon} ${b.label}</span><span class="v">${b.val}</span></div>`).join('')}
+    <div class="bd-tot"><span class="l">Final</span><span class="v">${d.grade} · ${d.pct}%${d.goldPaid > 0 ? ` <span class="bd-gold">+${d.goldPaid}💰</span>` : ''}</span></div>
+  </div>`;
+}
+
+function buildStampHtml(d: ReactionData): string {
+  if (d.misfire) {
+    return `<div class="stamp grade-f stamp-misfire"><span class="g">💫</span><span class="l">FIZZLE!</span></div>`;
+  }
+  return `<div class="stamp ${gradeClass(d.grade)}"><span class="g">${d.grade}</span><span class="l">${gradeLabel(d.grade)}</span></div>`;
+}
+
 export function showReactionOverlay(d: ReactionData): void {
   const ov = $('reactionOverlay');
   if (!ov) return;
 
-  const faces = facesFor(d.grade).map((f) => `<span>${f}</span>`).join('');
-  const starsHtml =
-    d.stars > 0
-      ? `<div class="rxn-stars">${[0, 1, 2].map((i) => `<span class="${i < d.stars ? 'on' : ''}">★</span>`).join('')}</div>`
-      : '';
-  const breakdownHtml = `<div class="bd-card">
-    ${d.breakdownLines.map((b) => `<div class="bd-line"><span class="l">${b.icon} ${b.label}</span><span class="v">${b.val}</span></div>`).join('')}
-    <div class="bd-tot"><span class="l">Final</span><span class="v">${d.grade} · ${d.pct}%${d.goldPaid > 0 ? ` <span class="bd-gold">+${d.goldPaid}💰</span>` : ''}</span></div>
-  </div>`;
+  const faces = (d.misfire ? MISFIRE_FACES : facesFor(d.grade)).map((f) => `<span>${f}</span>`).join('');
+  const starsHtml = buildStarsHtml(d);
+  const breakdownHtml = buildBreakdownHtml(d);
   const toasts =
     d.learned.map((l) => `<div class="rxn-toast learn"><span class="em">💡</span><div>${l}</div></div>`).join('') +
     (d.newRecipe ? `<div class="rxn-toast recipe"><span class="em">⚡</span><div>New recipe — <strong>${d.newRecipe}</strong></div></div>` : '');
@@ -214,11 +238,11 @@ export function showReactionOverlay(d: ReactionData): void {
 
   ov.innerHTML = `${d.grade !== 'F' ? confettiHtml() : ''}${(d.stink ?? 0) > 0.45 ? stinkHtml() : ''}<div class="rxn-scroll">
     <div class="rxn-crowd">${faces}</div>
-    <div class="stamp ${gradeClass(d.grade)}"><span class="g">${d.grade}</span><span class="l">${gradeLabel(d.grade)}</span></div>
+    ${buildStampHtml(d)}
     <div class="rxn-verdict">${d.verdict}</div>
     ${loadCaptionsEnabled() ? `<div class="rxn-cap"><span class="who">🔊 ${d.audience.name}</span>“${d.caption}”</div>` : ''}
     ${starsHtml}
-    ${judgeCardHtml(d.audience, d.axisFeedback, d.passed)}
+    ${d.misfire ? '' : judgeCardHtml(d.audience, d.axisFeedback, d.passed)}
     ${breakdownHtml}
     ${toasts}
   </div>

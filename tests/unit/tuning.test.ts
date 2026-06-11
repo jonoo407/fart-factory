@@ -71,6 +71,29 @@ describe('scoring tuning invariants', () => {
     expect(T.STAR_CUTS.one).toBe(T.GRADE_CUTS.C);
   });
 
+  it('Danger Zone overcharge: a real gamble that out-pays the safe perfect', () => {
+    const o = T.OVERCHARGE;
+    expect(o.rampMs).toBeGreaterThan(0);
+    // Releasing the instant the zone opens must be neutral, never a penalty.
+    expect(o.minMult).toBe(1.0);
+    // The whole point: full-depth overcharge beats the safe sweet-zone perfect.
+    expect(o.maxMult).toBeGreaterThan(T.CHARGE.perfect);
+    // The risk is real but never a coin-flip-or-worse (kid-friendly spicy).
+    expect(o.maxMisfire).toBeGreaterThan(0);
+    expect(o.maxMisfire).toBeLessThan(0.5);
+    // Superlinear ramp: shallow dips stay cheap, greed gets expensive.
+    expect(o.riskCurve).toBeGreaterThanOrEqual(1);
+    expect(T.MISFIRE_CONSOLATION_NOTES).toBeGreaterThanOrEqual(0);
+  });
+
+  it('crowd read: jitter is a fuzz, not a lie — small next to a tier width', () => {
+    // Tiers are 20pts wide (audience-reactions cutoffs); the jitter must stay
+    // well under that or the mood becomes noise instead of a hint.
+    expect(T.CROWD_READ.jitterPct).toBeGreaterThan(0);
+    expect(T.CROWD_READ.jitterPct).toBeLessThan(10);
+    expect(T.CROWD_READ.debounceMs).toBeGreaterThanOrEqual(0);
+  });
+
   it('gold by difficulty tier (D4) — monotone, covers all four tiers', () => {
     expect(Object.keys(T.GOLD_BY_TIER).sort()).toEqual(['boss', 'easy', 'hard', 'medium']);
     expect(T.GOLD_BY_TIER.easy).toBeLessThan(T.GOLD_BY_TIER.medium);

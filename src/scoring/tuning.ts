@@ -52,6 +52,35 @@ export const CHARGE_ZONES = {
   tapMs: 200,
 } as const;
 
+/**
+ * Danger Zone (overcharge) — push-your-luck extension past the meter top.
+ * Holding once the sweep pins at 100 ramps `depth` 0→1 over `rampMs`; release
+ * pays `minMult→maxMult` by depth but risks a misfire with chance
+ * `maxMisfire * depth^riskCurve` (so beating the safe ×1.25 perfect costs
+ * real risk: depth 0.5 ≈ ×1.25 at ~12% misfire; full depth ×1.5 at 35%).
+ */
+export const OVERCHARGE = {
+  rampMs: 1400,
+  minMult: 1.0,
+  maxMult: 1.5,
+  maxMisfire: 0.35,
+  riskCurve: 1.5,
+} as const;
+
+/** Research notes consoled on a misfire flop (science is also failure). */
+export const MISFIRE_CONSOLATION_NOTES = 1;
+
+/**
+ * Live crowd read — the coarse mood preview while plating. `jitterPct` is the
+ * ± fuzz added to the provisional pct BEFORE tier bucketing (anti-oracle: tier
+ * only, and stable per plate composition so re-checking can't reroll it).
+ * `debounceMs` paces the strip's animation/SFX, not the scoring itself.
+ */
+export const CROWD_READ = {
+  jitterPct: 4,
+  debounceMs: 300,
+} as const;
+
 /** A launch passes (can advance) at or above this match percentage. */
 export const PASS_PCT = 50;
 

@@ -27,4 +27,6 @@ export const HAPTICS = {
   launch: [12, 30, 12],
   combo: [25, 50, 25, 50, 60],
   achievement: [40],
+  /** Live Crowd Read — soft tick when the crowd's mood tier shifts. */
+  moodShift: [10],
 } as const;

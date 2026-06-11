@@ -25,4 +25,13 @@ describe('chargeBreakdownLine labels by charge zone, not just >1', () => {
     expect(chargeBreakdownLine(CHARGE.ok)).toBeNull();
     expect(chargeBreakdownLine(CHARGE.tap)).toBeNull();
   });
+  // The Danger Zone's ×1.0–1.5 range OVERLAPS the perfect threshold, so the
+  // zone label must come from the meter, not be inferred from the multiplier.
+  it('a survived overcharge reads "Overcharged!" at any depth', () => {
+    expect(chargeBreakdownLine(1.5, 'overcharge')?.label).toBe('Overcharged!');
+    expect(chargeBreakdownLine(1.0, 'overcharge')?.label).toBe('Overcharged!');
+  });
+  it('without the meter label, x1.5 would read as a Perfect charge (overlap proof)', () => {
+    expect(chargeBreakdownLine(1.5)?.label).toBe('Perfect charge');
+  });
 });
