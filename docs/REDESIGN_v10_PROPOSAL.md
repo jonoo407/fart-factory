@@ -28,7 +28,16 @@ not prose**. Holding it in *is* the fart joke. The mechanic finally becomes the 
 
 ## 1. Evidence (verified, not assumed)
 
-Played in the live preview (mobile viewport, fresh save, 2026-07-08):
+Played in the live preview (mobile viewport, fresh save, 2026-07-08), at commit `6f041b7`.
+**Concurrency note:** while this proposal was being written, PRs #32 and #33 landed on main —
+#32 re-words the judge card ("some" not "LOTS" for mid cravings, misses now say over/under; its own
+code comment concedes the confusion this doc cites: *"wanted lots, gave lots, ✗?!"*), and #33 adds
+a live crowd-mood read while plating plus a Danger Zone overcharge on the charge timer. Both are
+feedback-layer patches in the same emotional direction as this proposal (more anticipation, a dash
+of risk) — but the scoring engine, 7-axis hidden judging, pass gate, report-card payoff, and
+zero-pay anti-grind economy are unchanged, so every structural finding below still holds. The
+Danger Zone is the push-your-luck instinct applied to the wrong object: it risks a *timing
+multiplier*, not the fart itself.
 
 1. **The game's own hint fails the game's own test.** Show 1 of 6, Granny Edna. The hint bar says
    *"💡 Try these for Granny Edna: Zap Pea, Broccoli, Onion."* Plating 2×Zap Pea + Broccoli scored
