@@ -453,13 +453,92 @@ upward-only fame, no losable progress, no grades anywhere.
 | `codex.ts` / `field-guide.ts` | **merge into** the Album |
 | NEW | fame/rank engine (pure, seeded) · gut-upgrade registry + pick UI · drop tables · stage-growth renderer · recurring-fan cameo picker |
 
-### 4.7 Open questions (progression)
+### 4.7 Progression decisions — RESOLVED (user approved 2026-07-08)
 
-1. **Gut picks: permanent per save, or respec-able?** (Proposed: permanent — builds are identity;
-   a NG+ "World Tour" resets picks for replay value.)
-2. **How much randomness in drops?** Proposed: guaranteed-drop pity every 3 shows per region so a
-   session never ends dry; pure RNG otherwise.
-3. **Costumes: gold-only, or some as album-completion rewards?** (Proposed: both — shop for basics,
-   completion for the showpieces like the Cosmic Crown.)
-4. Should mastery stamps stay purely cosmetic, or carry one tiny perk tier? (Proposed: cosmetic —
-   this project has been burned by stat creep twice.)
+1. **Gut picks are permanent per save**; a NG+ "World Tour" resets picks for replay value.
+2. **Drops are pity-timed**: guaranteed drop every 3 shows per region; pure RNG otherwise.
+3. **Costumes come from both** — shop for basics, album completion for showpieces (Cosmic Crown).
+4. **Mastery stamps are purely cosmetic** — recognition, never stats; stat creep stays dead.
+
+---
+
+## 5. Easy to learn, hard to master — the skill curve
+
+> Added 2026-07-08 after the user asked: *"is the game easy to learn hard to master? i.e. is there
+> a natural skill progression?"* Lenses: Skill, Skill vs. Chance, Flow, Challenge; Bushnell's Law
+> (P3); the FUN_CRITIC Bushnell Floor-Ceiling and Dominant Strategy gates.
+
+### 5.0 The honest risk, named first
+
+Push-your-luck's failure mode is the slot machine: if the stop/push decision has a single
+memorizable answer ("always stop at EPIC") or is pure dice, novice and expert converge and the
+Bushnell gate fails just like the sliders did. v10 avoids this only if we **pin three mechanics**
+(§5.2). With them, the game is poker, not roulette: chance decides moments, skill decides sessions.
+
+### 5.1 The five skills, in the order players naturally acquire them
+
+Each rung is discovered about when the previous one automates (Koster's mastery cycle):
+
+1. **Reading the crowd** *(minute 1 — the floor).* Tags on the ticket are chunky and complete;
+   match colors, get multiplied. A 6-year-old's whole game, and it already works.
+2. **Knowing your pantry** *(session 1–3).* Thirty foods' tags and sizes internalize; composition
+   stops being lookup. Drops keep refreshing this knowledge for the rest of the save.
+3. **Riding the needle** *(the core mastery, never finished).* When to stop — given THIS crowd's
+   zone demand, THIS venue's hazard, tools in pocket, clenches left, and what's still in hand.
+   Includes the discoverable pro move, **the Pyramid** (§5.2.1): big foods early while risk is
+   cheap, crumbs at altitude. Watching someone crumb-top at the LEGENDARY line *looks* skilled —
+   the sibling-on-the-couch can see mastery (Lens of Spectation).
+4. **The clench** *(execution).* A timing window plus a spend decision — clenching early wastes
+   venting; clenching late busts mid-animation. Dexterity stays modest (kids), but *when* to spend
+   a limited clench is judgment that scales.
+5. **The campaign** *(strategy, hour 5+).* Loadout vs. the ladder ahead, gut-build identity,
+   pricing wild-food gambles, adapting to etiquette flips, splitting one belly across an encore
+   chain, doing all of it at tempo under zero-G decay. Region atoms are skill rungs — the
+   progression system and the skill curve are the same staircase (§4.1 Track 2).
+
+### 5.2 The three pins that guarantee depth (build requirements, not hopes)
+
+1. **Risk scales with bite size at current pressure** (`riskOfBite = base(pressure) × size(bite)`).
+   This single formula creates sequencing skill: eating order matters, the Pyramid emerges, and
+   "save your crumbs for the summit" becomes teachable playground lore. Without it, stuffing order
+   is irrelevant and rung 3 loses half its depth.
+2. **Risk reads as body language by default; exact numbers are an upgrade.** Cheeks, sweat, wobble
+   — learning to *read the belly* is itself a skill with a feel curve. The Slow Cooker gut pick
+   converts intuition to percentages for the min-maxer (knowledge as loot, §4.1). Showing raw % to
+   everyone from minute 1 would flatten rung 3 into an EV spreadsheet.
+3. **The stop decision must never have a context-free answer.** Crowd zone demands (Frat Bros boo
+   below EPIC), venue risk modifiers, hazards, flips, tools, and hand composition all move the
+   correct stopping point show by show. Guarded by an explicit anti-dominant-strategy test (§5.4).
+
+### 5.3 Where chance sits, on purpose
+
+Per-show variance is intentional — the gasp needs real stakes, and kids are here to take risks,
+not be judged (Lens of Skill vs. Chance). Skill expresses over the venue and the session: the
+EV-optimal player wins the thermometer race decisively even while individual shows bust. For the
+player who wants luck-free judgment, the design carries **skill-pure trophies**: venue records
+(only banked pressure counts — busts don't set records) and **clean badges** (LEGENDARY with no
+clenches, no tools). Those strip chance entirely; grades stay dead.
+
+### 5.4 The Bushnell test, made concrete and CI-checkable
+
+**Floor:** first 30 seconds — stuff two matching-color foods, release, get a scene and coins.
+No fail state exists at the floor; the worst first show is a small laugh.
+
+**Ceiling:** the hour-20 player walks in with a chosen loadout, pyramids to the LEGENDARY line,
+crumb-tops to 18.9, spends one clench on beat, banks ×5 with both LOVES doubled at a venue
+multiplier — roughly an order of magnitude more applause than the novice's SOLID ×2, because the
+delta sources are **multiplicative** (zone × tags × venue × tools), which is what makes the
+ceiling worth twenty hours.
+
+**PLAN_v10 acceptance gates (seeded simulation, red/green like everything else):**
+- `skill-delta`: a scripted NOVICE policy (random craving-adjacent foods, stop at first sweat,
+  never clench) vs. an EXPERT policy (pyramid sequencing, context-aware stop, clench on need)
+  over ≥200 seeded shows: expert **median** applause ≥ 3× novice median; novice payout never 0.
+- `no-solved-threshold`: the best *fixed* stop-rule ("always stop at pressure N", swept over all
+  N) must underperform the context-aware expert by ≥20% median — else the decision has collapsed
+  and the tuning (or the demand variety) must change before merge.
+- `bust-tolerance`: expert policy bust rate stays within a band (~15–30%) — below it the risk is
+  toothless, above it mastery feels punished.
+
+These three tests are the v10 equivalent of FUN_CRITIC's simulation scenarios — the skill curve
+stops being a claim and becomes a regression-tested property of the tuning constants.
