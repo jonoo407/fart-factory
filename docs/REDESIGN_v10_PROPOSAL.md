@@ -542,3 +542,127 @@ ceiling worth twenty hours.
 
 These three tests are the v10 equivalent of FUN_CRITIC's simulation scenarios — the skill curve
 stops being a claim and becomes a regression-tested property of the tuning constants.
+
+---
+
+## 6. UI / flow: re-staging, not re-skin
+
+> Added 2026-07-08 after the user asked: *"do we need to redesign the UI / flow based on all of
+> this?"* Lenses: Control, Physical/Virtual Interface, Transparency, Feedback, Juiciness,
+> Primality, Modes, the Venue.
+
+### 6.0 Verdict
+
+Yes, the **screen architecture** must be rebuilt — but the **design system** survives untouched.
+Keep: paper/ink/toxic-green tokens, Baloo/Nunito/Space Mono, sticker borders + hard shadows, the
+dock, and most meta screens. Rebuild: the play screen, the payoff, and the Book. The structural
+reason: v9 is a **batch** interface (compose a plate → submit → receive a grade), so its layout is
+a form — inputs at the bottom, results in a modal. v10 is a **streaming** interface (every bite
+immediately moves the belly, the needle, and the crowd), so its layout must be a stage where cause
+and effect are co-visible at all times. A form can scroll; a stage cannot.
+
+### 6.1 The one-screen rule (the fatal flaw v10 cannot inherit)
+
+Verified in the live preview: today's play column — title, status bar, crowd card, hint bar, daily
+quest, belly meter, Move On, plate, location line, pantry grid, blast button — spans **~3 phone
+screens of scroll**. You cannot see the crowd while choosing foods. In v10 that kills the toy:
+the entire game is watching the belly, needle, and crowd react to each bite. Hence the rule:
+**during a show, everything lives on one static portrait screen. Zero scrolling.**
+
+```
+┌──────────────────────────────┐
+│ HOMETOWN · show 3/6      💰42 │ ← slim status (fame pip on rank progress)
+│ ┌──────────────────────────┐ │
+│ │ 👵 Granny Edna            │ │ ← the TICKET: LOVES 🎺×2 · HATES 📢
+│ │ LOVES 🎺×2 · HATES 📢     │ │   tap to expand prose · tools drawer ⚙
+│ └──────────────────────────┘ │
+│    👧👦👵👨  (crowd row —      │ ← leans in / gasps as pressure rises
+│     lean in, gasp, murmur)   │
+│          ┌─────┐             │
+│          │(@_@)│  😰          │ ← THE PERFORMER — belly IS the meter:
+│         ┌┴─────┴┐            │   size = pressure · cheeks/sweat = risk
+│         │ ~~~~~ │ ◄ needle    │   POLITE→SOLID→EPIC→LEGENDARY zone arc
+│         └───────┘            │   drawn AROUND the belly
+│      🤢 🎺  (brew chips)      │ ← tags accumulated so far
+│ ┌────┬────┬────┬────┬────┬─▸ │
+│ │ 🫘 │ 🧀 │ 🧅 │ 🥦 │ 🫛 │   │ ← FOOD TRAY: horizontal swipe, thumb zone
+│ └────┴────┴────┴────┴────┴─▸ │
+│ [      💨 LET IT RIP!      ] │ ← release (plain tap — no hold, no sweep)
+└──────────────────────────────┘
+```
+
+Four zones, top to bottom: ticket → stage (crowd + performer) → tray → release. The eye line runs
+ticket-to-belly-to-thumb with no scrolling, ever. Daily quest, location line, and Move On leave
+the play screen entirely (quest → dock badge; location → the stage *backdrop* — each region's
+venues are literal scenery, which is Track-4 visible progression for free; Move On is dead with
+belly-as-ammo).
+
+### 6.2 Diegetic displays (kill the widget meters)
+
+The Lens of Transparency: a kid should never read a bar when a body can act it out.
+- **Pressure** = belly size + the zone arc around it. The separate belly `<meter>` dies.
+- **Risk** = cheeks, sweat, eye-cross, wobble (the §5.2 reading skill). Slow Cooker owners get a
+  small % badge on the needle — the UI reserves that slot from day one.
+- **Anticipation** = the crowd row physically leaning in, murmur SFX swelling (existing bank).
+- **Brew state** = accumulated tag chips under the performer (replaces plate slots and the old
+  fart-profile aggregate — there is no "plate" anymore; eating is immediate).
+- The charge-meter strip, plate slots, hint bar, and belly bar are all deleted, not restyled.
+
+### 6.3 Interactions (Control + Juiciness + Modes)
+
+- **Tap a food** → it flies from tray to mouth → chomp → gulp → belly pops a notch → needle ticks
+  → rumble layer joins → maybe the room reacts. The whole chain starts <100 ms from the tap
+  (Swink), and the spatial arc (tray → mouth) makes cause→effect literal for a 6-year-old.
+- **RELEASE** is a plain tap. No hold-to-charge anywhere in the game ever again.
+- **CLENCH = poke the wobbling belly.** During a wobble window the belly juddters and flashes;
+  tapping *the belly itself* is the clench (touch the thing that's about to blow — maximally
+  primal). A mirrored accessible button appears beside it for screen readers / motor access; no
+  button-morphing (Lens of Modes: RELEASE never changes meaning).
+- **Tools** live in a small drawer on the ticket (pre-show pick, closed during the show).
+- One-thumb portrait play throughout (the Venue: a kid on a couch, phone held one-handed).
+
+### 6.4 The payoff flow
+
+Release → **full-screen vignette** (the scene IS the screen; captions line at the bottom,
+preserving the P6 a11y investment) → **take-home strip** slides up: applause coin count-up, fame
+delta ticking the rank pip, drops presented as thrown gifts → strip collapses and **the next
+ticket slides in on the same stage**. No judge card, no grade stamp, no percentage breakdown, no
+modal stack. Rank-ups interrupt *between* shows as the marquee moment + 1-of-3 gut pick — the only
+full-screen menu in the core loop, and it's a celebration.
+
+### 6.5 Screen inventory — survive / change / die
+
+| Screen / element | Fate |
+|---|---|
+| Design tokens, dock, save-io, audio popover | **survive untouched** |
+| Shop | survives — stock pivots to tools + costumes |
+| Kitchen | **becomes** tool inventory + loadout (feeds the ticket drawer) |
+| Venue ladder | survives + applause thermometer + boss marquee |
+| Boss arena | survives — reskinned as a marquee show variant on the same stage |
+| Notebook / Research / Codex / Field guide | **merge into the Album** (scrapbook pages, §4) |
+| Onboarding (3 cards) | shrinks to ~1 card; the floor teaches itself by doing |
+| Intermission activities | **die** as a screen; the funny activity copy recycles into vignettes |
+| Play column (crowd card, hint bar, quest card, belly bar, plate, pantry grid, blast) | **replaced** by the Stage screen (§6.1) |
+| Reaction takeover + judge card | **replaced** by vignette + take-home strip |
+| Audience-preview (hold to hear them) | survives on the ticket |
+| Unicorn encounter | survives as a surprise show variant |
+
+### 6.6 Honest cost accounting
+
+The new build's real art surface, in order: (1) **the performer** — a new character that does not
+exist today (eat/inflate/sweat/clench/release/bust poses — the single biggest asset decision);
+(2) **vignette scenes** — start with 2 parameterized templates (cheer/flee) reusing crowd emoji +
+prop layers, hand-craft the top ~10 later; (3) **stage backdrops** per region (5, reusing location
+art direction). Everything else is layout within existing tokens. Flow simplification partially
+pays for it: fewer panels, no judge card, no plate management, one fewer meter, shorter
+onboarding. The e2e suite rebuilds around the new flow (the old specs encode the batch model).
+
+### 6.7 Open questions (UI)
+
+1. **Who is the performer?** A kid scientist? A creature mascot? Player-customizable from the
+   costume system day one, or fixed v1? (Biggest art + identity decision in v10; everything else
+   in §6 is layout.)
+2. Crowd row on the stage: live emoji portraits (cheap, ships v1) vs. drawn characters (charming,
+   costly)? Proposed: emoji v1, drawn pass later.
+3. Does the ticket show the venue hazard explicitly (a chip) or teach it through the backdrop +
+   one herald line? Proposed: chip + herald line the first time, chip only after.
