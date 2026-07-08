@@ -299,7 +299,11 @@ code that took v7–v9's balance effort to keep upright. New build surface: pres
 tag scoring (trivial), album. The vignettes are the real art cost — start with 2 generic templates
 (cheer/flee) parameterized per crowd emoji/props, ship, then hand-craft the top 10.
 
-### 3.10 Open questions for the user
+### 3.10 Open questions for the user — RESOLVED (see PLAN_v10 D12)
+
+> Q1 dice with body-language-readable risk (§5.2) · Q2 two parameterized vignette templates v1
+> (§6.6) · Q3 no grades; records + clean badges + Slow Cooker % serve the min-maxer (§5.3) ·
+> Q4 party mode → backlog. Original questions kept below for the record.
 
 1. **Blowout randomness** — dice-style visible risk (proposed) vs. fully deterministic threshold
    discovered per-crowd? (Dice = more gasps; deterministic = more plannable. Kids test says dice.)
