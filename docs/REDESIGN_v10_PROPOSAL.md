@@ -315,3 +315,151 @@ crowd LOVES/HATES + applause math · P2 stage scene: eat/inflate/rumble + releas
 vignettes · P3 economy swap (applause gold, drops, encore falloff) + ladder thermometer ·
 P4 album + records + cards · P5 bosses/treatments/blends/daily re-point · P6 vignette bespoke pass
 + audio polish. (Full PLAN_v10 with failing-test lists to follow once the direction is approved.)
+
+---
+
+## 4. Progression: THE RISE — from Backyard Nobody to Cosmic Legend
+
+> Added 2026-07-08 after the user approved the core-loop direction and asked: *"what about
+> progression? what is a fun and meaningful progression system?"*
+
+### 4.0 What makes progression *meaningful* (the bar to clear)
+
+Five tests, drawn from the lenses and from this project's own failed attempts:
+
+1. **The arc is nameable in one sentence** (Cook's Loops-vs-Arcs; FUN_CRITIC gate #10). Ours:
+   *"A backyard nobody grows a legendary gut, wins over every crowd in the world, and retires a
+   Cosmic Legend with a full scrapbook."* If a kid can't say what they're becoming, it's not an arc.
+2. **Progress buys new DECISIONS, not bigger numbers** (Koster mastery; Cook skill atoms). Every
+   major unlock must add a verb, a rule, or a choice — never only `+N`. The v1–v9 builds inflated
+   numbers around an unchanging verb three times; never again.
+3. **Every session ends holding something** (Lens of Reward; the v6 "loot vs commerce" critique).
+   Gifts lead, purchases follow, and nothing meaningful is gated behind real-world days.
+4. **Progress is visible without opening a menu** (Lens of Visible Progress). The stage, the
+   marquee, the crowd size, and the performer themselves must *look* different at hour 10 vs hour 1.
+5. **Failure also progresses** (P30, Hades/Spelunky model). Blowouts and scandals pay collectibles
+   and fame trickle. Zero-payout outcomes are banned everywhere in the design.
+
+### 4.1 The four tracks (one spine, three orbits)
+
+**Track 1 — FAME, the spine (who you're becoming).**
+Every show's applause feeds two meters at once: **gold** (spendable) and **FAME** (cumulative,
+never decreases — the game only ever judges you upward, Lens of Judgment, kid-safe). Fame fills
+toward **Rank-Ups** — a marquee moment: lights flare, your name gets bigger on the poster, the
+crowd chants. ~12 ranks per save, milestone ranks carry stage titles:
+`Backyard Amateur → Local Stinker → City Sensation → Wilderness Windmaker → Royal Gasmaster →
+Cosmic Legend`. Early ranks land every 2–3 shows; late ranks every ~8–10 (tuning knobs).
+
+**Ranks 1–8 each grant a GUT UPGRADE — pick 1 of 3** (the build-your-own-performer choice; kids
+love picking, and picks diverge into recognizable builds):
+
+| Line | Example upgrades (pool ~15) |
+|---|---|
+| **Capacity** (push deeper) | *Iron Stomach* (+2 belly) · *Rubber Belly* (blowout threshold +1 notch) · *Double Gulp* (once/show: eat 2 foods on one risk roll) |
+| **Control** (push safer) | *Titanium Clench* (+1 clench/show) · *Slow Cooker* (see the exact blowout %, replacing body-language-only — knowledge as an upgrade for the min-maxer) · *Belly of Holding* (carry 1 uneaten food between shows) |
+| **Chaos** (fail funnier) | *Blowout Artist* (disaster scenes pay double cards + pity applause) · *Scandal Darling* (hate-tag ejections pay +50% — "they'll talk about this for WEEKS") |
+
+A Chaos build that *wants* blowouts is legitimate, hilarious, and keeps pillar 3 honest.
+Ranks 9–12 grant stage tiers + titles + gold purses (prestige, no power creep).
+
+**Track 2 — REGIONS as new rules (what the game becomes).**
+The five existing regions stop being reskins and each introduces **exactly one new mechanic** that
+composes with stuffing/squeezing (progressive disclosure, one skill atom per region):
+
+| Region | New atom |
+|---|---|
+| Hometown | the pure loop (stuff/squeeze/show-off) |
+| City | **Venue hazards** (Library silence meter — LOUD is environmentally risky; Fancy Restaurant bans STINKY) + **tools** (kitchen treatments become pickable pre-show consumables) |
+| Wilderness | **Wild foods** — foraged one-shots with huge tags and *unknown size revealed only when eaten* (a gambling food!) + wind that carries LOUD farther (multiplier shifts) |
+| Royal | **Etiquette flips** — a herald announces mid-show that a tag's polarity flipped ("TOOTY is now vulgar!"); **encore chains** — nobles demand two shows from one belly (allocation decision) |
+| Cosmic | **Zero-G pressure** — the needle drifts back down, so stuffing gains time pressure; a fifth flavor tag **COSMIC ✨** only from cosmic foods |
+
+Day-7 play contains day-1 items combining non-trivially with new rules (P28 satisfied): beans are
+still beans, but beans *in zero-G during an etiquette flip* is a different puzzle.
+
+**Track 3 — THE COLLECTION (what you're keeping).** All existing collection code re-points here:
+- **Food drops** (30 foods; drop tables per crowd, owned-filtered) — every food is a new toy, not a
+  stat stick. Crowds *throw* them; card-flip reveal. Shop survives as a gold sink for tools +
+  **costumes** (cape, crown, tutu — worn by the performer *inside every vignette*; expression, zero
+  balance impact, prime kid catnip).
+- **Boss Relics** — each of the 5 bosses drops a unique keepsake with a verb: *Opera Phantom's
+  Tuning Fork* (reveals a crowd's secret **bonus** tag — hidden info as pure upside, never a
+  gotcha) · *Frat King's Golden Keg* (start shows at +3 pressure) · *Grandpa's Lucky Chair*
+  (once per venue, re-roll a blowout) · etc. Relics are the "I beat that boss" story objects.
+- **The Album** — per-region pages: crowd stickers (max-applause), Disaster Cards (1 per venue,
+  ??? slots visible from day one — pointable curiosity gaps), Scandal Cards, venue pressure
+  records, Secret Blends, and **golden mastery stamps** (eat a food ~25 times → the crowd starts
+  recognizing it: "He's doing the BEANS!" — recognition, not stats, closing the v6 mastery gap
+  without number inflation). Completion % per page; a show-it-off mode for handing the phone over.
+
+**Track 4 — RECOGNITION (the world remembers you).** Cheapest track, most charm:
+- **The stage itself grows** with rank — bigger curtains, more lights, deeper crowd rows, your
+  title on the marquee. Hour-10 vs hour-1 is visible from the home screen with zero menus.
+- **Recurring fans**: 3-star a crowd and its portrait starts appearing in later regions' audiences
+  wearing your merch. Granny Edna follows you to the cosmos. A per-save "Biggest Fan" line.
+- **Venue records** stay forever beatable — the evergreen "one more try" for any session length.
+
+### 4.2 The goal stack (what am I doing, at every zoom level)
+
+| Timescale | The question in the player's head |
+|---|---|
+| this tap | *dare one more bite?* |
+| this show | *which zone do I bank, and do I hit their LOVES?* |
+| this venue | *fill the thermometer → boss; beat my record* |
+| this region | *learn its twist, win its relic, finish its album page* |
+| this save | *reach Cosmic Legend with MY gut build; complete the album* |
+| forever | *records, secret blends, the weekly Legendary Demand* |
+
+(GamePlus's Hot Spot re-points to a **weekly Legendary Demand** — one rotating outrageous request,
+e.g. "LEGENDARY + TOOTY + no clenches at the Opera House" — for the long-tail player.)
+
+### 4.3 Pacing promise (the first session, ~20 minutes)
+
+Show 1: two tag reveals + first food drop · Show 2: first venue record · Show 3: **RANK UP → first
+gut pick** · Show 4: a crowd whispers a Secret Blend hint · Show 5: VIP variant + second drop ·
+Show 6: **BOSS → relic + City unlocks**, likely rank 2. Every show ends with a take-home strip
+(applause · fame delta · drops). Every *session* ends with something structural: a rank, a relic,
+a region, or an album page milestone. Nothing is day-gated; the daily quest survives as pure bonus.
+
+### 4.4 Flow across the arc (why it stays tense)
+
+Gut upgrades raise what you can survive; crowd demands and hazards raise what you must attempt
+(Frat Bros boo below EPIC; royal courts demand LEGENDARY under a flip). The *ratio* stays roughly
+constant, so the needle's danger zone never stops mattering — a veteran is not safer, they're
+braver at higher altitude. Mastery expression for experts is self-set (Lens of Goals): clean
+LEGENDARY (no clenches), naked runs (no tools), all logged as album badges.
+
+### 4.5 Lens re-check for progression
+
+Goals: concrete at six timescales · Visible Progress: needle → thermometer → marquee/stage → map ·
+Novelty: one new rule per region, not front-loaded · Curiosity: ??? album slots, locked regions on
+the map, bonus tags behind the Tuning Fork, unknown-size wild foods · Meaningful Choices: 1-of-3
+gut picks, tool loadouts, encore allocation · Endogenous Value: fame→upgrades, applause→tools and
+costumes, records→titles — every number buys something felt · Reward: mixed cadences (drops per
+show, ranks per few shows, relics per region) = variable-ratio without dark patterns · Judgment:
+upward-only fame, no losable progress, no grades anywhere.
+
+### 4.6 Module map (progression specifically)
+
+| Existing | Fate |
+|---|---|
+| `venue-ladder`, `location-progress`, `boss-cadence` | **survive** — thermometer gate + region atoms |
+| `trophies.ts`, `conquests.ts` | **become** the Album's badges/records backbone |
+| `quests.ts` (legendary unlock chains) | **re-point** to boss relics + Secret Blend hints |
+| `shop.ts` | **pivots** to tools + costumes (foods move to drops); prices re-cut to session scale |
+| `food-mastery.ts` | **re-points** to golden stamps (recognition, not stat perks) |
+| `gameplus.ts` (Hot Spot) | **re-points** to the weekly Legendary Demand |
+| `daily-quest.ts` | survives as bonus-only |
+| `codex.ts` / `field-guide.ts` | **merge into** the Album |
+| NEW | fame/rank engine (pure, seeded) · gut-upgrade registry + pick UI · drop tables · stage-growth renderer · recurring-fan cameo picker |
+
+### 4.7 Open questions (progression)
+
+1. **Gut picks: permanent per save, or respec-able?** (Proposed: permanent — builds are identity;
+   a NG+ "World Tour" resets picks for replay value.)
+2. **How much randomness in drops?** Proposed: guaranteed-drop pity every 3 shows per region so a
+   session never ends dry; pure RNG otherwise.
+3. **Costumes: gold-only, or some as album-completion rewards?** (Proposed: both — shop for basics,
+   completion for the showpieces like the Cosmic Crown.)
+4. Should mastery stamps stay purely cosmetic, or carry one tiny perk tier? (Proposed: cosmetic —
+   this project has been burned by stat creep twice.)
